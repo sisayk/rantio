@@ -1,17 +1,25 @@
+/* Stugora landing page. Photo-led layout: big rounded photos, white cards,
+   pill buttons, hairline lists. Content width 1200px. */
+
 /* ---------- header ---------- */
 .header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+.headerInner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 72px;
-  padding: 0 24px;
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(8px);
+  max-width: 1280px;
+  height: 76px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
 .brand {
@@ -20,7 +28,7 @@
   gap: 8px;
   color: var(--lake);
   text-decoration: none;
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -28,23 +36,22 @@
 .headerNav {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .langLink {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 
 .langLink:hover {
-  color: var(--ink);
   text-decoration: underline;
 }
 
 .headerCta {
-  padding: 10px 18px;
+  padding: 11px 20px;
   border-radius: var(--pill);
   background: var(--lake);
   color: #fff;
@@ -58,26 +65,80 @@
   background: var(--lake-deep);
 }
 
+/* ---------- shared section frame ---------- */
+.wide {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 72px 40px;
+}
+
+.sectionHead {
+  max-width: 640px;
+}
+
+.sectionTitle {
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.sectionLead {
+  max-width: 56ch;
+  margin-top: 14px;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+
+.primaryButton {
+  display: inline-block;
+  padding: 16px 32px;
+  border: 0;
+  border-radius: var(--pill);
+  background: var(--lake);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryButton:hover {
+  background: var(--lake-deep);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 /* ---------- hero ---------- */
 .hero {
-  max-width: 720px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: 64px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 72px 24px 64px;
-  text-align: center;
+  padding: 48px 40px 40px;
+}
+
+.heroCopy {
+  max-width: 560px;
 }
 
 .estimator {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .heroTitle {
-  max-width: 13ch;
-  font-size: clamp(38px, 7vw, 60px);
-  line-height: 1.04;
+  font-size: clamp(40px, 5.2vw, 68px);
+  line-height: 1.02;
   font-weight: 800;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
@@ -87,7 +148,7 @@
 }
 
 .heroMeta {
-  margin-top: 20px;
+  margin-top: 22px;
   font-size: 15px;
   font-weight: 600;
   text-decoration: underline;
@@ -189,97 +250,200 @@
 }
 
 .finePrint {
-  max-width: 46ch;
-  margin-top: 16px;
+  max-width: 48ch;
+  margin-top: 14px;
   font-size: 13px;
   color: var(--ink-soft);
 }
 
 .heroLead {
-  max-width: 50ch;
-  margin: 40px auto 28px;
+  max-width: 46ch;
+  margin: 28px 0 24px;
   font-size: 18px;
   color: var(--ink-soft);
 }
 
-.primaryButton {
-  display: inline-block;
-  padding: 15px 30px;
-  border: 0;
-  border-radius: var(--pill);
-  background: var(--lake);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.primaryButton:hover {
-  background: var(--lake-deep);
-}
-
-.primaryButton:disabled {
-  opacity: 0.6;
-  cursor: progress;
-}
-
-/* ---------- sections ---------- */
-.section {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 56px 24px;
-}
-
-.narrow {
-  max-width: 640px;
-}
-
-.sectionTitle,
-.sectionTitleCenter {
-  font-size: clamp(26px, 4vw, 34px);
-  line-height: 1.12;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
-
-.sectionTitleCenter {
-  text-align: center;
-}
-
-.sectionLead,
-.sectionLeadCenter {
-  margin-top: 14px;
-  color: var(--ink-soft);
-}
-
-.sectionLeadCenter {
-  max-width: 52ch;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
-/* ---------- calendar ---------- */
-.calendarCard {
-  display: grid;
-  grid-template-columns: 1fr minmax(0, 420px);
-  align-items: center;
-  gap: 48px;
-  padding: 48px;
-  border-radius: var(--radius-lg);
+.heroPhoto {
+  position: relative;
+  aspect-ratio: 5 / 6;
+  border-radius: 28px;
+  overflow: hidden;
   background: var(--surface);
 }
 
-.calendarText {
-  max-width: 40ch;
+.heroPhoto img,
+.cardPhoto img,
+.splitPhoto img,
+.formPhoto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chipSync {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px 12px;
+  border-radius: var(--pill);
+  background: #fff;
+  box-shadow: var(--shadow-float);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chipSync svg {
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  border-radius: 50%;
+  background: var(--pine-tint);
+  fill: none;
+  stroke: var(--pine);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chipBooking,
+.formPhotoCard {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: min(320px, calc(100% - 48px));
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-float);
+  animation: chip-in 600ms cubic-bezier(0.2, 0.7, 0.2, 1) 900ms both;
+}
+
+.formPhotoCard {
+  display: block;
+  max-width: min(360px, calc(100% - 48px));
+  animation: none;
+}
+
+.chipDot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--berry);
+  box-shadow: 0 0 0 4px rgba(227, 154, 47, 0.2);
+}
+
+.chipTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.chipBody {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- example listing cards ---------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cardPhoto {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.cardBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 12px;
+  border-radius: var(--pill);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cardTitle {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cardFacts {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.cardPrice {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.cardPrice strong {
+  font-weight: 700;
+}
+
+.cardsNote {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* ---------- photo + text split (calendar) ---------- */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 64px;
+}
+
+.splitPhoto {
+  aspect-ratio: 5 / 6;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.splitBody .calendar {
+  margin-top: 28px;
+  max-width: 460px;
 }
 
 .legend {
-  display: grid;
-  gap: 10px;
-  margin: 24px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
   font-size: 15px;
@@ -391,35 +555,32 @@
 
 /* ---------- steps ---------- */
 .steps {
-  margin: 32px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 36px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .step {
-  display: flex;
-  gap: 18px;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.step:last-child {
-  border-bottom: 0;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
 }
 
 .stepIcon {
   display: grid;
-  flex: none;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-sm);
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   background: var(--surface);
 }
 
 .stepIcon svg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   fill: none;
   stroke: var(--ink);
   stroke-width: 1.6;
@@ -428,41 +589,49 @@
 }
 
 .stepTitle {
-  font-size: 18px;
+  margin-top: 20px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .stepBody {
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 15px;
   color: var(--ink-soft);
 }
 
-/* ---------- price ---------- */
+/* ---------- two columns: price, faq ---------- */
+.twoCol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 64px;
+  border-top: 1px solid var(--line);
+}
+
 .priceCard {
-  margin-top: 32px;
-  padding: 28px;
+  padding: 32px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: 24px;
   box-shadow: var(--shadow-float);
 }
 
 .priceCardTitle {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .priceRows {
-  margin: 16px 0 0;
+  margin: 18px 0 0;
 }
 
 .priceRows > div {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 10px 0;
-  font-size: 15px;
+  padding: 11px 0;
+  font-size: 16px;
 }
 
 .priceRows dt {
@@ -476,11 +645,11 @@
 }
 
 .priceRows > .priceTotal {
-  margin-top: 6px;
-  padding-top: 16px;
+  margin-top: 8px;
+  padding-top: 18px;
   border-top: 1px solid var(--line);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
 }
 
 .priceTotal dt {
@@ -488,14 +657,14 @@
 }
 
 .priceTerms {
-  margin-top: 14px;
-  font-size: 14px;
+  max-width: 52ch;
+  margin-top: 16px;
+  font-size: 15px;
   color: var(--ink-soft);
 }
 
-/* ---------- faq ---------- */
 .faq {
-  margin-top: 24px;
+  border-top: 1px solid var(--line);
 }
 
 .faqItem {
@@ -507,8 +676,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 20px 0;
-  font-size: 17px;
+  padding: 22px 0;
+  font-size: 18px;
   font-weight: 600;
   list-style: none;
   cursor: pointer;
@@ -536,16 +705,38 @@
 
 .faqItem p {
   max-width: 56ch;
-  padding-bottom: 20px;
+  padding-bottom: 22px;
   color: var(--ink-soft);
 }
 
-/* ---------- form ---------- */
+/* ---------- sign-up: photo + form ---------- */
+.formSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 40px;
+}
+
+.formPhoto {
+  position: relative;
+  min-height: 560px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.formPhoto img {
+  position: absolute;
+  inset: 0;
+}
+
 .formCard {
   padding: 40px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: 28px;
 }
+
+/* ---------- form ---------- */
 
 .form {
   display: grid;
@@ -735,35 +926,75 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px 24px;
-  max-width: 1080px;
-  margin: 40px auto 0;
-  padding: 32px 24px 48px;
+  max-width: 1280px;
+  margin: 24px auto 0;
+  padding: 32px 40px 48px;
   border-top: 1px solid var(--line);
   font-size: 14px;
   color: var(--ink-soft);
 }
 
-/* ---------- small screens ---------- */
-@media (max-width: 820px) {
-  .calendarCard {
+/* ---------- tablet ---------- */
+@media (max-width: 1024px) {
+  .hero,
+  .split,
+  .twoCol,
+  .formSplit {
     grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 28px 20px;
+    gap: 40px;
+  }
+  .heroCopy {
+    max-width: 640px;
+  }
+  .heroPhoto {
+    aspect-ratio: 4 / 3;
+  }
+  .splitPhoto {
+    aspect-ratio: 16 / 9;
+  }
+  .formPhoto {
+    min-height: 360px;
+  }
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .steps {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 560px) {
-  .header {
+/* ---------- phone ---------- */
+@media (max-width: 600px) {
+  .headerInner {
+    height: 64px;
     padding: 0 16px;
   }
   .langLink {
     display: none;
   }
   .hero {
-    padding: 48px 16px 40px;
+    padding: 32px 16px 16px;
   }
-  .section {
-    padding: 40px 16px;
+  .wide {
+    padding: 48px 16px;
+  }
+  .heroPhoto {
+    aspect-ratio: 4 / 5;
+    border-radius: 22px;
+  }
+  .chipSync {
+    top: 14px;
+    right: 14px;
+    font-size: 13px;
+  }
+  .chipBooking,
+  .formPhotoCard {
+    left: 14px;
+    bottom: 14px;
+    max-width: calc(100% - 28px);
+  }
+  .cards {
+    gap: 20px 14px;
   }
   .formCard {
     padding: 28px 18px;
@@ -785,5 +1016,8 @@
   .dayChannel {
     left: 4px;
     font-size: 9px;
+  }
+  .footer {
+    padding: 32px 16px 40px;
   }
 }
