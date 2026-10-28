@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { content } from "@/lib/content";
+import { guestContent as content } from "@/lib/guestContent";
 import "../../globals.css";
 
 export const metadata: Metadata = {
   title: content.en.meta.title,
   description: content.en.meta.description,
-  alternates: { languages: { fi: "/" } },
 };
 
 export default function EnglishLayout({ children }: { children: React.ReactNode }) {

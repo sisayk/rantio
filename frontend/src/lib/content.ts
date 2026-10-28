@@ -12,7 +12,7 @@ const fi = {
     description:
       "Stugora tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. 99 € vuodessa ja 12 % tuomistamme varauksista.",
   },
-  nav: { otherLang: "In English", otherHref: "/en", cta: "Ilmoita mökkisi" },
+  nav: { otherLang: "In English", otherHref: "/en/hosts", cta: "Ilmoita mökkisi" },
   hero: {
     before: "Mökkisi voisi tienata",
     after: "lisää vuodessa",
@@ -139,7 +139,7 @@ const en: Content = {
     description:
       "Stugora brings foreign guests to your Finnish cottage and keeps calendars in step with Nettimökki. €99 a year and 12% of the bookings we bring.",
   },
-  nav: { otherLang: "Suomeksi", otherHref: "/", cta: "List your cottage" },
+  nav: { otherLang: "Suomeksi", otherHref: "/omistajille", cta: "List your cottage" },
   hero: {
     before: "Your cottage could earn",
     after: "more a year",
