@@ -9,6 +9,7 @@ import { PHOTOS, SHOWCASE_CARDS } from "@/lib/showcase";
 import Estimator from "./Estimator";
 import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
+import HostSwitchLink from "./guest/HostSwitchLink";
 import styles from "./landing.module.css";
 
 // July 2027 at an example Saimaa cottage: Nettimökki weeks stay, gaps fill from abroad.
@@ -72,9 +73,13 @@ export default function Landing({ lang }: { lang: Lang }) {
           </a>
           <nav className={styles.headerNav}>
             <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langLink} />
-            <a className={styles.langLink} href={paths.hostingLogin(lang)}>
-              {t.nav.login}
-            </a>
+            <HostSwitchLink
+              lang={lang}
+              becomeHost={t.nav.login}
+              switchToHosting={m.guest.menu.switchToHosting}
+              signedOutHref={paths.hostingLogin(lang)}
+              className={styles.langLink}
+            />
             <a className={styles.headerCta} href="#ilmoita">
               {t.nav.cta}
             </a>

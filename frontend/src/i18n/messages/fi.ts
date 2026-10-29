@@ -95,6 +95,10 @@ export const fi: Translation = {
       saved: "Tallennetut mökit",
       all: "Kaikki mökit",
       language: "Kieli",
+      switchToHosting: "Vaihda isännöintiin",
+      hostMessages: "Viestit",
+      logout: "Kirjaudu ulos",
+      signedInAs: "Kirjautuneena: {name}",
     },
     hero: {
       title: "Löydä Pohjolan kauneimmat mökit",
@@ -559,6 +563,7 @@ export const fi: Translation = {
       join: "Ilmoita mökkisi",
     },
     logout: "Kirjaudu ulos",
+    switchToTraveling: "Vaihda matkustamiseen",
     hello: "Hei, {name}",
     lead: "Tässä mökkiesi varaukset, tulot ja Stugoran osuus.",
     year: "Vuosi",

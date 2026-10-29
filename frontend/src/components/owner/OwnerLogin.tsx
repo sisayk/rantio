@@ -5,6 +5,7 @@ import type { Messages } from "@/i18n";
 import { fill } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
+import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import { ownerApi } from "@/lib/ownerApi";
 import { Logo } from "../guest/icons";
 import styles from "./owner.module.css";
@@ -49,6 +50,7 @@ export default function OwnerLogin({
     setError("");
     try {
       await ownerApi.verifyCode(email.trim(), code);
+      forgetOwnerSession();
       window.location.assign(paths.hosting(lang));
     } catch (err) {
       const status = (err as { status?: number }).status;

@@ -95,6 +95,10 @@ export const lv: Translation = {
       saved: "Saglabātās mājas",
       all: "Visas brīvdienu mājas",
       language: "Valoda",
+      switchToHosting: "Pārslēgties uz izīrēšanu",
+      hostMessages: "Ziņojumi",
+      logout: "Iziet",
+      signedInAs: "Pieteicies: {name}",
     },
     hero: {
       title: "Atklājiet Ziemeļu skaistākās brīvdienu mājas",
@@ -562,6 +566,7 @@ export const lv: Translation = {
       join: "Pieteikt savu māju",
     },
     logout: "Iziet",
+    switchToTraveling: "Pārslēgties uz ceļošanu",
     hello: "Sveiki, {name}!",
     lead: "Jūsu māju rezervācijas, ienākumi un Stugora daļa.",
     year: "Gads",

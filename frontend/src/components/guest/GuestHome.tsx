@@ -7,6 +7,8 @@ import { fill, number, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { type Currency, convert } from "@/lib/currency";
 import { useMoney } from "@/lib/useMoney";
+import { ownerApi } from "@/lib/ownerApi";
+import { forgetOwnerSession, useOwnerSession } from "@/lib/useOwnerSession";
 import CurrencyButton from "../CurrencyButton";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
@@ -270,6 +272,12 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
   };
   const u = t.units;
   const [langOpen, setLangOpen] = useState(false);
+  const owner = useOwnerSession();
+  async function signOut() {
+    await ownerApi.logout().catch(() => undefined);
+    forgetOwnerSession();
+    window.location.reload();
+  }
 
   const [where, setWhere] = useState("");
   const [dates, setDates] = useState<DateRange | undefined>();
@@ -563,9 +571,15 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
             <LanguageButton lang={lang} t={common.language} names={languages} className={styles.langButton} />
             <CurrencyButton lang={lang} t={t.currency} names={currencies} className={styles.langButton} />
             <span className={styles.pillDivider} aria-hidden="true" />
-            <a className={styles.hostLink} href={paths.hosts(lang)}>
-              {t.becomeHost}
-            </a>
+            {owner ? (
+              <a className={styles.hostLink} href={paths.hosting(lang)}>
+                {t.menu.switchToHosting}
+              </a>
+            ) : (
+              <a className={styles.hostLink} href={paths.hosts(lang)}>
+                {t.becomeHost}
+              </a>
+            )}
             <button
               type="button"
               className={styles.iconButton}
@@ -587,16 +601,36 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 aria-expanded={menu === "account"}
                 onClick={() => setMenu(menu === "account" ? null : "account")}
               >
-                <UserIcon className={styles.icon22} />
+                {owner ? (
+                  <span className={styles.avatarInitial} aria-hidden="true">
+                    {owner.name.charAt(0).toUpperCase()}
+                  </span>
+                ) : (
+                  <UserIcon className={styles.icon22} />
+                )}
               </button>
               {menu === "account" ? (
                 <div className={`${styles.popover} ${styles.popoverRight}`} role="menu">
-                  <a role="menuitem" href={paths.hosts(lang)}>
-                    {t.menu.owners}
-                  </a>
-                  <a role="menuitem" href={paths.hostingLogin(lang)}>
-                    {t.menu.login}
-                  </a>
+                  {owner ? (
+                    <>
+                      <p className={styles.menuWho}>{fill(lang, t.menu.signedInAs, { name: owner.name })}</p>
+                      <a role="menuitem" href={paths.hosting(lang)} className={styles.menuSwitch}>
+                        {t.menu.switchToHosting}
+                      </a>
+                      <a role="menuitem" href={paths.hostingMessages(lang)}>
+                        {t.menu.hostMessages}
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <a role="menuitem" href={paths.hosts(lang)}>
+                        {t.menu.owners}
+                      </a>
+                      <a role="menuitem" href={paths.hostingLogin(lang)}>
+                        {t.menu.login}
+                      </a>
+                    </>
+                  )}
                   <button role="menuitem" type="button" onClick={() => { setSavedOnly(true); setMenu(null); resultsRef.current?.scrollIntoView({ behavior: "smooth" }); }}>
                     {t.menu.saved}
                   </button>
@@ -617,6 +651,11 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                     <span className={styles.menuLanguageValue}>{LANG_INFO[lang].native}</span>
                   </button>
                   <CurrencyButton lang={lang} t={t.currency} names={currencies} row className={styles.menuCurrency} />
+                  {owner ? (
+                    <button role="menuitem" type="button" className={styles.menuSignOut} onClick={signOut}>
+                      {t.menu.logout}
+                    </button>
+                  ) : null}
                 </div>
               ) : null}
             </div>

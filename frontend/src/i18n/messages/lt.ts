@@ -95,6 +95,10 @@ export const lt: Translation = {
       saved: "Išsaugoti nameliai",
       all: "Visi nameliai",
       language: "Kalba",
+      switchToHosting: "Perjungti į nuomojimą",
+      hostMessages: "Žinutės",
+      logout: "Atsijungti",
+      signedInAs: "Prisijungta: {name}",
     },
     hero: {
       title: "Atraskite gražiausius Šiaurės poilsio namelius",
@@ -567,6 +571,7 @@ export const lt: Translation = {
       join: "Paskelbkite namelį",
     },
     logout: "Atsijungti",
+    switchToTraveling: "Perjungti į keliavimą",
     hello: "Sveiki, {name}",
     lead: "Jūsų namelių užsakymai, pajamos ir Stugora dalis.",
     year: "Metai",

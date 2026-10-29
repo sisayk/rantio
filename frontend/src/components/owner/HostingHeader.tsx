@@ -5,10 +5,12 @@ import { number } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { ownerApi } from "@/lib/ownerApi";
+import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import { Logo } from "../guest/icons";
 import styles from "./owner.module.css";
 
-/** Top of every hosting page: brand, the Overview / Messages tabs, language and sign-out. */
+/** Top of every hosting page: brand, the Overview / Messages tabs, the switch to the guest
+ *  side (as on Airbnb), language and sign-out. */
 export default function HostingHeader({
   lang,
   t,
@@ -26,6 +28,7 @@ export default function HostingHeader({
 }) {
   async function logout() {
     await ownerApi.logout().catch(() => undefined);
+    forgetOwnerSession();
     window.location.assign(paths.hostingLogin(lang));
   }
   return (
@@ -46,6 +49,9 @@ export default function HostingHeader({
           </a>
         </nav>
         <div className={styles.topNav}>
+          <a className={styles.switchLink} href={paths.home(lang)}>
+            {t.switchToTraveling}
+          </a>
           {languageButton}
           {ownerName ? <span className={styles.who}>{ownerName}</span> : null}
           <button type="button" className={styles.outline} onClick={logout}>

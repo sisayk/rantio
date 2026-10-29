@@ -95,6 +95,10 @@ export const nn: Translation = {
       saved: "Lagra hytter",
       all: "Alle hytter",
       language: "Språk",
+      switchToHosting: "Byt til utleige",
+      hostMessages: "Meldingar",
+      logout: "Logg ut",
+      signedInAs: "Logga inn som {name}",
     },
     hero: {
       title: "Finn dei vakraste hyttene i Norden",
@@ -562,6 +566,7 @@ export const nn: Translation = {
       join: "Legg ut hytta di",
     },
     logout: "Logg ut",
+    switchToTraveling: "Byt til reising",
     hello: "Hei, {name}",
     lead: "Bookingar, inntekter og delen til Stugora for hyttene dine.",
     year: "År",

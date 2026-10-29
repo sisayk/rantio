@@ -95,6 +95,10 @@ export const da: Translation = {
       saved: "Gemte sommerhuse",
       all: "Alle sommerhuse",
       language: "Sprog",
+      switchToHosting: "Skift til værtskab",
+      hostMessages: "Beskeder",
+      logout: "Log ud",
+      signedInAs: "Logget ind som {name}",
     },
     hero: {
       title: "Find Nordens smukkeste sommerhuse og hytter",
@@ -562,6 +566,7 @@ export const da: Translation = {
       join: "Udlej dit sommerhus",
     },
     logout: "Log ud",
+    switchToTraveling: "Skift til rejser",
     hello: "Hej {name}",
     lead: "Dine sommerhuses bookinger, indtægter og Stugoras andel.",
     year: "År",

@@ -228,6 +228,19 @@
 
 .topNav .outline { white-space: nowrap; }
 
+/* "Switch to traveling": back to the guest side, as on Airbnb. */
+.switchLink {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--o-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.switchLink:hover { background: var(--o-ground); }
+.switchLink:focus-visible { outline: 2px solid var(--o-green); outline-offset: 2px; }
+
 .who {
   color: var(--o-soft);
   font-size: 14px;
@@ -807,6 +820,7 @@
   .main { padding-inline: 16px; }
   .area,
   .who { display: none; }
+  .switchLink { padding: 6px 8px; font-size: 13px; }
   .brand { font-size: 22px; }
   .kpis { gap: 10px; }
   .kpi { padding: 14px; }

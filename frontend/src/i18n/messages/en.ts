@@ -104,6 +104,10 @@ export const en = {
       saved: "Saved cottages",
       all: "All cottages",
       language: "Language",
+      switchToHosting: "Switch to hosting",
+      hostMessages: "Messages",
+      logout: "Sign out",
+      signedInAs: "Signed in as {name}",
     },
     hero: {
       title: "Discover the North's most beautiful cottages",
@@ -575,6 +579,7 @@ export const en = {
       join: "List your cottage",
     },
     logout: "Sign out",
+    switchToTraveling: "Switch to traveling",
     hello: "Hi, {name}",
     lead: "Your cottages' bookings, earnings and Stugora's share.",
     year: "Year",

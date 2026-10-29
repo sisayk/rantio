@@ -95,6 +95,10 @@ export const et: Translation = {
       saved: "Salvestatud puhkemajad",
       all: "Kõik puhkemajad",
       language: "Keel",
+      switchToHosting: "Lülitu majutamisele",
+      hostMessages: "Sõnumid",
+      logout: "Logi välja",
+      signedInAs: "Sisse logitud: {name}",
     },
     hero: {
       title: "Avasta Põhjala kauneimad puhkemajad",
@@ -562,6 +566,7 @@ export const et: Translation = {
       join: "Lisa oma puhkemaja",
     },
     logout: "Logi välja",
+    switchToTraveling: "Lülitu reisimisele",
     hello: "Tere, {name}",
     lead: "Sinu majade broneeringud, tulu ja Stugora osa.",
     year: "Aasta",

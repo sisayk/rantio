@@ -95,6 +95,10 @@ export const is: Translation = {
       saved: "Vistaðir bústaðir",
       all: "Allir bústaðir",
       language: "Tungumál",
+      switchToHosting: "Skipta yfir í útleigu",
+      hostMessages: "Skilaboð",
+      logout: "Skrá út",
+      signedInAs: "Skráð inn: {name}",
     },
     hero: {
       title: "Uppgötvaðu fallegustu sumarbústaði norðursins",
@@ -562,6 +566,7 @@ export const is: Translation = {
       join: "Skráðu bústaðinn þinn",
     },
     logout: "Skrá út",
+    switchToTraveling: "Skipta yfir í ferðalög",
     hello: "Hæ, {name}",
     lead: "Bókanir, tekjur og hlutur Stugora fyrir bústaðina þína.",
     year: "Ár",

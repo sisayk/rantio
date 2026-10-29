@@ -95,6 +95,10 @@ export const sv: Translation = {
       saved: "Sparade stugor",
       all: "Alla stugor",
       language: "Språk",
+      switchToHosting: "Byt till värdskap",
+      hostMessages: "Meddelanden",
+      logout: "Logga ut",
+      signedInAs: "Inloggad som {name}",
     },
     hero: {
       title: "Upptäck Nordens vackraste stugor",
@@ -562,6 +566,7 @@ export const sv: Translation = {
       join: "Lägg ut din stuga",
     },
     logout: "Logga ut",
+    switchToTraveling: "Byt till resande",
     hello: "Hej {name}",
     lead: "Dina stugors bokningar, intäkter och Stugoras andel.",
     year: "År",

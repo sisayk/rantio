@@ -12,6 +12,7 @@ import { PLACES } from "@/lib/places";
 import CurrencyButton from "../CurrencyButton";
 import LanguageButton from "../LanguagePicker";
 import DetailGallery from "./DetailGallery";
+import HostSwitchLink from "./HostSwitchLink";
 import ListingPrice from "./ListingPrice";
 import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
 import ContactOwner from "./ContactOwner";
@@ -45,9 +46,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
         <div className={styles.detailTopLinks}>
           <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langButton} />
           <CurrencyButton lang={lang} t={t.currency} names={currencyNames(lang)} className={styles.langButton} />
-          <a className={styles.hostLink} href={paths.hosts(lang)}>
-            {t.becomeHost}
-          </a>
+          <HostSwitchLink lang={lang} becomeHost={t.becomeHost} switchToHosting={t.menu.switchToHosting} className={styles.hostLink} />
         </div>
       </header>
 
