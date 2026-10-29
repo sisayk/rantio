@@ -40,10 +40,12 @@ export default function Surroundings({ lang, lat, lng }: { lang: Lang; lat: numb
 
   const places = state.status === "ready" ? state.places : [];
   const shown = all ? places : places.slice(0, FIRST);
-  const km = (n: number) =>
-    n < 1
-      ? `${Math.max(100, Math.round((n * 1000) / 100) * 100)} m`
+  const km = (n: number) => {
+    const metres = Math.max(100, Math.round(n * 10) * 100); // nearest 100 m
+    return metres < 1000
+      ? `${metres} m`
       : `${n.toLocaleString(guestContent[lang].locale, { maximumFractionDigits: n < 10 ? 1 : 0 })} km`;
+  };
 
   return (
     <section className={styles.detailSection} aria-labelledby="nearby-title">
