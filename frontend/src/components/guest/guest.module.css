@@ -1767,6 +1767,27 @@
   margin-top: 20px;
 }
 
+/* A long list (usually Features) takes the full width in two columns. */
+.amenityGroups > div:has(li:nth-child(9)) {
+  grid-column: 1 / -1;
+}
+
+.amenityGroups > div:has(li:nth-child(9)) ul {
+  display: block;
+  columns: 2;
+  column-gap: 32px;
+}
+
+.amenityGroups > div:has(li:nth-child(9)) li {
+  margin-bottom: 8px;
+  break-inside: avoid;
+}
+
+.detailPage .footer {
+  max-width: 1200px;
+  padding-inline: 32px;
+}
+
 .amenityGroups h3 {
   margin: 0 0 10px;
   font-size: 15px;
@@ -1898,5 +1919,9 @@
 
   .detailTopLinks .hostLink {
     display: none;
+  }
+
+  .detailTopLinks .langButton {
+    display: inline-flex;
   }
 }

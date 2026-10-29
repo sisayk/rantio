@@ -73,6 +73,9 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 
 - Switch map tiles from tile.openstreetmap.org (fine for development only) to a
   hosted tile provider such as MapTiler or Stadia Maps
+- Move the "Nearby" lookups (frontend/src/lib/nearby.ts) behind a small Django
+  endpoint that caches Wikipedia's answer per cottage for a week, so each page
+  view doesn't call Wikipedia from the guest's browser
 - Buy stugora.fi and set up hello@stugora.fi (used on the page)
 - Privacy policy page (GDPR) and a link to it next to the consent box
 - Finnish copy checked by a native speaker

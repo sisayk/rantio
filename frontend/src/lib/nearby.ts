@@ -11,11 +11,33 @@ export type NearbyPlace = {
   lng: number;
   km: number;
   thumb?: string;
+  rank: number; // 0 = national park or nature reserve ... 3 = everything else
 };
 
 const RADIUS_M = 10_000; // the most Wikipedia's geosearch allows
-// Articles that are rarely worth a trip: transport stops, roads, schools, districts.
-const SKIP = /\b(station|railway|bus stop|road|highway|street|school|district|electoral|parish|municipality of|company|neighbourhood|census)\b|asema|pysäkki|maantie|katu\b|koulu|kaupunginosa|vaalipiiri|yritys/i;
+// Articles that are rarely worth a trip: transport, roads, schools, sports venues, admin areas.
+const SKIP =
+  /\b(station|railway|bus stop|road|highway|street|bridge|school|hospital|cemetery|power (plant|station)|district|electoral|parish|congregation|diocese|former municipality|municipality of|region of|company|association|club|neighbourhood|census|arena|stadium|sports venue|ice rink|championships|skiing event|sand pit|airport|borough)\b|asema|pysäkki|seisake|liikennepaikka|maantie|katu\b|silta|koulu|lukio|sairaala|hautausmaa|voimalaitos|kaupunginosa|vaalipiiri|seurakunta|hiippakunta|yhdistys|seura\b|yritys|entinen kunta|jäähalli|stadion|jalkapallo|urheilu|hiekkakuoppa|maakunta\b/i;
+
+// What guests usually come for, best first. Anything else ranks after these, by distance.
+const DRAWS: RegExp[] = [
+  /national park|nature reserve|kansallispuisto|luonnonsuojelualue|luonnonpuisto|nationalpark|naturreservat/i,
+  /castle|fortress|linna\b|linnoitus|museum|museo|festival|juhlat|ski resort|ski course|hiihtokeskus|laskettelukeskus|waterfall|vesiputous|koski\b|fjord|vuono|beach|uimaranta|hiekkaranta|dune|dyyni|spit\b|cave\b|luola|monument|muistomerkki|standing stone|island|saari\b|lake\b|järvi\b|fell|tunturi|vaara\b|hill|mountain|vuori\b|glacier|jäätikkö|lighthouse|majakka|manor|kartano|zoo|eläintarha|amusement park|entertainment park|huvipuisto/i,
+  /church|kirkko|town|city|village|kaupunki|kylä|taajama|harbour|port\b|satama|market|tori\b|park\b|puisto/i,
+];
+const draw = (text: string) => {
+  const i = DRAWS.findIndex((re) => re.test(text));
+  return i === -1 ? DRAWS.length : i;
+};
+
+// At most two of a kind, so one list isn't eight small lakes or eight villages.
+const KINDS: RegExp[] = [
+  /\blakes?\b|järvi|lampi|vatnet|sjön/i,
+  /village|kylä|settlement|taajama|town in|kaupunki\b/i,
+  /mountain|vuori|tunturi/i,
+  /church|kirkko/i,
+];
+const PER_KIND = 2;
 
 export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   const r = (d: number) => (d * Math.PI) / 180;
@@ -31,7 +53,25 @@ type WikiPage = {
   fullurl: string;
   coordinates?: { lat: number; lon: number }[];
   thumbnail?: { source: string };
+  extract?: string;
 };
+
+const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** The short description, or else the article's first sentence, cut to a line or two. */
+function blurb(p: WikiPage) {
+  const name = p.title.replace(/\s*\(.*$/, ""); // "Ulvik (village)" -> "Ulvik"
+  const text = (p.description || p.extract || "")
+    .replace(/\s*\([^)]*\)/g, "") // (ruots. Olofsborg), (1475)
+    .replace(/\s*\([^)]*$/, "") // a bracket the one-sentence extract cut open
+    // "Gemla on taajama…" / "Kuressaare is a town…": the name is already the heading.
+    .replace(new RegExp(`^${escape(name)}\\s+(on|oli|is an?|is the|is|was an?|was)\\s+`, "i"), "")
+    .trim();
+  if (!text || text.toLowerCase() === name.toLowerCase() || text.toLowerCase() === p.title.toLowerCase()) return "";
+  if (text.length <= 120) return text;
+  const cut = text.slice(0, 117);
+  return `${cut.slice(0, cut.lastIndexOf(" "))}…`;
+}
 
 async function search(wiki: string, lat: number, lng: number, signal: AbortSignal): Promise<NearbyPlace[]> {
   const params = new URLSearchParams({
@@ -43,7 +83,11 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
     ggscoord: `${lat}|${lng}`,
     ggsradius: String(RADIUS_M),
     ggslimit: "40",
-    prop: "coordinates|pageimages|description|info",
+    prop: "coordinates|pageimages|description|info|extracts",
+    exintro: "1",
+    explaintext: "1",
+    exsentences: "1",
+    exlimit: "max",
     inprop: "url",
     piprop: "thumbnail",
     pithumbsize: "240",
@@ -53,30 +97,57 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
   if (!res.ok) throw new Error(`Wikipedia ${res.status}`);
   const data: { query?: { pages?: WikiPage[] } } = await res.json();
   return (data.query?.pages ?? [])
-    .filter((p) => p.coordinates?.length && p.description && !SKIP.test(p.description))
-    .map((p) => {
+    .map((p) => ({ p, text: blurb(p) }))
+    .filter(({ p, text }) => p.coordinates?.length && text && !SKIP.test(text.slice(0, 90)))
+    .map(({ p, text }) => {
       const c = p.coordinates![0];
       return {
         key: `${wiki}:${p.pageid}`,
         title: p.title,
-        description: p.description!.charAt(0).toUpperCase() + p.description!.slice(1),
+        description: text.charAt(0).toUpperCase() + text.slice(1),
         url: p.fullurl,
         lat: c.lat,
         lng: c.lon,
         km: distanceKm(lat, lng, c.lat, c.lon),
         thumb: p.thumbnail?.source,
+        rank: draw(`${p.title} ${text}`),
       };
     });
 }
 
-/** Up to `limit` places, nearest first; Finnish pages fall back to English ones when few exist. */
+/** Up to `limit` places, sights first and then nearest. Finnish pages add English
+ *  articles that Finnish Wikipedia lacks, since it covers fewer places abroad. */
 export async function findNearby(lat: number, lng: number, lang: Lang, signal: AbortSignal, limit = 16) {
-  let places = await search(lang, lat, lng, signal);
-  if (lang === "fi" && places.length < 6) {
-    const more = await search("en", lat, lng, signal).catch(() => []);
-    // The same place in both languages sits at the same coordinates.
-    const taken = (p: NearbyPlace) => places.some((q) => distanceKm(p.lat, p.lng, q.lat, q.lng) < 0.15);
-    places = [...places, ...more.filter((p) => !taken(p))];
+  // If Finnish Wikipedia doesn't answer, the English results still fill the list.
+  let places = await search(lang, lat, lng, signal).catch((e) => {
+    if (lang !== "fi" || signal.aborted) throw e;
+    return [];
+  });
+  if (lang === "fi") {
+    const more = await search("en", lat, lng, signal).catch((e) => {
+      if (!places.length) throw e; // neither language answered
+      return [];
+    });
+    // The same place in both languages has the same name or sits at the same spot.
+    const taken = (p: NearbyPlace) =>
+      places.some((q) => q.title.toLowerCase() === p.title.toLowerCase() || distanceKm(p.lat, p.lng, q.lat, q.lng) < 0.3);
+    places = [...places, ...more.filter((p) => !taken(p) && (places.length < 6 || p.rank <= 1))];
   }
-  return places.sort((a, b) => a.km - b.km).slice(0, limit);
+  places.sort((a, b) => a.rank - b.rank || a.km - b.km);
+  // Places with no recognisable draw only fill in when there is little else.
+  const notable = places.filter((p) => p.rank < DRAWS.length);
+  if (notable.length >= 5) places = notable;
+  const counts = new Map<number, number>();
+  const picked: NearbyPlace[] = [];
+  for (const p of places) {
+    const kind = KINDS.findIndex((re) => re.test(p.description));
+    if (kind !== -1) {
+      const n = counts.get(kind) ?? 0;
+      if (n >= PER_KIND) continue;
+      counts.set(kind, n + 1);
+    }
+    picked.push(p);
+    if (picked.length === limit) break;
+  }
+  return picked;
 }
