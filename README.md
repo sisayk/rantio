@@ -17,6 +17,15 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     (no passwords; 15 minutes, 5 tries, at most 5 codes an hour):
     `POST /api/auth/request-code/`, `POST /api/auth/verify-code/`, `POST /api/auth/logout/`,
     `GET /api/owner/summary/?year=`, `GET /api/owner/bookings/?year=`
+  - messages between guests and owners: `POST /api/enquiries/` (from a cottage page; throttled,
+    honeypot) starts a conversation and returns its private token; the guest reads and
+    replies at `/api/conversations/<token>/` (no account; the link is emailed to them and the
+    owner never sees their email). Owners use `/api/owner/conversations/` and
+    `/api/owner/conversations/<id>/` (read, reply, archive). Owner and guest are emailed in
+    their own language when a message arrives. Threads from Airbnb, Booking.com and the
+    other sites will come in through the channel manager; until then they are demo data and
+    replies to them stay in Stugora. Enquiries about example cottages with no owner go to
+    `SIGNUP_NOTIFY_EMAILS` and are answered in the admin
   - `python manage.py seed_demo` — a demo owner (demo@stugora.fi) with three cottages and a
     year of bookings; `./dev.sh` creates it on a fresh database
   - `/admin/` — work the sign-ups, owners, cottages and bookings
@@ -36,7 +45,9 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
   - owner dashboard `/<lang>/hosting` (sign in at `/<lang>/hosting/login`; `/hallinta`
     redirects to `/fi/hosting`): stays now and coming up, earnings, Stugora's share, earnings
     by month, sites, cottages, the year's bookings with CSV download, yearly fees; words in
-    the `dashboard` part of the messages files. The browser reaches Django through the
+    the `dashboard` part of the messages files. Messages at `/<lang>/hosting/messages`;
+    guests write from the cottage page ("Message the owner") and continue at
+    `/<lang>/messages/<token>`. The browser reaches Django through the
     site's own `/api/*` path (`next.config.ts`), so the sign-in cookie is first-party.
 
 ## Languages
@@ -102,6 +113,8 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 | `DJANGO_ALLOWED_HOSTS` | `api.stugora.fi` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` (the dashboard posts through the site) |
 | `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
+| `SITE_URL` | `https://stugora.fi` (links in emails) |
+| `ADMIN_URL` | `https://api.stugora.fi/admin` |
 | `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
 | `SIGNUP_NOTIFY_EMAILS` | `sisay@…,juha@…` |
 | `EMAIL_BACKEND` | your transactional email backend |

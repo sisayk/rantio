@@ -60,6 +60,45 @@ export type Summary = {
   }[];
   fees: { cottage: string; listing_year: number; starts_on: string; fee: Money; vat: Money }[];
   upcoming: BookingRow[];
+  unread_messages: number;
+};
+
+export type ChatMessage = { id: number; sender: "guest" | "host"; body: string; at: string };
+
+export type ConversationRow = {
+  id: number;
+  guest_name: string;
+  guest_language: string;
+  cottage: string;
+  channel: string;
+  channel_label: string;
+  replies_here: boolean;
+  check_in: string | null;
+  check_out: string | null;
+  guests: number | null;
+  archived: boolean;
+  unread: boolean;
+  last_at: string | null;
+  preview: { sender: "guest" | "host"; body: string } | null;
+};
+
+export type Thread = ConversationRow & {
+  host_name: string;
+  listing_slug: string;
+  messages: ChatMessage[];
+  viewer: "guest" | "host";
+};
+
+export type Enquiry = {
+  listing: string;
+  name: string;
+  email: string;
+  lang: string;
+  body: string;
+  check_in?: string | null;
+  check_out?: string | null;
+  guests?: number | null;
+  website?: string;
 };
 
 export class SignedOut extends Error {}
@@ -89,5 +128,19 @@ export const ownerApi = {
   summary: (year?: number) => call<Summary>(`owner/summary/${year ? `?year=${year}` : ""}`),
   bookings: (year: number) => call<{ results: BookingRow[] }>(`owner/bookings/?year=${year}`),
   logout: () => call<{ ok: boolean }>("auth/logout/", { method: "POST" }),
+  conversations: () => call<{ results: ConversationRow[]; unread: number }>("owner/conversations/"),
+  thread: (id: number) => call<Thread>(`owner/conversations/${id}/`),
+  reply: (id: number, body: string) =>
+    call<Thread>(`owner/conversations/${id}/`, { method: "POST", body: JSON.stringify({ body }) }),
+  archive: (id: number, archived: boolean) =>
+    call<ConversationRow>(`owner/conversations/${id}/`, { method: "PATCH", body: JSON.stringify({ archived }) }),
+};
+
+/** The guest's side: no account, the conversation's token is the key. */
+export const guestApi = {
+  enquire: (e: Enquiry) => call<{ token: string }>("enquiries/", { method: "POST", body: JSON.stringify(e) }),
+  thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
+  send: (token: string, body: string) =>
+    call<Thread>(`conversations/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify({ body }) }),
 };
 

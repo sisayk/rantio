@@ -13,6 +13,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from . import login as owner_login
+from . import messaging
 from .models import Language
 from .statements import booking_row, bookings_for, summary
 
@@ -107,7 +108,10 @@ class SummaryView(APIView):
     permission_classes = [IsOwner]
 
     def get(self, request):
-        return Response(summary(request.user.owner, year_param(request), timezone.localdate()))
+        owner = request.user.owner
+        data = summary(owner, year_param(request), timezone.localdate())
+        data["unread_messages"] = sum(messaging.unread_for_owner(c) for c in messaging.owner_conversations(owner))
+        return Response(data)
 
 
 class BookingsView(APIView):

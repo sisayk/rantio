@@ -7,6 +7,9 @@ export const paths = {
   cottage: (lang: Lang, id: string) => `/${lang}/cottages/${id}`,
   hosting: (lang: Lang) => `/${lang}/hosting`,
   hostingLogin: (lang: Lang) => `/${lang}/hosting/login`,
+  hostingMessages: (lang: Lang) => `/${lang}/hosting/messages`,
+  /** A guest's private conversation page; the token is its only key. */
+  guestChat: (lang: Lang, token: string) => `/${lang}/messages/${token}`,
 };
 
 /** The same page in another language: swaps the first path segment. */

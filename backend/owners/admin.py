@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Booking, Cottage, LoginCode, Owner, OwnerSignup
+from .models import Booking, Conversation, Cottage, LoginCode, Message, Owner, OwnerSignup
 
 
 @admin.register(OwnerSignup)
@@ -29,7 +29,7 @@ class OwnerAdmin(admin.ModelAdmin):
 
 @admin.register(Cottage)
 class CottageAdmin(admin.ModelAdmin):
-    list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "status", "listing_started_on"]
+    list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality"]
 
@@ -51,3 +51,21 @@ class LoginCodeAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+class MessageInline(admin.TabularInline):
+    model = Message
+    extra = 1
+    fields = ["sender", "body", "created_at"]
+    readonly_fields = ["created_at"]
+
+
+@admin.register(Conversation)
+class ConversationAdmin(admin.ModelAdmin):
+    """Enquiries about example cottages with no owner yet land here for the team to answer."""
+
+    list_display = ["guest_name", "cottage", "listing_slug", "channel", "last_message_at", "archived"]
+    list_filter = ["channel", "archived", "guest_language"]
+    search_fields = ["guest_name", "guest_email", "listing_slug", "cottage__name"]
+    readonly_fields = ["token", "created_at", "last_message_at", "owner_read_at", "guest_read_at"]
+    inlines = [MessageInline]

@@ -5,6 +5,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
 # - €99 yearly fee per cottage, invoiced when each listing year starts;
@@ -171,6 +172,10 @@ class Cottage(models.Model):
     description_fi = models.TextField(blank=True)
     description_en = models.TextField(blank=True)
     nettimokki_url = models.URLField(blank=True)
+    listing_slug = models.SlugField(
+        max_length=60, blank=True, db_index=True,
+        help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
+    )
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.INTAKE)
     listing_started_on = models.DateField(
         null=True, blank=True, help_text="First day of listing year 1; each year renews with the yearly fee."
@@ -294,3 +299,62 @@ class LoginCode(models.Model):
 
     def __str__(self) -> str:
         return f"Login code for {self.owner} at {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class Conversation(models.Model):
+    """One guest talking with one cottage's owner.
+
+    Enquiries from stugora.fi (channel "direct") are answered here and the guest reads
+    the answer through a private link. Threads from Airbnb, Booking.com and the other
+    sites will arrive through the channel manager; until it is connected they exist
+    only as demo data and a reply is kept here, not sent to the site.
+    """
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, null=True, blank=True, related_name="conversations")
+    listing_slug = models.SlugField(max_length=60, blank=True, help_text="Which stugora.fi page the guest wrote from.")
+    booking = models.ForeignKey(Booking, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
+    channel = models.CharField(max_length=12, choices=Booking.Channel.choices, default=Booking.Channel.DIRECT)
+    guest_name = models.CharField(max_length=120)
+    guest_email = models.EmailField(blank=True)
+    guest_language = models.CharField(max_length=2, choices=Language.choices, default=Language.ENGLISH)
+    check_in = models.DateField(null=True, blank=True)
+    check_out = models.DateField(null=True, blank=True)
+    guests = models.PositiveSmallIntegerField(null=True, blank=True)
+    token = models.CharField(max_length=48, unique=True, help_text="The guest's private link to this conversation.")
+    archived = models.BooleanField(default=False)
+    owner_read_at = models.DateTimeField(null=True, blank=True)
+    guest_read_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_message_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-last_message_at"]
+
+    def __str__(self) -> str:
+        return f"{self.guest_name} – {self.cottage.name if self.cottage else self.listing_slug}"
+
+    @property
+    def owner(self):
+        return self.cottage.owner if self.cottage else None
+
+    @property
+    def replies_here(self) -> bool:
+        """True when the guest reads replies on stugora.fi, not on a booking site."""
+        return self.channel == Booking.Channel.DIRECT
+
+
+class Message(models.Model):
+    class Sender(models.TextChoices):
+        GUEST = "guest", "Guest"
+        HOST = "host", "Host"
+
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
+    sender = models.CharField(max_length=5, choices=Sender.choices)
+    body = models.TextField(max_length=4000)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+
+    def __str__(self) -> str:
+        return f"{self.get_sender_display()}: {self.body[:40]}"

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path
 
-from owners import portal
+from owners import inbox, portal
 from owners.views import OwnerSignupCreateView
 
 admin.site.site_header = "Stugora admin"
@@ -17,5 +17,9 @@ urlpatterns = [
     path("api/owner/me/", portal.MeView.as_view(), name="owner-me"),
     path("api/owner/summary/", portal.SummaryView.as_view(), name="owner-summary"),
     path("api/owner/bookings/", portal.BookingsView.as_view(), name="owner-bookings"),
+    path("api/enquiries/", inbox.EnquiryView.as_view(), name="enquiry"),
+    path("api/conversations/<str:token>/", inbox.GuestThreadView.as_view(), name="guest-thread"),
+    path("api/owner/conversations/", inbox.OwnerConversationsView.as_view(), name="owner-conversations"),
+    path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),
     path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
 ]

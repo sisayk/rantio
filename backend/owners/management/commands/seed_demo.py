@@ -9,6 +9,7 @@ the code is shown on the page (and printed in the terminal).
 """
 
 import random
+import secrets
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -16,15 +17,15 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
-from owners.models import Booking, Cottage, Country, Owner, Region
+from owners.models import Booking, Conversation, Cottage, Country, Message, Owner, Region
 
 DEMO_EMAIL = "demo@stugora.fi"
 
 COTTAGES = [
-    # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up)
-    ("Järvihuvila", "Savonlinna", Region.SAIMAA, 6, 3, 180, 9),
-    ("Rantasauna", "Lohja", Region.HELSINKI, 4, 2, 120, 5),
-    ("Metsämökki", "Kuusamo", Region.OTHER, 5, 2, 140, None),
+    # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up), stugora.fi page
+    ("Järvihuvila", "Savonlinna", Region.SAIMAA, 6, 3, 180, 9, "lakeside-villa"),
+    ("Rantasauna", "Lohja", Region.HELSINKI, 4, 2, 120, 5, "lohja-lake-cabin"),
+    ("Metsämökki", "Kuusamo", Region.OTHER, 5, 2, 140, None, ""),
 ]
 # Where demo guests book from, roughly like a lake cottage's first Stugora year.
 CHANNELS = [
@@ -69,16 +70,55 @@ class Command(BaseCommand):
             name="Maija Demo", email=DEMO_EMAIL, language="fi", is_pilot=True, agreement_signed_on=months_ago(today, 9)
         )
         count = 0
-        for name, town, region, guests, bedrooms, price, listed in COTTAGES:
+        for name, town, region, guests, bedrooms, price, listed, slug in COTTAGES:
             cottage = Cottage.objects.create(
                 owner=owner, name=name, municipality=town, country=Country.FINLAND, region=region,
                 max_guests=guests, bedrooms=bedrooms, beds=guests, price_per_night=Decimal(price),
                 status=Cottage.Status.LIVE if listed else Cottage.Status.LISTING,
-                listing_started_on=months_ago(today, listed) if listed else None,
+                listing_started_on=months_ago(today, listed) if listed else None, listing_slug=slug,
             )
             if listed:
                 count += self.book(cottage, guests, price, today, rng)
-        self.stdout.write(self.style.SUCCESS(f"Demo owner {DEMO_EMAIL} with {count} bookings."))
+        talks = self.talk(owner, timezone.now())
+        self.stdout.write(self.style.SUCCESS(f"Demo owner {DEMO_EMAIL} with {count} bookings and {talks} conversations."))
+
+    def talk(self, owner: Owner, now) -> int:
+        """A few guest conversations: one from each kind of place guests write from."""
+        villa, sauna = owner.cottages.get(name="Järvihuvila"), owner.cottages.get(name="Rantasauna")
+        today = timezone.localdate()
+        staying = villa.bookings.filter(check_in__lte=today, check_out__gt=today).first()
+        coming = sauna.bookings.filter(check_in__gt=today, cancelled=False).order_by("check_in").first()
+        h = lambda hours: now - timedelta(hours=hours)  # noqa: E731
+        threads = [
+            # (cottage, booking, channel, guest, language, email, messages: (sender, hours ago, text), owner has read)
+            (villa, staying, Booking.Channel.BOOKING, "Lukas Becker", "en", "", [
+                ("guest", 30, "Hello! We arrive around 18:00. Is there a key box, or will someone meet us?"),
+                ("host", 29, "Welcome Lukas! The key is in the box by the door, code 4521. The sauna wood is in the shed behind the cottage."),
+                ("guest", 2, "Thank you, everything is perfect. One question: may we use the rowing boat in the evening?"),
+            ], False),
+            (sauna, coming, Booking.Channel.AIRBNB, "Emma Lindqvist", "sv", "", [
+                ("guest", 50, "Hi! Is the sauna wood-heated, and do we need to bring our own towels?"),
+                ("host", 48, "Hi Emma, yes, it's a wood-heated sauna by the lake. Towels and bed linen are included."),
+                ("guest", 47, "Wonderful, thanks!"),
+            ], True),
+            (villa, None, Booking.Channel.DIRECT, "Anna Korhonen", "fi", "anna.korhonen@example.com", [
+                ("guest", 5, "Hei! Onko Järvihuvila vapaana helmikuun hiihtolomaviikolla? Meitä olisi 2 aikuista ja 3 lasta."),
+            ], False),
+        ]
+        booking_sites = {"airbnb", "booking", "vrbo", "expedia", "holidu", "hometogo"}
+        for cottage, booking, channel, guest, lang, email, msgs, read in threads:
+            if booking and booking.channel in booking_sites:
+                channel = booking.channel  # the thread lives on the site the stay was booked on
+            c = Conversation.objects.create(
+                cottage=cottage, booking=booking, channel=channel, guest_name=guest, guest_language=lang,
+                guest_email=email, listing_slug=cottage.listing_slug, token=secrets.token_urlsafe(24),
+                check_in=booking.check_in if booking else None, check_out=booking.check_out if booking else None,
+                guests=booking.guests if booking else 5, last_message_at=h(msgs[-1][1]),
+                owner_read_at=now if read else h(msgs[-2][1]) if len(msgs) > 1 else None, guest_read_at=now,
+            )
+            for sender, hours, text in msgs:
+                Message.objects.create(conversation=c, sender=sender, body=text, created_at=h(hours))
+        return len(threads)
 
     def book(self, cottage: Cottage, max_guests: int, price: int, today: date, rng: random.Random) -> int:
         """Back-to-back stays from the listing start to three months ahead, plus one stay right now."""

@@ -1,15 +1,15 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- small favicons loaded from each listing site */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CHANNELS, type ChannelId, channelIcon } from "@/lib/catalog";
 import type { Messages } from "@/i18n";
 import { fill, money, number, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { type BookingRow, ownerApi, SignedOut, type Summary } from "@/lib/ownerApi";
-import { Bed, CalendarIcon, Logo, People } from "../guest/icons";
+import { Bed, CalendarIcon, People } from "../guest/icons";
 import EarningsChart from "./EarningsChart";
+import HostingHeader from "./HostingHeader";
+import SiteIcon from "./SiteIcon";
 import styles from "./owner.module.css";
 
 type Load = { state: "loading" } | { state: "error" } | { state: "ready"; summary: Summary; bookings: BookingRow[] };
@@ -19,20 +19,6 @@ const FIRST_ROWS = 12;
 const parse = (iso: string) => new Date(`${iso}T12:00:00`);
 
 type T = Messages["dashboard"];
-
-function SiteIcon({ channel, label, t }: { channel: string; label: string; t: T }) {
-  const known = channel in CHANNELS ? (channel as ChannelId) : null;
-  const name = known ? CHANNELS[known].name : channel === "owner" ? t.ownBooking : channel === "direct" ? "Stugora" : label;
-  return (
-    <span className={styles.site}>
-      <span className={styles.siteIcon} aria-hidden="true">
-        <span>{name.charAt(0)}</span>
-        {known ? <img src={channelIcon(known)} alt="" width={18} height={18} loading="lazy" referrerPolicy="no-referrer" /> : null}
-      </span>
-      {name}
-    </span>
-  );
-}
 
 export default function OwnerDashboard({
   lang,
@@ -89,11 +75,6 @@ export default function OwnerDashboard({
     setYear(y);
   }, []);
 
-  async function logout() {
-    await ownerApi.logout().catch(() => undefined);
-    window.location.assign(paths.hostingLogin(lang));
-  }
-
   function downloadCsv(s: Summary, rows: BookingRow[]) {
     const fi = lang === "fi";
     const sep = fi ? ";" : ",";
@@ -114,22 +95,14 @@ export default function OwnerDashboard({
   }
 
   const header = (
-    <header className={styles.top}>
-      <div className={styles.topInner}>
-        <a className={styles.brand} href={paths.home(lang)}>
-          <Logo className={styles.logo} />
-          Stugora
-          <span className={styles.area}>{t.area}</span>
-        </a>
-        <nav className={styles.topNav}>
-          {languageButton}
-          {load.state === "ready" ? <span className={styles.who}>{load.summary.owner.name}</span> : null}
-          <button type="button" className={styles.outline} onClick={logout}>
-            {t.logout}
-          </button>
-        </nav>
-      </div>
-    </header>
+    <HostingHeader
+      lang={lang}
+      t={t}
+      languageButton={languageButton}
+      active="overview"
+      ownerName={load.state === "ready" ? load.summary.owner.name : undefined}
+      unread={load.state === "ready" ? load.summary.unread_messages : 0}
+    />
   );
 
   if (load.state !== "ready") {
@@ -202,7 +175,7 @@ export default function OwnerDashboard({
                       {b.guests}
                     </span>
                     <span className={styles.stayFoot}>
-                      <SiteIcon channel={b.channel} label={b.channel_label} t={t} />
+                      <SiteIcon channel={b.channel} label={b.channel_label} ownBooking={t.ownBooking} />
                       <b>{fmt.eur(b.payout)}</b>
                     </span>
                   </li>
@@ -264,7 +237,7 @@ export default function OwnerDashboard({
                   <tbody>
                     {s.channels.map((c) => (
                       <tr key={c.channel}>
-                        <th scope="row"><SiteIcon channel={c.channel} label={c.label} t={t} /></th>
+                        <th scope="row"><SiteIcon channel={c.channel} label={c.label} ownBooking={t.ownBooking} /></th>
                         <td className={styles.num}>{c.bookings}</td>
                         <td className={styles.num}>{c.nights}</td>
                         <td className={styles.num}>{fmt.eur(c.payout)}</td>
@@ -349,7 +322,7 @@ export default function OwnerDashboard({
                         {b.cancelled ? <span className={styles.cancelled}>{t.statement.cancelled}</span> : null}
                       </th>
                       <td>{b.cottage}</td>
-                      <td><SiteIcon channel={b.channel} label={b.channel_label} t={t} /></td>
+                      <td><SiteIcon channel={b.channel} label={b.channel_label} ownBooking={t.ownBooking} /></td>
                       <td className={styles.num}>{b.nights}</td>
                       <td className={styles.num}>{b.guests}</td>
                       <td className={styles.num}>{fmt.eurCents(b.payout)}</td>

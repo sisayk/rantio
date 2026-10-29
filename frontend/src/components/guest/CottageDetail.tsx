@@ -11,6 +11,7 @@ import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import LanguageButton from "../LanguagePicker";
 import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
+import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
 
@@ -174,6 +175,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                 </li>
               ))}
             </ul>
+            <ContactOwner lang={lang} listingId={l.id} cottage={name} maxGuests={l.guests} t={t.contact} />
             <p className={styles.bookNote}>{d.bookNote}</p>
           </aside>
         </div>
