@@ -26,6 +26,20 @@ export const en = {
   },
 
   guest: {
+    photos: {
+      exterior: "Outside",
+      living: "Living room",
+      bedroom: "Bedroom",
+      kitchen: "Kitchen and dining",
+      sauna: "Sauna",
+      outside: "Surroundings",
+      showAll: "Show all {n} photos",
+      close: "Close",
+      prev: "Previous photo",
+      next: "Next photo",
+      photoOf: "Photo {n} of {total}",
+      gallery: "Photos of {name}",
+    },
     slides: {
       pause: "Pause the slideshow",
       play: "Play the slideshow",

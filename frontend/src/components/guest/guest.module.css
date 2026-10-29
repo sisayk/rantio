@@ -2212,3 +2212,217 @@
 @media (prefers-reduced-motion: reduce) {
   .heroMedia, .heroSlide { transition: none; }
 }
+
+/* ---------- Card photos (CardPhotos.tsx) ---------- */
+/* A swipeable row above the card's link layer, so swiping and arrows work and a tap
+   still opens the cottage (each photo links to it). */
+.cardTrack {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.cardTrack::-webkit-scrollbar { display: none; }
+.cardSlide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background: #dfe5e2;
+}
+.cardSlide img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+.cardPhoto > .badge { z-index: 3; pointer-events: none; }
+.cardPhoto > .save { z-index: 3; }
+.cardArrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--g-ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.cardArrowPrev { left: 10px; }
+.cardArrowNext { right: 10px; }
+.cardArrow:hover { transform: scale(1.06); background: #fff; }
+.card:hover .cardArrow, .cardArrow:focus-visible { opacity: 1; }
+.cardArrow:focus-visible { outline: 3px solid var(--g-green); outline-offset: 2px; }
+@media (hover: none) { .cardArrow { display: none; } }
+.cardDots {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.cardDots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.cardDots span[data-on="true"] { background: #fff; transform: scale(1.25); }
+
+/* ---------- Cottage page photos (DetailGallery.tsx) ---------- */
+.gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  height: clamp(320px, 40vw, 520px);
+  overflow: hidden;
+  border-radius: 18px;
+}
+.gallery[data-count="1"] { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+.gallery[data-count="2"] { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr; }
+.gallery[data-count="3"] { grid-template-columns: 2fr 1fr; }
+.gallery[data-count="4"] > .galleryTile:nth-child(4) { grid-column: 2 / 4; }
+.galleryTile {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: #dfe5e2;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+.galleryTile:first-child { grid-row: 1 / -1; }
+.galleryTile img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease, filter 0.2s ease; }
+.galleryTile:hover img { transform: scale(1.03); filter: brightness(0.92); }
+.galleryTile:focus-visible { outline: 3px solid var(--g-green); outline-offset: -3px; z-index: 1; }
+.galleryAll {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--g-ink);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--g-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.galleryAll:hover { background: var(--g-ground); }
+.galleryRow { display: none; position: relative; }
+.galleryRowTrack { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.galleryRowTrack::-webkit-scrollbar { display: none; }
+.galleryRowSlide { flex: 0 0 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; background: #dfe5e2; scroll-snap-align: start; }
+.galleryRowSlide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.galleryCount {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(20, 30, 26, 0.6);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+@media (max-width: 700px) {
+  .gallery { display: none; }
+  .galleryRow { display: block; margin-inline: -16px; }
+}
+
+/* The full-size viewer: a modal dialog over a dark page. */
+.viewer {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #0d1210;
+  color: #fff;
+}
+.viewer::backdrop { background: rgba(0, 0, 0, 0.85); }
+.viewerBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  font-size: 14px;
+}
+.viewerClose {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.viewerClose:hover { background: rgba(255, 255, 255, 0.2); }
+.viewerFigure {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 64px 72px 48px;
+  box-sizing: border-box;
+}
+.viewerFigure img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+.viewerFigure figcaption { position: absolute; left: 0; right: 0; bottom: 16px; text-align: center; font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+.viewerArrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: -24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1d2a2e;
+  cursor: pointer;
+}
+.viewerArrow:hover { background: #fff; }
+.viewerPrev { left: 16px; }
+.viewerNext { right: 16px; }
+.viewerArrow:focus-visible, .viewerClose:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.viewerPreload { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+@media (max-width: 700px) {
+  .viewerFigure { padding: 60px 0 44px; }
+  .viewerFigure img { border-radius: 0; }
+  .viewerArrow { width: 40px; height: 40px; margin-top: -20px; background: rgba(255, 255, 255, 0.75); }
+  .viewerPrev { left: 8px; }
+  .viewerNext { right: 8px; }
+}

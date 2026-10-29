@@ -17,6 +17,20 @@ export const da: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Udefra",
+      living: "Stue",
+      bedroom: "Soveværelse",
+      kitchen: "Køkken og spiseplads",
+      sauna: "Sauna",
+      outside: "Omgivelser",
+      showAll: "Vis alle {n} billeder",
+      close: "Luk",
+      prev: "Forrige billede",
+      next: "Næste billede",
+      photoOf: "Billede {n} af {total}",
+      gallery: "Billeder af {name}",
+    },
     slides: {
       pause: "Sæt diasshowet på pause",
       play: "Afspil diasshowet",

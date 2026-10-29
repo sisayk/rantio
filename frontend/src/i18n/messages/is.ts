@@ -17,6 +17,20 @@ export const is: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Að utan",
+      living: "Stofa",
+      bedroom: "Svefnherbergi",
+      kitchen: "Eldhús og borðstofa",
+      sauna: "Gufubað",
+      outside: "Umhverfi",
+      showAll: "Sýna allar {n} myndirnar",
+      close: "Loka",
+      prev: "Fyrri mynd",
+      next: "Næsta mynd",
+      photoOf: "Mynd {n} af {total}",
+      gallery: "Myndir af {name}",
+    },
     slides: {
       pause: "Gera hlé á myndasýningu",
       play: "Spila myndasýningu",

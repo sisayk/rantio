@@ -17,6 +17,20 @@ export const lv: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "No ārpuses",
+      living: "Dzīvojamā istaba",
+      bedroom: "Guļamistaba",
+      kitchen: "Virtuve un ēdamzona",
+      sauna: "Pirts",
+      outside: "Apkārtne",
+      showAll: "Rādīt visus {n} fotoattēlus",
+      close: "Aizvērt",
+      prev: "Iepriekšējais fotoattēls",
+      next: "Nākamais fotoattēls",
+      photoOf: "Fotoattēls {n} no {total}",
+      gallery: "Fotoattēli: {name}",
+    },
     slides: {
       pause: "Apturēt slaidrādi",
       play: "Atsākt slaidrādi",

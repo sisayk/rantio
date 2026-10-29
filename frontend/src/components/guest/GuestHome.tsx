@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -25,11 +24,12 @@ import {
   type Listing,
   listingCurrency,
   listingName,
-  unsplash,
+  listingPhotos,
 } from "@/lib/listings";
 import { type City, PLACES } from "@/lib/places";
 import ChannelIcons from "./ChannelIcons";
 import type { MapFocus } from "./CottageMap";
+import CardPhotos from "./CardPhotos";
 import HeroSlides from "./HeroSlides";
 import FiltersModal, { countFilters, EMPTY_FILTERS, type FilterState } from "./FiltersModal";
 import { DatePanel, GuestPanel, type Guests, PricePanel, type PriceRange, priceLabel } from "./Pickers";
@@ -479,7 +479,12 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         onMouseLeave={() => setActiveId(null)}
       >
         <div className={styles.cardPhoto}>
-          <img src={unsplash(l.photo, 720, 420, l.photoCrop)} alt="" loading="lazy" width={720} height={420} />
+          <CardPhotos
+            photos={listingPhotos(l)}
+            href={paths.cottage(lang, l.id)}
+            name={listingName(names, l)}
+            labels={{ prev: t.photos.prev, next: t.photos.next }}
+          />
           <span className={styles.badge}>{t.badges[l.badge]}</span>
           <button
             type="button"

@@ -17,6 +17,20 @@ export const sv: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Utsida",
+      living: "Vardagsrum",
+      bedroom: "Sovrum",
+      kitchen: "Kök och matplats",
+      sauna: "Bastu",
+      outside: "Omgivning",
+      showAll: "Visa alla {n} bilder",
+      close: "Stäng",
+      prev: "Föregående bild",
+      next: "Nästa bild",
+      photoOf: "Bild {n} av {total}",
+      gallery: "Bilder på {name}",
+    },
     slides: {
       pause: "Pausa bildspelet",
       play: "Spela bildspelet",

@@ -17,6 +17,20 @@ export const fi: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Ulkoa",
+      living: "Olohuone",
+      bedroom: "Makuuhuone",
+      kitchen: "Keittiö ja ruokailu",
+      sauna: "Sauna",
+      outside: "Ympäristö",
+      showAll: "Näytä kaikki {n} kuvaa",
+      close: "Sulje",
+      prev: "Edellinen kuva",
+      next: "Seuraava kuva",
+      photoOf: "Kuva {n}/{total}",
+      gallery: "Kuvia: {name}",
+    },
     slides: {
       pause: "Pysäytä diaesitys",
       play: "Jatka diaesitystä",

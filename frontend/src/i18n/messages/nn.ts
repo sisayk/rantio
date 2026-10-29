@@ -17,6 +17,20 @@ export const nn: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Utsida",
+      living: "Stove",
+      bedroom: "Soverom",
+      kitchen: "Kjøkken og spiseplass",
+      sauna: "Badstove",
+      outside: "Omgjevnader",
+      showAll: "Vis alle {n} bileta",
+      close: "Lukk",
+      prev: "Førre bilete",
+      next: "Neste bilete",
+      photoOf: "Bilete {n} av {total}",
+      gallery: "Bilete av {name}",
+    },
     slides: {
       pause: "Set biletframsyninga på pause",
       play: "Spel av biletframsyninga",

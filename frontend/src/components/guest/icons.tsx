@@ -31,6 +31,18 @@ export const Sliders = ({ className }: P) => (
 export const Chevron = ({ className }: P) => (
   <svg {...base(className)} strokeWidth={2}><path d="m7 10 5 5 5-5" /></svg>
 );
+export const ChevronLeft = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={2.4}><path d="m14.5 6-6 6 6 6" /></svg>
+);
+export const ChevronRight = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={2.4}><path d="m9.5 6 6 6-6 6" /></svg>
+);
+export const Close = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={2}><path d="M6 6l12 12M18 6 6 18" /></svg>
+);
+export const GridIcon = ({ className }: P) => (
+  <svg {...base(className)}><rect x="4" y="4" width="6.5" height="6.5" rx="1" /><rect x="13.5" y="4" width="6.5" height="6.5" rx="1" /><rect x="4" y="13.5" width="6.5" height="6.5" rx="1" /><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1" /></svg>
+);
 export const Heart = ({ className, filled }: P & { filled?: boolean }) => (
   <svg {...base(className)} fill={filled ? "currentColor" : "none"} strokeWidth={2}>
     <path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z" />

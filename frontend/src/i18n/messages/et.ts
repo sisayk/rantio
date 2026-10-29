@@ -17,6 +17,20 @@ export const et: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Väljast",
+      living: "Elutuba",
+      bedroom: "Magamistuba",
+      kitchen: "Köök ja söögituba",
+      sauna: "Saun",
+      outside: "Ümbrus",
+      showAll: "Näita kõiki {n} fotot",
+      close: "Sulge",
+      prev: "Eelmine foto",
+      next: "Järgmine foto",
+      photoOf: "Foto {n}/{total}",
+      gallery: "Fotod: {name}",
+    },
     slides: {
       pause: "Peata slaidiseanss",
       play: "Jätka slaidiseanssi",

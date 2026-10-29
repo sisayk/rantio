@@ -6,11 +6,12 @@ import { paths } from "@/i18n/paths";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
 import { CONTACT_EMAIL } from "@/lib/content";
-import { type Listing, listingCurrency, listingName, unsplash } from "@/lib/listings";
+import { type Listing, listingCurrency, listingName, listingPhotos } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import CurrencyButton from "../CurrencyButton";
 import LanguageButton from "../LanguagePicker";
+import DetailGallery from "./DetailGallery";
 import ListingPrice from "./ListingPrice";
 import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
 import ContactOwner from "./ContactOwner";
@@ -84,9 +85,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
           </p>
         </div>
 
-        <figure className={styles.detailPhoto}>
-          <img src={unsplash(l.photo, 1600, 760, l.photoCrop)} alt={name} width={1600} height={760} />
-        </figure>
+        <DetailGallery lang={lang} photos={listingPhotos(l)} name={name} t={t.photos} />
 
         <div className={styles.detailColumns}>
           <div className={styles.detailMain}>

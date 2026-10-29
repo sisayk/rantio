@@ -17,6 +17,20 @@ export const lt: Translation = {
   },
 
   guest: {
+    photos: {
+      exterior: "Iš lauko",
+      living: "Svetainė",
+      bedroom: "Miegamasis",
+      kitchen: "Virtuvė ir valgomasis",
+      sauna: "Pirtis",
+      outside: "Apylinkės",
+      showAll: "Rodyti visas {n} nuotraukas",
+      close: "Uždaryti",
+      prev: "Ankstesnė nuotrauka",
+      next: "Kita nuotrauka",
+      photoOf: "Nuotrauka {n} iš {total}",
+      gallery: "{name} nuotraukos",
+    },
     slides: {
       pause: "Pristabdyti skaidrių peržiūrą",
       play: "Tęsti skaidrių peržiūrą",
