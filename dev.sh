@@ -50,8 +50,8 @@ CORS_ALLOWED_ORIGINS=http://localhost:3100 backend/.venv/bin/python backend/mana
 sleep 6
 echo
 echo "Stugora is running:"
-echo "  Guest site:   http://localhost:3100"
-echo "  Owner page:   http://localhost:3100/omistajille"
+echo "  Guest site:   http://localhost:3100  (opens /en, /fi, /sv ... by your browser's language)"
+echo "  Owner page:   http://localhost:3100/en/hosts  (or /fi/hosts, /sv/hosts ...)"
 echo "  Admin:        http://localhost:8100/admin  (create a login: backend/.venv/bin/python backend/manage.py createsuperuser)"
 echo "Press Ctrl+C to stop."
 if [ "$(uname)" = "Darwin" ]; then open http://localhost:3100 || true; fi

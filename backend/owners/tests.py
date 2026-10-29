@@ -76,6 +76,24 @@ class SignupApiTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Saimaa lake region, Finland", mail.outbox[0].subject)
 
+    def test_accepts_every_site_language(self):
+        # The codes in frontend/src/i18n/locales.ts; the form sends the page's language.
+        for code in ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"]:
+            cache.clear()
+            response = self.client.post(self.url, {**VALID, "email": f"{code}@example.com", "language": code}, format="json")
+            self.assertEqual(response.status_code, 201, (code, response.data))
+        self.assertEqual(OwnerSignup.objects.get(email="lt@example.com").get_language_display(), "Lietuvių")
+
+    def test_rejects_unknown_language(self):
+        response = self.client.post(self.url, {**VALID, "language": "de"}, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("language", response.data)
+
+    @override_settings(SIGNUP_NOTIFY_EMAILS=["sisay@stugora.fi"])
+    def test_team_email_says_which_language_to_answer_in(self):
+        self.client.post(self.url, {**VALID, "language": "et"}, format="json")
+        self.assertIn("writes in: Eesti", mail.outbox[0].body)
+
     def test_signup_list_is_not_public(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)
 

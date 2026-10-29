@@ -3,19 +3,24 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { CONTACT_EMAIL, type Lang } from "@/lib/content";
-import { guestContent } from "@/lib/guestContent";
+import type { Messages } from "@/i18n";
+import { fill, money as formatMoney, number, plural } from "@/i18n/format";
+import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
+import { CONTACT_EMAIL } from "@/lib/content";
+import { cityNames, countryNamesAll, regionLabel } from "@/lib/placeNames";
+import LanguageButton, { LanguageDialog, type LanguageNames } from "../LanguagePicker";
 import type { DateRange } from "react-day-picker";
 import { FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import {
   CATEGORIES,
   type Category,
   COUNTRIES,
-  cottageHref,
   type Country,
   HERO_PHOTO,
   LISTINGS,
   type Listing,
+  listingName,
   unsplash,
 } from "@/lib/listings";
 import { type City, PLACES } from "@/lib/places";
@@ -54,7 +59,7 @@ type Menu = null | "dates" | "guests" | "guestsBar" | "account";
 // Which filter section each option belongs to, and whether a cottage needs one or all of them.
 const GROUP_OF = new Map<FeatureKey, { id: string; match: "any" | "all" }>(
   FEATURE_GROUPS.flatMap((g) =>
-    Object.keys(g.options).map((k) => [k as FeatureKey, { id: g.id, match: g.match }] as const),
+    g.options.map((k) => [k as FeatureKey, { id: g.id, match: g.match }] as const),
   ),
 );
 
@@ -79,6 +84,97 @@ const SUGGESTED = Array.from(new Set(LISTINGS.flatMap((l) => l.place.split(", ")
 const REGION_NAMES = new Map(
   Object.values(PLACES).flat().map((r) => [r.id, `${r.name.en} ${r.name.fi} ${r.name.local}`]),
 );
+
+// The search box matches a cottage by any name of its town or country, in any of our languages.
+const PLACE_WORDS = new Map(
+  LISTINGS.map((l) => [l.id, [...cityNames(l.city), ...countryNamesAll(l.country)].join(" ")]),
+);
+
+// Search, dates, guests and filters live in the address, so the page can be shared,
+// reloaded or opened in another language without losing them.
+type UrlState = {
+  where: string;
+  from?: string;
+  to?: string;
+  adults: number;
+  children: number;
+  category: Category;
+  country: Country | "";
+  region: string;
+  city: string;
+  maxPrice: number;
+  sort: Sort;
+  view: "list" | "map";
+  filters: FilterState;
+  savedOnly: boolean;
+};
+
+const isoDay = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const parseDay = (s: string | null) => {
+  if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return undefined;
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+
+function readUrl(search: string): Partial<UrlState> {
+  const q = new URLSearchParams(search);
+  const num = (k: string) => {
+    const n = Number(q.get(k));
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  };
+  const country = q.get("country") ?? "";
+  const category = q.get("cat") ?? "all";
+  const sort = q.get("sort") ?? "recommended";
+  const features = (q.get("f") ?? "").split(",").filter((k) => GROUP_OF.has(k as FeatureKey)) as FeatureKey[];
+  return {
+    where: q.get("q") ?? "",
+    from: q.get("from") ?? undefined,
+    to: q.get("to") ?? undefined,
+    adults: num("adults"),
+    children: num("children"),
+    category: (CATEGORIES as readonly string[]).includes(category) ? (category as Category) : "all",
+    country: (COUNTRIES as readonly string[]).includes(country) ? (country as Country) : "",
+    region: q.get("region") ?? "",
+    city: q.get("city") ?? "",
+    maxPrice: num("price"),
+    sort: ["recommended", "priceLow", "priceHigh", "guests"].includes(sort) ? (sort as Sort) : "recommended",
+    view: q.get("view") === "map" ? "map" : "list",
+    filters: {
+      features,
+      bedrooms: (q.get("br") ?? "").split(",").map(Number).filter((n) => n >= 1 && n <= 4),
+      rating4: q.get("r4") === "1",
+    },
+    savedOnly: q.get("saved") === "1",
+  };
+}
+
+function writeUrl(s: UrlState) {
+  const q = new URLSearchParams();
+  const set = (k: string, v: string | number | boolean | undefined) => {
+    if (v && v !== "all" && v !== "recommended" && v !== "list") q.set(k, String(v === true ? 1 : v));
+  };
+  set("q", s.where.trim());
+  set("from", s.from);
+  set("to", s.to);
+  set("adults", s.adults);
+  set("children", s.children);
+  set("cat", s.category);
+  set("country", s.country);
+  set("region", s.region);
+  set("city", s.city);
+  set("price", s.maxPrice);
+  set("sort", s.sort);
+  set("view", s.view);
+  set("f", s.filters.features.join(","));
+  set("br", s.filters.bedrooms.join(","));
+  set("r4", s.filters.rating4);
+  set("saved", s.savedOnly);
+  const next = q.toString();
+  if (next !== window.location.search.slice(1)) {
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${next ? `?${next}` : ""}${window.location.hash}`);
+  }
+}
 
 // The box that holds a set of points, padded so a single town still gets some context.
 function boxAround(points: { lat: number; lng: number }[], pad: number): MapFocus["bounds"] {
@@ -134,12 +230,23 @@ function normalise(text: string) {
   return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
-export default function GuestHome({ lang }: { lang: Lang }) {
-  const t = guestContent[lang];
-  const money = useMemo(
-    () => new Intl.NumberFormat(t.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }),
-    [t.locale],
-  );
+type Props = {
+  lang: Lang;
+  t: Messages["guest"];
+  catalog: Messages["catalog"];
+  names: Record<string, string>;
+  common: Messages["common"];
+  /** Country names in the page's language, worked out on the server so the browser's
+   *  own locale data (which can differ) never changes them after the page loads. */
+  countries: Record<Country, string>;
+  languages: LanguageNames;
+};
+
+export default function GuestHome({ lang, t, catalog, names, common, countries, languages }: Props) {
+  const intl = LANG_INFO[lang].intl;
+  const money = useMemo(() => ({ format: (n: number) => formatMoney(lang, n) }), [lang]);
+  const u = t.units;
+  const [langOpen, setLangOpen] = useState(false);
 
   const [where, setWhere] = useState("");
   const [dates, setDates] = useState<DateRange | undefined>();
@@ -161,6 +268,54 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const saved = useMemo(() => parseSaved(savedRaw), [savedRaw]);
   const [menu, setMenu] = useState<Menu>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const [urlRead, setUrlRead] = useState(false);
+
+  // Once, after the first render: take the search from the address (shared link,
+  // reload or a switch of language). Reading it any earlier would not match the
+  // server-rendered page.
+  useEffect(() => {
+    const s = readUrl(window.location.search);
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from the address */
+    if (s.where) setWhere(s.where);
+    const from = parseDay(s.from ?? null);
+    if (from) setDates({ from, to: parseDay(s.to ?? null) });
+    if (s.adults || s.children) setParty({ adults: Math.max(1, s.adults ?? 0), children: s.children ?? 0 });
+    if (s.category) setCategory(s.category);
+    if (s.country) {
+      setCountry(s.country);
+      if (s.region && PLACES[s.country].some((r) => r.id === s.region)) {
+        setRegion(s.region);
+        if (s.city) setCity(s.city);
+      }
+    }
+    if (s.maxPrice) setMaxPrice(s.maxPrice);
+    if (s.sort) setSort(s.sort);
+    if (s.view) setView(s.view);
+    if (s.filters) setFilters(s.filters);
+    if (s.savedOnly) setSavedOnly(true);
+    setUrlRead(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  useEffect(() => {
+    if (!urlRead) return;
+    writeUrl({
+      where,
+      from: dates?.from ? isoDay(dates.from) : undefined,
+      to: dates?.to ? isoDay(dates.to) : undefined,
+      adults: party.adults,
+      children: party.children,
+      category,
+      country,
+      region,
+      city,
+      maxPrice,
+      sort,
+      view,
+      filters,
+      savedOnly,
+    });
+  }, [urlRead, where, dates, party, category, country, region, city, maxPrice, sort, view, filters, savedOnly]);
 
   useEffect(() => {
     if (!menu) return;
@@ -199,14 +354,18 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     setMenu(menu === "dates" ? null : "dates");
   }
 
-  const dayFormat = useMemo(
-    () => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "short" }),
-    [t.locale],
-  );
+  const dayFormat = useMemo(() => new Intl.DateTimeFormat(intl, { day: "numeric", month: "short" }), [intl]);
   const datesText = dates?.from
     ? `${dayFormat.format(dates.from)}${dates.to ? ` – ${dayFormat.format(dates.to)}` : ""}`
     : "";
-  const guestsText = guests ? t.guestSummary(party.adults, party.children) : "";
+  const guestsText = !guests
+    ? ""
+    : party.children
+      ? fill(lang, u.guestsWithChildren, {
+          guests: plural(lang, u.guests, guests),
+          children: plural(lang, u.children, party.children),
+        })
+      : plural(lang, u.guests, guests);
 
   function clearAll() {
     setWhere("");
@@ -225,8 +384,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const results = useMemo(() => {
     const q = normalise(where.trim());
     const list = LISTINGS.filter((l) => {
-      const countryNames = `${guestContent.fi.countries[l.country]} ${guestContent.en.countries[l.country]}`;
-      const haystack = `${l.place} ${l.name.fi} ${l.name.en} ${countryNames} ${REGION_NAMES.get(l.region) ?? ""}`;
+      const haystack = `${l.place} ${listingName(names, l)} ${PLACE_WORDS.get(l.id) ?? ""} ${REGION_NAMES.get(l.region) ?? ""}`;
       if (q && !normalise(haystack).includes(q)) return false;
       if (category !== "all" && !l.categories.includes(category)) return false;
       if (country && l.country !== country) return false;
@@ -242,7 +400,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [where, category, country, region, city, maxPrice, guests, filters, savedOnly, saved, sort]);
+  }, [where, names, category, country, region, city, maxPrice, guests, filters, savedOnly, saved, sort]);
 
   const advancedCount = countFilters(filters);
 
@@ -252,7 +410,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     [country, region],
   );
   const regionCities = useMemo<City[]>(() => regionData?.cities ?? [], [regionData]);
-  const regionName = (r: { name: { en: string; fi: string } }) => (lang === "fi" ? r.name.fi : r.name.en);
+  const regionName = (r: (typeof regions)[number]) => regionLabel(r, country, lang);
 
   // The map follows the narrowest place chosen: town, then region, then country.
   const focus = useMemo<MapFocus>(() => {
@@ -275,7 +433,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     setCity("");
   }
 
-  const placeLabel = (l: Listing) => `${l.place}, ${t.countries[l.country]}`;
+  const placeLabel = (l: Listing) => `${l.place}, ${countries[l.country]}`;
 
   function renderCard(l: Listing) {
     const isSaved = saved.includes(l.id);
@@ -294,7 +452,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             type="button"
             className={styles.save}
             aria-pressed={isSaved}
-            aria-label={`${isSaved ? t.card.saved : t.card.save}: ${l.name[lang]}`}
+            aria-label={`${isSaved ? t.card.saved : t.card.save}: ${listingName(names, l)}`}
             onClick={() => toggleSaved(l.id)}
           >
             <Heart className={styles.icon22} filled={isSaved} />
@@ -303,14 +461,14 @@ export default function GuestHome({ lang }: { lang: Lang }) {
         <div className={styles.cardBody}>
           <div className={styles.cardHead}>
             <h3 className={styles.cardTitle}>
-              <a className={styles.cardLink} href={cottageHref(lang, l.id)}>
-                {l.name[lang]}
+              <a className={styles.cardLink} href={paths.cottage(lang, l.id)}>
+                {listingName(names, l)}
               </a>
             </h3>
             {l.rating ? (
               <span className={styles.rating}>
                 <Star className={styles.icon16} />
-                {l.rating.toLocaleString(t.locale, { minimumFractionDigits: 1 })}
+                {number(lang, l.rating, { min: 1, max: 1 })}
               </span>
             ) : (
               <span className={styles.newTag}>{t.card.isNew}</span>
@@ -320,17 +478,17 @@ export default function GuestHome({ lang }: { lang: Lang }) {
           <p className={styles.cardFacts}>
             <span>
               <People className={styles.icon16} />
-              {t.card.guests(l.guests)}
+              {plural(lang, u.guests, l.guests)}
             </span>
             <span>
               <Bed className={styles.icon16} />
-              {t.card.bedrooms(l.bedrooms)}
+              {plural(lang, u.bedrooms, l.bedrooms)}
             </span>
           </p>
           <p className={styles.cardPrice}>
             <strong>{money.format(l.price)}</strong> {t.card.night}
           </p>
-          <ChannelIcons ids={l.channels} label={t.card.bookOn} more={t.card.moreSites} />
+          <ChannelIcons ids={l.channels} label={t.card.bookOn} more={(n) => `+${n}`} />
         </div>
       </li>
     );
@@ -342,7 +500,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     <div className={styles.page}>
       <section className={styles.hero} style={{ "--hero": `url(${HERO_PHOTO})` } as React.CSSProperties}>
         <header className={styles.topbar}>
-          <a className={styles.brand} href={lang === "fi" ? "/" : "/en"}>
+          <a className={styles.brand} href={paths.home(lang)}>
             <Logo className={styles.logo} />
             <span>Stugora</span>
           </a>
@@ -360,14 +518,10 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             )}
           </nav>
           <div className={styles.userPill}>
-            <a className={styles.langButton} href={t.langOther.href} hrefLang={lang === "fi" ? "en" : "fi"}>
-              <Globe className={styles.icon18} />
-              {t.langLabel}
-              <Chevron className={styles.icon14} />
-            </a>
+            <LanguageButton lang={lang} t={common.language} names={languages} className={styles.langButton} />
             <span className={styles.pillDivider} aria-hidden="true" />
-            <a className={styles.hostLink} href={t.becomeHost.href}>
-              {t.becomeHost.label}
+            <a className={styles.hostLink} href={paths.hosts(lang)}>
+              {t.becomeHost}
             </a>
             <button
               type="button"
@@ -394,7 +548,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               </button>
               {menu === "account" ? (
                 <div className={`${styles.popover} ${styles.popoverRight}`} role="menu">
-                  <a role="menuitem" href={t.becomeHost.href}>
+                  <a role="menuitem" href={paths.hosts(lang)}>
                     {t.menu.owners}
                   </a>
                   <button role="menuitem" type="button" onClick={() => { setSavedOnly(true); setMenu(null); resultsRef.current?.scrollIntoView({ behavior: "smooth" }); }}>
@@ -402,6 +556,19 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                   </button>
                   <button role="menuitem" type="button" onClick={clearAll}>
                     {t.menu.all}
+                  </button>
+                  <button
+                    role="menuitem"
+                    type="button"
+                    className={styles.menuLanguage}
+                    onClick={() => {
+                      setMenu(null);
+                      setLangOpen(true);
+                    }}
+                  >
+                    <Globe className={styles.icon18} />
+                    <span>{t.menu.language}</span>
+                    <span className={styles.menuLanguageValue}>{LANG_INFO[lang].native}</span>
                   </button>
                 </div>
               ) : null}
@@ -433,7 +600,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                   autoComplete="off"
                 />
                 <datalist id="destinations">
-                  {[...COUNTRIES.map((c) => t.countries[c]), ...SUGGESTED].map((d) => (
+                  {[...COUNTRIES.map((c) => countries[c]), ...SUGGESTED].map((d) => (
                     <option key={d} value={d} />
                   ))}
                 </datalist>
@@ -456,7 +623,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               </button>
               {menu === "dates" && today ? (
                 <div className={`${styles.searchPopover} ${styles.searchPopoverDates}`}>
-                  <DatePanel lang={lang} value={dates} today={today} onChange={setDates} onDone={() => setMenu(null)} />
+                  <DatePanel lang={lang} t={t.datePicker} nights={u.nights} value={dates} today={today} onChange={setDates} onDone={() => setMenu(null)} />
                 </div>
               ) : null}
             </div>
@@ -478,7 +645,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               {menu === "guests" ? (
                 <div className={`${styles.searchPopover} ${styles.searchPopoverRight}`}>
                   <GuestPanel
-                    lang={lang}
+                    t={t.guestPicker}
                     value={party}
                     onApply={(g) => {
                       setParty(g);
@@ -533,7 +700,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                 <option value="">{f.location}</option>
                 {COUNTRIES.map((c) => (
                   <option key={c} value={c}>
-                    {t.countries[c]}
+                    {countries[c]}
                   </option>
                 ))}
               </select>
@@ -544,7 +711,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                 <select aria-label={f.region} value={region} onChange={(e) => pickRegion(e.target.value)}>
                   <option value="">{f.region}</option>
                   {[...regions]
-                    .sort((a, b) => regionName(a).localeCompare(regionName(b), t.locale))
+                    .sort((a, b) => regionName(a).localeCompare(regionName(b), intl))
                     .map((r) => (
                       <option key={r.id} value={r.id}>
                         {regionName(r)}
@@ -559,7 +726,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                 <select aria-label={f.city} value={city} onChange={(e) => setCity(e.target.value)}>
                   <option value="">{f.city}</option>
                   {[...regionCities]
-                    .sort((a, b) => a.name.localeCompare(b.name, t.locale))
+                    .sort((a, b) => a.name.localeCompare(b.name, intl))
                     .map((c) => (
                       <option key={c.name} value={c.name}>
                         {c.name}
@@ -572,9 +739,11 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             <span className={styles.selectChip} data-active={!!maxPrice}>
               <select aria-label={f.price} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))}>
                 <option value={0}>{f.price}</option>
-                <option value={150}>{f.prices[150]}</option>
-                <option value={180}>{f.prices[180]}</option>
-                <option value={200}>{f.prices[200]}</option>
+                {[150, 180, 200].map((n) => (
+                  <option key={n} value={n}>
+                    {fill(lang, f.upTo, { price: money.format(n) })}
+                  </option>
+                ))}
               </select>
               <Chevron className={styles.icon16} />
             </span>
@@ -593,7 +762,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               {menu === "guestsBar" ? (
                 <div className={styles.popoverBare}>
                   <GuestPanel
-                    lang={lang}
+                    t={t.guestPicker}
                     value={party}
                     onApply={(g) => {
                       setParty(g);
@@ -652,7 +821,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
         </div>
 
         <p className={styles.resultCount} aria-live="polite">
-          {t.results(results.length)}
+          {plural(lang, u.cottages, results.length)}
         </p>
 
         <div className={view === "map" ? styles.mapLayout : undefined}>
@@ -677,6 +846,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                 selectedCity={city}
                 activeId={activeId}
                 lang={lang}
+                names={names}
                 label={t.view.map}
                 placeLabel={placeLabel}
                 price={(n) => money.format(n)}
@@ -694,7 +864,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             <h2>{t.hostBand.title}</h2>
             <p>{t.hostBand.body}</p>
           </div>
-          <a className={styles.hostCta} href={t.becomeHost.href}>
+          <a className={styles.hostCta} href={paths.hosts(lang)}>
             {t.hostBand.cta}
           </a>
         </section>
@@ -703,6 +873,9 @@ export default function GuestHome({ lang }: { lang: Lang }) {
       {filtersOpen ? (
         <FiltersModal
           lang={lang}
+          t={t.filterPanel}
+          catalog={catalog}
+          cottages={u.cottages}
           value={filters}
           resultCount={results.length}
           onChange={setFilters}
@@ -711,11 +884,13 @@ export default function GuestHome({ lang }: { lang: Lang }) {
       ) : null}
 
       <footer className={styles.footer}>
-        <p>{t.footer.note}</p>
+        <p>{common.footer.note}</p>
         <p>
-          {t.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
+          {common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
         </p>
       </footer>
+
+      {langOpen ? <LanguageDialog lang={lang} t={common.language} names={languages} onClose={() => setLangOpen(false)} /> : null}
     </div>
   );
 }

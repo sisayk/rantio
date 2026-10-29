@@ -969,7 +969,8 @@
     height: 64px;
     padding: 0 16px;
   }
-  .langLink {
+  /* Globe only on phones; the button's label still names the language. */
+  .langLink span {
     display: none;
   }
   .hero {

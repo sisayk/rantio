@@ -3,8 +3,9 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import type { Lang } from "@/lib/content";
-import { guestContent } from "@/lib/guestContent";
+import type { Messages } from "@/i18n";
+import { number } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
 import { findNearby, type NearbyPlace } from "@/lib/nearby";
 import { External, Pin } from "./icons";
 import styles from "./guest.module.css";
@@ -19,8 +20,9 @@ const FIRST = 8;
 type State = { status: "loading" } | { status: "ready"; places: NearbyPlace[] } | { status: "error" };
 
 /** Places near the cottage, listed beside a map; loaded from Wikipedia in the browser. */
-export default function Surroundings({ lang, lat, lng }: { lang: Lang; lat: number; lng: number }) {
-  const t = guestContent[lang].detail;
+type Props = { lang: Lang; t: Messages["guest"]["detail"]; lat: number; lng: number };
+
+export default function Surroundings({ lang, t, lat, lng }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [all, setAll] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export default function Surroundings({ lang, lat, lng }: { lang: Lang; lat: numb
     const metres = Math.max(100, Math.round(n * 10) * 100); // nearest 100 m
     return metres < 1000
       ? `${metres} m`
-      : `${n.toLocaleString(guestContent[lang].locale, { maximumFractionDigits: n < 10 ? 1 : 0 })} km`;
+      : `${number(lang, n, { max: n < 10 ? 1 : 0 })} km`;
   };
 
   return (
@@ -86,7 +88,7 @@ export default function Surroundings({ lang, lat, lng }: { lang: Lang; lat: numb
                         <strong>{p.title}</strong>
                         <span>{p.description}</span>
                         <span className={styles.nearbyDistance}>
-                          {km(p.km)} {t.away}
+                          {t.away.replace("{distance}", km(p.km))}
                         </span>
                       </span>
                       <External className={styles.icon16} />

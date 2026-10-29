@@ -3,12 +3,16 @@
 import "react-day-picker/style.css";
 import { useState } from "react";
 import { type DateRange, DayPicker } from "react-day-picker";
-import { enGB, fi } from "react-day-picker/locale";
-import type { Lang } from "@/lib/content";
-import { guestContent } from "@/lib/guestContent";
+import { da, enIE, et, fi, is, lt, lv, nb, nn, sv } from "react-day-picker/locale";
+import type { Messages } from "@/i18n";
+import { type Plural, plural } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
 import styles from "./guest.module.css";
 
 export type Guests = { adults: number; children: number };
+
+// Month and weekday names for the calendar; weeks start on Monday everywhere we work.
+const CALENDAR_LOCALES = { en: enIE, fi, sv, nb, nn, da, is, et, lv, lt } as const;
 
 function Stepper({
   label,
@@ -47,15 +51,14 @@ function Stepper({
 
 /** Adults and children, applied with "Use" so half-made changes don't filter the list. */
 export function GuestPanel({
-  lang,
+  t,
   value,
   onApply,
 }: {
-  lang: Lang;
+  t: Messages["guest"]["guestPicker"];
   value: Guests;
   onApply: (g: Guests) => void;
 }) {
-  const t = guestContent[lang].guestPicker;
   const [draft, setDraft] = useState<Guests>(value.adults ? value : { adults: 1, children: 0 });
   return (
     <div className={styles.guestPanel} role="dialog" aria-label={t.title}>
@@ -92,18 +95,21 @@ export function GuestPanel({
 /** Check-in and check-out on a two-month calendar. */
 export function DatePanel({
   lang,
+  t,
+  nights: nightsWord,
   value,
   today,
   onChange,
   onDone,
 }: {
   lang: Lang;
+  t: Messages["guest"]["datePicker"];
+  nights: Plural;
   value: DateRange | undefined;
   today: Date;
   onChange: (r: DateRange | undefined) => void;
   onDone: () => void;
 }) {
-  const t = guestContent[lang].datePicker;
   // The panel only opens after a click, so the window size is known here.
   const [months] = useState(() => (window.innerWidth < 720 ? 1 : 2));
   const nights =
@@ -112,7 +118,7 @@ export function DatePanel({
     <div className={styles.datePanel} role="dialog" aria-label={t.title}>
       <DayPicker
         mode="range"
-        locale={lang === "fi" ? fi : enGB}
+        locale={CALENDAR_LOCALES[lang]}
         numberOfMonths={months}
         pagedNavigation
         weekStartsOn={1}
@@ -125,7 +131,7 @@ export function DatePanel({
         className={styles.dayPicker}
       />
       <div className={styles.panelFooter}>
-        <span className={styles.nights}>{nights ? t.nights(nights) : t.hint}</span>
+        <span className={styles.nights}>{nights ? plural(lang, nightsWord, nights) : t.hint}</span>
         <button type="button" className={styles.textButton} onClick={() => onChange(undefined)}>
           {t.clear}
         </button>

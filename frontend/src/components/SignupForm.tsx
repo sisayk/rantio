@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { content, type Lang, REGIONS } from "@/lib/content";
+import type { Messages } from "@/i18n";
+import type { Lang } from "@/i18n/locales";
+import { CONTACT_EMAIL, REGIONS } from "@/lib/content";
 import { COUNTRIES } from "@/lib/listings";
 import styles from "./landing.module.css";
 
@@ -10,8 +12,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
 type Field = "name" | "email" | "region" | "nettimokki_url" | "privacy_consent";
 type Errors = Partial<Record<Field | "form", string>>;
 
-export default function SignupForm({ lang }: { lang: Lang }) {
-  const f = content[lang].form;
+type Props = {
+  lang: Lang;
+  f: Messages["owner"]["form"];
+  /** Country names in the page's language, from the server (see GuestHome). */
+  countries: Record<string, string>;
+};
+
+export default function SignupForm({ lang, f: words, countries }: Props) {
+  const f = { ...words, errors: { ...words.errors, network: words.errors.network.replace("{email}", CONTACT_EMAIL) } };
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [errors, setErrors] = useState<Errors>({});
   const [doneName, setDoneName] = useState("");
@@ -97,7 +106,7 @@ export default function SignupForm({ lang }: { lang: Lang }) {
     return (
       <div className={styles.success} role="status">
         <p className={styles.successTitle}>{f.successTitle}</p>
-        <p>{f.success(doneName)}</p>
+        <p>{f.success.replace("{name}", doneName)}</p>
       </div>
     );
   }
@@ -151,7 +160,7 @@ export default function SignupForm({ lang }: { lang: Lang }) {
             <option value="" disabled>
               {f.regionPlaceholder}
             </option>
-            <optgroup label={f.countries.FI}>
+            <optgroup label={countries.FI}>
               {REGIONS.map((r) => (
                 <option key={r} value={`FI:${r}`}>
                   {f.regions[r]}
@@ -161,7 +170,7 @@ export default function SignupForm({ lang }: { lang: Lang }) {
             <optgroup label={f.otherCountries}>
               {COUNTRIES.filter((c) => c !== "FI").map((c) => (
                 <option key={c} value={c}>
-                  {f.countries[c]}
+                  {countries[c]}
                 </option>
               ))}
             </optgroup>

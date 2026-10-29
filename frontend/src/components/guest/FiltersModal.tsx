@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { BEDROOM_CHOICES, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
-import type { Lang } from "@/lib/content";
-import { guestContent } from "@/lib/guestContent";
+import type { Messages } from "@/i18n";
+import { fill, type Plural, plural } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
 import styles from "./guest.module.css";
 
 export type FilterState = {
@@ -20,14 +21,16 @@ export function countFilters(f: FilterState) {
 
 type Props = {
   lang: Lang;
+  t: Messages["guest"]["filterPanel"];
+  catalog: Messages["catalog"];
+  cottages: Plural;
   value: FilterState;
   resultCount: number;
   onChange: (f: FilterState) => void;
   onClose: () => void;
 };
 
-export default function FiltersModal({ lang, value, resultCount, onChange, onClose }: Props) {
-  const t = guestContent[lang].filterPanel;
+export default function FiltersModal({ lang, t, catalog, cottages, value, resultCount, onChange, onClose }: Props) {
   const dialog = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,11 +58,11 @@ export default function FiltersModal({ lang, value, resultCount, onChange, onClo
       bedrooms: value.bedrooms.includes(n) ? value.bedrooms.filter((x) => x !== n) : [...value.bedrooms, n],
     });
 
-  const groups = FEATURE_GROUPS as unknown as {
-    id: string;
-    title: Record<Lang, string>;
-    options: Record<string, Record<Lang, string>>;
-  }[];
+  const groups = FEATURE_GROUPS.map((g) => ({
+    id: g.id,
+    title: catalog.groups[g.id],
+    options: g.options.map((k) => [k, catalog.features[k]] as const),
+  }));
 
   return (
     <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -80,9 +83,9 @@ export default function FiltersModal({ lang, value, resultCount, onChange, onClo
 
         <div className={styles.modalBody}>
           {groups.slice(0, 1).map((g) => (
-            <FilterSection key={g.id} title={g.title[lang]}>
-              {Object.entries(g.options).map(([k, label]) => (
-                <Check key={k} label={label[lang]} checked={value.features.includes(k as FeatureKey)} onChange={() => toggleFeature(k as FeatureKey)} />
+            <FilterSection key={g.id} title={g.title}>
+              {g.options.map(([k, label]) => (
+                <Check key={k} label={label} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
               ))}
             </FilterSection>
           ))}
@@ -98,9 +101,9 @@ export default function FiltersModal({ lang, value, resultCount, onChange, onClo
           </FilterSection>
 
           {groups.slice(1).map((g) => (
-            <FilterSection key={g.id} title={g.title[lang]}>
-              {Object.entries(g.options).map(([k, label]) => (
-                <Check key={k} label={label[lang]} checked={value.features.includes(k as FeatureKey)} onChange={() => toggleFeature(k as FeatureKey)} />
+            <FilterSection key={g.id} title={g.title}>
+              {g.options.map(([k, label]) => (
+                <Check key={k} label={label} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
               ))}
             </FilterSection>
           ))}
@@ -111,7 +114,7 @@ export default function FiltersModal({ lang, value, resultCount, onChange, onClo
             {t.clearAll}
           </button>
           <button type="button" className={styles.applyButton} onClick={onClose}>
-            {t.show(resultCount)}
+            {fill(lang, t.show, { cottages: plural(lang, cottages, resultCount) })}
           </button>
         </footer>
       </div>

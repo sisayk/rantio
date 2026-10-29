@@ -1,36 +1,38 @@
 "use client";
 
 import { useId, useState } from "react";
-import { content, type Lang, ownerNetGain } from "@/lib/content";
+import type { Messages } from "@/i18n";
+import { money, plural } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
+import { ownerNetGain } from "@/lib/content";
 import styles from "./landing.module.css";
 
-export default function Estimator({ lang }: { lang: Lang }) {
-  const t = content[lang];
+export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"]["hero"] }) {
   const [nights, setNights] = useState(20);
   const [price, setPrice] = useState(150);
   const sliderId = useId();
   const priceId = useId();
 
   const gain = Math.round(ownerNetGain(nights, price) / 10) * 10;
-  const euros = new Intl.NumberFormat(t.locale, {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(gain);
+  const euros = money(lang, gain);
+  // "Your cottage could earn {amount} more a year": the amount sits wherever the language puts it.
+  const [before, after = ""] = t.title.split("{amount}");
   const fill = ((nights - 5) / (60 - 5)) * 100;
 
   return (
     <div className={styles.estimator}>
       <h1 className={styles.heroTitle}>
-        {t.hero.before} <span className={styles.heroAmount}>{euros}</span> {t.hero.after}
+        {before}
+        <span className={styles.heroAmount}>{euros}</span>
+        {after}
       </h1>
 
       <p className={styles.heroMeta} aria-live="polite">
-        {t.hero.nights(nights)}, {price} {t.hero.perNight}
+        {plural(lang, t.nights, nights)}, {price} {t.perNight}
       </p>
 
       <label htmlFor={sliderId} className={styles.visuallyHidden}>
-        {t.hero.nightsLabel}
+        {t.nightsLabel}
       </label>
       <input
         id={sliderId}
@@ -45,7 +47,7 @@ export default function Estimator({ lang }: { lang: Lang }) {
       />
 
       <div className={styles.pricePill}>
-        <label htmlFor={priceId}>{t.hero.priceLabel}</label>
+        <label htmlFor={priceId}>{t.priceLabel}</label>
         <span className={styles.priceInputWrap}>
           <input
             id={priceId}
@@ -60,11 +62,11 @@ export default function Estimator({ lang }: { lang: Lang }) {
               if (Number.isFinite(value)) setPrice(Math.min(1000, Math.max(0, value)));
             }}
           />
-          <span aria-hidden="true">{t.hero.perNight}</span>
+          <span aria-hidden="true">{t.perNight}</span>
         </span>
       </div>
 
-      <p className={styles.finePrint}>{t.hero.finePrint}</p>
+      <p className={styles.finePrint}>{t.finePrint}</p>
     </div>
   );
 }
