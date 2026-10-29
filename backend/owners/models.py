@@ -257,6 +257,11 @@ class Booking(models.Model):
     cancelled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def currency(self) -> str:
+        """Payouts and commission are in the cottage's currency."""
+        return self.cottage.currency
+
     class Meta:
         ordering = ["-check_in"]
         constraints = [

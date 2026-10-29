@@ -29,14 +29,14 @@ class OwnerAdmin(admin.ModelAdmin):
 
 @admin.register(Cottage)
 class CottageAdmin(admin.ModelAdmin):
-    list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "status", "listing_started_on", "listing_slug"]
+    list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "currency", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality"]
 
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ["cottage", "channel", "check_in", "check_out", "owner_payout", "commission", "commission_vat", "cancelled"]
+    list_display = ["cottage", "channel", "check_in", "check_out", "owner_payout", "commission", "commission_vat", "currency", "cancelled"]
     list_filter = ["channel", "cancelled"]
     date_hierarchy = "check_in"
     search_fields = ["cottage__name", "external_id"]
@@ -73,6 +73,8 @@ class ConversationAdmin(admin.ModelAdmin):
 
 @admin.register(ExchangeRate)
 class ExchangeRateAdmin(admin.ModelAdmin):
+    """The ECB's daily rates, fetched automatically; read-only."""
+
     list_display = ("currency", "per_eur", "rate_date", "fetched_at")
 
     def has_add_permission(self, request):
