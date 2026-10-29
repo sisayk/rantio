@@ -239,6 +239,7 @@ export default function OwnerInbox({
                   </button>
                 </div>
                 <ChatThread
+                  key={thread.id}
                   lang={lang}
                   messages={thread.messages}
                   mine="host"
@@ -246,6 +247,7 @@ export default function OwnerInbox({
                   note={thread.replies_here ? i.directNote : fill(lang, i.siteNote, { site: siteName(thread) })}
                   words={{ placeholder: i.placeholder, send: i.send, sending: i.sending, failed: i.failed, hint: i.sendHint }}
                   onSend={reply}
+                  assist={{ words: i.ai, onDraft: (notes, draft) => ownerApi.draft(thread.id, notes, draft).then((r) => r.draft) }}
                 />
               </>
             )}

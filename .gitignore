@@ -16,3 +16,6 @@ scripts/node_modules/
 
 # Old update archives and moved-aside files on the Mac
 _old-updates/
+
+# Local secrets
+backend/.env

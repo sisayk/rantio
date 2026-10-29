@@ -6,6 +6,7 @@ Owners: /api/owner/conversations/ lists their own conversations, one by id with 
 messages, and posts replies.
 """
 
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import permissions, serializers, status
@@ -13,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import messaging
+from . import assistant, messaging
 from .models import Conversation, Language, Message
 from .portal import IsOwner
 
@@ -137,3 +138,35 @@ class OwnerThreadView(APIView):
         c.archived = bool(request.data.get("archived"))
         c.save(update_fields=["archived"])
         return Response(messaging.conversation_row(c))
+
+
+class DraftSerializer(serializers.Serializer):
+    notes = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    draft = serializers.CharField(max_length=4000, required=False, allow_blank=True)
+
+
+class OwnerDraftView(APIView):
+    """A reply suggested by Claude for the owner to edit; nothing is sent from here."""
+
+    permission_classes = [IsOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "ai-draft"
+
+    def post(self, request, pk):
+        c = get_object_or_404(messaging.owner_conversations(request.user.owner), pk=pk)
+        data = DraftSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        try:
+            text = assistant.suggest_reply(c, data.validated_data.get("notes", ""), data.validated_data.get("draft", ""))
+        except assistant.NotConfigured:
+            return Response({"detail": "ai_not_configured"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        except assistant.DraftFailed:
+            return Response({"detail": "ai_failed"}, status=status.HTTP_502_BAD_GATEWAY)
+        return Response({"draft": text})
+
+
+class AssistantStatusView(APIView):
+    permission_classes = [IsOwner]
+
+    def get(self, request):
+        return Response({"enabled": bool(settings.ANTHROPIC_API_KEY)})

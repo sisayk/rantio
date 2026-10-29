@@ -169,6 +169,10 @@ class Cottage(models.Model):
     cleaning_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal("0.00"))
     min_nights = models.PositiveSmallIntegerField(default=2)
     house_rules = models.TextField(blank=True)
+    amenities = models.JSONField(
+        default=list, blank=True,
+        help_text="What the cottage has, as the site's feature keys (frontend/src/lib/catalog.ts), e.g. [\"lake\", \"boat\"].",
+    )
     description_fi = models.TextField(blank=True)
     description_en = models.TextField(blank=True)
     nettimokki_url = models.URLField(blank=True)

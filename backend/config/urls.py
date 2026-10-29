@@ -21,5 +21,7 @@ urlpatterns = [
     path("api/conversations/<str:token>/", inbox.GuestThreadView.as_view(), name="guest-thread"),
     path("api/owner/conversations/", inbox.OwnerConversationsView.as_view(), name="owner-conversations"),
     path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),
+    path("api/owner/conversations/<int:pk>/draft/", inbox.OwnerDraftView.as_view(), name="owner-draft"),
+    path("api/owner/assistant/", inbox.AssistantStatusView.as_view(), name="owner-assistant"),
     path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
 ]

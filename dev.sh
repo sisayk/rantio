@@ -26,6 +26,8 @@ echo "Using $("$PY" --version) and Node $(node --version)"
 
 echo "Setting up the backend…"
 cd backend
+# Local secrets such as ANTHROPIC_API_KEY (AI reply suggestions) live in backend/.env.
+if [ -f .env ]; then set -a; . ./.env; set +a; fi
 if [ -d .venv ] && ! .venv/bin/python -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
   rm -rf .venv
 fi

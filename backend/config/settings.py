@@ -116,6 +116,7 @@ REST_FRAMEWORK = {
         "login-verify": os.environ.get("LOGIN_VERIFY_THROTTLE_RATE", "30/hour"),
         "enquiry": os.environ.get("ENQUIRY_THROTTLE_RATE", "10/hour"),
         "guest-message": os.environ.get("GUEST_MESSAGE_THROTTLE_RATE", "60/hour"),
+        "ai-draft": os.environ.get("AI_DRAFT_THROTTLE_RATE", "60/hour"),
     },
 }
 
@@ -128,6 +129,10 @@ DEV_LOGIN_CODES = env_bool("DEV_LOGIN_CODES", DEBUG)
 # Links in emails: the public site (guest conversations, the owner inbox) and the admin.
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:3100").rstrip("/")
 ADMIN_URL = os.environ.get("ADMIN_URL", "http://localhost:8100/admin").rstrip("/")
+
+# Claude suggests owners' replies (owners/assistant.py). Without a key the helper is off.
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")

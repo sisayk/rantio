@@ -26,6 +26,12 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     other sites will come in through the channel manager; until then they are demo data and
     replies to them stay in Stugora. Enquiries about example cottages with no owner go to
     `SIGNUP_NOTIFY_EMAILS` and are answered in the admin
+  - AI reply suggestions: `POST /api/owner/conversations/<id>/draft/` sends the conversation, the
+    cottage's facts (amenities, house rules, booked dates) and the owner's optional notes or own
+    draft to Claude (`owners/assistant.py`) and returns a suggested reply for the owner to edit and
+    send; nothing is sent to the guest from there. Needs `ANTHROPIC_API_KEY` (in `backend/.env`
+    locally; see `backend/.env.example`). Guests' messages go to Anthropic for this, so the
+    privacy policy must name Anthropic as a processor
   - `python manage.py seed_demo` — a demo owner (demo@stugora.fi) with three cottages and a
     year of bookings; `./dev.sh` creates it on a fresh database
   - `/admin/` — work the sign-ups, owners, cottages and bookings
@@ -113,6 +119,8 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 | `DJANGO_ALLOWED_HOSTS` | `api.stugora.fi` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` (the dashboard posts through the site) |
 | `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
+| `ANTHROPIC_API_KEY` | key for AI reply suggestions (optional; the button says it's off without it) |
+| `ANTHROPIC_MODEL` | `claude-sonnet-5-5` (default) |
 | `SITE_URL` | `https://stugora.fi` (links in emails) |
 | `ADMIN_URL` | `https://api.stugora.fi/admin` |
 | `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
@@ -130,6 +138,6 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
   endpoint that caches Wikipedia's answer per cottage for a week, so each page
   view doesn't call Wikipedia from the guest's browser
 - Buy stugora.fi and set up hello@stugora.fi (used on the page)
-- Privacy policy page (GDPR) and a link to it next to the consent box
+- Privacy policy page (GDPR), naming Anthropic as processor for AI reply suggestions, and a link to it next to the consent box
 - Finnish copy checked by a native speaker
 - Confirm with the accountant that Elda-Auto Tmi charges VAT on Stugora fees

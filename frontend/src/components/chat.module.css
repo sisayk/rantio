@@ -239,6 +239,7 @@
 
 .messages {
   flex: 1;
+  min-height: 180px;
   margin: 0;
   padding: 16px 18px;
   overflow-y: auto;
@@ -290,6 +291,8 @@
   padding: 12px 18px 10px;
   border-top: 1px solid var(--c-line);
 }
+
+.composer textarea { max-height: 40vh; }
 
 .composer textarea,
 .contactForm input,
@@ -544,3 +547,82 @@
 
   .bubble { max-width: 88%; }
 }
+
+/* ---------- AI help in the reply box ---------- */
+.assist { margin-bottom: 10px; }
+
+.assistBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.assistButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 14px;
+  border: 1px solid #c9d8cf;
+  border-radius: 999px;
+  background: #eef5f0;
+  color: var(--c-green-deep);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.assistButton:hover:not(:disabled) { background: #e1ede6; }
+
+.assistButton:disabled { opacity: 0.6; cursor: progress; }
+
+.assistButton svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.linkButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.assistNotes {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-soft);
+}
+
+.assistNotes input {
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid #b9c2bf;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--c-ink);
+}
+
+.drafted {
+  margin: 0 0 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #fdf3dc;
+  color: #6b4a0e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.composer textarea[data-suggested="true"] { border-color: #d9b867; }

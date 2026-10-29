@@ -132,6 +132,9 @@ export const ownerApi = {
   thread: (id: number) => call<Thread>(`owner/conversations/${id}/`),
   reply: (id: number, body: string) =>
     call<Thread>(`owner/conversations/${id}/`, { method: "POST", body: JSON.stringify({ body }) }),
+  /** Claude's suggestion for the reply box; nothing is sent to the guest. */
+  draft: (id: number, notes: string, draft: string) =>
+    call<{ draft: string }>(`owner/conversations/${id}/draft/`, { method: "POST", body: JSON.stringify({ notes, draft }) }),
   archive: (id: number, archived: boolean) =>
     call<ConversationRow>(`owner/conversations/${id}/`, { method: "PATCH", body: JSON.stringify({ archived }) }),
 };

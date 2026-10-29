@@ -27,6 +27,17 @@ COTTAGES = [
     ("Rantasauna", "Lohja", Region.HELSINKI, 4, 2, 120, 5, "lohja-lake-cabin"),
     ("Metsämökki", "Kuusamo", Region.OTHER, 5, 2, 140, None, ""),
 ]
+# What the demo cottages have, as on their stugora.fi pages (frontend/src/lib/listings.ts).
+AMENITIES = {
+    "lakeside-villa": ["lake", "privateShore", "electricSauna", "woodSauna", "jetty", "boat", "canoe", "hotTub",
+                       "dishwasher", "washingMachine", "grillHut", "highChair", "babyBed", "heatPump", "internet", "tv"],
+    "lohja-lake-cabin": ["lake", "privateShore", "woodSauna", "jetty", "boat", "loft", "outdoorWc", "solarPower",
+                         "carriedWater", "grillHut"],
+}
+HOUSE_RULES = {
+    "lakeside-villa": "Check-in from 16:00, check-out by 12:00. No smoking indoors. Pets by agreement.",
+    "lohja-lake-cabin": "Check-in from 15:00, check-out by 11:00. Water is carried in from the well; outdoor toilet.",
+}
 # Where demo guests book from, roughly like a lake cottage's first Stugora year.
 CHANNELS = [
     (Booking.Channel.AIRBNB, 34), (Booking.Channel.BOOKING, 24), (Booking.Channel.NETTIMOKKI, 22),
@@ -76,6 +87,8 @@ class Command(BaseCommand):
                 max_guests=guests, bedrooms=bedrooms, beds=guests, price_per_night=Decimal(price),
                 status=Cottage.Status.LIVE if listed else Cottage.Status.LISTING,
                 listing_started_on=months_ago(today, listed) if listed else None, listing_slug=slug,
+                amenities=AMENITIES.get(slug, []), house_rules=HOUSE_RULES.get(slug, ""),
+                has_lake_or_sea_access=slug in AMENITIES,
             )
             if listed:
                 count += self.book(cottage, guests, price, today, rng)
