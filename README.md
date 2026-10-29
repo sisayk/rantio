@@ -12,9 +12,11 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     `Booking` (commission and VAT per stay, yearly fee per listing year)
   - `POST /api/signups/` — public, throttled (10/hour per IP), honeypot field, emails the team
   - `/admin/` — work the sign-ups, owners, cottages and bookings
-- `frontend/` — Next.js 16 landing page for stugora.fi
-  - `/` in Finnish, `/en` in English; copy lives in `src/lib/content.ts`
-  - earnings estimator in the hero, using the same assumptions as the plan
+- `frontend/` — Next.js 16 site for stugora.fi
+  - guest homepage at `/` (Finnish) and `/en`: search, categories, filters, saved cottages;
+    example cottages in `src/lib/listings.ts`, copy in `src/lib/guestContent.ts`
+  - owner page at `/omistajille` and `/en/hosts`: earnings estimator and sign-up form;
+    copy in `src/lib/content.ts`
 
 ## Run it locally
 
