@@ -38,7 +38,10 @@ cd ..
 echo "Setting up the frontend…"
 cd frontend
 [ -f .env.local ] || cp .env.example .env.local
-[ -d node_modules ] || npm install --no-fund --no-audit
+# Install when packages are missing or package-lock.json changed since the last install.
+if [ ! -d node_modules ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then
+  npm install --no-fund --no-audit
+fi
 cd ..
 
 trap 'kill 0' EXIT
