@@ -23,6 +23,11 @@ export const en = {
       note: "Stugora is a trading name of Elda-Auto Tmi.",
       contact: "Contact",
     },
+    apps: {
+      title: "Get the Stugora app",
+      soon: "Coming soon",
+      download: "Download on",
+    },
   },
 
   guest: {

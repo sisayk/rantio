@@ -14,6 +14,11 @@ export const lv: Translation = {
       note: "Stugora ir uzņēmuma Elda-Auto Tmi papildu nosaukums.",
       contact: "Kontakti",
     },
+    apps: {
+      title: "Lejupielādējiet Stugora lietotni",
+      soon: "Drīzumā",
+      download: "Lejupielādēt no",
+    },
   },
 
   guest: {

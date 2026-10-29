@@ -14,6 +14,11 @@ export const is: Translation = {
       note: "Stugora er aukanafn Elda-Auto Tmi.",
       contact: "Hafa samband",
     },
+    apps: {
+      title: "Sæktu Stugora-appið",
+      soon: "Væntanlegt",
+      download: "Sækja í",
+    },
   },
 
   guest: {

@@ -14,6 +14,11 @@ export const da: Translation = {
       note: "Stugora er et binavn for Elda-Auto Tmi.",
       contact: "Kontakt",
     },
+    apps: {
+      title: "Hent Stugora-appen",
+      soon: "Kommer snart",
+      download: "Hent i",
+    },
   },
 
   guest: {

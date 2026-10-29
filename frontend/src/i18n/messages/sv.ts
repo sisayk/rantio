@@ -14,6 +14,11 @@ export const sv: Translation = {
       note: "Stugora är en bifirma till Elda-Auto Tmi.",
       contact: "Kontakt",
     },
+    apps: {
+      title: "Skaffa Stugora-appen",
+      soon: "Kommer snart",
+      download: "Ladda ner från",
+    },
   },
 
   guest: {

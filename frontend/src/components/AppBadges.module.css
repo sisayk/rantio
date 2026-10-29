@@ -1,0 +1,96 @@
+.apps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-basis: 100%;
+  padding-bottom: 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 156px;
+  height: 48px;
+  padding: 0 16px 0 12px;
+  border-radius: 10px;
+  background: #222;
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+a.badge:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+
+a.badge:focus-visible {
+  outline: 2px solid #222;
+  outline-offset: 2px;
+}
+
+.soon {
+  cursor: default;
+  opacity: 0.92;
+}
+
+.icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.text small {
+  font-size: 11px;
+  font-weight: 500;
+  color: #ddd;
+}
+
+.text strong {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 560px) {
+  .apps {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .badges {
+    width: 100%;
+  }
+  .badge {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

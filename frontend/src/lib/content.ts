@@ -17,3 +17,10 @@ export function ownerNetGain(nights: number, pricePerNight: number): number {
   const stugora = payout * COMMISSION * (1 + VAT) + YEARLY_FEE * (1 + VAT);
   return Math.max(0, payout - stugora);
 }
+
+// Store pages for the phone apps. Leave empty until the app is live in that store:
+// an empty link shows the button as "Coming soon" instead of linking anywhere.
+export const APP_LINKS = {
+  ios: "",
+  android: "",
+};

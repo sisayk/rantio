@@ -14,6 +14,11 @@ export const lt: Translation = {
       note: "Stugora yra Elda-Auto Tmi prekinis pavadinimas.",
       contact: "Kontaktai",
     },
+    apps: {
+      title: "Atsisiųskite Stugora programėlę",
+      soon: "Jau netrukus",
+      download: "Atsisiųsti iš",
+    },
   },
 
   guest: {

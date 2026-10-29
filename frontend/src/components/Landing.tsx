@@ -11,6 +11,7 @@ import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
 import HostSwitchLink from "./guest/HostSwitchLink";
 import styles from "./landing.module.css";
+import AppBadges from "./AppBadges";
 
 // July 2027 at an example Saimaa cottage: Nettimökki weeks stay, gaps fill from abroad.
 const JULY_OFFSET = 3; // 1 July 2027 is a Thursday
@@ -267,6 +268,7 @@ export default function Landing({ lang }: { lang: Lang }) {
       </main>
 
       <footer className={styles.footer}>
+        <AppBadges t={m.common.apps} />
         <p>{m.common.footer.note}</p>
         <p>
           {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>

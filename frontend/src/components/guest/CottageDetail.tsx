@@ -18,6 +18,7 @@ import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star }
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
+import AppBadges from "../AppBadges";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
   const m = getMessages(lang);
@@ -181,6 +182,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
       </main>
 
       <footer className={styles.footer}>
+        <AppBadges t={m.common.apps} />
         <p>{m.common.footer.note}</p>
         <p>
           {m.common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>

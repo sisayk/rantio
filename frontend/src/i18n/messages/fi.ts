@@ -14,6 +14,11 @@ export const fi: Translation = {
       note: "Stugora on Elda-Auto Tmi:n aputoiminimi.",
       contact: "Yhteys",
     },
+    apps: {
+      title: "Lataa Stugora-sovellus",
+      soon: "Tulossa pian",
+      download: "Lataa",
+    },
   },
 
   guest: {

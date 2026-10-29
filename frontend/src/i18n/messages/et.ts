@@ -14,6 +14,11 @@ export const et: Translation = {
       note: "Stugora on Elda-Auto Tmi kõrvalärinimi.",
       contact: "Kontakt",
     },
+    apps: {
+      title: "Laadi alla Stugora äpp",
+      soon: "Varsti tulemas",
+      download: "Laadi alla",
+    },
   },
 
   guest: {

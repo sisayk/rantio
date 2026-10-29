@@ -53,6 +53,7 @@ import {
   UserIcon,
 } from "./icons";
 import styles from "./guest.module.css";
+import AppBadges from "../AppBadges";
 
 // Leaflet needs the browser, so the map loads on the client only.
 const CottageMap = dynamic(() => import("./CottageMap"), {
@@ -997,6 +998,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
       ) : null}
 
       <footer className={styles.footer}>
+        <AppBadges t={common.apps} />
         <p>{common.footer.note}</p>
         <p>
           {common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
