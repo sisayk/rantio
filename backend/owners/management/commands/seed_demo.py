@@ -74,6 +74,8 @@ class Command(BaseCommand):
         existing = Owner.objects.filter(email=DEMO_EMAIL).first()
         if existing and not reset:
             self.stdout.write(f"Demo owner already exists: {DEMO_EMAIL} (use --reset to recreate)")
+            if not Owner.objects.filter(email=DEMO_SE_EMAIL).exists():
+                self.swedish(timezone.localdate(), random.Random(2026))
             return
         for old in Owner.objects.filter(email__in=[DEMO_EMAIL, DEMO_SE_EMAIL]):
             Booking.objects.filter(cottage__owner=old).delete()
@@ -102,6 +104,10 @@ class Command(BaseCommand):
         talks = self.talk(owner, timezone.now())
         self.stdout.write(self.style.SUCCESS(f"Demo owner {DEMO_EMAIL} with {count} bookings and {talks} conversations."))
 
+        self.swedish(today, rng)
+
+    def swedish(self, today: date, rng: random.Random) -> None:
+        """A Swedish owner with one cottage, priced and paid in kronor."""
         erik = Owner.objects.create(
             name="Erik Demo", email=DEMO_SE_EMAIL, language="sv", is_pilot=False, agreement_signed_on=months_ago(today, 7)
         )
