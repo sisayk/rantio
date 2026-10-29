@@ -1,0 +1,314 @@
+{% extends 'unfold/layouts/unauthenticated.html' %}
+{# Stugora admin login, the same split-screen layout as Bona's admin login:
+   left (hidden under 768px) a forest-green panel with the Stugora mark and a
+   lake-and-forest line drawing; right a centred card. The auth form, the
+   #login-form id and unfold's error notes are unchanged. Honours dark mode. #}
+
+{% load i18n static unfold %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <meta name="google" content="notranslate">
+    <script>document.documentElement.setAttribute('lang', 'en'); document.documentElement.setAttribute('translate', 'no');</script>
+    {{ form.media }}
+    <style>
+      :root {
+        --bl-espresso-1: #0F2A21;
+        --bl-espresso-2: #143A2D;
+        --bl-cream: #F3F5F2;
+        --bl-cream-muted: rgba(243, 245, 242, .76);
+        /* Stugora forest green, as on stugora.fi. Variable names as in Bona's login. */
+        --bl-on-dark: #A9D4C1;
+        --bl-rose: #1D4C3C;
+        --bl-rose-dark: #143A2D;
+        --bl-rose-soft: #EAF1EE;
+        --bl-page-bg: #F5F6F5;
+        --bl-card-bg: #ffffff;
+        --bl-card-border: #E1E5E3;
+        --bl-text: #1D2A2E;
+        --bl-muted: #5D6A6E;
+        --bl-input-border: #C9D1CE;
+      }
+      .dark {
+        --bl-page-bg: #0E1412;
+        --bl-card-bg: #141A18;
+        --bl-card-border: #27332F;
+        --bl-text: #EEF3F1;
+        --bl-muted: #8C9A95;
+        --bl-input-border: #36463F;
+        --bl-rose-soft: #1F302A;
+        --bl-rose: #4F8C76;
+        --bl-rose-dark: #5F9C86;
+      }
+
+      .bl-left {
+        position: relative;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        width: 40%;
+        max-width: 620px;
+        padding: 56px;
+        color: var(--bl-cream);
+        background:
+          radial-gradient(120% 80% at 80% 0%, rgba(169, 212, 193, .16) 0%, rgba(169, 212, 193, 0) 60%),
+          linear-gradient(160deg, var(--bl-espresso-2) 0%, var(--bl-espresso-1) 100%);
+        overflow: hidden;
+      }
+      @media (min-width: 768px) { .bl-left { display: flex; } }
+
+      .bl-art { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: auto; color: var(--bl-on-dark); opacity: .22; pointer-events: none; }
+
+      .bl-logo { position: absolute; top: 42px; left: 48px; }
+      .bl-logo { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 800; letter-spacing: -.01em; color: var(--bl-cream); }
+      .bl-logo svg { width: 44px; height: 44px; color: var(--bl-on-dark); }
+
+      .bl-welcome { font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; color: var(--bl-cream); }
+      .bl-welcome .accent { color: var(--bl-on-dark); display: block; font-size: 40px; }
+      .bl-blurb { margin-top: 14px; font-size: 14.5px; line-height: 1.65; color: var(--bl-cream-muted); max-width: 330px; }
+
+      .bl-secure {
+        position: absolute; bottom: 26px; left: 48px;
+        display: flex; align-items: center; gap: 10px;
+        font-size: 12px; color: var(--bl-cream-muted);
+      }
+      .bl-secure .material-symbols-outlined { font-size: 20px; color: var(--bl-on-dark); }
+      .bl-secure .t1 { font-weight: 700; display: block; color: var(--bl-cream); }
+      .bl-secure .t2 { display: block; }
+
+      .bl-right {
+        position: relative; flex: 1;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 48px 20px 28px;
+        background: var(--bl-page-bg);
+      }
+
+      .bl-card {
+        width: 100%; max-width: 480px;
+        background: var(--bl-card-bg);
+        border: 1px solid var(--bl-card-border);
+        border-radius: 16px;
+        padding: 38px 36px 30px;
+        box-shadow: 0 12px 44px rgba(16, 22, 28, .08);
+      }
+      .bl-lock {
+        width: 56px; height: 56px; margin: 0 auto 14px;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--bl-rose-soft); border-radius: 16px;
+      }
+      .bl-lock .material-symbols-outlined { color: var(--bl-rose); font-size: 26px; }
+      .bl-title { text-align: center; font-size: 21px; font-weight: 800; color: var(--bl-text); letter-spacing: -.01em; }
+      .bl-sub { text-align: center; font-size: 13px; color: var(--bl-muted); margin: 4px 0 24px; }
+
+      .bl-field { margin-bottom: 16px; }
+      .bl-field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--bl-text); margin-bottom: 6px; }
+      .bl-input-wrap { position: relative; }
+      .bl-input-wrap .lead {
+        position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        font-size: 18px; color: var(--bl-muted); pointer-events: none;
+      }
+      #login-form .bl-input-wrap input {
+        width: 100%; box-sizing: border-box;
+        min-height: 46px; padding: 12px 40px 12px 40px !important;
+        background: var(--bl-card-bg) !important;
+        border: 1px solid var(--bl-input-border) !important;
+        border-radius: 8px !important;
+        color: var(--bl-text) !important;
+        font-size: 14px !important;
+        box-shadow: none !important;
+      }
+      #login-form .bl-input-wrap input::placeholder { color: var(--bl-muted); opacity: .8; }
+      #login-form .bl-input-wrap input:focus {
+        border-color: var(--bl-rose) !important;
+        outline: 3px solid rgba(29, 76, 60, .18) !important;
+        outline-offset: 0;
+      }
+      .bl-eye {
+        position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+        display: flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border: none; background: transparent; cursor: pointer;
+        color: var(--bl-muted); border-radius: 8px;
+      }
+      .bl-eye:hover { color: var(--bl-text); }
+      .bl-eye .material-symbols-outlined { font-size: 19px; }
+
+      .bl-forgot { display: block; text-align: right; font-size: 12.5px; font-weight: 600; color: var(--bl-rose); text-decoration: none; margin: -6px 0 16px; }
+      .bl-forgot:hover { color: var(--bl-rose-dark); text-decoration: underline; }
+
+      #login-form button.bl-signin {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; min-height: 46px;
+        background: var(--bl-rose) !important;
+        color: #FFFFFF !important;
+        background-image: linear-gradient(180deg, #245B48 0%, #1D4C3C 100%) !important;
+        border: 1px solid var(--bl-rose) !important;
+        border-radius: 8px !important;
+        font-size: 14.5px !important; font-weight: 700 !important;
+        cursor: pointer; opacity: 1 !important;
+        box-shadow: 0 2px 12px rgba(29, 76, 60, .28);
+      }
+      #login-form button.bl-signin:hover { background: var(--bl-rose-dark) !important; border-color: var(--bl-rose-dark) !important; }
+      #login-form button.bl-signin:focus-visible { outline: 3px solid rgba(29, 76, 60, .40) !important; outline-offset: 2px; }
+      #login-form button.bl-signin:disabled { opacity: .75 !important; cursor: not-allowed; }
+
+      .bl-or { display: flex; align-items: center; gap: 12px; margin: 20px 0 14px; color: var(--bl-muted); font-size: 12px; }
+      .bl-or::before, .bl-or::after { content: ""; flex: 1; height: 1px; background: var(--bl-card-border); }
+
+      .bl-note { display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; color: var(--bl-muted); }
+      .bl-note .material-symbols-outlined { font-size: 16px; color: var(--bl-rose); }
+
+      .bl-footer { margin-top: 26px; font-size: 12px; color: var(--bl-muted); text-align: center; }
+
+      .bl-errors { margin-bottom: 18px; }
+    </style>
+{% endblock %}
+
+{% block title %}
+    {{ title }} | {{ site_title }}
+{% endblock %}
+
+{% block base %}
+    <div id="page" class="flex min-h-screen">
+
+        {# ── Left: forest-green brand panel ────────────────────────────── #}
+        <div class="bl-left">
+            <div class="bl-logo">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                    <path d="M15 4 6 17h4.5L5 25h20l-5.5-8H24L15 4Z" fill="currentColor"/>
+                    <path d="M14 25v4h2v-4" fill="currentColor"/>
+                    <path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Stugora
+            </div>
+            <svg class="bl-art" viewBox="0 0 600 260" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+                <path d="M0 150 60 70l20 26 30-46 34 52 22-30 40 58"/>
+                <path d="M190 150 214 112l14 18 26-44 30 46 20-24 32 42"/>
+                <path d="M330 150h40l14-22 14 22h44l18-30 18 30h40"/>
+                <path d="M392 128v-16l18-14 18 14v16"/>
+                <path d="M470 150 500 96l18 24 22-40 30 48 30-20v42"/>
+                <path d="M0 150h600"/>
+                <path d="M0 176c40-8 80-8 120 0s80 8 120 0 80-8 120 0 80 8 120 0 80-8 120 0"/>
+                <path d="M30 204c34-6 68-6 102 0s68 6 102 0 68-6 102 0 68 6 102 0 68-6 102 0"/>
+                <path d="M70 232c30-5 60-5 90 0s60 5 90 0 60-5 90 0 60 5 90 0"/>
+            </svg>
+
+            <div>
+                <div class="bl-welcome">
+                    {% translate 'Welcome back,' %}
+                    <span class="accent">Admin</span>
+                </div>
+                <p class="bl-blurb">
+                    Sign in to the Stugora admin to look after owners, cottages, stays and guests.
+                </p>
+            </div>
+
+            <div class="bl-secure">
+                <span class="material-symbols-outlined">verified_user</span>
+                <span>
+                    <span class="t1">{% translate 'Secure admin access' %}</span>
+                    <span class="t2">{% translate 'Your data is protected' %}</span>
+                </span>
+            </div>
+        </div>
+
+        {# ── Right: login card ────────────────────────────────────────── #}
+        <div class="bl-right">
+            <div class="bl-card">
+                <div class="bl-lock"><span class="material-symbols-outlined">lock</span></div>
+                <h1 class="bl-title">{% translate 'Admin Login' %}</h1>
+                <p class="bl-sub">{% translate 'Sign in to your admin account' %}</p>
+
+                {% include "unfold/helpers/messages.html" %}
+
+                {% if form.errors or form.non_field_errors %}
+                    <div class="bl-errors flex flex-col gap-4 *:mb-0">
+                        {% include "unfold/helpers/messages/errornote.html" with errors=form.errors %}
+
+                        {% include "unfold/helpers/messages/error.html" with errors=form.non_field_errors %}
+
+                        {% if user.is_authenticated %}
+                            {% blocktranslate trimmed asvar message %}
+                                You are authenticated as {{ username }}, but are not authorized to
+                                access this page. Would you like to login to a different account?
+                            {% endblocktranslate %}
+
+                            {% include "unfold/helpers/messages/error.html" with error=message %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <form action="{{ app_path }}" method="post" id="login-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <div class="bl-field">
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        <div class="bl-input-wrap">
+                            <span class="material-symbols-outlined lead">person</span>
+                            {{ form.username }}
+                        </div>
+                    </div>
+
+                    <div class="bl-field">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <div class="bl-input-wrap">
+                            <span class="material-symbols-outlined lead">lock</span>
+                            {{ form.password }}
+                            <button type="button" class="bl-eye" aria-label="{% translate 'Show password' %}"
+                                    onclick="var i=document.getElementById('{{ form.password.id_for_label }}');var s=this.querySelector('span');if(i.type==='password'){i.type='text';s.textContent='visibility_off';}else{i.type='password';s.textContent='visibility';}">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if form.otp_token %}
+                        {% comment %}Two-factor auth (django-otp). One field accepts
+                        either the 6-digit authenticator code or a static backup code —
+                        the backend matches the token against all of the user's
+                        devices.{% endcomment %}
+                        <div class="bl-field">
+                            <label for="id_otp_token">{% translate 'Authenticator Code' %}</label>
+                            <div class="bl-input-wrap">
+                                <span class="material-symbols-outlined lead">pin</span>
+                                <input type="text" name="otp_token" id="id_otp_token"
+                                       autocomplete="one-time-code" inputmode="numeric"
+                                       placeholder="6-digit code" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% url 'admin_password_reset' as password_reset_url %}
+                    {% url 'admin:admin_password_reset' as unfold_password_reset_url %}
+                    {% if password_reset_url or unfold_password_reset_url %}
+                        <a class="bl-forgot" href="{{ password_reset_url|default:unfold_password_reset_url }}">{% translate 'Forgot password?' %}</a>
+                    {% endif %}
+
+                    <button type="submit" class="bl-signin submit-row">
+                        {% translate 'Sign In' %}
+                    </button>
+                </form>
+
+                <div class="bl-or">{% translate 'or' %}</div>
+                <div class="bl-note">
+                    <span class="material-symbols-outlined">verified_user</span>
+                    {% translate 'Secure access to the Stugora admin' %}
+                </div>
+            </div>
+
+            <div class="bl-footer">&copy; {% now "Y" %} Stugora · Elda-Auto Tmi</div>
+
+            {% include "unfold/helpers/unauthenticated_header.html" %}
+        </div>
+    </div>
+
+    <script>
+      /* Visual-only: placeholders on the existing auth form (form class untouched). */
+      (function () {
+        var u = document.querySelector('#login-form input[name="username"]');
+        var p = document.querySelector('#login-form input[name="password"]');
+        if (u) u.placeholder = 'Your username';
+        if (p) p.placeholder = 'Enter your password';
+      })();
+    </script>
+{% endblock %}

@@ -1,0 +1,906 @@
+/* Stugora admin stylesheet — the same design as Bona's operations admin
+   (django-unfold + this file), in Stugora's green.
+   Served by config/admin_assets_view.py at /admin/_assets/stugora-admin.css, so it
+   ships with the code and needs no collectstatic. */
+/* ---------- 0. Theme tokens — light defaults + dark overrides ----------- */
+/* Unfold toggles the `dark` class on <html>; every colour below flips with it. */
+:root {
+  /* Stugora forest green, as on stugora.fi and the owner dashboard. */
+  --st-accent: #1D4C3C;
+  --st-accent-hover: #143A2D;
+  --st-accent-light: #4F7A6B;
+  --st-accent-ring: rgba(29, 76, 60, 0.18);
+  --st-surface: #ffffff;
+  --st-surface-translucent: rgba(255, 255, 255, 0.96);
+  --st-soft: #F3F5F4;
+  --st-hover: #EAF1EE;
+  --st-border: #E1E5E3;
+  --st-border-strong: #C9D1CE;
+  --st-text: #1D2A2E;
+  --st-text-2: #3A4649;
+  --st-muted: #5D6A6E;
+  --st-accent-soft: #B7CCC4;
+  --st-danger: #B91C1C;
+  --st-danger-strong: #DC2626;
+  --st-danger-bg: #FEE2E2;
+  --st-danger-border: #FECACA;
+}
+.dark {
+  --st-accent: #7FB8A2;
+  --st-accent-hover: #9CCAB7;
+  --st-accent-light: #4F8C76;
+  --st-accent-ring: rgba(127, 184, 162, 0.28);
+  --st-surface: #141A18;
+  --st-surface-translucent: rgba(20, 26, 24, 0.96);
+  --st-soft: #1B2320;
+  --st-hover: #1F302A;
+  --st-border: #27332F;
+  --st-border-strong: #36463F;
+  --st-text: #EEF3F1;
+  --st-text-2: #C7D2CE;
+  --st-muted: #8C9A95;
+  --st-accent-soft: #4F8C76;
+  --st-danger: #F87171;
+  --st-danger-strong: #F87171;
+  --st-danger-bg: #3A1A1E;
+  --st-danger-border: #5E2730;
+}
+
+
+/* =========================================================================
+   Stugora admin — global form design system.
+   Applies to every /admin/ add/edit page via UNFOLD["STYLES"].
+
+   Goals
+   ─────
+   • Centered, card-style form area (max-width 1100px)
+   • Fieldsets render as titled cards with grid-based field layouts:
+       .st-grid-2 → 2 cols (tablet+); .st-grid-3 → 3 cols (desktop)
+       .st-wide   → single full-width row (textareas, JSON)
+   • Inputs: consistent height, on-brand border, clean focus ring
+   • Date / time inputs: calendar icon stays inline beside the input
+   • Related FK widgets (Salon dropdown + pencil/+/eye actions):
+       icons render inline as a small row, never stacked vertically
+   • Sticky save bar polished
+   • Fully responsive @ 1440 / 1280 / 1024 / 768 / 430
+   ========================================================================= */
+
+
+/* ---------- 1. Form container: center & cap width ------------------------ */
+
+#content > form,
+#content-main > form {
+  max-width: 1120px;
+  margin: 0 auto 80px;
+  /* Leave room for the sticky save bar at the bottom so it never covers
+     form fields when the user scrolls to the last fieldset. */
+  padding-bottom: 120px;
+}
+
+/* List-page changelist: keep full width */
+#content > form#changelist-form,
+#content-main > form#changelist-form,
+#changelist {
+  max-width: none;
+}
+
+
+/* ---------- 2. Fieldsets as cards ---------------------------------------- */
+
+#content fieldset.module {
+  background: var(--st-surface);
+  border: 1px solid var(--st-border);
+  border-radius: 14px;
+  padding: 22px 24px 8px;
+  margin: 0 0 18px;
+  box-shadow: 0 1px 2px rgba(15, 8, 28, 0.03);
+}
+
+#content fieldset.module h2,
+#content fieldset.module .module-header {
+  background: transparent !important;
+  color: var(--st-text) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 0 14px 0 !important;
+  margin: 0 0 16px 0 !important;
+  border-bottom: 1px dashed var(--st-border);
+}
+
+#content fieldset.module .description {
+  color: var(--st-muted);
+  font-size: 12px;
+  margin: -8px 0 14px 0;
+  line-height: 1.5;
+}
+
+
+/* ---------- 3. Form rows: stacked label/input by default ----------------- */
+
+#content fieldset.module .form-row {
+  display: block;
+  padding: 0 0 14px 0 !important;
+  border: none !important;
+  background: transparent !important;
+  overflow: visible;
+}
+
+#content fieldset.module .form-row > div,
+#content fieldset.module .form-row > .flex {
+  display: block;
+}
+
+#content fieldset.module .form-row label,
+#content fieldset.module .form-row .vTimeField + br + label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-text-2) !important;
+  margin: 0 0 6px 0 !important;
+  text-align: left !important;
+  width: auto !important;
+  float: none !important;
+  padding: 0 !important;
+}
+
+#content fieldset.module .form-row label.required::after,
+#content fieldset.module .form-row .required label::after {
+  content: " *";
+  color: var(--st-danger-strong);
+  font-weight: 800;
+}
+
+#content fieldset.module .form-row .help,
+#content fieldset.module .form-row .helptext,
+#content fieldset.module .form-row small.help {
+  display: block;
+  margin: 6px 0 0 0;
+  font-size: 11px;
+  color: var(--st-muted) !important;
+  opacity: 1 !important;
+  line-height: 1.5;
+}
+
+
+/* ---------- 4. Grid variants -------------------------------------------- */
+/* Unfold wraps all .form-row elements inside an inner .form-rows container,
+   so the grid must be applied to .form-rows (not to the fieldset itself).
+   Add .st-grid-2 / .st-grid-3 / .st-wide via ModelAdmin fieldsets
+   `classes` tuple. */
+
+#content fieldset.module.st-grid-2 > .form-rows,
+#content fieldset.module.st-grid-3 > .form-rows {
+  display: grid !important;
+  gap: 0;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#content fieldset.module.st-grid-2 > .form-rows { grid-template-columns: 1fr; }
+#content fieldset.module.st-grid-3 > .form-rows { grid-template-columns: 1fr; }
+
+@media (min-width: 768px) {
+  #content fieldset.module.st-grid-2 > .form-rows { grid-template-columns: 1fr 1fr; }
+  #content fieldset.module.st-grid-3 > .form-rows { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1024px) {
+  #content fieldset.module.st-grid-3 > .form-rows { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* Grid cells get a subtle dashed separator */
+#content fieldset.module.st-grid-2 > .form-rows > .form-row,
+#content fieldset.module.st-grid-3 > .form-rows > .form-row {
+  border: none !important;
+  border-bottom: 1px dashed var(--st-border) !important;
+  border-right: 1px dashed var(--st-border) !important;
+  background: transparent !important;
+}
+
+/* Full-width single column variant (for notes/json) */
+#content fieldset.module.st-wide .form-row textarea {
+  width: 100% !important;
+  min-height: 140px;
+  resize: vertical;
+}
+
+
+/* ---------- 5. Inputs ---------------------------------------------------- */
+
+#content input[type="text"],
+#content input[type="number"],
+#content input[type="email"],
+#content input[type="url"],
+#content input[type="tel"],
+#content input[type="password"],
+#content input[type="search"],
+#content input[type="date"],
+#content input[type="time"],
+#content input[type="datetime-local"],
+#content textarea,
+#content select,
+#content .vTextField,
+#content .vIntegerField,
+#content .vBigIntegerField,
+#content .vURLField,
+#content .vEmailField,
+#content .vDateField,
+#content .vTimeField,
+#content .vDateTimeField,
+#content .vForeignKeyRawIdAdminField {
+  width: 100%;
+  max-width: 100%;
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border-strong) !important;
+  border-radius: 8px !important;
+  color: var(--st-text) !important;
+  padding: 9px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.4;
+  box-shadow: none !important;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+/* Narrower native widgets shouldn't blow up */
+#content input.vIntegerField,
+#content input[type="number"] {
+  max-width: 320px;
+}
+#content input.vDateField,
+#content input[type="date"] {
+  max-width: 220px;
+}
+#content input.vTimeField,
+#content input[type="time"] {
+  max-width: 160px;
+}
+
+#content textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+#content input:focus,
+#content textarea:focus,
+#content select:focus {
+  border-color: var(--st-accent) !important;
+  outline: 3px solid var(--st-accent-ring) !important;
+  outline-offset: 0 !important;
+}
+
+#content input[disabled],
+#content input[readonly],
+#content textarea[readonly] {
+  background: var(--st-soft) !important;
+  color: var(--st-text-2) !important;
+  border-color: var(--st-border) !important;
+  cursor: not-allowed;
+}
+
+/* Read-only display (no <input>, just text) */
+#content .form-row .readonly {
+  display: inline-block;
+  padding: 9px 12px;
+  background: var(--st-soft);
+  border: 1px solid var(--st-border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--st-text-2);
+  min-height: 22px;
+}
+
+
+/* ---------- 6. Date / time pickers ------------------------------------- */
+/*
+   Django uses plain <input type="text" class="vDateField"> (not native date)
+   with a sibling <span class="datetimeshortcuts"> containing TWO <a> links:
+     1. text link  → "Today" / "Now"    (no icon inside)
+     2. picker link → <span class="date-icon">/<span class="clock-icon">
+   Separated by a literal "|" text node.
+
+   Goals:
+     · input on the left, shortcuts on the right, one clean horizontal group
+     · "Today" / "Now" rendered as a labelled pill with a small icon prefix
+     · the picker trigger is a 36×36 square icon button
+     · the literal "|" separator and surrounding &nbsp; whitespace hidden
+     · usable on mobile (wrap below input if needed)
+   ---------------------------------------------------------------------- */
+
+#content .timezonewarning,
+#content .help.timezonewarning { display: none !important; }
+
+/* Row layout: input + shortcuts in one inline-flex line */
+#content .field-line p.date,
+#content .field-line p.time,
+#content .field-line p.datetime {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Input sizing (text-mode, narrow) */
+#content .field-line p.date > input.vDateField,
+#content .field-line p.time > input.vTimeField,
+#content .field-line .vDateField  { max-width: 220px; width: 100%; flex: 0 1 220px; }
+#content .field-line .vTimeField  { max-width: 160px; width: 100%; flex: 0 1 160px; }
+
+/* Shortcuts wrapper */
+#content .datetimeshortcuts {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  /* Collapse the &nbsp;|&nbsp; text nodes between the two <a> tags. */
+  font-size: 0 !important;
+  color: transparent;
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* RESTORE font on the visible <a> children so their text shows up.
+   Force document order via explicit `order`: "Today/Now" first, picker after. */
+#content .datetimeshortcuts > a {
+  font-size: 12px !important;
+  color: var(--st-accent) !important;
+  order: 2 !important;
+}
+#content .datetimeshortcuts > a:first-of-type { order: 1 !important; }
+#content .datetimeshortcuts > a:last-of-type  { order: 2 !important; }
+
+/* "Today" / "Now" pill (first link, text-only) */
+#content .datetimeshortcuts > a:first-of-type {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px !important;
+  height: 36px;
+  min-width: 0;
+  width: auto !important;
+  background: var(--st-soft);
+  border: 1px solid var(--st-border);
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  line-height: 1;
+}
+#content .datetimeshortcuts > a:first-of-type:hover {
+  background: var(--st-hover);
+  border-color: var(--st-accent-soft);
+}
+/* small leading icon glyph before the text */
+#content .field-line p.date  .datetimeshortcuts > a:first-of-type::before,
+#content .field-line p.time  .datetimeshortcuts > a:first-of-type::before,
+#content .field-line p.datetime .datetimeshortcuts > a:first-of-type::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex: none;
+}
+#content .field-line p.date .datetimeshortcuts > a:first-of-type::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231D4C3C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+}
+#content .field-line p.time .datetimeshortcuts > a:first-of-type::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231D4C3C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>");
+}
+
+/* Picker trigger (second link, contains .date-icon / .clock-icon) — square icon button */
+#content .datetimeshortcuts > a:last-of-type {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px;
+  padding: 0 !important;
+  background: var(--st-soft);
+  border: 1px solid var(--st-border);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0 !important;
+  line-height: 0;
+}
+#content .datetimeshortcuts > a:last-of-type:hover {
+  background: var(--st-hover);
+  border-color: var(--st-accent-soft);
+}
+
+/* Suppress unfold's auto-injected Material Symbols icons. Unfold ships its
+   own ::after on every <a> inside .datetimeshortcuts (content "update")
+   and on .date-icon / .clock-icon (content "calendar_today" / "schedule"),
+   rendered via a Material Symbols font. We use our own SVG icons via
+   ::before on the pill and via a background-image on the .date-icon span,
+   so we need to kill the duplicates. */
+#content .datetimeshortcuts > a::after,
+#content .date-icon::after,
+#content .clock-icon::after,
+#content .date-icon::before,
+#content .clock-icon::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+
+/* Render an SVG glyph inside the empty .date-icon / .clock-icon spans */
+#content .date-icon,
+#content .clock-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+  vertical-align: middle;
+  /* Override any inherited font icon size/color from Material Symbols */
+  font-size: 0 !important;
+  color: transparent !important;
+}
+#content .date-icon {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231D4C3C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+}
+#content .clock-icon {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231D4C3C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>");
+}
+
+/* Mobile: wrap shortcuts below input */
+@media (max-width: 640px) {
+  #content .field-line p.date,
+  #content .field-line p.time,
+  #content .field-line p.datetime {
+    gap: 8px;
+  }
+  #content .field-line .vDateField,
+  #content .field-line .vTimeField {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+
+/* ---------- 7. select2 (FK + autocomplete) ------------------------------ */
+
+.select2-container .select2-selection--single,
+.select2-container--admin-autocomplete .select2-selection--single,
+.select2-container--default .select2-selection--single {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border-strong) !important;
+  border-radius: 8px !important;
+  min-height: 40px !important;
+  height: 40px !important;
+}
+.select2-container .select2-selection--single .select2-selection__rendered,
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--st-text) !important;
+  line-height: 38px !important;
+  padding-left: 12px !important;
+}
+.select2-container .select2-selection--single .select2-selection__arrow,
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px !important;
+  right: 8px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: var(--st-muted) !important;
+}
+.select2-container--open .select2-dropdown {
+  border: 1px solid var(--st-accent-soft) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: var(--st-accent) !important;
+  color: #ffffff !important;
+}
+
+.select2-container--default .select2-selection--multiple {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border-strong) !important;
+  border-radius: 8px !important;
+  min-height: 40px !important;
+  padding: 4px 8px !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: var(--st-hover) !important;
+  border: 1px solid var(--st-accent-soft) !important;
+  color: var(--st-text-2) !important;
+  border-radius: 6px !important;
+  font-size: 12px;
+}
+
+
+/* ---------- 8. Related-widget icons (pencil / + / eye) ------------------ */
+/*
+   Inline FK actions Django renders after a select/autocomplete widget:
+     ✏️ change-related  ➕ add-related  👁️ view-related
+   Unfold renders each <a> as a separate block, stacking them vertically below
+   the select. Force the wrapper into an inline-flex row, links inline.       */
+
+#content .related-widget-wrapper,
+#content div.related-widget-wrapper,
+#content .form-row .related-widget-wrapper,
+#content .field-line .related-widget-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  width: 100%;
+  max-width: 100%;
+}
+
+#content .related-widget-wrapper > select,
+#content .related-widget-wrapper > .select2,
+#content .related-widget-wrapper > input[type="text"] {
+  flex: 1 1 260px !important;
+  min-width: 0 !important;
+}
+
+/* The select2 span ships with an inline style="width: 280px;" — override */
+#content .related-widget-wrapper > .select2.select2-container {
+  width: auto !important;
+  flex: 1 1 260px !important;
+  min-width: 240px !important;
+  max-width: 100% !important;
+}
+
+#content a.related-widget-wrapper-link,
+#content .related-widget-wrapper > a,
+#content .related-widget-wrapper-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  background: var(--st-soft) !important;
+  border: 1px solid var(--st-border) !important;
+  color: var(--st-accent) !important;
+  text-decoration: none !important;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+#content a.related-widget-wrapper-link:hover,
+#content .related-widget-wrapper > a:hover {
+  background: var(--st-hover) !important;
+  border-color: var(--st-accent-soft) !important;
+  color: var(--st-accent-hover) !important;
+}
+
+#content .related-widget-wrapper-link img,
+#content .related-widget-wrapper-link svg,
+#content .related-widget-wrapper-link span[class*="material"],
+#content .related-widget-wrapper-link i {
+  width: 16px;
+  height: 16px;
+  font-size: 16px !important;
+  display: inline-block;
+}
+
+
+/* ---------- 9. Errors & required markers -------------------------------- */
+
+#content .form-row.errors,
+#content .form-row .errorlist {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+#content .errorlist {
+  list-style: none;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+#content .errorlist li {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--st-danger);
+  background: var(--st-danger-bg);
+  border: 1px solid var(--st-danger-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+#content .form-row.errors input,
+#content .form-row.errors textarea,
+#content .form-row.errors select {
+  border-color: var(--st-danger-strong) !important;
+}
+
+
+/* ---------- 10. Sticky submit row --------------------------------------- */
+/* IMPORTANT: every selector here is scoped to #content. Unfold tags the LOGIN
+   button with class "submit-row" (admin/login.html), so a bare ".submit-row"
+   rule would hijack that button — white background + the button's own white
+   text = an invisible button. The login page renders with NO #content wrapper,
+   so #content-scoping keeps these save-bar styles off it. The login button is
+   styled explicitly in section 13 below. */
+
+#content .submit-row {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: var(--st-surface-translucent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--st-border);
+  padding: 14px 22px !important;
+  margin: 0 auto !important;
+  max-width: 1120px;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 -6px 18px rgba(15, 8, 28, 0.04);
+}
+
+#content .submit-row input,
+#content .submit-row button {
+  padding: 9px 16px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  border: 1px solid var(--st-border) !important;
+  background: var(--st-surface) !important;
+  color: var(--st-text-2) !important;
+  cursor: pointer;
+  min-height: 38px;
+  line-height: 1;
+}
+
+#content .submit-row input.default,
+#content .submit-row input[name="_save"] {
+  background: var(--st-accent) !important;
+  color: #ffffff !important;
+  border-color: var(--st-accent) !important;
+}
+#content .submit-row input.default:hover {
+  background: var(--st-accent-hover) !important;
+}
+
+/* Delete link should be visually de-emphasized */
+#content .submit-row .deletelink,
+#content .submit-row a.deletelink {
+  background: transparent !important;
+  color: var(--st-danger) !important;
+  border-color: transparent !important;
+  margin-right: auto !important;
+  text-decoration: none;
+}
+
+
+/* ---------- 11. Responsive tweaks --------------------------------------- */
+
+@media (max-width: 1024px) {
+  #content > form,
+  #content-main > form { padding: 0 12px; }
+}
+
+@media (max-width: 768px) {
+  #content fieldset.module { padding: 16px 14px 4px; border-radius: 12px; }
+  #content fieldset.module.st-grid-2,
+  #content fieldset.module.st-grid-3 { grid-template-columns: 1fr; gap: 0; }
+  #content .submit-row {
+    border-radius: 0;
+    padding: 12px 14px !important;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  #content .submit-row input,
+  #content .submit-row button { flex: 1 1 auto; min-width: 0; }
+}
+
+@media (max-width: 430px) {
+  #content fieldset.module h2 { font-size: 11px !important; }
+  #content input,
+  #content textarea,
+  #content select { font-size: 16px !important; } /* iOS no-zoom */
+}
+
+
+/* ---------- 12. Page header polish (small, cross-page) ------------------ */
+
+.breadcrumbs,
+#content .breadcrumbs {
+  font-size: 12px !important;
+  color: var(--st-muted) !important;
+}
+
+#content h1 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--st-text) !important;
+  letter-spacing: -0.01em;
+  margin: 4px 0 16px 0;
+}
+
+
+/* ---------- 13. Login page submit button -------------------------------- */
+/*
+   The admin login button (admin/login.html) is rendered by Unfold's button
+   component with class "submit-row w-full". This block guarantees it is a
+   clearly visible, on-brand primary button in BOTH light and dark mode, and
+   resets any layout/position leakage. Scoped to #login-form so it never
+   affects edit-page save bars (those live under #content, section 10).
+
+   Requirements covered: strong Stugora green bg + white text, full width,
+   44–48px tall, 10px radius, weight 600, darker hover, visible focus ring,
+   and disabled/loading that stays visible (never opacity-0 / white-on-white). */
+
+#login-form button[type="submit"],
+#login-form .submit-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 12px 18px !important;
+  background: var(--st-accent) !important;          /* Stugora green (primary-600) */
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid var(--st-accent) !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  opacity: 1 !important;                   /* never invisible */
+  /* undo any sticky/flex-end/backdrop leak from the old bare .submit-row rule */
+  position: static !important;
+  inset: auto !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 1px solid var(--st-accent) !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* the trailing arrow icon + label must stay white in both themes */
+#login-form button[type="submit"] * {
+  color: #ffffff !important;
+}
+
+#login-form button[type="submit"]:hover {
+  background: var(--st-accent-hover) !important;          /* darker green */
+  border-color: var(--st-accent-hover) !important;
+}
+
+#login-form button[type="submit"]:focus-visible {
+  outline: 3px solid rgba(29, 76, 60, 0.45) !important;
+  outline-offset: 2px !important;
+}
+
+#login-form button[type="submit"]:disabled,
+#login-form button[type="submit"][disabled],
+#login-form button[type="submit"][aria-disabled="true"] {
+  background: var(--st-accent-light) !important;          /* lighter green — still clearly visible */
+  border-color: var(--st-accent-light) !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+/* "Forgotten password" secondary button: keep it readable, de-emphasized */
+#login-form .password-reset-link {
+  width: 100% !important;
+  color: var(--st-accent-hover) !important;
+}
+
+
+/* ---------- 14. Audit fixes, Sep 2026 ----------------------------------- */
+
+#content .select2-container .select2-selection--single {
+  height: auto !important;
+  min-height: 40px;
+}
+#content .select2-container .select2-selection--single .select2-selection__rendered {
+  line-height: 1.6 !important;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+  overflow: visible;
+}
+
+/* Required marker: unfold already prints a red "*" inside the label, so the
+   ::after from section 3 produced "Name* *". */
+#content fieldset.module .form-row label.required::after,
+#content fieldset.module .form-row .required label::after {
+  content: none !important;
+}
+
+/* The changelist search box. Section 5 gives every text input a border and a
+   40px min-height, and the search input sits INSIDE unfold's own bordered
+   pill — that drew a box inside a box with the "/" hint stranded outside. */
+#content #changelist-search #searchbar,
+#content #toolbar input#searchbar {
+  border: 0 !important;
+  background: transparent !important;
+  min-height: 0 !important;
+  padding: 8px 6px !important;
+  width: auto !important;
+  flex: 1 1 auto;
+}
+
+/* Lists: dates, money and short codes stay on one line; names still wrap. */
+#result_list td.field-created_at, #result_list td.field-check_in, #result_list td.field-check_out,
+#result_list td.field-last_message_at, #result_list td.field-listing_started_on,
+#result_list td.field-agreement_signed_on, #result_list td.field-rate_date, #result_list td.field-fetched_at,
+#result_list td.field-expires_at, #result_list td.field-used_at, #result_list td.field-status,
+#result_list td.field-channel, #result_list td.field-country, #result_list td.field-currency,
+#result_list td.field-price_per_night, #result_list td.field-owner_payout,
+#result_list td.field-commission, #result_list td.field-commission_vat, #result_list td.field-per_eur {
+  white-space: nowrap;
+}
+#result_list td.field-price_per_night, #result_list td.field-owner_payout,
+#result_list td.field-commission, #result_list td.field-commission_vat, #result_list td.field-per_eur,
+#result_list td.field-max_guests, #result_list td.field-cottage_count,
+#result_list th.column-price_per_night, #result_list th.column-owner_payout,
+#result_list th.column-commission, #result_list th.column-commission_vat, #result_list th.column-per_eur {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Calm, not loud: a green accent on the active sidebar item, and the queue
+   counts as small teal pills rather than unfold's default red dot. */
+#nav-sidebar-inner a.active,
+nav a.active {
+  box-shadow: inset 3px 0 0 var(--st-accent);
+}
+
+/* Forms: section 2 already draws each fieldset as a card, and unfold draws its
+   own bordered box around the rows inside it — a card inside a card. Keep the
+   outer one. */
+#content fieldset.module > div:has(> .form-row) {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Lists: names get room instead of wrapping to four lines. */
+#result_list td.field-name, #result_list td.field-owner, #result_list td.field-cottage,
+#result_list td.field-guest_name, #result_list td.field-email {
+  min-width: 160px;
+}
+
+/* Redesigned edit pages stretch every <select> to 100%; select2 keeps the real
+   <select> as a 1px off-screen element, and stretching it made the whole page
+   scroll sideways. Keep the hidden one 1px. */
+html body select.select2-hidden-accessible.select2-hidden-accessible { width:1px !important; min-width:0 !important; min-height:0 !important; }
+
+/* ---------- 15. Stugora: a lone date field ------------------------------- */
+/* Section 6 sizes date and time inputs with flex-basis for a row of inputs;
+   where unfold puts the date input in a column, that basis became its height. */
+#content .field-line .flex-col > input.vDateField,
+#content .field-line .flex-col > input.vTimeField {
+  flex: none;
+  height: auto;
+}
+#result_list td.field-region, #result_list td.field-municipality { white-space: nowrap; }
+/* Dark mode: the active sidebar link in the light green, so it reads on the dark panel. */
+.dark #nav-sidebar-inner a.active,
+.dark nav a.active,
+.dark nav a.active .material-symbols-outlined { color: var(--st-accent) !important; }
+.dark .kpi .tr.up { color: #6FCF97; }

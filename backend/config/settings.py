@@ -48,6 +48,8 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:3100")
 
 INSTALLED_APPS = [
+    # Unfold restyles the admin (same theme as Bona's); it must come before django.contrib.admin.
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -75,7 +77,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -163,3 +165,48 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+
+
+# Admin look: django-unfold, set up like Bona's operations admin, in Stugora's green.
+# The sidebar (config/admin_nav.py) and the dashboard (config/admin_dashboard.py) are
+# built per request; the stylesheet is served from config/admin_assets/ by Django
+# itself, so it needs no collectstatic.
+def _admin_css(request):
+    from config.admin_assets_view import admin_css_url
+
+    return admin_css_url(request)
+
+
+UNFOLD = {
+    "SITE_TITLE": "Stugora admin",
+    "SITE_HEADER": "Stugora",
+    "SITE_SUBHEADER": "Internal admin · stugora.fi",
+    "SITE_URL": SITE_URL + "/",
+    "SITE_SYMBOL": "cottage",
+    "DASHBOARD_CALLBACK": "config.admin_dashboard.dashboard_callback",
+    "STYLES": [_admin_css],
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "THEME": None,  # follows the system; switch in the user menu
+    "COLORS": {
+        # Stugora forest green (#1d4c3c at 600), the colour of the site and the owner dashboard.
+        "primary": {
+            "50": "241 244 243",
+            "100": "223 230 228",
+            "200": "192 205 200",
+            "300": "151 173 165",
+            "400": "106 137 126",
+            "500": "65 105 91",
+            "600": "29 76 60",
+            "700": "24 64 50",
+            "800": "20 53 42",
+            "900": "16 43 34",
+            "950": "11 29 23",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": "config.admin_nav.navigation",
+    },
+}

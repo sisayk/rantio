@@ -1,0 +1,258 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{# Stugora admin dashboard, laid out like Bona's operations dashboard.        #}
+{# Numbers: config/admin_dashboard.py (UNFOLD["DASHBOARD_CALLBACK"]).          #}
+
+{% block bodyclass %}{{ block.super }} st-dash{% endblock %}
+{% block coltype %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  :root { --st-page:#F5F6F5; }
+  .dark { --st-page:#0E1412; }
+  .st-dash #main { background: var(--st-page); }
+
+  /* header */
+  .dh { display:flex; align-items:center; gap:14px; height:60px; max-width:1480px; margin:0 auto; color:var(--st-text); }
+  .dh .tog { cursor:pointer; font-size:20px; color:var(--st-muted); }
+  .dh .ttl { font-weight:600; font-size:15px; }
+  .dh .right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .dh-bell { position:relative; }
+  .dh-bell > summary { list-style:none; width:40px; height:40px; border-radius:9px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--st-text-2); }
+  .dh-bell > summary::-webkit-details-marker { display:none; }
+  .dh-bell > summary:hover, .dh-bell[open] > summary { background:var(--st-hover); }
+  .dh-bell .dot { position:absolute; top:7px; right:8px; min-width:8px; height:8px; border-radius:99px; background:#E0393F; box-shadow:0 0 0 2px var(--st-surface); }
+  .dh-bell .dd { position:absolute; right:0; top:48px; z-index:70; width:340px; background:var(--st-surface); border:1px solid var(--st-border); border-radius:12px; box-shadow:0 16px 40px rgba(16,22,28,.16); padding:8px; }
+  .dh-bell .dd h6 { margin:6px 8px 8px; font-size:13px; font-weight:700; }
+  .dh-bell .dd a { display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:8px; text-decoration:none; color:var(--st-text) !important; font-size:13.5px; }
+  .dh-bell .dd a:hover { background:var(--st-hover); }
+  .dh-bell .dd .n { margin-left:auto; font-weight:700; font-variant-numeric:tabular-nums; }
+  .dh-bell .dd .n.hot { color:#fff; background:#E0393F; border-radius:99px; padding:1px 8px; font-size:12px; }
+  .dh-bell .dd .material-symbols-outlined { font-size:19px; color:var(--st-muted); }
+
+  /* page */
+  .db { max-width:1480px; margin:0 auto; padding:18px 0 40px; color:var(--st-text); }
+  .db-top { display:flex; align-items:flex-start; gap:14px; margin-bottom:16px; }
+  .db-top .hello { flex:1; }
+  .db-top .hello .h { font-size:30px; font-weight:800; letter-spacing:-.02em; line-height:1.15; }
+  .db-top .hello p { margin:4px 0 0; color:var(--st-muted); font-size:15px; }
+  .db-chip { display:flex; align-items:center; gap:14px; background:var(--st-surface); border:1px solid var(--st-border); border-radius:12px; padding:12px 18px; }
+  .db-chip .ic { width:40px; height:40px; border-radius:10px; background:var(--st-soft); display:flex; align-items:center; justify-content:center; color:var(--st-text-2); }
+  .db-chip b { display:block; font-size:14px; font-weight:600; } .db-chip span.s { color:var(--st-muted); font-size:12.5px; }
+
+  .db-alert { display:flex; align-items:center; gap:14px; border-radius:10px; padding:11px 18px; margin-bottom:8px; border:1px solid transparent; }
+  .db-alert .material-symbols-outlined.i { font-size:22px; }
+  .db-alert .b { flex:1; } .db-alert .tt { font-weight:600; font-size:13.5px; color:#1B2227; } .db-alert .tx { font-size:12.5px; color:#46525B; margin-top:2px; }
+  .db-alert a { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; text-decoration:none; color:#1D4C3C !important; white-space:nowrap; }
+  .db-alert a .material-symbols-outlined { font-size:17px; }
+  .db-alert.danger { background:#FDECEC; border-color:#F8D3D5; } .db-alert.danger .i { color:#D0242B; }
+  .db-alert.warn { background:#FEF5E3; border-color:#F7E1B5; } .db-alert.warn .i { color:#B7791F; }
+  .db-alert.info { background:#E8F3FC; border-color:#CFE4F7; } .db-alert.info .i { color:#1F6FB2; }
+  .db-alert.ok { background:#E7F6EE; border-color:#C9EBD7; } .db-alert.ok .i { color:#1E7A45; }
+
+  .db-kpis { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin:14px 0; }
+  .db-card { background:var(--st-surface); border:1px solid var(--st-border); border-radius:12px; box-shadow:0 1px 2px rgba(16,22,28,.03); }
+  .kpi { display:flex; gap:14px; padding:16px; position:relative; text-decoration:none; color:inherit; }
+  .kpi:hover { border-color: var(--st-accent-soft); }
+  .kpi .ic { width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .kpi .ic .material-symbols-outlined { font-size:24px; }
+  .tone-rose .ic { background:#FDE9EA; color:#D0242B; } .tone-green .ic { background:#E3F5EA; color:#1E7A45; }
+  .tone-blue .ic { background:#E3EEFB; color:#1F5FAE; } .tone-violet .ic { background:#EEEBFB; color:#5B4BB7; }
+  .tone-orange .ic { background:#FDEEDC; color:#C26512; }
+  .kpi .lb { font-size:12.5px; color:var(--st-text-2); }
+  .kpi .v { font-size:24px; font-weight:800; line-height:1.25; letter-spacing:-.01em; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .kpi .tr { font-size:12.5px; display:inline-flex; align-items:center; gap:4px; margin-top:2px; }
+  .kpi .tr .material-symbols-outlined { font-size:16px; }
+  .kpi .tr.up { color:#1E7A45; } .kpi .tr.down { color:#C0262D; } .kpi .tr.flat { color:var(--st-muted); }
+  .kpi .tr.note { color:#1E7A45; text-decoration:underline; text-underline-offset:3px; }
+  .kpi .more { position:absolute; top:10px; right:8px; font-size:18px; color:var(--st-muted); }
+
+  .db-charts { display:grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap:12px; margin-bottom:14px; }
+  .ch { padding:16px 16px 12px; }
+  .ch .hd { display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; }
+  .ch .hd .material-symbols-outlined { font-size:19px; color:var(--st-accent); }
+  .ch .big { font-size:22px; font-weight:800; margin-top:8px; font-variant-numeric:tabular-nums; }
+  .ch .meta { font-size:12px; color:var(--st-muted); }
+  .ch svg { display:block; width:100%; height:92px; margin-top:10px; overflow:visible; }
+  .ch .ax { position:relative; height:16px; font-size:11px; color:var(--st-muted); margin-top:4px; }
+  .ch .ax span { position:absolute; transform:translateX(-50%); white-space:nowrap; }
+  .ch .bars rect { fill: var(--st-accent); opacity:.85; } .ch .bars rect:hover { opacity:1; }
+  .ch .axb { display:flex; font-size:11px; color:var(--st-muted); margin-top:4px; }
+  .ch .axb span { flex:1; text-align:center; white-space:nowrap; }
+
+  .db-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; align-items:stretch; }
+  .pn { padding:16px 18px; }
+  .pn .hd { display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; margin-bottom:10px; }
+  .pn .hd .material-symbols-outlined { font-size:19px; color:var(--st-accent); }
+  .pn .hd a { margin-left:auto; font-size:12.5px; font-weight:500; color:#1F6FB2 !important; text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+  .pn .hd a .material-symbols-outlined { font-size:16px; color:inherit; }
+  .pn .sub { display:flex; align-items:center; gap:10px; font-weight:600; font-size:13.5px; margin:4px 0 6px; }
+  .pn .sub .material-symbols-outlined { font-size:18px; color:var(--st-accent); background:var(--st-soft); border-radius:6px; padding:3px; }
+  .pn .row { display:flex; justify-content:space-between; align-items:center; padding:7px 2px; border-bottom:1px solid var(--st-border); font-size:13px; }
+  .pn .row:last-child { border-bottom:0; }
+  .pn .row a { color:var(--st-text-2); text-decoration:none; } .pn .row a:hover { color:var(--st-accent); }
+  .pn .row .v { font-weight:700; font-variant-numeric:tabular-nums; }
+  .pn .row .v.hot { color:#C0262D; }
+  .pn.act { grid-row: span 2; }
+  .act .it { display:flex; gap:12px; align-items:flex-start; padding:8px 0; text-decoration:none; color:inherit; }
+  .act .it .ic { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .act .it .ic .material-symbols-outlined { font-size:19px; }
+  .act .blue { background:#E3EEFB; color:#1F5FAE; } .act .green { background:#E3F5EA; color:#1E7A45; }
+  .act .orange { background:#FDEEDC; color:#C26512; } .act .pink { background:#FCE7F3; color:#BE2A7B; } .act .amber { background:#FEF3D6; color:#B7791F; }
+  .act .t { font-size:13px; font-weight:600; } .act .s { font-size:12px; color:var(--st-muted); }
+  .act a.it:hover .t { color:var(--st-accent); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chips a { display:inline-flex; align-items:center; gap:8px; background:var(--st-soft); border:1px solid var(--st-border); border-radius:8px; padding:6px 11px; font-size:12.5px; color:var(--st-text) !important; text-decoration:none; }
+  .chips a b { color:var(--st-accent); }
+  .db-alert .tt { color:var(--st-text); } .dark .db-alert .tt { color:#1B2227; }
+  .muted { color:var(--st-muted); font-size:12.5px; }
+
+  @media (max-width: 1280px) { .db-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); } .db-charts { grid-template-columns:1fr 1fr; } .db-charts > :last-child { grid-column: 1 / -1; } }
+  @media (max-width: 720px) {
+    .db-top { flex-wrap:wrap; } .db-top .hello { flex-basis:100%; }
+    .db-kpis, .db-charts, .db-grid { grid-template-columns:1fr; }
+    .db-alert { flex-wrap:wrap; }
+  }
+</style>
+{% endblock %}
+
+{% block header %}
+<div class="px-4 border-b" style="border-color:var(--st-border);background:var(--st-surface);">
+  <div class="dh">
+    {% if is_nav_sidebar_enabled and not is_popup %}
+      <span class="material-symbols-outlined tog hidden! xl:block!" x-on:click="sidebarDesktopOpen = !sidebarDesktopOpen; localStorage.setItem('sidebarDesktopOpen', sidebarDesktopOpen ? '1' : '0');">dock_to_right</span>
+      <span class="material-symbols-outlined tog block! xl:hidden!" x-on:click="sidebarMobileOpen = !sidebarMobileOpen">dock_to_right</span>
+    {% endif %}
+    <span class="ttl">Dashboard</span>
+    <div class="right">
+      <details class="dh-bell">
+        <summary aria-label="Things that need attention"><span class="material-symbols-outlined">notifications</span><span class="dot" id="dh-dot" hidden></span></summary>
+        <div class="dd">
+          <h6>Needs attention</h6>
+          {% for q in st_queues %}
+            <a href="{{ q.link }}" data-n="{{ q.n }}"><span class="material-symbols-outlined">{{ q.icon }}</span>{{ q.label }}<span class="n {% if q.n %}hot{% endif %}">{{ q.n }}</span></a>
+          {% endfor %}
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="db">
+
+  <div class="db-top">
+    <div class="hello">
+      <div class="h">Good {% if st_now.hour < 12 %}morning{% elif st_now.hour < 18 %}afternoon{% else %}evening{% endif %}{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}</div>
+      <p>Here's what's happening with Stugora today.</p>
+    </div>
+    <div class="db-chip">
+      <span class="ic"><span class="material-symbols-outlined">calendar_month</span></span>
+      <div><b>{{ st_date_long }}</b><span class="s">Week {{ st_week }} · Helsinki</span></div>
+    </div>
+  </div>
+
+  {% for a in st_alerts %}
+    <div class="db-alert {{ a.tone }}">
+      <span class="material-symbols-outlined i">{% if a.tone == "danger" %}error{% elif a.tone == "ok" %}check_circle{% elif a.tone == "warn" %}warning{% else %}info{% endif %}</span>
+      <div class="b"><div class="tt">{{ a.title }}</div><div class="tx">{{ a.body }}</div></div>
+      {% if a.link %}<a href="{{ a.link }}">{{ a.cta }} <span class="material-symbols-outlined">arrow_forward</span></a>{% endif %}
+    </div>
+  {% endfor %}
+
+  <div class="db-kpis">
+    {% for k in st_kpis %}
+      <a class="db-card kpi tone-{{ k.tone }}" href="{{ k.link }}">
+        <span class="ic"><span class="material-symbols-outlined">{{ k.icon }}</span></span>
+        <div style="min-width:0;">
+          <div class="lb">{{ k.label }}</div>
+          <div class="v">{{ k.value }}</div>
+          <div class="tr {{ k.dir }}">{% if k.dir == "up" %}<span class="material-symbols-outlined">arrow_upward</span>{% elif k.dir == "down" %}<span class="material-symbols-outlined">arrow_downward</span>{% endif %}{{ k.trend }}</div>
+        </div>
+        <span class="material-symbols-outlined more" title="Open list">more_vert</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="db-charts">
+    <div class="db-card ch">
+      <div class="hd"><span class="material-symbols-outlined">trending_up</span>Owner sign-ups · 12 weeks</div>
+      <div class="big">{{ st_signups.now }}</div>
+      <div class="meta">This week · {{ st_signups.total }} in all</div>
+      <svg viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="gA" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" style="stop-color:var(--st-accent);stop-opacity:.22"/><stop offset="100%" style="stop-color:var(--st-accent);stop-opacity:0"/></linearGradient></defs>
+        <path d="{{ st_signups.area }}" fill="url(#gA)"/>
+        <path d="{{ st_signups.line }}" fill="none" style="stroke:var(--st-accent)" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      </svg>
+      <div class="ax">{% for m in st_month_labels %}<span style="left:{{ m.pct }}%">{{ m.label }}</span>{% endfor %}</div>
+    </div>
+
+    <div class="db-card ch">
+      <div class="hd"><span class="material-symbols-outlined">calendar_month</span>Arrivals · next 14 days</div>
+      <div class="big">{{ st_arrivals.total }}</div>
+      <div class="meta">{{ st_arrivals.today }} today</div>
+      <svg viewBox="0 0 400 90" preserveAspectRatio="none" class="bars" role="img" aria-label="Arrivals per day, next 14 days">
+        {% for b in st_arrivals.bars %}<rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="2"><title>{{ b.title }}</title></rect>{% endfor %}
+      </svg>
+      <div class="axb">{% for b in st_arrivals.bars %}<span>{{ b.label }}</span>{% endfor %}</div>
+    </div>
+
+    <div class="db-card ch">
+      <div class="hd"><span class="material-symbols-outlined">monitoring</span>Commission · 12 weeks (EUR)</div>
+      <div class="big">{{ st_commission.now }}</div>
+      <div class="meta">This week, by check-in{% if st_commission.rate_day %} · kronor at ECB {{ st_commission.rate_day }}{% endif %}</div>
+      <svg viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="rA" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" style="stop-color:#CF9433;stop-opacity:.24"/><stop offset="100%" style="stop-color:#CF9433;stop-opacity:0"/></linearGradient></defs>
+        <path d="{{ st_commission.area }}" fill="url(#rA)"/>
+        <path d="{{ st_commission.line }}" fill="none" stroke="#B9822A" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      </svg>
+      <div class="ax">{% for m in st_month_labels %}<span style="left:{{ m.pct }}%">{{ m.label }}</span>{% endfor %}</div>
+    </div>
+  </div>
+
+  <div class="db-grid">
+    <div class="db-card pn">
+      <div class="hd"><span class="material-symbols-outlined">cottage</span>Owners &amp; cottages</div>
+      {% for row in st_panels.owners %}<div class="row"><a href="{{ row.2 }}">{{ row.0 }}</a><span class="v {% if row.0 == 'Sign-ups to contact' and row.1 %}hot{% endif %}">{{ row.1 }}</span></div>{% endfor %}
+    </div>
+    <div class="db-card pn">
+      <div class="hd"><span class="material-symbols-outlined">event</span>Stays</div>
+      {% for row in st_panels.stays %}<div class="row"><a href="{{ row.2 }}">{{ row.0 }}</a><span class="v">{{ row.1 }}</span></div>{% endfor %}
+    </div>
+    <div class="db-card pn act">
+      <div class="hd"><span class="material-symbols-outlined">history</span>Recent activity</div>
+      {% for i in st_activity %}
+        {% if i.link %}<a class="it" href="{{ i.link }}">{% else %}<div class="it">{% endif %}
+          <span class="ic {{ i.tone }}"><span class="material-symbols-outlined">{{ i.icon }}</span></span>
+          <div style="min-width:0;"><div class="t">{{ i.title }}</div><div class="s">{% if i.sub %}{{ i.sub }} · {% endif %}{{ i.ago }}</div></div>
+        {% if i.link %}</a>{% else %}</div>{% endif %}
+      {% empty %}
+        <p class="muted">Nothing yet.</p>
+      {% endfor %}
+    </div>
+
+    <div class="db-card pn">
+      <div class="hd"><span class="material-symbols-outlined">forum</span>Guests &amp; messages</div>
+      {% for row in st_panels.guests %}<div class="row"><a href="{{ row.2 }}">{{ row.0 }}</a><span class="v {% if row.0 == 'Waiting for the team' and row.1 %}hot{% endif %}">{{ row.1 }}</span></div>{% endfor %}
+    </div>
+    <div class="db-card pn">
+      <div class="hd"><span class="material-symbols-outlined">hub</span>Stays by site, {{ st_now.year }}<a href="{% url 'admin:owners_booking_changelist' %}">View all <span class="material-symbols-outlined">arrow_forward</span></a></div>
+      {% if st_channels %}<div class="chips">{% for c in st_channels %}<a href="{% url 'admin:owners_booking_changelist' %}?channel__exact={{ c.code }}">{{ c.name }} <b>{{ c.n }}</b></a>{% endfor %}</div>{% else %}<p class="muted">No stays yet.</p>{% endif %}
+      <div class="hd" style="margin-top:18px;"><span class="material-symbols-outlined">public</span>Cottages by country</div>
+      {% if st_countries %}<div class="chips">{% for c in st_countries %}<a href="{% url 'admin:owners_cottage_changelist' %}?country__exact={{ c.code }}">{{ c.name }} <b>{{ c.n }}</b></a>{% endfor %}</div>{% else %}<p class="muted">No cottages yet.</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var hot = document.querySelectorAll('.dh-bell .dd a[data-n]:not([data-n="0"])').length;
+  var dot = document.getElementById('dh-dot'); if (dot) dot.hidden = !hot;
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('details.dh-bell[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{# As unfold's admin/base_site.html, plus (as in Bona): the admin is English only, #}
+{# so browsers should not machine-translate it.                                   #}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+  <meta name="google" content="notranslate">
+  <script>document.documentElement.setAttribute('lang', 'en'); document.documentElement.setAttribute('translate', 'no');</script>
+  {{ block.super }}
+{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

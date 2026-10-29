@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path
 
+from config.admin_assets_view import admin_css
 from owners import inbox, portal
 from owners.views import OwnerSignupCreateView, RatesView
 
@@ -9,6 +10,7 @@ admin.site.site_header = "Stugora admin"
 admin.site.site_title = "Stugora"
 
 urlpatterns = [
+    path("admin/_assets/stugora-admin.css", admin_css, name="admin_css"),
     path("admin/", admin.site.urls),
     path("api/signups/", OwnerSignupCreateView.as_view(), name="owner-signup"),
     path("api/auth/request-code/", portal.RequestCodeView.as_view(), name="login-request-code"),
