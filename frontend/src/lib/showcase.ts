@@ -47,7 +47,7 @@ const en: typeof fi = {
   chipSync: "Same dates closed on Nettimökki",
   listings: {
     title: "How your cottage looks to guests from abroad",
-    lead: "We make every cottage an English listing with large photos, clear facts and a price that leaves you at least what you get on Nettimökki.",
+    lead: "We make every cottage an English listing with large photos, clear facts and a price that leaves you at least what you get on the sites you use now.",
     note: "Examples. Photos: Unsplash.",
     cards: [
       { photo: "card1", region: "Lakeland", title: "Red cottage with a big garden", facts: "6 guests, 3 bedrooms", price: "€140" },

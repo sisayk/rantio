@@ -26,10 +26,10 @@ class OwnerSignupCreateView(generics.CreateAPIView):
         if settings.SIGNUP_NOTIFY_EMAILS:
             try:
                 send_mail(
-                    subject=f"New Stugora owner: {signup.name} ({signup.get_region_display()})",
+                    subject=f"New Stugora owner: {signup.name} ({signup.location_display})",
                     message=(
                         f"{signup.name} <{signup.email}> {signup.phone}\n"
-                        f"Region: {signup.get_region_display()} · cottages: {signup.cottage_count}\n"
+                        f"Where: {signup.location_display} · cottages: {signup.cottage_count}\n"
                         f"Nettimökki: {signup.nettimokki_url or '-'}\n\n{signup.message}"
                     ),
                     from_email=settings.DEFAULT_FROM_EMAIL,

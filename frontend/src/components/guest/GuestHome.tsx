@@ -4,7 +4,17 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { CONTACT_EMAIL, type Lang } from "@/lib/content";
 import { guestContent } from "@/lib/guestContent";
-import { AMENITIES, type Amenity, CATEGORIES, type Category, HERO_PHOTO, LISTINGS, unsplash } from "@/lib/listings";
+import {
+  AMENITIES,
+  type Amenity,
+  CATEGORIES,
+  type Category,
+  COUNTRIES,
+  type Country,
+  HERO_PHOTO,
+  LISTINGS,
+  unsplash,
+} from "@/lib/listings";
 import {
   Bed,
   CalendarIcon,
@@ -23,10 +33,10 @@ import {
 import styles from "./guest.module.css";
 
 type Sort = "recommended" | "priceLow" | "priceHigh" | "guests";
-type Region = "" | "saimaa" | "lakeland" | "lapland";
 type Menu = null | "filters" | "amenities" | "account";
 
-const DESTINATIONS = ["Saimaa", "Savonlinna", "Puumala", "Mikkeli", "Päijänne", "Jämsä", "Lappi", "Levi", "Ylläs", "Rovaniemi"];
+// Suggestions under the search box; countries are added in the visitor's language.
+const PLACES = Array.from(new Set(LISTINGS.flatMap((l) => l.place.split(", "))));
 const SAVED_KEY = "stugora:saved";
 
 // Saved cottages live in this browser only (localStorage, with an in-memory fallback).
@@ -84,7 +94,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(0);
   const [category, setCategory] = useState<Category>("all");
-  const [region, setRegion] = useState<Region>("");
+  const [country, setCountry] = useState<Country | "">("");
   const [maxPrice, setMaxPrice] = useState(0);
   const [bedrooms, setBedrooms] = useState(0);
   const [instantBook, setInstantBook] = useState(false);
@@ -128,7 +138,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     setCheckOut("");
     setGuests(0);
     setCategory("all");
-    setRegion("");
+    setCountry("");
     setMaxPrice(0);
     setBedrooms(0);
     setInstantBook(false);
@@ -141,9 +151,10 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const results = useMemo(() => {
     const q = normalise(where.trim());
     const list = LISTINGS.filter((l) => {
-      if (q && !normalise(`${l.place} ${l.name.fi} ${l.name.en} ${l.region}`).includes(q)) return false;
+      const countryNames = `${guestContent.fi.countries[l.country]} ${guestContent.en.countries[l.country]}`;
+      if (q && !normalise(`${l.place} ${l.name.fi} ${l.name.en} ${countryNames}`).includes(q)) return false;
       if (category !== "all" && !l.categories.includes(category)) return false;
-      if (region && l.region !== region) return false;
+      if (country && l.country !== country) return false;
       if (maxPrice && l.price > maxPrice) return false;
       if (guests && l.guests < guests) return false;
       if (bedrooms && l.bedrooms < bedrooms) return false;
@@ -157,7 +168,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [where, category, region, maxPrice, guests, bedrooms, instantBook, freeCancellation, amenities, savedOnly, saved, sort]);
+  }, [where, category, country, maxPrice, guests, bedrooms, instantBook, freeCancellation, amenities, savedOnly, saved, sort]);
 
   const advancedCount = [instantBook, freeCancellation].filter(Boolean).length + amenities.length;
   const f = t.filters;
@@ -268,7 +279,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                   autoComplete="off"
                 />
                 <datalist id="destinations">
-                  {DESTINATIONS.map((d) => (
+                  {[...COUNTRIES.map((c) => t.countries[c]), ...PLACES].map((d) => (
                     <option key={d} value={d} />
                   ))}
                 </datalist>
@@ -372,12 +383,14 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               ) : null}
             </div>
 
-            <span className={styles.selectChip} data-active={!!region}>
-              <select aria-label={f.location} value={region} onChange={(e) => setRegion(e.target.value as Region)}>
+            <span className={styles.selectChip} data-active={!!country}>
+              <select aria-label={f.location} value={country} onChange={(e) => setCountry(e.target.value as Country | "")}>
                 <option value="">{f.location}</option>
-                <option value="saimaa">{f.locations.saimaa}</option>
-                <option value="lakeland">{f.locations.lakeland}</option>
-                <option value="lapland">{f.locations.lapland}</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c} value={c}>
+                    {t.countries[c]}
+                  </option>
+                ))}
               </select>
               <Chevron className={styles.icon16} />
             </span>
@@ -488,7 +501,9 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                         <span className={styles.newTag}>{t.card.isNew}</span>
                       )}
                     </div>
-                    <p className={styles.cardPlace}>{l.place}</p>
+                    <p className={styles.cardPlace}>
+                      {l.place}, {t.countries[l.country]}
+                    </p>
                     <p className={styles.cardFacts}>
                       <span>
                         <People className={styles.icon16} />

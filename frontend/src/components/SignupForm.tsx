@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { content, type Lang, REGIONS } from "@/lib/content";
+import { COUNTRIES } from "@/lib/listings";
 import styles from "./landing.module.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
@@ -14,6 +15,9 @@ export default function SignupForm({ lang }: { lang: Lang }) {
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [errors, setErrors] = useState<Errors>({});
   const [doneName, setDoneName] = useState("");
+  // "FI:saimaa" for a Finnish region, or a country code such as "SE".
+  const [location, setLocation] = useState("");
+  const inFinland = location.startsWith("FI");
 
   function validate(data: FormData): Errors {
     const e: Errors = {};
@@ -41,14 +45,16 @@ export default function SignupForm({ lang }: { lang: Lang }) {
     }
 
     const params = new URLSearchParams(window.location.search);
+    const [country, region = ""] = String(data.get("region")).split(":");
     const body = {
       name: String(data.get("name")).trim(),
       email: String(data.get("email")).trim(),
       phone: String(data.get("phone") ?? "").trim(),
       language: lang,
-      region: data.get("region"),
+      country,
+      region,
       cottage_count: Number(data.get("cottage_count") ?? 1),
-      nettimokki_url: String(data.get("nettimokki_url") ?? "").trim(),
+      nettimokki_url: country === "FI" ? String(data.get("nettimokki_url") ?? "").trim() : "",
       message: String(data.get("message") ?? "").trim(),
       privacy_consent: true,
       source: params.get("utm_source") ?? params.get("ref") ?? "",
@@ -135,15 +141,30 @@ export default function SignupForm({ lang }: { lang: Lang }) {
       <div className={styles.fieldRow}>
         <label className={styles.field} data-invalid={!!errors.region}>
           <span>{f.region}</span>
-          <select name="region" defaultValue="" aria-invalid={!!errors.region} aria-describedby={described("region")}>
+          <select
+            name="region"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            aria-invalid={!!errors.region}
+            aria-describedby={described("region")}
+          >
             <option value="" disabled>
               {f.regionPlaceholder}
             </option>
-            {REGIONS.map((r) => (
-              <option key={r} value={r}>
-                {f.regions[r]}
-              </option>
-            ))}
+            <optgroup label={f.countries.FI}>
+              {REGIONS.map((r) => (
+                <option key={r} value={`FI:${r}`}>
+                  {f.regions[r]}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label={f.otherCountries}>
+              {COUNTRIES.filter((c) => c !== "FI").map((c) => (
+                <option key={c} value={c}>
+                  {f.countries[c]}
+                </option>
+              ))}
+            </optgroup>
           </select>
           {err("region")}
         </label>
@@ -159,6 +180,7 @@ export default function SignupForm({ lang }: { lang: Lang }) {
         </label>
       </div>
 
+      {inFinland ? (
       <label className={styles.field} data-invalid={!!errors.nettimokki_url}>
         <span>
           {f.nettimokki} <em>({f.optional})</em>
@@ -173,6 +195,7 @@ export default function SignupForm({ lang }: { lang: Lang }) {
         />
         {err("nettimokki_url")}
       </label>
+      ) : null}
 
       <label className={styles.field}>
         <span>

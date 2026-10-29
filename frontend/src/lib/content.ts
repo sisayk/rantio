@@ -86,7 +86,7 @@ const fi = {
       },
       {
         q: "Missä toimitte?",
-        a: "Aloitamme Saimaalta ja Lapista, mutta otamme mökkejä mukaan koko Suomesta.",
+        a: "Kaikkialla Pohjoismaissa ja Baltiassa: Suomessa, Ruotsissa, Norjassa, Tanskassa, Islannissa, Virossa, Latviassa ja Liettuassa. Ensimmäiset pilottimökit ovat Saimaalla ja Lapissa.",
       },
     ],
   },
@@ -97,14 +97,16 @@ const fi = {
     email: "Sähköposti",
     phone: "Puhelin",
     region: "Missä mökki on?",
-    regionPlaceholder: "Valitse alue",
+    regionPlaceholder: "Valitse alue tai maa",
+    otherCountries: "Muut maat",
+    countries: { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska", IS: "Islanti", EE: "Viro", LV: "Latvia", LT: "Liettua" },
     regions: {
       saimaa: "Saimaa",
       lakeland: "Muu Järvi-Suomi",
       lapland: "Lappi",
       helsinki: "Helsingin seutu",
       coast: "Rannikko tai saaristo",
-      other: "Muualla",
+      other: "Muualla Suomessa",
     } as Record<Region, string>,
     count: "Montako mökkiä?",
     nettimokki: "Linkki Nettimökki-ilmoitukseen",
@@ -137,7 +139,7 @@ const en: Content = {
   meta: {
     title: "Stugora – your cottage on Airbnb, Booking.com and Vrbo",
     description:
-      "Stugora brings foreign guests to your Finnish cottage and keeps calendars in step with Nettimökki. €99 a year and 12% of the bookings we bring.",
+      "Stugora brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. €99 a year and 12% of the bookings we bring.",
   },
   nav: { otherLang: "Suomeksi", otherHref: "/omistajille", cta: "List your cottage" },
   hero: {
@@ -150,7 +152,7 @@ const en: Content = {
     finePrint:
       "The estimate takes off platform fees (about 15%), Stugora's €99 yearly fee, the 12% commission and VAT.",
     lead:
-      "Stugora puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with Nettimökki.",
+      "Stugora puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with the local sites you already use, such as Nettimökki in Finland.",
     cta: "List your cottage",
   },
   calendar: {
@@ -170,7 +172,7 @@ const en: Content = {
       },
       {
         title: "We open the new channels",
-        body: "Your cottage appears on Airbnb, Booking.com and Vrbo. The calendars update each other, Nettimökki bookings included.",
+        body: "Your cottage appears on Airbnb, Booking.com and Vrbo. The calendars update each other, including bookings from the sites you already use.",
       },
       {
         title: "Guests book, you get paid",
@@ -181,7 +183,7 @@ const en: Content = {
   price: {
     title: "€99 a year and 12% of the bookings we bring",
     lead:
-      "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Stugora opened, you pay 12% of what the platform pays you. VAT of 25.5% is added to both. We never charge for Nettimökki bookings.",
+      "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Stugora opened, you pay 12% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
     exampleTitle: "Example: 20 extra nights at €150 a night",
     rows: [
       { label: "Guests pay", value: "€3,000" },
@@ -196,8 +198,8 @@ const en: Content = {
     title: "Questions",
     items: [
       {
-        q: "Do I have to leave Nettimökki?",
-        a: "No. Nettimökki carries on as before. We read its booking confirmations and close the same dates elsewhere.",
+        q: "Do I have to leave the sites I already use?",
+        a: "No. Nettimökki in Finland, or any local site you use, carries on as before. When a booking comes in anywhere, we close the same dates everywhere else.",
       },
       {
         q: "Who looks after the guests?",
@@ -213,7 +215,7 @@ const en: Content = {
       },
       {
         q: "Where do you work?",
-        a: "We start in the Saimaa region and Lapland, and take cottages from anywhere in Finland.",
+        a: "Across the Nordics and the Baltics: Finland, Sweden, Norway, Denmark, Iceland, Estonia, Latvia and Lithuania. Our first pilot cottages are in the Saimaa region and Lapland.",
       },
     ],
   },
@@ -224,14 +226,16 @@ const en: Content = {
     email: "Email",
     phone: "Phone",
     region: "Where is the cottage?",
-    regionPlaceholder: "Choose a region",
+    regionPlaceholder: "Choose a region or country",
+    otherCountries: "Other countries",
+    countries: { FI: "Finland", SE: "Sweden", NO: "Norway", DK: "Denmark", IS: "Iceland", EE: "Estonia", LV: "Latvia", LT: "Lithuania" },
     regions: {
       saimaa: "Saimaa",
       lakeland: "Elsewhere in Lakeland",
       lapland: "Lapland",
       helsinki: "Helsinki region",
       coast: "Coast or archipelago",
-      other: "Somewhere else",
+      other: "Elsewhere in Finland",
     },
     count: "How many cottages?",
     nettimokki: "Link to your Nettimökki listing",

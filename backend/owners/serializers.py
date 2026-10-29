@@ -12,7 +12,7 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = OwnerSignup
         fields = [
-            "id", "name", "email", "phone", "language", "region", "cottage_count",
+            "id", "name", "email", "phone", "language", "country", "region", "cottage_count",
             "nettimokki_url", "message", "privacy_consent", "source", "website",
         ]
         read_only_fields = ["id"]
@@ -37,6 +37,8 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.pop("website", ""):
             raise serializers.ValidationError("Invalid submission.")
+        if attrs.get("region") and attrs.get("country", "FI") != "FI":
+            raise serializers.ValidationError({"region": "Regions are only used for Finnish cottages."})
         attrs["email"] = attrs["email"].strip().lower()
         attrs["name"] = attrs["name"].strip()
         return attrs

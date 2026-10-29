@@ -35,6 +35,22 @@ class SignupApiTests(TestCase):
         self.assertEqual(signup.email, "matti@example.fi")
         self.assertEqual(signup.status, OwnerSignup.Status.NEW)
 
+    def test_owner_from_another_country_needs_no_region(self):
+        data = {**VALID, "country": "SE", "region": "", "nettimokki_url": ""}
+        response = self.client.post(self.url, data, format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        signup = OwnerSignup.objects.get()
+        self.assertEqual(signup.location_display, "Sweden")
+
+    def test_finnish_region_only_with_finland(self):
+        response = self.client.post(self.url, {**VALID, "country": "NO"}, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("region", response.data)
+
+    def test_country_defaults_to_finland(self):
+        self.client.post(self.url, VALID, format="json")
+        self.assertEqual(OwnerSignup.objects.get().location_display, "Saimaa lake region, Finland")
+
     def test_requires_privacy_consent(self):
         response = self.client.post(self.url, {**VALID, "privacy_consent": False}, format="json")
         self.assertEqual(response.status_code, 400)
@@ -58,7 +74,7 @@ class SignupApiTests(TestCase):
     def test_notifies_team(self):
         self.client.post(self.url, VALID, format="json")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("Saimaa", mail.outbox[0].subject)
+        self.assertIn("Saimaa lake region, Finland", mail.outbox[0].subject)
 
     def test_signup_list_is_not_public(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)

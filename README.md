@@ -1,6 +1,8 @@
 # Stugora
 
-Lists Finnish cottages on Airbnb, Booking.com and Vrbo for their owners.
+Lists cottages across the Nordics and the Baltics (Finland, Sweden, Norway,
+Denmark, Iceland, Estonia, Latvia, Lithuania) on Airbnb, Booking.com and Vrbo
+for their owners.
 Pricing (plan of 28 Oct 2026): €99 a year per cottage plus 12% of the owner's
 payout on bookings from Stugora's channels, both plus 25.5% VAT. Nettimökki
 bookings are never charged. Pilot owners pay 10% and their first year is free.

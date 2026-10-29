@@ -5,8 +5,8 @@ from .models import Booking, Cottage, Owner, OwnerSignup
 
 @admin.register(OwnerSignup)
 class OwnerSignupAdmin(admin.ModelAdmin):
-    list_display = ["name", "email", "region", "cottage_count", "status", "created_at"]
-    list_filter = ["status", "region", "language"]
+    list_display = ["name", "email", "country", "region", "cottage_count", "status", "created_at"]
+    list_filter = ["status", "country", "region", "language"]
     list_editable = ["status"]
     search_fields = ["name", "email", "phone"]
     readonly_fields = ["created_at", "privacy_consent", "source"]
@@ -15,7 +15,7 @@ class OwnerSignupAdmin(admin.ModelAdmin):
 class CottageInline(admin.TabularInline):
     model = Cottage
     extra = 0
-    fields = ["name", "region", "max_guests", "price_per_night", "status"]
+    fields = ["name", "country", "region", "max_guests", "price_per_night", "status"]
     show_change_link = True
 
 
@@ -29,8 +29,8 @@ class OwnerAdmin(admin.ModelAdmin):
 
 @admin.register(Cottage)
 class CottageAdmin(admin.ModelAdmin):
-    list_display = ["name", "owner", "region", "max_guests", "price_per_night", "status", "listing_started_on"]
-    list_filter = ["status", "region", "has_sauna"]
+    list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "status", "listing_started_on"]
+    list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality"]
 
 

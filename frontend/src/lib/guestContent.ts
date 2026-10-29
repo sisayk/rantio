@@ -1,11 +1,11 @@
 import type { Lang } from "./content";
-import type { Amenity, Category } from "./listings";
+import type { Amenity, Category, Country } from "./listings";
 
 const fi = {
   locale: "fi-FI",
   meta: {
-    title: "Stugora – Suomen kauneimmat mökit",
-    description: "Järvi-, metsä- ja Lapin mökkejä saunalla. Varaa Airbnbsta, Booking.comista, Vrbo:sta tai Nettimökistä.",
+    title: "Stugora – mökit Pohjoismaissa ja Baltiassa",
+    description: "Mökkejä järvien, vuonojen, metsien ja rannikoiden äärellä Islannista Liettuaan. Varaa Airbnbsta, Booking.comista tai Vrbo:sta.",
   },
   nav: ["Majoitus", "Elämykset", "Kohteet", "Inspiraatio"],
   comingSoon: "Tulossa",
@@ -15,12 +15,12 @@ const fi = {
   saved: "Tallennetut",
   menu: { label: "Valikko", owners: "Mökin omistajille", saved: "Tallennetut mökit", all: "Kaikki mökit" },
   hero: {
-    title: "Löydä Suomen kauneimmat mökit",
-    lead: "Järviä, metsiä ja unohtumattomia hetkiä.",
+    title: "Löydä Pohjolan kauneimmat mökit",
+    lead: "Järviä, vuonoja, metsiä ja rannikoita Islannista Liettuaan.",
   },
   search: {
     where: "Minne",
-    wherePlaceholder: "Hae kohdetta",
+    wherePlaceholder: "Maa, alue tai kaupunki",
     dates: "Saapuminen – lähtö",
     checkIn: "Saapuminen",
     checkOut: "Lähtö",
@@ -31,7 +31,7 @@ const fi = {
   },
   categories: {
     all: "Kaikki",
-    lakefront: "Rantamökit",
+    waterfront: "Rannalla",
     forest: "Metsämökit",
     modern: "Modernit",
     traditional: "Perinteiset",
@@ -43,7 +43,7 @@ const fi = {
     unique: "Erikoiset",
   } as Record<Category, string>,
   badges: {
-    lakefront: "Rantamökki",
+    waterfront: "Rannalla",
     forest: "Metsämökki",
     modern: "Moderni",
     traditional: "Perinteinen",
@@ -56,8 +56,7 @@ const fi = {
   } as Record<Exclude<Category, "all">, string>,
   filters: {
     filters: "Suodattimet",
-    location: "Sijainti",
-    locations: { any: "Kaikki alueet", saimaa: "Saimaa", lakeland: "Järvi-Suomi", lapland: "Lappi" },
+    location: "Maa",
     price: "Hinta",
     prices: { any: "Mikä tahansa hinta", 150: "Enintään 150 €", 180: "Enintään 180 €", 200: "Enintään 200 €" },
     guests: "Vieraat",
@@ -69,7 +68,7 @@ const fi = {
     amenities: "Mukavuudet",
     amenityNames: {
       sauna: "Sauna",
-      lake: "Oma ranta",
+      lake: "Oma ranta tai laituri",
       fireplace: "Takka",
       wifi: "Wifi",
       hotTub: "Palju",
@@ -78,6 +77,16 @@ const fi = {
     sorts: { recommended: "Suositellut", priceLow: "Halvin ensin", priceHigh: "Kallein ensin", guests: "Eniten vieraita" },
     clear: "Tyhjennä",
   },
+  countries: {
+    FI: "Suomi",
+    SE: "Ruotsi",
+    NO: "Norja",
+    DK: "Tanska",
+    IS: "Islanti",
+    EE: "Viro",
+    LV: "Latvia",
+    LT: "Liettua",
+  } as Record<Country, string>,
   results: (n: number) => (n === 1 ? "1 mökki" : `${n} mökkiä`),
   empty: { title: "Näillä valinnoilla ei löytynyt mökkejä", action: "Tyhjennä haku ja suodattimet" },
   card: {
@@ -89,10 +98,10 @@ const fi = {
     saved: "Tallennettu",
     bookOn: "Varattavissa",
   },
-  examples: "Esimerkkikohteita. Kuvat: Unsplash.",
+  examples: "Esimerkkikohteita. Hinnat euroina. Kuvat: Unsplash.",
   hostBand: {
     title: "Onko sinulla mökki?",
-    body: "Viemme sen Airbnbhin, Booking.comiin ja Vrbo:hon ja pidämme kalenterit samassa tahdissa Nettimökin kanssa.",
+    body: "Viemme sen Airbnbhin, Booking.comiin ja Vrbo:hon ja pidämme kalenterit samassa tahdissa jo käyttämiesi sivustojen, kuten Nettimökin, kanssa. Pohjoismaissa ja Baltiassa.",
     cta: "Ilmoita mökkisi",
   },
   footer: { note: "Stugora on Elda-Auto Tmi:n aputoiminimi.", contact: "Yhteys" },
@@ -103,8 +112,8 @@ export type GuestContent = typeof fi;
 const en: GuestContent = {
   locale: "en-IE",
   meta: {
-    title: "Stugora – Finland's most beautiful cottages",
-    description: "Lake, forest and Lapland cottages with a sauna. Book on Airbnb, Booking.com, Vrbo or Nettimökki.",
+    title: "Stugora – cottages across the Nordics and the Baltics",
+    description: "Cottages by lakes, fjords, forests and coasts from Iceland to Lithuania. Book on Airbnb, Booking.com or Vrbo.",
   },
   nav: ["Stays", "Experiences", "Destinations", "Inspiration"],
   comingSoon: "Coming soon",
@@ -114,12 +123,12 @@ const en: GuestContent = {
   saved: "Saved",
   menu: { label: "Menu", owners: "For cottage owners", saved: "Saved cottages", all: "All cottages" },
   hero: {
-    title: "Discover Finland's most beautiful cottages",
-    lead: "Lakes, forests and unforgettable stays.",
+    title: "Discover the North's most beautiful cottages",
+    lead: "Lakes, fjords, forests and coasts from Iceland to Lithuania.",
   },
   search: {
     where: "Where",
-    wherePlaceholder: "Search destinations",
+    wherePlaceholder: "Country, region or town",
     dates: "Check in – Check out",
     checkIn: "Check in",
     checkOut: "Check out",
@@ -130,7 +139,7 @@ const en: GuestContent = {
   },
   categories: {
     all: "All stays",
-    lakefront: "Lakefront",
+    waterfront: "Waterfront",
     forest: "Forest cabins",
     modern: "Modern",
     traditional: "Traditional",
@@ -142,7 +151,7 @@ const en: GuestContent = {
     unique: "Unique stays",
   },
   badges: {
-    lakefront: "Lakefront",
+    waterfront: "Waterfront",
     forest: "Forest cabin",
     modern: "Modern",
     traditional: "Traditional",
@@ -155,8 +164,7 @@ const en: GuestContent = {
   },
   filters: {
     filters: "Filters",
-    location: "Location",
-    locations: { any: "All regions", saimaa: "Saimaa", lakeland: "Lakeland", lapland: "Lapland" },
+    location: "Country",
     price: "Price",
     prices: { any: "Any price", 150: "Up to €150", 180: "Up to €180", 200: "Up to €200" },
     guests: "Guests",
@@ -166,10 +174,20 @@ const en: GuestContent = {
     instantBook: "Instant book",
     freeCancellation: "Free cancellation",
     amenities: "Amenities",
-    amenityNames: { sauna: "Sauna", lake: "Private shore", fireplace: "Fireplace", wifi: "Wifi", hotTub: "Hot tub" },
+    amenityNames: { sauna: "Sauna", lake: "Private shore or jetty", fireplace: "Fireplace", wifi: "Wifi", hotTub: "Hot tub" },
     sortBy: "Sort by",
     sorts: { recommended: "Recommended", priceLow: "Lowest price", priceHigh: "Highest price", guests: "Most guests" },
     clear: "Clear",
+  },
+  countries: {
+    FI: "Finland",
+    SE: "Sweden",
+    NO: "Norway",
+    DK: "Denmark",
+    IS: "Iceland",
+    EE: "Estonia",
+    LV: "Latvia",
+    LT: "Lithuania",
   },
   results: (n: number) => (n === 1 ? "1 cottage" : `${n} cottages`),
   empty: { title: "No cottages match these choices", action: "Clear search and filters" },
@@ -182,10 +200,10 @@ const en: GuestContent = {
     saved: "Saved",
     bookOn: "Book on",
   },
-  examples: "Example stays. Photos: Unsplash.",
+  examples: "Example stays. Prices in euros. Photos: Unsplash.",
   hostBand: {
     title: "Own a cottage?",
-    body: "We put it on Airbnb, Booking.com and Vrbo and keep every calendar in step with Nettimökki.",
+    body: "We put it on Airbnb, Booking.com and Vrbo and keep every calendar in step with the local sites you already use, anywhere in the Nordics and the Baltics.",
     cta: "Become a host",
   },
   footer: { note: "Stugora is a trading name of Elda-Auto Tmi.", contact: "Contact" },

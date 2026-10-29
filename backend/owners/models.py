@@ -37,13 +37,26 @@ class Language(models.TextChoices):
     ENGLISH = "en", "English"
 
 
+class Country(models.TextChoices):
+    FINLAND = "FI", "Finland"
+    SWEDEN = "SE", "Sweden"
+    NORWAY = "NO", "Norway"
+    DENMARK = "DK", "Denmark"
+    ICELAND = "IS", "Iceland"
+    ESTONIA = "EE", "Estonia"
+    LATVIA = "LV", "Latvia"
+    LITHUANIA = "LT", "Lithuania"
+
+
 class Region(models.TextChoices):
+    """Finnish regions only; other countries leave region blank."""
+
     SAIMAA = "saimaa", "Saimaa lake region"
     LAKELAND = "lakeland", "Other Lakeland"
     LAPLAND = "lapland", "Lapland"
     HELSINKI = "helsinki", "Helsinki region"
     COAST = "coast", "Coast and archipelago"
-    OTHER = "other", "Somewhere else"
+    OTHER = "other", "Elsewhere in Finland"
 
 
 class OwnerSignup(models.Model):
@@ -60,7 +73,8 @@ class OwnerSignup(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=40, blank=True)
     language = models.CharField(max_length=2, choices=Language.choices, default=Language.FINNISH)
-    region = models.CharField(max_length=20, choices=Region.choices)
+    country = models.CharField(max_length=2, choices=Country.choices, default=Country.FINLAND)
+    region = models.CharField(max_length=20, choices=Region.choices, blank=True)
     cottage_count = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1)])
     nettimokki_url = models.URLField(blank=True)
     message = models.TextField(blank=True, max_length=2000)
@@ -76,6 +90,12 @@ class OwnerSignup(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} <{self.email}>"
+
+    @property
+    def location_display(self) -> str:
+        if self.region:
+            return f"{self.get_region_display()}, {self.get_country_display()}"
+        return self.get_country_display()
 
 
 class Owner(models.Model):
@@ -125,7 +145,8 @@ class Cottage(models.Model):
 
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name="cottages")
     name = models.CharField(max_length=120)
-    region = models.CharField(max_length=20, choices=Region.choices)
+    country = models.CharField(max_length=2, choices=Country.choices, default=Country.FINLAND)
+    region = models.CharField(max_length=20, choices=Region.choices, blank=True)
     municipality = models.CharField(max_length=80, blank=True)
     max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     bedrooms = models.PositiveSmallIntegerField(default=1)
