@@ -70,13 +70,14 @@ class HeroSlidesView(views.APIView):
         for s in HeroSlide.objects.filter(active=True):
             if s.kind == HeroSlide.Kind.VIDEO and not s.video:
                 continue
-            if s.kind == HeroSlide.Kind.IMAGE and not s.image:
+            photo = s.image.url if s.image else s.image_url
+            if s.kind == HeroSlide.Kind.IMAGE and not photo:
                 continue
             slides.append({
                 "id": s.pk,
                 "kind": s.kind,
-                "src": s.video.url if s.kind == HeroSlide.Kind.VIDEO else s.image.url,
-                "poster": s.image.url if s.kind == HeroSlide.Kind.VIDEO and s.image else None,
+                "src": s.video.url if s.kind == HeroSlide.Kind.VIDEO else photo,
+                "poster": (photo or None) if s.kind == HeroSlide.Kind.VIDEO else None,
                 "alt": s.alt,
                 "focus": s.focus,
                 "seconds": float(s.video_seconds) if s.kind == HeroSlide.Kind.VIDEO and s.video_seconds else s.seconds,

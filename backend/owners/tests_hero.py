@@ -56,20 +56,20 @@ class HeroAdminTests(TestCase):
     def test_adds_a_photo_slide(self):
         res = self.post(image=SimpleUploadedFile("lake.png", PNG, "image/png"))
         self.assertEqual(res.status_code, 302, res.content[:2000])
-        slide = HeroSlide.objects.get()
+        slide = HeroSlide.objects.get(title="Lake")
         self.assertTrue(slide.image.name.startswith("hero/"))
         self.assertEqual(slide.order, 1)
 
     def test_adds_a_video_and_stores_its_length(self):
         res = self.post(kind="video", video=SimpleUploadedFile("lake.mp4", mp4(12), "video/mp4"))
         self.assertEqual(res.status_code, 302)
-        self.assertEqual(float(HeroSlide.objects.get().video_seconds), 12.0)
+        self.assertEqual(float(HeroSlide.objects.get(title="Lake").video_seconds), 12.0)
 
     def test_refuses_a_long_video(self):
         res = self.post(kind="video", video=SimpleUploadedFile("long.mp4", mp4(31), "video/mp4"))
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, "31 seconds long")
-        self.assertFalse(HeroSlide.objects.exists())
+        self.assertFalse(HeroSlide.objects.filter(title="Lake").exists())
 
     def test_refuses_a_file_that_is_not_a_photo(self):
         res = self.post(image=SimpleUploadedFile("x.png", b"<svg onload=alert(1)>", "image/png"))
@@ -80,6 +80,13 @@ class HeroAdminTests(TestCase):
         self.post(title="A", kind="video", video=SimpleUploadedFile("a.mp4", mp4(8), "video/mp4"))
         HeroSlide.objects.create(title="Off", image="hero/off.png", active=False)
         slides = APIClient().get("/api/hero/").json()["slides"]
-        self.assertEqual([s["kind"] for s in slides], ["image", "video"])
-        self.assertEqual(slides[1]["seconds"], 8.0)
-        self.assertTrue(slides[0]["src"].startswith("/media/hero/"))
+        # The site's original lake photo comes first (migration 0011), then the uploads.
+        self.assertEqual([s["kind"] for s in slides], ["image", "image", "video"])
+        self.assertTrue(slides[0]["src"].startswith("https://images.unsplash.com/"))
+        self.assertTrue(slides[1]["src"].startswith("/media/hero/"))
+        self.assertEqual(slides[2]["seconds"], 8.0)
+
+    def test_photo_address_instead_of_upload(self):
+        res = self.post(title="Web photo", image_url="https://images.unsplash.com/photo-1?w=10")
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(HeroSlide.objects.get(title="Web photo").image_url, "https://images.unsplash.com/photo-1?w=10")

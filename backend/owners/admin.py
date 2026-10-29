@@ -146,7 +146,7 @@ class SlideUpload(forms.ClearableFileInput):
 class HeroSlideForm(forms.ModelForm):
     class Meta:
         model = HeroSlide
-        fields = ["title", "kind", "image", "video", "alt", "focus", "seconds", "active"]
+        fields = ["title", "kind", "image", "image_url", "video", "alt", "focus", "seconds", "active"]
         widgets = {"image": SlideUpload("image", "image/jpeg,image/png,image/webp"),
                    "video": SlideUpload("video", "video/mp4,video/quicktime")}
 
@@ -165,7 +165,7 @@ class HeroSlideForm(forms.ModelForm):
                 self.instance.video_seconds = Decimal(f"{media_checks.check_video(video):.2f}")
             except forms.ValidationError as err:
                 self.add_error("video", err)
-        if kind == HeroSlide.Kind.IMAGE and not image:
+        if kind == HeroSlide.Kind.IMAGE and not image and not data.get("image_url"):
             self.add_error("image", "Add the photo.")
         if kind == HeroSlide.Kind.VIDEO and not video:
             self.add_error("video", "Add the video.")
@@ -185,7 +185,7 @@ class HeroSlideAdmin(ModelAdmin):
     hide_ordering_field = True
     fieldsets = [
         ("Slide", {"fields": ["title", "kind", "active"], "classes": ["st-grid-3"]}),
-        ("Photo or video", {"fields": ["video", "image"]}),
+        ("Photo or video", {"fields": ["video", "image", "image_url"]}),
         ("On the page", {"fields": ["alt", "focus", "seconds"], "classes": ["st-grid-3"]}),
     ]
 
@@ -199,8 +199,9 @@ class HeroSlideAdmin(ModelAdmin):
 
     @display(description="")
     def preview(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" alt="" style="width:120px;height:60px;object-fit:cover;border-radius:8px;">', obj.image.url)
+        if obj.image or obj.image_url:
+            return format_html('<img src="{}" alt="" style="width:120px;height:60px;object-fit:cover;border-radius:8px;">',
+                               obj.image.url if obj.image else obj.image_url)
         if obj.video:
             return format_html('<video src="{}#t=0.5" muted preload="metadata" style="width:120px;height:60px;object-fit:cover;border-radius:8px;"></video>', obj.video.url)
         return "–"

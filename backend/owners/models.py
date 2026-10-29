@@ -418,6 +418,10 @@ class HeroSlide(models.Model):
         upload_to="hero/", blank=True,
         help_text="",
     )
+    image_url = models.URLField(
+        "Photo address", max_length=500, blank=True,
+        help_text="A photo on the web instead of an upload (the site's original lake photo is one).",
+    )
     video = models.FileField(
         upload_to="hero/", blank=True,
         help_text="",
