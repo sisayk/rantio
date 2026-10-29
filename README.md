@@ -18,32 +18,33 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
 
 ## Run it locally
 
-In a normal terminal, backend:
+In a normal terminal:
 
 ```bash
-cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver 8000
+cd ~/stugora
+./dev.sh
 ```
 
-In a second normal terminal, frontend:
+The first run sets up a Python virtual environment and installs the npm
+packages, which takes a few minutes. It then opens http://localhost:3100.
+
+| What | Address |
+| --- | --- |
+| Guest site (Finnish / English) | http://localhost:3100 and /en |
+| Owner sign-up page | http://localhost:3100/omistajille and /en/hosts |
+| Admin (sign-ups, owners, bookings) | http://localhost:8100/admin |
+
+Ports 3100 and 8100 leave 3000 and 8000 free for Bona. Press Ctrl+C to stop.
+To log in to the admin, in a normal terminal:
 
 ```bash
-cd frontend
-cp .env.example .env.local
-npm install
-npm run dev
+cd ~/stugora && backend/.venv/bin/python backend/manage.py createsuperuser
 ```
-
-Open http://localhost:3000 for the page and http://localhost:8000/admin for sign-ups.
 
 Tests, in a normal terminal:
 
 ```bash
-cd backend && python manage.py test
+cd ~/stugora/backend && .venv/bin/python manage.py test
 ```
 
 ## Production settings (environment variables)
@@ -54,7 +55,7 @@ cd backend && python manage.py test
 | `DJANGO_SECRET_KEY` | a long random string |
 | `DJANGO_ALLOWED_HOSTS` | `api.stugora.fi` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://api.stugora.fi` |
-| `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` |
+| `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
 | `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
 | `SIGNUP_NOTIFY_EMAILS` | `sisay@…,juha@…` |
 | `EMAIL_BACKEND` | your transactional email backend |

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { content, type Lang, REGIONS } from "@/lib/content";
 import styles from "./landing.module.css";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
 
 type Field = "name" | "email" | "region" | "nettimokki_url" | "privacy_consent";
 type Errors = Partial<Record<Field | "form", string>>;
