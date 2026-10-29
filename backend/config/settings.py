@@ -12,6 +12,23 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_env_file(path: Path) -> None:
+    """Local secrets from backend/.env (KEY=value lines). Real environment variables win."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = (part.strip() for part in line.split("=", 1))
+        value = value.strip("\"'")
+        if key and value and not os.environ.get(key):
+            os.environ[key] = value
+
+
+load_env_file(BASE_DIR / ".env")
+
+
 def env_bool(name: str, default: bool = False) -> bool:
     return os.environ.get(name, str(default)).lower() in {"1", "true", "yes", "on"}
 
