@@ -11,3 +11,4 @@ frontend/.env*.local
 frontend/next-env.d.ts
 # OS
 .DS_Store
+frontend/tsconfig.tsbuildinfo
