@@ -413,14 +413,14 @@ class HeroSlide(models.Model):
 
     title = models.CharField(max_length=120, help_text="For you in the admin, e.g. 'Saimaa at sunset'.")
     kind = models.CharField(max_length=5, choices=Kind.choices, default=Kind.IMAGE)
+    # Limits and previews are in the upload box (templates/admin/owners/heroslide/upload.html).
     image = models.FileField(
         upload_to="hero/", blank=True,
-        help_text="JPG, PNG or WebP, up to 8 MB. Best 2400 × 1200 px or larger, landscape. "
-                  "For a video this is the still shown before it plays and on phones saving data.",
+        help_text="",
     )
     video = models.FileField(
         upload_to="hero/", blank=True,
-        help_text="MP4 (H.264), up to 20 seconds and 40 MB. Plays without sound, so it needs none.",
+        help_text="",
     )
     alt = models.CharField(
         "Description", max_length=200, blank=True,

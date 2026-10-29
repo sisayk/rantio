@@ -904,3 +904,36 @@ html body select.select2-hidden-accessible.select2-hidden-accessible { width:1px
 .dark nav a.active,
 .dark nav a.active .material-symbols-outlined { color: var(--st-accent) !important; }
 .dark .kpi .tr.up { color: #6FCF97; }
+
+/* ---------- 16. Homepage slide uploads (heroslide/upload.html) ---------- */
+.st-upload { display: grid; gap: 12px; max-width: 720px; }
+.st-file { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.st-drop {
+  display: flex !important; align-items: center; gap: 16px;
+  padding: 22px 24px !important; margin: 0 !important;
+  border: 2px dashed var(--st-border-strong); border-radius: 14px;
+  background: var(--st-soft); color: var(--st-text) !important;
+  cursor: pointer; transition: border-color .15s, background .15s;
+  font-weight: 400 !important; font-size: 14px !important;
+}
+.st-drop:hover, .st-drop.st-over { border-color: var(--st-accent); background: var(--st-hover); }
+.st-file:focus-visible + .st-chosen, .st-upload:focus-within .st-drop { outline: 3px solid var(--st-accent-ring); outline-offset: 2px; }
+.st-drop-icon { font-size: 36px !important; color: var(--st-accent); }
+.st-drop-text { display: grid; gap: 2px; }
+.st-drop-text strong { font-size: 15px; font-weight: 700; color: var(--st-accent); }
+.st-drop-text span { color: var(--st-text-2); }
+.st-drop-text small { color: var(--st-muted); font-size: 12px; }
+.st-current, .st-chosen { display: flex; align-items: center; gap: 14px; }
+.st-current img, .st-current video, .st-chosen-preview img, .st-chosen-preview video {
+  width: 220px; aspect-ratio: 2 / 1; object-fit: cover; border-radius: 10px; background: #000; display: block;
+}
+.st-current-name, .st-chosen-meta { font-size: 13px; color: var(--st-muted); }
+.st-current-name a { color: var(--st-accent) !important; }
+.st-chosen-info { display: grid; gap: 4px; }
+.st-chosen-name { font-size: 14px; color: var(--st-text); word-break: break-all; }
+.st-chosen.st-bad .st-chosen-meta { color: var(--st-danger); font-weight: 600; }
+.st-clear { display: flex !important; align-items: center; gap: 8px; font-weight: 400 !important; font-size: 13px !important; }
+@media (max-width: 600px) {
+  .st-current, .st-chosen { flex-direction: column; align-items: flex-start; }
+  .st-current img, .st-current video, .st-chosen-preview img, .st-chosen-preview video { width: 100%; }
+}

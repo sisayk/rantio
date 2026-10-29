@@ -122,12 +122,33 @@ class ExchangeRateAdmin(ModelAdmin):
         return False
 
 
+class SlideUpload(forms.ClearableFileInput):
+    """A large 'choose or drop a file' box with a preview, the current file, and checks
+    before upload (size, video length). Template: templates/admin/owners/heroslide/upload.html."""
+
+    def __init__(self, kind: str, accept: str):
+        super().__init__(attrs={"accept": accept})
+        self.kind = kind
+
+    def render(self, name, value, attrs=None, renderer=None):
+        from django.template.loader import render_to_string
+        from django.utils.safestring import mark_safe
+
+        attrs = attrs or {}
+        url = getattr(value, "url", None) if value else None
+        return mark_safe(render_to_string("admin/owners/heroslide/upload.html", {
+            "name": name, "id": attrs.get("id", f"id_{name}"), "accept": self.attrs["accept"], "kind": self.kind,
+            "url": url, "filename": str(value).rsplit("/", 1)[-1] if url else "",
+            "can_clear": bool(url) and not self.is_required, "clear_name": self.clear_checkbox_name(name),
+        }))
+
+
 class HeroSlideForm(forms.ModelForm):
     class Meta:
         model = HeroSlide
         fields = ["title", "kind", "image", "video", "alt", "focus", "seconds", "active"]
-        widgets = {"image": forms.ClearableFileInput(attrs={"accept": "image/jpeg,image/png,image/webp"}),
-                   "video": forms.ClearableFileInput(attrs={"accept": "video/mp4,video/quicktime"})}
+        widgets = {"image": SlideUpload("image", "image/jpeg,image/png,image/webp"),
+                   "video": SlideUpload("video", "video/mp4,video/quicktime")}
 
     def clean(self):
         data = super().clean()
@@ -162,12 +183,9 @@ class HeroSlideAdmin(ModelAdmin):
     list_filter = ["kind", "active"]
     ordering_field = "order"
     hide_ordering_field = True
-    readonly_fields = ["current"]
     fieldsets = [
         ("Slide", {"fields": ["title", "kind", "active"], "classes": ["st-grid-3"]}),
-        ("Photo or video", {"fields": ["current", "image", "video"],
-                            "description": "Photos: JPG, PNG or WebP up to 8 MB, landscape, 2400 × 1200 px or more. "
-                                           "Videos: MP4 up to 20 seconds and 40 MB, no sound needed; add a photo too as its still."}),
+        ("Photo or video", {"fields": ["video", "image"]}),
         ("On the page", {"fields": ["alt", "focus", "seconds"], "classes": ["st-grid-3"]}),
     ]
 
@@ -192,17 +210,6 @@ class HeroSlideAdmin(ModelAdmin):
         if obj.kind == HeroSlide.Kind.VIDEO:
             return f"{obj.video_seconds:.0f} s video" if obj.video_seconds else "video"
         return f"{obj.seconds} s"
-
-    @display(description="Now")
-    def current(self, obj):
-        if obj and obj.kind == HeroSlide.Kind.VIDEO and obj.video:
-            return format_html(
-                '<video src="{}" poster="{}" controls muted playsinline style="max-width:560px;width:100%;border-radius:12px;"></video>',
-                obj.video.url, obj.image.url if obj.image else "",
-            )
-        if obj and obj.image:
-            return format_html('<img src="{}" alt="" style="max-width:560px;width:100%;border-radius:12px;">', obj.image.url)
-        return "Nothing uploaded yet."
 
 
 # Admin users and groups in the same look (unfold's forms), as in Bona.

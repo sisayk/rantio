@@ -1,0 +1,92 @@
+{# Upload box for a homepage slide's photo or video (owners/admin.py SlideUpload). #}
+<div class="st-upload" data-kind="{{ kind }}">
+  {% if url %}
+    <div class="st-current">
+      {% if kind == "video" %}
+        <video src="{{ url }}" controls muted playsinline preload="metadata"></video>
+      {% else %}
+        <img src="{{ url }}" alt="">
+      {% endif %}
+      <span class="st-current-name">Now: <a href="{{ url }}" target="_blank" rel="noopener">{{ filename }}</a></span>
+    </div>
+  {% endif %}
+  <label class="st-drop" for="{{ id }}">
+    <span class="material-symbols-outlined st-drop-icon">{% if kind == "video" %}movie{% else %}add_photo_alternate{% endif %}</span>
+    <span class="st-drop-text">
+      <strong>{% if url %}Choose another {% else %}Choose a {% endif %}{% if kind == "video" %}video{% else %}photo{% endif %}</strong>
+      <span>or drag it here</span>
+      <small>{% if kind == "video" %}MP4 · up to 20 seconds · up to 40 MB{% else %}JPG, PNG or WebP · up to 8 MB · wide, 2400 × 1200 px or more{% endif %}</small>
+    </span>
+  </label>
+  {# unfold's app.js writes the chosen file name into the nearest text input; give it one. #}
+  <input type="text" hidden disabled aria-hidden="true" tabindex="-1">
+  <input class="st-file" type="file" name="{{ name }}" id="{{ id }}" accept="{{ accept }}">
+  <div class="st-chosen" hidden>
+    <div class="st-chosen-preview"></div>
+    <div class="st-chosen-info"><strong class="st-chosen-name"></strong><span class="st-chosen-meta"></span></div>
+  </div>
+  {% if can_clear %}
+    <label class="st-clear"><input type="checkbox" name="{{ clear_name }}" id="{{ id }}_clear"> Remove the current {% if kind == "video" %}video{% else %}photo{% endif %}</label>
+  {% endif %}
+</div>
+{% if kind == "video" %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.stUploadReady) return; window.stUploadReady = true;
+  var MAX = { image: 8 * 1048576, video: 40 * 1048576 };
+  function mb(n) { return (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB'; }
+  function show(box, file) {
+    var kind = box.dataset.kind, chosen = box.querySelector('.st-chosen'), pv = chosen.querySelector('.st-chosen-preview');
+    var meta = chosen.querySelector('.st-chosen-meta'), url = URL.createObjectURL(file), problems = [];
+    chosen.hidden = false; chosen.classList.remove('st-bad'); pv.innerHTML = '';
+    chosen.querySelector('.st-chosen-name').textContent = file.name;
+    if (file.size > MAX[kind]) problems.push('too big (' + mb(file.size) + ', the limit is ' + mb(MAX[kind]) + ')');
+    function done(extra) {
+      meta.textContent = [mb(file.size)].concat(extra || []).concat(problems.length ? ['Not accepted: ' + problems.join(', ')] : []).join(' · ');
+      chosen.classList.toggle('st-bad', problems.length > 0);
+    }
+    if (kind === 'video') {
+      var v = document.createElement('video'); v.muted = true; v.playsInline = true; v.src = url; v.controls = true;
+      v.onloadedmetadata = function () {
+        var s = Math.round(v.duration * 10) / 10;
+        if (s > 20.5) problems.push('the video is ' + Math.round(s) + ' seconds; the limit is 20');
+        done([s + ' s']);
+      };
+      v.onerror = function () { problems.push('this browser cannot play it; use MP4 (H.264)'); done(); };
+      pv.appendChild(v);
+    } else {
+      var i = new Image(); i.src = url; i.alt = '';
+      i.onload = function () {
+        var extra = [i.naturalWidth + ' × ' + i.naturalHeight + ' px'];
+        if (i.naturalWidth < 1600) extra.push('small: it may look soft on big screens');
+        done(extra);
+      };
+      i.onerror = function () { problems.push('not a photo this browser can show'); done(); };
+      pv.appendChild(i);
+    }
+  }
+  document.querySelectorAll('.st-upload').forEach(function (box) {
+    var input = box.querySelector('.st-file'), drop = box.querySelector('.st-drop');
+    input.addEventListener('change', function () { if (input.files[0]) show(box, input.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add('st-over'); }); });
+    ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('st-over'); }); });
+    drop.addEventListener('drop', function (e) {
+      var f = e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return;
+      var dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; show(box, f);
+    });
+  });
+  // Photo slides need no video; for a video slide the photo is its optional still.
+  var kind = document.getElementById('id_kind');
+  function row(id) { var el = document.getElementById(id); return el && (el.closest('.form-row') || el.closest('.field-line')); }
+  function label(id) { var r = row(id); return r && r.querySelector('label[for="' + id + '"], .st-field-label'); }
+  var imageLabel = label('id_image');
+  function sync() {
+    var isVideo = kind && kind.value === 'video', vr = row('id_video');
+    if (vr) vr.style.display = isVideo ? '' : 'none';
+    var sr = row('id_seconds'); if (sr) sr.style.visibility = isVideo ? 'hidden' : '';
+    if (imageLabel) imageLabel.firstChild.textContent = isVideo ? 'Still photo for the video (optional) ' : 'Photo ';
+  }
+  if (kind) { kind.addEventListener('change', sync); sync(); }
+});
+</script>
+{% endif %}
