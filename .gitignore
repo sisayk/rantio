@@ -13,3 +13,6 @@ frontend/next-env.d.ts
 .DS_Store
 frontend/tsconfig.tsbuildinfo
 scripts/node_modules/
+
+# Old update archives and moved-aside files on the Mac
+_old-updates/
