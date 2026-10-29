@@ -12,3 +12,4 @@ frontend/next-env.d.ts
 # OS
 .DS_Store
 frontend/tsconfig.tsbuildinfo
+scripts/node_modules/

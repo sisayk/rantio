@@ -538,6 +538,33 @@
   right: 4px;
 }
 
+.filterEnd {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+}
+
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--g-ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.viewToggle:hover {
+  background: #33444a;
+}
+
 .resultCount {
   margin: 16px 0 12px;
   font-size: 14px;
@@ -556,9 +583,14 @@
 
 .card {
   overflow: hidden;
+  transition: box-shadow 150ms ease;
   border-radius: 14px;
   background: #fff;
   box-shadow: var(--g-card-shadow);
+}
+
+.card[data-active="true"] {
+  box-shadow: 0 0 0 2px var(--g-green), var(--g-card-shadow);
 }
 
 .cardPhoto {
@@ -694,6 +726,112 @@
   color: #3d4b4f;
 }
 
+/* ---------- map view ---------- */
+.mapLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.resultsColumn {
+  min-width: 0;
+}
+
+.gridWithMap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mapPanel {
+  position: sticky;
+  top: 16px;
+  height: calc(100vh - 32px);
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: var(--g-card-shadow);
+  background: #dfe7e4;
+}
+
+.map,
+.mapLoading {
+  width: 100%;
+  height: 100%;
+}
+
+.mapLoading {
+  background: linear-gradient(90deg, #dfe7e4, #eaf0ee, #dfe7e4);
+}
+
+.popupCard {
+  width: 240px;
+  overflow: hidden;
+  border-radius: 12px;
+  font-family: var(--font);
+}
+
+.popupCard img {
+  display: block;
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.popupBody {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  font-size: 13px;
+  color: var(--g-soft);
+}
+
+.popupBody strong {
+  font-size: 15px;
+  color: var(--g-ink);
+}
+
+.popupBody b {
+  color: var(--g-ink);
+}
+
+.map :global(.stugora-pin-wrap) {
+  background: none;
+  border: 0;
+}
+
+.map :global(.stugora-pin) {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--g-ink);
+  font: 700 13px/1 var(--font);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(29, 42, 46, 0.28);
+  transition: transform 120ms ease;
+}
+
+.map :global(.stugora-pin.is-active) {
+  background: var(--g-ink);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.map :global(.stugora-popup .leaflet-popup-content-wrapper) {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.map :global(.stugora-popup .leaflet-popup-content) {
+  margin: 0;
+}
+
 .empty {
   display: grid;
   justify-items: start;
@@ -777,7 +915,15 @@
   .mainNav { display: none; }
 }
 
+@media (max-width: 1100px) {
+  .gridWithMap { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 960px) {
+  .mapLayout { grid-template-columns: 1fr; }
+  .mapPanel { position: relative; top: 0; order: -1; height: 60vh; min-height: 320px; }
+  .gridWithMap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filterEnd { justify-content: space-between; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .searchBar {
     grid-template-columns: 1fr;
@@ -816,7 +962,7 @@
   .searchBar { margin-top: 120px; }
   .categoriesInner { padding: 0 8px; justify-content: flex-start; }
   .listingArea { padding: 16px 16px 0; }
-  .grid { grid-template-columns: 1fr; }
+  .grid, .gridWithMap { grid-template-columns: 1fr; }
   .footer { padding: 28px 16px 40px; }
   .popover { position: fixed; left: 16px; right: 16px; top: auto; bottom: 16px; }
 }

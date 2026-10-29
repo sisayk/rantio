@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { CONTACT_EMAIL, type Lang } from "@/lib/content";
 import { guestContent } from "@/lib/guestContent";
@@ -13,8 +14,11 @@ import {
   type Country,
   HERO_PHOTO,
   LISTINGS,
+  type Listing,
   unsplash,
 } from "@/lib/listings";
+import { type City, PLACES } from "@/lib/places";
+import type { MapFocus } from "./CottageMap";
 import {
   Bed,
   CalendarIcon,
@@ -22,7 +26,9 @@ import {
   Chevron,
   Globe,
   Heart,
+  ListIcon,
   Logo,
+  MapIcon,
   People,
   Pin,
   SearchIcon,
@@ -32,11 +38,31 @@ import {
 } from "./icons";
 import styles from "./guest.module.css";
 
+// Leaflet needs the browser, so the map loads on the client only.
+const CottageMap = dynamic(() => import("./CottageMap"), {
+  ssr: false,
+  loading: () => <div className={styles.mapLoading} />,
+});
+
 type Sort = "recommended" | "priceLow" | "priceHigh" | "guests";
 type Menu = null | "filters" | "amenities" | "account";
 
 // Suggestions under the search box; countries are added in the visitor's language.
-const PLACES = Array.from(new Set(LISTINGS.flatMap((l) => l.place.split(", "))));
+const SUGGESTED = Array.from(new Set(LISTINGS.flatMap((l) => l.place.split(", "))));
+
+const REGION_NAMES = new Map(
+  Object.values(PLACES).flat().map((r) => [r.id, `${r.name.en} ${r.name.fi} ${r.name.local}`]),
+);
+
+// The box that holds a set of points, padded so a single town still gets some context.
+function boxAround(points: { lat: number; lng: number }[], pad: number): MapFocus["bounds"] {
+  const lats = points.map((p) => p.lat);
+  const lngs = points.map((p) => p.lng);
+  return [
+    [Math.min(...lats) - pad, Math.min(...lngs) - pad * 2],
+    [Math.max(...lats) + pad, Math.max(...lngs) + pad * 2],
+  ];
+}
 const SAVED_KEY = "stugora:saved";
 
 // Saved cottages live in this browser only (localStorage, with an in-memory fallback).
@@ -95,6 +121,10 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const [guests, setGuests] = useState(0);
   const [category, setCategory] = useState<Category>("all");
   const [country, setCountry] = useState<Country | "">("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  const [view, setView] = useState<"list" | "map">("list");
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState(0);
   const [bedrooms, setBedrooms] = useState(0);
   const [instantBook, setInstantBook] = useState(false);
@@ -139,6 +169,8 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     setGuests(0);
     setCategory("all");
     setCountry("");
+    setRegion("");
+    setCity("");
     setMaxPrice(0);
     setBedrooms(0);
     setInstantBook(false);
@@ -152,9 +184,12 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     const q = normalise(where.trim());
     const list = LISTINGS.filter((l) => {
       const countryNames = `${guestContent.fi.countries[l.country]} ${guestContent.en.countries[l.country]}`;
-      if (q && !normalise(`${l.place} ${l.name.fi} ${l.name.en} ${countryNames}`).includes(q)) return false;
+      const haystack = `${l.place} ${l.name.fi} ${l.name.en} ${countryNames} ${REGION_NAMES.get(l.region) ?? ""}`;
+      if (q && !normalise(haystack).includes(q)) return false;
       if (category !== "all" && !l.categories.includes(category)) return false;
       if (country && l.country !== country) return false;
+      if (region && l.region !== region) return false;
+      if (city && l.city !== city) return false;
       if (maxPrice && l.price > maxPrice) return false;
       if (guests && l.guests < guests) return false;
       if (bedrooms && l.bedrooms < bedrooms) return false;
@@ -168,9 +203,101 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [where, category, country, maxPrice, guests, bedrooms, instantBook, freeCancellation, amenities, savedOnly, saved, sort]);
+  }, [where, category, country, region, city, maxPrice, guests, bedrooms, instantBook, freeCancellation, amenities, savedOnly, saved, sort]);
 
   const advancedCount = [instantBook, freeCancellation].filter(Boolean).length + amenities.length;
+
+  const regions = country ? PLACES[country] : [];
+  const regionData = useMemo(
+    () => (country ? PLACES[country].find((r) => r.id === region) : undefined),
+    [country, region],
+  );
+  const regionCities = useMemo<City[]>(() => regionData?.cities ?? [], [regionData]);
+  const regionName = (r: { name: { en: string; fi: string } }) => (lang === "fi" ? r.name.fi : r.name.en);
+
+  // The map follows the narrowest place chosen: town, then region, then country.
+  const focus = useMemo<MapFocus>(() => {
+    const town = regionCities.find((c) => c.name === city);
+    if (town) return { bounds: boxAround([town], 0.12), maxZoom: 11 };
+    if (regionData) return { bounds: boxAround([...regionData.cities, ...results], 0.05), maxZoom: 10 };
+    if (country) return { bounds: boxAround(PLACES[country].flatMap((r) => r.cities), 0.2), maxZoom: 7 };
+    const shown = results.length ? results : LISTINGS;
+    return { bounds: boxAround(shown, 0.5), maxZoom: 9 };
+  }, [regionCities, city, regionData, country, results]);
+
+  function pickCountry(value: Country | "") {
+    setCountry(value);
+    setRegion("");
+    setCity("");
+  }
+
+  function pickRegion(value: string) {
+    setRegion(value);
+    setCity("");
+  }
+
+  const placeLabel = (l: Listing) => `${l.place}, ${t.countries[l.country]}`;
+
+  function renderCard(l: Listing) {
+    const isSaved = saved.includes(l.id);
+    return (
+      <li
+        key={l.id}
+        className={styles.card}
+        data-active={activeId === l.id}
+        onMouseEnter={() => setActiveId(l.id)}
+        onMouseLeave={() => setActiveId(null)}
+      >
+        <div className={styles.cardPhoto}>
+          <img src={unsplash(l.photo, 720, 420, l.photoCrop)} alt="" loading="lazy" width={720} height={420} />
+          <span className={styles.badge}>{t.badges[l.badge]}</span>
+          <button
+            type="button"
+            className={styles.save}
+            aria-pressed={isSaved}
+            aria-label={`${isSaved ? t.card.saved : t.card.save}: ${l.name[lang]}`}
+            onClick={() => toggleSaved(l.id)}
+          >
+            <Heart className={styles.icon22} filled={isSaved} />
+          </button>
+        </div>
+        <div className={styles.cardBody}>
+          <div className={styles.cardHead}>
+            <h3 className={styles.cardTitle}>{l.name[lang]}</h3>
+            {l.rating ? (
+              <span className={styles.rating}>
+                <Star className={styles.icon16} />
+                {l.rating.toLocaleString(t.locale, { minimumFractionDigits: 1 })}
+              </span>
+            ) : (
+              <span className={styles.newTag}>{t.card.isNew}</span>
+            )}
+          </div>
+          <p className={styles.cardPlace}>{placeLabel(l)}</p>
+          <p className={styles.cardFacts}>
+            <span>
+              <People className={styles.icon16} />
+              {t.card.guests(l.guests)}
+            </span>
+            <span>
+              <Bed className={styles.icon16} />
+              {t.card.bedrooms(l.bedrooms)}
+            </span>
+          </p>
+          <p className={styles.cardPrice}>
+            <strong>{money.format(l.price)}</strong> {t.card.night}
+          </p>
+          <p className={styles.channels} aria-label={`${t.card.bookOn}: ${l.channels.join(", ")}`}>
+            {l.channels.map((c) => (
+              <span key={c} className={styles.channel}>
+                {c}
+              </span>
+            ))}
+          </p>
+        </div>
+      </li>
+    );
+  }
   const f = t.filters;
 
   const amenityChecks = (
@@ -279,7 +406,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                   autoComplete="off"
                 />
                 <datalist id="destinations">
-                  {[...COUNTRIES.map((c) => t.countries[c]), ...PLACES].map((d) => (
+                  {[...COUNTRIES.map((c) => t.countries[c]), ...SUGGESTED].map((d) => (
                     <option key={d} value={d} />
                   ))}
                 </datalist>
@@ -384,7 +511,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             </div>
 
             <span className={styles.selectChip} data-active={!!country}>
-              <select aria-label={f.location} value={country} onChange={(e) => setCountry(e.target.value as Country | "")}>
+              <select aria-label={f.location} value={country} onChange={(e) => pickCountry(e.target.value as Country | "")}>
                 <option value="">{f.location}</option>
                 {COUNTRIES.map((c) => (
                   <option key={c} value={c}>
@@ -394,6 +521,36 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               </select>
               <Chevron className={styles.icon16} />
             </span>
+            {country ? (
+              <span className={styles.selectChip} data-active={!!region}>
+                <select aria-label={f.region} value={region} onChange={(e) => pickRegion(e.target.value)}>
+                  <option value="">{f.region}</option>
+                  {[...regions]
+                    .sort((a, b) => regionName(a).localeCompare(regionName(b), t.locale))
+                    .map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {regionName(r)}
+                      </option>
+                    ))}
+                </select>
+                <Chevron className={styles.icon16} />
+              </span>
+            ) : null}
+            {region ? (
+              <span className={styles.selectChip} data-active={!!city}>
+                <select aria-label={f.city} value={city} onChange={(e) => setCity(e.target.value)}>
+                  <option value="">{f.city}</option>
+                  {[...regionCities]
+                    .sort((a, b) => a.name.localeCompare(b.name, t.locale))
+                    .map((c) => (
+                      <option key={c.name} value={c.name}>
+                        {c.name}
+                      </option>
+                    ))}
+                </select>
+                <Chevron className={styles.icon16} />
+              </span>
+            ) : null}
             <span className={styles.selectChip} data-active={!!maxPrice}>
               <select aria-label={f.price} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))}>
                 <option value={0}>{f.price}</option>
@@ -451,6 +608,16 @@ export default function GuestHome({ lang }: { lang: Lang }) {
             </div>
           </div>
 
+          <div className={styles.filterEnd}>
+          <button
+            type="button"
+            className={styles.viewToggle}
+            aria-pressed={view === "map"}
+            onClick={() => setView(view === "map" ? "list" : "map")}
+          >
+            {view === "map" ? <ListIcon className={styles.icon18} /> : <MapIcon className={styles.icon18} />}
+            {view === "map" ? t.view.showList : t.view.showMap}
+          </button>
           <label className={styles.sort}>
             {f.sortBy}:
             <span className={styles.sortSelect}>
@@ -464,79 +631,45 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               <Chevron className={styles.icon16} />
             </span>
           </label>
+          </div>
         </div>
 
         <p className={styles.resultCount} aria-live="polite">
           {t.results(results.length)}
         </p>
 
-        {results.length ? (
-          <ul className={styles.grid}>
-            {results.map((l) => {
-              const isSaved = saved.includes(l.id);
-              return (
-                <li key={l.id} className={styles.card}>
-                  <div className={styles.cardPhoto}>
-                    <img src={unsplash(l.photo, 720, 420, l.photoCrop)} alt="" loading="lazy" width={720} height={420} />
-                    <span className={styles.badge}>{t.badges[l.badge]}</span>
-                    <button
-                      type="button"
-                      className={styles.save}
-                      aria-pressed={isSaved}
-                      aria-label={`${isSaved ? t.card.saved : t.card.save}: ${l.name[lang]}`}
-                      onClick={() => toggleSaved(l.id)}
-                    >
-                      <Heart className={styles.icon22} filled={isSaved} />
-                    </button>
-                  </div>
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardHead}>
-                      <h3 className={styles.cardTitle}>{l.name[lang]}</h3>
-                      {l.rating ? (
-                        <span className={styles.rating}>
-                          <Star className={styles.icon16} />
-                          {l.rating.toLocaleString(t.locale, { minimumFractionDigits: 1 })}
-                        </span>
-                      ) : (
-                        <span className={styles.newTag}>{t.card.isNew}</span>
-                      )}
-                    </div>
-                    <p className={styles.cardPlace}>
-                      {l.place}, {t.countries[l.country]}
-                    </p>
-                    <p className={styles.cardFacts}>
-                      <span>
-                        <People className={styles.icon16} />
-                        {t.card.guests(l.guests)}
-                      </span>
-                      <span>
-                        <Bed className={styles.icon16} />
-                        {t.card.bedrooms(l.bedrooms)}
-                      </span>
-                    </p>
-                    <p className={styles.cardPrice}>
-                      <strong>{money.format(l.price)}</strong> {t.card.night}
-                    </p>
-                    <p className={styles.channels} aria-label={`${t.card.bookOn}: ${l.channels.join(", ")}`}>
-                      {l.channels.map((c) => (
-                        <span key={c} className={styles.channel}>
-                          {c}
-                        </span>
-                      ))}
-                    </p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div className={styles.empty}>
-            <p>{t.empty.title}</p>
-            <button type="button" className={styles.clearButton} onClick={clearAll}>
-              {t.empty.action}
-            </button>
+        <div className={view === "map" ? styles.mapLayout : undefined}>
+          <div className={styles.resultsColumn}>
+            {results.length ? (
+              <ul className={view === "map" ? styles.gridWithMap : styles.grid}>{results.map(renderCard)}</ul>
+            ) : (
+              <div className={styles.empty}>
+                <p>{t.empty.title}</p>
+                <button type="button" className={styles.clearButton} onClick={clearAll}>
+                  {t.empty.action}
+                </button>
+              </div>
+            )}
           </div>
-        )}
+          {view === "map" ? (
+            <div className={styles.mapPanel}>
+              <CottageMap
+                listings={results}
+                focus={focus}
+                cities={regionCities}
+                selectedCity={city}
+                activeId={activeId}
+                lang={lang}
+                label={t.view.map}
+                placeLabel={placeLabel}
+                price={(n) => money.format(n)}
+                nightLabel={t.card.night}
+                onHover={setActiveId}
+                onCity={(name) => setCity(name === city ? "" : name)}
+              />
+            </div>
+          ) : null}
+        </div>
         <p className={styles.examples}>{t.examples}</p>
 
         <section className={styles.hostBand}>

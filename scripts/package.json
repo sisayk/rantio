@@ -1,0 +1,6 @@
+{
+  "name": "stugora-scripts",
+  "private": true,
+  "description": "One-off data scripts for Stugora",
+  "dependencies": { "all-the-cities": "^3.1.0" }
+}

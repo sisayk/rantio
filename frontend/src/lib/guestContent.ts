@@ -57,6 +57,8 @@ const fi = {
   filters: {
     filters: "Suodattimet",
     location: "Maa",
+    region: "Alue",
+    city: "Kaupunki",
     price: "Hinta",
     prices: { any: "Mikä tahansa hinta", 150: "Enintään 150 €", 180: "Enintään 180 €", 200: "Enintään 200 €" },
     guests: "Vieraat",
@@ -87,6 +89,7 @@ const fi = {
     LV: "Latvia",
     LT: "Liettua",
   } as Record<Country, string>,
+  view: { showMap: "Näytä kartta", showList: "Näytä lista", map: "Mökit kartalla" },
   results: (n: number) => (n === 1 ? "1 mökki" : `${n} mökkiä`),
   empty: { title: "Näillä valinnoilla ei löytynyt mökkejä", action: "Tyhjennä haku ja suodattimet" },
   card: {
@@ -165,6 +168,8 @@ const en: GuestContent = {
   filters: {
     filters: "Filters",
     location: "Country",
+    region: "Region",
+    city: "Town",
     price: "Price",
     prices: { any: "Any price", 150: "Up to €150", 180: "Up to €180", 200: "Up to €200" },
     guests: "Guests",
@@ -189,6 +194,7 @@ const en: GuestContent = {
     LV: "Latvia",
     LT: "Lithuania",
   },
+  view: { showMap: "Show map", showList: "Show list", map: "Map of cottages" },
   results: (n: number) => (n === 1 ? "1 cottage" : `${n} cottages`),
   empty: { title: "No cottages match these choices", action: "Clear search and filters" },
   card: {

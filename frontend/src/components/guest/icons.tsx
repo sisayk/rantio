@@ -44,6 +44,12 @@ export const UserIcon = ({ className }: P) => (
 export const Bed = ({ className }: P) => (
   <svg {...base(className)}><path d="M3 18.5V7M3 14h18v4.5M21 14v-2.5a2.5 2.5 0 0 0-2.5-2.5H11v5" /><rect x="5.5" y="9.5" width="3.5" height="2.5" rx="1" /></svg>
 );
+export const MapIcon = ({ className }: P) => (
+  <svg {...base(className)}><path d="m3.5 6.5 5.5-2.5 6 2.5 5.5-2.5v13.5l-5.5 2.5-6-2.5-5.5 2.5V6.5Z" /><path d="M9 4v13.5M15 6.5V20" /></svg>
+);
+export const ListIcon = ({ className }: P) => (
+  <svg {...base(className)}><rect x="3.5" y="4.5" width="7" height="6" rx="1.5" /><rect x="13.5" y="4.5" width="7" height="6" rx="1.5" /><rect x="3.5" y="13.5" width="7" height="6" rx="1.5" /><rect x="13.5" y="13.5" width="7" height="6" rx="1.5" /></svg>
+);
 export const Star = ({ className }: P) => (
   <svg {...base(className)} fill="currentColor" stroke="none"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8L12 3.5Z" /></svg>
 );
