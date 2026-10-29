@@ -29,7 +29,8 @@ class OwnerSignupCreateView(generics.CreateAPIView):
                     subject=f"New Stugora owner: {signup.name} ({signup.location_display})",
                     message=(
                         f"{signup.name} <{signup.email}> {signup.phone}\n"
-                        f"Where: {signup.location_display} · cottages: {signup.cottage_count}\n"
+                        f"Where: {signup.location_display} · cottages: {signup.cottage_count}"
+                        f" · writes in: {signup.get_language_display()}\n"
                         f"Nettimökki: {signup.nettimokki_url or '-'}\n\n{signup.message}"
                     ),
                     from_email=settings.DEFAULT_FROM_EMAIL,

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { Messages } from "@/i18n";
+import { money, plural } from "@/i18n/format";
+import { LANG_INFO, type Lang } from "@/i18n/locales";
 import type { Summary } from "@/lib/ownerApi";
-import type { OwnerContent } from "@/lib/ownerContent";
 import styles from "./owner.module.css";
 
 // Validated pair (dataviz validator, light surface): CVD ΔE 12.2, normal 22.0.
@@ -11,7 +13,7 @@ export const SERIES = { stugora: "#2f855f", own: "#cf9433" } as const;
 
 const W = 720;
 const H = 240;
-const PAD = { top: 12, right: 8, bottom: 28, left: 44 };
+const PAD = { top: 12, right: 8, bottom: 28, left: 64 };
 const BAR = 24;
 const GAP = 2;
 
@@ -35,24 +37,26 @@ function segment(x: number, y: number, w: number, h: number, roundTop: boolean) 
 export default function EarningsChart({
   months,
   year,
+  lang,
   t,
-  money,
 }: {
   months: Summary["months"];
   year: number;
-  t: OwnerContent;
-  money: (v: number) => string;
+  lang: Lang;
+  t: Messages["dashboard"];
 }) {
+  const eur = (v: number) => money(lang, v);
   const [hover, setHover] = useState<number | null>(null);
   const rows = months.map((m) => ({ ...m, stugora: Number(m.stugora), own: Number(m.own) }));
   const top = niceMax(Math.max(...rows.map((r) => r.stugora + r.own)));
   const plotH = H - PAD.top - PAD.bottom;
   const band = (W - PAD.left - PAD.right) / 12;
   const y = (v: number) => (v / top) * plotH;
-  const monthName = new Intl.DateTimeFormat(t.locale, { month: "short" });
-  const monthLong = new Intl.DateTimeFormat(t.locale, { month: "long", year: "numeric" });
+  // Rendered only in the browser, after the figures load, so Intl's month names are safe here.
+  const intl = LANG_INFO[lang].intl;
+  const monthName = new Intl.DateTimeFormat(intl, { month: "short" });
+  const monthLong = new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" });
   const label = (m: number) => monthName.format(new Date(year, m - 1, 1)).replace(".", "");
-  const compact = new Intl.NumberFormat(t.locale, { notation: "compact", maximumFractionDigits: 1 });
   const ticks = [0, top / 2, top];
   const active = hover === null ? null : rows[hover];
   const at = hover ?? 0;
@@ -66,7 +70,7 @@ export default function EarningsChart({
         </li>
         <li>
           <span style={{ background: SERIES.own }} />
-          {t.chart.own}
+          {t.chart.own} ({t.chart.ownNote})
         </li>
       </ul>
       <div className={styles.chartBox}>
@@ -82,7 +86,7 @@ export default function EarningsChart({
                   className={styles.grid}
                 />
                 <text x={PAD.left - 8} y={PAD.top + plotH - y(v) + 4} className={styles.tick} textAnchor="end">
-                  {v === 0 ? "0" : `${compact.format(v)} €`}
+                  {v === 0 ? "0" : eur(v)}
                 </text>
               </g>
             ))}
@@ -111,7 +115,7 @@ export default function EarningsChart({
                     onFocus={() => setHover(i)}
                     onBlur={() => setHover(null)}
                     tabIndex={0}
-                    aria-label={`${monthLong.format(new Date(year, r.month - 1, 1))}: ${money(r.stugora + r.own)}`}
+                    aria-label={`${monthLong.format(new Date(year, r.month - 1, 1))}: ${eur(r.stugora + r.own)}`}
                   />
                 </g>
               );
@@ -129,14 +133,14 @@ export default function EarningsChart({
               <strong>{monthLong.format(new Date(year, active.month - 1, 1))}</strong>
               <span>
                 <i style={{ background: SERIES.stugora }} />
-                {t.chart.stugora}: {money(active.stugora)}
+                {t.chart.stugora}: {eur(active.stugora)}
               </span>
               <span>
                 <i style={{ background: SERIES.own }} />
-                {t.chart.own.split(" (")[0]}: {money(active.own)}
+                {t.chart.own}: {eur(active.own)}
               </span>
               <span className={styles.tooltipTotal}>
-                {t.chart.total}: {money(active.stugora + active.own)} · {t.chart.nights(active.nights)}
+                {t.chart.total}: {eur(active.stugora + active.own)} · {plural(lang, t.nights, active.nights)}
               </span>
             </div>
           ) : null}
@@ -150,7 +154,7 @@ export default function EarningsChart({
               <tr>
                 <th scope="col">{t.chart.month}</th>
                 <th scope="col">{t.chart.stugora}</th>
-                <th scope="col">{t.chart.own.split(" (")[0]}</th>
+                <th scope="col">{t.chart.own}</th>
                 <th scope="col">{t.chart.total}</th>
               </tr>
             </thead>
@@ -158,9 +162,9 @@ export default function EarningsChart({
               {rows.map((r) => (
                 <tr key={r.month}>
                   <th scope="row">{monthLong.format(new Date(year, r.month - 1, 1))}</th>
-                  <td>{money(r.stugora)}</td>
-                  <td>{money(r.own)}</td>
-                  <td>{money(r.stugora + r.own)}</td>
+                  <td>{eur(r.stugora)}</td>
+                  <td>{eur(r.own)}</td>
+                  <td>{eur(r.stugora + r.own)}</td>
                 </tr>
               ))}
             </tbody>

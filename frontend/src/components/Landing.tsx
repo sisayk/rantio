@@ -1,7 +1,13 @@
 /* eslint-disable @next/next/no-img-element -- static photos in /public, sized by CSS */
-import { CONTACT_EMAIL, content, type Lang } from "@/lib/content";
-import { PHOTOS, showcase } from "@/lib/showcase";
+import { getMessages } from "@/i18n";
+import { countryName, languageNamesIn, money } from "@/i18n/format";
+import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
+import { COMMISSION, CONTACT_EMAIL, PLATFORM_FEE, VAT, YEARLY_FEE } from "@/lib/content";
+import { COUNTRIES } from "@/lib/listings";
+import { PHOTOS, SHOWCASE_CARDS } from "@/lib/showcase";
 import Estimator from "./Estimator";
+import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
 import styles from "./landing.module.css";
 
@@ -30,25 +36,43 @@ const STEP_ICONS = [
   <svg key="c" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5" /><circle cx="12" cy="12" r="2.6" /><path d="M6.5 9.5v5M17.5 9.5v5" /></svg>,
 ];
 
+// The price example: 20 extra nights at €150, worked out the same way as the estimator.
+const EXAMPLE_GUESTS = 20 * 150;
+const EXAMPLE_PLATFORM = EXAMPLE_GUESTS * PLATFORM_FEE;
+const EXAMPLE_COMMISSION = (EXAMPLE_GUESTS - EXAMPLE_PLATFORM) * COMMISSION * (1 + VAT);
+const EXAMPLE_YEARLY = YEARLY_FEE * (1 + VAT);
+const EXAMPLE_KEEP = EXAMPLE_GUESTS - EXAMPLE_PLATFORM - EXAMPLE_COMMISSION - EXAMPLE_YEARLY;
+
 export default function Landing({ lang }: { lang: Lang }) {
-  const t = content[lang];
-  const s = showcase[lang];
+  const m = getMessages(lang);
+  const t = m.owner;
+  const intl = LANG_INFO[lang].intl;
+  const eur = (n: number) => money(lang, Math.round(n));
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  // July 2027 starts on a Thursday; 5–11 July 2027 is a Monday-to-Sunday week.
+  const month = new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" }).format(new Date(2027, 6, 1));
+  const weekdays = Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(intl, { weekday: "short" }).format(new Date(2027, 6, 5 + i)),
+  );
+  const priceRows = [
+    { label: t.price.rows.guests, value: eur(EXAMPLE_GUESTS) },
+    { label: t.price.rows.platform, value: `−${eur(EXAMPLE_PLATFORM)}` },
+    { label: t.price.rows.commission, value: `−${eur(EXAMPLE_COMMISSION)}` },
+    { label: t.price.rows.yearly, value: `−${eur(EXAMPLE_YEARLY)}` },
+  ];
   let fillOrder = 0;
 
   return (
     <>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <a className={styles.brand} href={lang === "fi" ? "/" : "/en"}>
+          <a className={styles.brand} href={paths.home(lang)}>
             <Mark />
             <span>Stugora</span>
           </a>
           <nav className={styles.headerNav}>
-            <a className={styles.langLink} href={t.nav.otherHref} hrefLang={lang === "fi" ? "en" : "fi"}>
-              {t.nav.otherLang}
-            </a>
-            <a className={styles.langLink} href={t.nav.loginHref}>
+            <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langLink} />
+            <a className={styles.langLink} href={paths.hostingLogin(lang)}>
               {t.nav.login}
             </a>
             <a className={styles.headerCta} href="#ilmoita">
@@ -62,23 +86,23 @@ export default function Landing({ lang }: { lang: Lang }) {
         {/* Hero: the estimate beside the kind of cottage guests are looking for */}
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <Estimator lang={lang} />
+            <Estimator lang={lang} t={t.hero} />
             <p className={styles.heroLead}>{t.hero.lead}</p>
             <a className={styles.primaryButton} href="#ilmoita">
               {t.hero.cta}
             </a>
           </div>
           <div className={styles.heroPhoto}>
-            <img src={PHOTOS.hero.src} alt={s.heroAlt} width={1200} height={1400} fetchPriority="high" />
+            <img src={PHOTOS.hero.src} alt={t.hero.photoAlt} width={1200} height={1400} fetchPriority="high" />
             <div className={styles.chipSync}>
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10.5 3.2 3L15 6.5" /></svg>
-              {s.chipSync}
+              {t.hero.chipSync}
             </div>
             <div className={styles.chipBooking}>
               <span className={styles.chipDot} aria-hidden="true" />
               <div>
-                <p className={styles.chipTitle}>{s.chipBooking.title}</p>
-                <p className={styles.chipBody}>{s.chipBooking.body}</p>
+                <p className={styles.chipTitle}>{t.hero.chipBookingTitle}</p>
+                <p className={styles.chipBody}>{t.hero.chipBookingBody}</p>
               </div>
             </div>
           </div>
@@ -88,12 +112,12 @@ export default function Landing({ lang }: { lang: Lang }) {
         <section className={styles.wide} aria-labelledby="listings-title">
           <div className={styles.sectionHead}>
             <h2 id="listings-title" className={styles.sectionTitle}>
-              {s.listings.title}
+              {t.listings.title}
             </h2>
-            <p className={styles.sectionLead}>{s.listings.lead}</p>
+            <p className={styles.sectionLead}>{t.listings.lead}</p>
           </div>
           <ul className={styles.cards}>
-            {s.listings.cards.map((card) => (
+            {t.listings.cards.map((card, i) => ({ ...card, ...SHOWCASE_CARDS[i] })).map((card) => (
               <li key={card.title} className={styles.card}>
                 <div className={styles.cardPhoto}>
                   <img src={PHOTOS[card.photo].src} alt="" width={800} height={800} loading="lazy" />
@@ -102,18 +126,18 @@ export default function Landing({ lang }: { lang: Lang }) {
                 <h3 className={styles.cardTitle}>{card.title}</h3>
                 <p className={styles.cardFacts}>{card.facts}</p>
                 <p className={styles.cardPrice}>
-                  <strong>{card.price}</strong> {s.listings.perNight}
+                  <strong>{eur(card.price)}</strong> {t.listings.perNight}
                 </p>
               </li>
             ))}
           </ul>
-          <p className={styles.cardsNote}>{s.listings.note}</p>
+          <p className={styles.cardsNote}>{t.listings.note}</p>
         </section>
 
         {/* Calendar: Nettimökki stays, the gaps fill */}
         <section className={`${styles.wide} ${styles.split}`} aria-labelledby="calendar-title">
           <div className={styles.splitPhoto}>
-            <img src={PHOTOS.interior.src} alt={s.calendarAlt} width={1000} height={1200} loading="lazy" />
+            <img src={PHOTOS.interior.src} alt={t.calendar.photoAlt} width={1000} height={1200} loading="lazy" />
           </div>
           <div className={styles.splitBody}>
             <h2 id="calendar-title" className={styles.sectionTitle}>
@@ -121,9 +145,9 @@ export default function Landing({ lang }: { lang: Lang }) {
             </h2>
             <p className={styles.sectionLead}>{t.calendar.lead}</p>
             <figure className={styles.calendar}>
-              <figcaption className={styles.calendarMonth}>{t.calendar.month}</figcaption>
+              <figcaption className={styles.calendarMonth}>{month}</figcaption>
               <div className={styles.calendarGrid} role="presentation">
-                {t.calendar.weekdays.map((d) => (
+                {weekdays.map((d) => (
                   <span key={d} className={styles.weekday}>
                     {d}
                   </span>
@@ -189,15 +213,15 @@ export default function Landing({ lang }: { lang: Lang }) {
           <div className={styles.priceCard}>
             <h3 className={styles.priceCardTitle}>{t.price.exampleTitle}</h3>
             <dl className={styles.priceRows}>
-              {t.price.rows.map((row) => (
+              {priceRows.map((row) => (
                 <div key={row.label}>
                   <dt>{row.label}</dt>
                   <dd>{row.value}</dd>
                 </div>
               ))}
               <div className={styles.priceTotal}>
-                <dt>{t.price.total.label}</dt>
-                <dd>{t.price.total.value}</dd>
+                <dt>{t.price.total}</dt>
+                <dd>{t.price.about.replace("{amount}", eur(Math.round(EXAMPLE_KEEP / 10) * 10))}</dd>
               </div>
             </dl>
           </div>
@@ -221,10 +245,10 @@ export default function Landing({ lang }: { lang: Lang }) {
         {/* Sign-up */}
         <section id="ilmoita" className={`${styles.wide} ${styles.formSplit}`} aria-labelledby="form-title">
           <div className={styles.formPhoto}>
-            <img src={PHOTOS.winter.src} alt={s.formAlt} width={1000} height={1300} loading="lazy" />
+            <img src={PHOTOS.winter.src} alt={t.form.photoAlt} width={1000} height={1300} loading="lazy" />
             <div className={styles.formPhotoCard}>
-              <p className={styles.chipTitle}>{s.formAside.title}</p>
-              <p className={styles.chipBody}>{s.formAside.body}</p>
+              <p className={styles.chipTitle}>{t.form.asideTitle}</p>
+              <p className={styles.chipBody}>{t.form.asideBody}</p>
             </div>
           </div>
           <div className={styles.formCard}>
@@ -232,15 +256,15 @@ export default function Landing({ lang }: { lang: Lang }) {
               {t.form.title}
             </h2>
             <p className={styles.sectionLead}>{t.form.lead}</p>
-            <SignupForm lang={lang} />
+            <SignupForm lang={lang} f={t.form} countries={Object.fromEntries(COUNTRIES.map((c) => [c, countryName(lang, c)]))} />
           </div>
         </section>
       </main>
 
       <footer className={styles.footer}>
-        <p>{t.footer.note}</p>
+        <p>{m.common.footer.note}</p>
         <p>
-          {t.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </p>
       </footer>
     </>

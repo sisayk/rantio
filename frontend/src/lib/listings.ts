@@ -33,7 +33,7 @@ export type Listing = {
   id: string;
   photo: string;
   photoCrop?: "top" | "bottom" | "center" | "entropy";
-  name: { fi: string; en: string };
+  // The name is in each language's messages (listingNames), keyed by id.
   place: string; // town and area; the country name is added when shown
   country: Country;
   region: string; // region id from places.ts
@@ -55,7 +55,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "lakeside-villa",
     photo: "1574514342513-f739e07c81cf",
-    name: { fi: "Järvihuvila", en: "Lakeside Villa" },
     place: "Savonlinna, Saimaa",
     country: "FI",
     region: "etela-savo",
@@ -74,7 +73,6 @@ export const LISTINGS: Listing[] = [
     id: "lofoten-rorbu",
     photo: "1696229720367-db510940a3f5",
     photoCrop: "center",
-    name: { fi: "Kalastajamökki Lofooteilla", en: "Lofoten Fisherman's Cabin" },
     place: "Reine, Lofoten",
     country: "NO",
     region: "nordland",
@@ -92,7 +90,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "red-stuga",
     photo: "1617645861462-855c6660550b",
-    name: { fi: "Punainen torppa", en: "Red Stuga" },
     place: "Växjö, Småland",
     country: "SE",
     region: "kronoberg",
@@ -110,7 +107,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "arctic-cabin",
     photo: "1643611657752-fb0ce6989d88",
-    name: { fi: "Revontulimökki", en: "Arctic Cabin" },
     place: "Levi, Lapland",
     country: "FI",
     region: "lappi",
@@ -129,7 +125,6 @@ export const LISTINGS: Listing[] = [
     id: "dune-cabin",
     photo: "1786194152334-3e86d8287063",
     photoCrop: "center",
-    name: { fi: "Dyynimökki", en: "Dune Summer House" },
     place: "Henne Strand, Jutland",
     country: "DK",
     region: "syddanmark",
@@ -148,7 +143,6 @@ export const LISTINGS: Listing[] = [
     id: "fjord-house",
     photo: "1661279188780-2e2d2f749840",
     photoCrop: "center",
-    name: { fi: "Vuonotalo", en: "Fjord House" },
     place: "Ísafjörður, Westfjords",
     country: "IS",
     region: "vestfirdir",
@@ -166,7 +160,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "modern-forest-retreat",
     photo: "1724931282671-2d3bcd6de8f2",
-    name: { fi: "Moderni metsähuvila", en: "Modern Forest Retreat" },
     place: "Jämsä, Central Finland",
     country: "FI",
     region: "keski-suomi",
@@ -184,7 +177,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "ivy-cottage",
     photo: "1596962727337-3f800f290de1",
-    name: { fi: "Muratimökki", en: "Ivy Cottage" },
     place: "Kuressaare, Saaremaa",
     country: "EE",
     region: "saaremaa",
@@ -203,7 +195,6 @@ export const LISTINGS: Listing[] = [
     id: "fjord-cabin",
     photo: "1565450443120-ea90b0ca5117",
     photoCrop: "center",
-    name: { fi: "Vuonomökki", en: "Fjord Cabin" },
     place: "Ulvik, Hardanger",
     country: "NO",
     region: "vestland",
@@ -221,7 +212,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "lake-house-latgale",
     photo: "1700228509432-519ed2d2d754",
-    name: { fi: "Järvitalo", en: "Lake House" },
     place: "Rēzekne, Latgale",
     country: "LV",
     region: "latgale",
@@ -239,7 +229,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "ski-stuga",
     photo: "1632217367356-8d948d7c7e7e",
-    name: { fi: "Hiihtomökki", en: "Ski Stuga" },
     place: "Åre, Jämtland",
     country: "SE",
     region: "jamtland",
@@ -257,7 +246,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "thatched-homestead",
     photo: "1723987731572-795df078bfcd",
-    name: { fi: "Olkikattoinen maatila", en: "Thatched Homestead" },
     place: "Nida, Curonian Spit",
     country: "LT",
     region: "klaipeda",
@@ -275,7 +263,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "archipelago-villa",
     photo: "1705840337565-630edbc57b24",
-    name: { fi: "Saaristohuvila", en: "Archipelago Villa" },
     place: "Porvoo, Uusimaa",
     country: "FI",
     region: "uusimaa",
@@ -293,7 +280,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "lohja-lake-cabin",
     photo: "1687614706800-22f780f2cb11",
-    name: { fi: "Järvimökki Lohjalla", en: "Lohja Lake Cabin" },
     place: "Lohja, Uusimaa",
     country: "FI",
     region: "uusimaa",
@@ -311,7 +297,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "nuuksio-forest-cabin",
     photo: "1568729937315-2ef5ee9cf4f2",
-    name: { fi: "Metsämökki Nuuksiossa", en: "Nuuksio Forest Cabin" },
     place: "Espoo, Uusimaa",
     country: "FI",
     region: "uusimaa",
@@ -329,7 +314,6 @@ export const LISTINGS: Listing[] = [
   {
     id: "sipoo-seaside-cottage",
     photo: "1630832057884-966e56438ad4",
-    name: { fi: "Merenrantamökki Sipoossa", en: "Sipoo Seaside Cottage" },
     place: "Sipoo, Uusimaa",
     country: "FI",
     region: "uusimaa",
@@ -348,5 +332,5 @@ export const LISTINGS: Listing[] = [
 
 export const getListing = (id: string) => LISTINGS.find((l) => l.id === id);
 
-/** A cottage's own page: /mokit/<id> in Finnish, /en/cottages/<id> in English. */
-export const cottageHref = (lang: "fi" | "en", id: string) => (lang === "fi" ? `/mokit/${id}` : `/en/cottages/${id}`);
+/** The cottage's name in the page's language, else its English name, else its id. */
+export const listingName = (names: Record<string, string>, l: { id: string }) => names[l.id] ?? l.id;

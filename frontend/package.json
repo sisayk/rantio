@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "i18n:check": "node scripts/i18n-check.cjs",
+    "test:i18n": "node --test scripts/i18n-test.cjs"
   },
   "dependencies": {
     "@fontsource/hanken-grotesk": "^5.3.0",

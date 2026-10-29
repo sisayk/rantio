@@ -87,7 +87,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "en"
-LANGUAGES = [("fi", "Suomi"), ("sv", "Svenska"), ("en", "English")]
+LANGUAGES = [
+    ("en", "English"), ("fi", "Suomi"), ("sv", "Svenska"), ("nb", "Norsk bokmål"), ("nn", "Norsk nynorsk"),
+    ("da", "Dansk"), ("is", "Íslenska"), ("et", "Eesti"), ("lv", "Latviešu"), ("lt", "Lietuvių"),
+]
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = True
 USE_TZ = True

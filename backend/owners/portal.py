@@ -13,6 +13,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from . import login as owner_login
+from .models import Language
 from .statements import booking_row, bookings_for, summary
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ class IsOwner(permissions.BasePermission):
 
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    lang = serializers.ChoiceField(choices=["fi", "en"], default="fi")
+    lang = serializers.ChoiceField(choices=Language.values, default=Language.ENGLISH)
 
 
 class CodeSerializer(serializers.Serializer):

@@ -6,7 +6,9 @@ import L, { type LatLngBoundsExpression } from "leaflet";
 import { useEffect, useMemo } from "react";
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from "react-leaflet";
 import type { Listing } from "@/lib/listings";
-import { cottageHref, unsplash } from "@/lib/listings";
+import type { Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
+import { listingName, unsplash } from "@/lib/listings";
 import type { City } from "@/lib/places";
 import styles from "./guest.module.css";
 
@@ -18,7 +20,8 @@ type Props = {
   cities: City[]; // towns of the selected region, drawn as dots
   selectedCity: string;
   activeId: string | null;
-  lang: "fi" | "en";
+  lang: Lang;
+  names: Record<string, string>;
   label: string;
   placeLabel: (l: Listing) => string;
   price: (n: number) => string;
@@ -52,7 +55,7 @@ function pin(text: string, active: boolean) {
 }
 
 export default function CottageMap(props: Props) {
-  const { listings, focus, cities, selectedCity, activeId, lang } = props;
+  const { listings, focus, cities, selectedCity, activeId, lang, names } = props;
   const icons = useMemo(
     () => new Map(listings.map((l) => [l.id, pin(props.price(l.price), l.id === activeId)])),
     // icons depend only on the listing, its price text and whether it is active
@@ -109,10 +112,10 @@ export default function CottageMap(props: Props) {
           }}
         >
           <Popup className="stugora-popup" closeButton={false} offset={[0, -8]}>
-            <a className={`${styles.popupCard} ${styles.popupLink}`} href={cottageHref(lang, l.id)}>
+            <a className={`${styles.popupCard} ${styles.popupLink}`} href={paths.cottage(lang, l.id)}>
               <img src={unsplash(l.photo, 480, 300, l.photoCrop)} alt="" width={240} height={150} />
               <div className={styles.popupBody}>
-                <strong>{l.name[lang]}</strong>
+                <strong>{listingName(names, l)}</strong>
                 <span>{props.placeLabel(l)}</span>
                 <span>
                   <b>{props.price(l.price)}</b> {props.nightLabel}

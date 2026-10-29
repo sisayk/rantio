@@ -1,17 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import type { Lang } from "@/lib/content";
-import { dashboardHref, ownerApi } from "@/lib/ownerApi";
-import { ownerContent } from "@/lib/ownerContent";
+import type { Messages } from "@/i18n";
+import { fill } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
+import { ownerApi } from "@/lib/ownerApi";
 import { Logo } from "../guest/icons";
 import styles from "./owner.module.css";
 
 type Step = { name: "email" } | { name: "code"; devCode?: string };
 
 /** Email, then the six-digit code we send to it. */
-export default function OwnerLogin({ lang }: { lang: Lang }) {
-  const t = ownerContent[lang];
+export default function OwnerLogin({
+  lang,
+  t,
+  languageButton,
+}: {
+  lang: Lang;
+  t: Messages["dashboard"];
+  languageButton: React.ReactNode;
+}) {
   const l = t.login;
   const [step, setStep] = useState<Step>({ name: "email" });
   const [email, setEmail] = useState("");
@@ -40,7 +49,7 @@ export default function OwnerLogin({ lang }: { lang: Lang }) {
     setError("");
     try {
       await ownerApi.verifyCode(email.trim(), code);
-      window.location.assign(dashboardHref(lang));
+      window.location.assign(paths.hosting(lang));
     } catch (err) {
       const status = (err as { status?: number }).status;
       setError(status === 400 ? l.wrongCode : status === 429 ? l.tooMany : l.failed);
@@ -51,13 +60,11 @@ export default function OwnerLogin({ lang }: { lang: Lang }) {
   return (
     <div className={styles.loginPage}>
       <header className={styles.loginTop}>
-        <a className={styles.brand} href={lang === "fi" ? "/omistajille" : "/en/hosts"}>
+        <a className={styles.brand} href={paths.hosts(lang)}>
           <Logo className={styles.logo} />
           Stugora
         </a>
-        <a className={styles.quietLink} href={t.otherLang.login} hrefLang={lang === "fi" ? "en" : "fi"}>
-          {t.otherLang.label}
-        </a>
+        {languageButton}
       </header>
 
       <main className={styles.loginCard}>
@@ -82,9 +89,9 @@ export default function OwnerLogin({ lang }: { lang: Lang }) {
         ) : (
           <form onSubmit={verify} className={styles.loginForm}>
             <p className={styles.loginLead} role="status">
-              {l.sentTo(email.trim())}
+              {fill(lang, l.sentTo, { email: email.trim() })}
             </p>
-            {step.devCode ? <p className={styles.devCode}>{l.devCode(step.devCode)}</p> : null}
+            {step.devCode ? <p className={styles.devCode}>{fill(lang, l.devCode, { code: step.devCode })}</p> : null}
             <label htmlFor="owner-code">{l.code}</label>
             <input
               id="owner-code"
@@ -118,7 +125,7 @@ export default function OwnerLogin({ lang }: { lang: Lang }) {
           </p>
         ) : null}
         <p className={styles.loginJoin}>
-          {l.notOwner} <a href={l.joinHref}>{l.join}</a>
+          {l.notOwner} <a href={paths.hosts(lang)}>{l.join}</a>
         </p>
       </main>
     </div>

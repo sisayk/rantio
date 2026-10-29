@@ -42,6 +42,8 @@ class LoginTests(TestCase):
         self.assertIn("kirjautumiskoodisi", mail.outbox[0].subject)
         self.request_code(lang="en")
         self.assertIn("sign-in code", mail.outbox[1].subject)
+        self.request_code(lang="sv")
+        self.assertIn("inloggningskod", mail.outbox[2].subject)
 
     def test_correct_code_signs_in_once(self):
         self.request_code()

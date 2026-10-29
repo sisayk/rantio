@@ -32,9 +32,18 @@ def vat_on(amount: Decimal) -> Decimal:
 
 
 class Language(models.TextChoices):
+    """The site's languages (frontend/src/i18n/locales.ts), named in themselves."""
+
+    ENGLISH = "en", "English"
     FINNISH = "fi", "Suomi"
     SWEDISH = "sv", "Svenska"
-    ENGLISH = "en", "English"
+    NORWEGIAN_BOKMAL = "nb", "Norsk bokmål"
+    NORWEGIAN_NYNORSK = "nn", "Norsk nynorsk"
+    DANISH = "da", "Dansk"
+    ICELANDIC = "is", "Íslenska"
+    ESTONIAN = "et", "Eesti"
+    LATVIAN = "lv", "Latviešu"
+    LITHUANIAN = "lt", "Lietuvių"
 
 
 class Country(models.TextChoices):

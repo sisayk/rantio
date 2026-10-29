@@ -1,6 +1,6 @@
 // Places near a cottage, from Wikipedia's geosearch (articles with coordinates).
 // Runs in the guest's browser; text and photos stay on Wikipedia under CC BY-SA.
-import type { Lang } from "./content";
+import { LANG_INFO, type Lang } from "@/i18n/locales";
 
 export type NearbyPlace = {
   key: string;
@@ -116,17 +116,17 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
     });
 }
 
-/** Up to `limit` places, sights first and then nearest. Finnish pages add English
- *  articles that Finnish Wikipedia lacks, since it covers fewer places abroad. */
+/** Up to `limit` places, sights first and then nearest. Pages in other languages add
+ *  English articles their own Wikipedia lacks, since each covers fewer places abroad. */
 async function lookUp(lat: number, lng: number, lang: Lang, signal: AbortSignal, limit: number) {
   // If Finnish Wikipedia doesn't answer, the English results still fill the list.
   let complete = true; // false when one language had to be skipped
-  let places = await search(lang, lat, lng, signal).catch((e) => {
-    if (lang !== "fi" || signal.aborted) throw e;
+  let places = await search(LANG_INFO[lang].wiki, lat, lng, signal).catch((e) => {
+    if (lang === "en" || signal.aborted) throw e;
     complete = false;
     return [];
   });
-  if (lang === "fi") {
+  if (lang !== "en") {
     const more = await search("en", lat, lng, signal).catch((e) => {
       if (!places.length) throw e; // neither language answered
       complete = false;

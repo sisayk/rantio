@@ -1925,3 +1925,22 @@
     display: inline-flex;
   }
 }
+
+/* Language row in the account menu: the only way to change language on phones,
+   where the header's language button is hidden. */
+.popover > button.menuLanguage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border-top: 1px solid var(--g-line);
+  border-radius: 0 0 10px 10px;
+  margin-top: 4px;
+  padding-top: 14px;
+}
+
+.menuLanguageValue {
+  margin-left: auto;
+  color: var(--g-soft);
+  font-size: 14px;
+}

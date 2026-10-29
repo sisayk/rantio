@@ -1,32 +1,35 @@
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
-import { activitiesFor, SEASON_LABEL } from "@/lib/activities";
+import { getMessages } from "@/i18n";
+import { countryName, languageNamesIn, money, number, plural } from "@/i18n/format";
+import type { Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
+import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
-import { CONTACT_EMAIL, type Lang } from "@/lib/content";
-import { guestContent } from "@/lib/guestContent";
-import { cottageHref, type Listing, unsplash } from "@/lib/listings";
+import { CONTACT_EMAIL } from "@/lib/content";
+import { type Listing, listingName, unsplash } from "@/lib/listings";
+import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
-import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Globe, Logo, People, Star } from "./icons";
+import LanguageButton from "../LanguagePicker";
+import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
-  const t = guestContent[lang];
+  const m = getMessages(lang);
+  const t = m.guest;
   const d = t.detail;
-  const home = lang === "fi" ? "/" : "/en";
-  const other: Lang = lang === "fi" ? "en" : "fi";
+  const home = paths.home(lang);
+  const name = listingName(m.listingNames, l);
+  const country = countryName(lang, l.country);
   const region = PLACES[l.country].find((r) => r.id === l.region);
-  const money = new Intl.NumberFormat(t.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-  const activities = activitiesFor(l, lang);
+  const activities = activitiesFor(l, m.activities);
   const amenities = FEATURE_GROUPS.filter((g) => g.id !== "booking")
     .map((g) => ({
       id: g.id,
-      title: g.title[lang],
-      items: Object.entries(g.options as Record<string, Record<Lang, string>>)
-        .filter(([k]) => (l.features as string[]).includes(k))
-        .map(([, label]) => label[lang]),
+      title: m.catalog.groups[g.id],
+      items: g.options.filter((k) => (l.features as string[]).includes(k)).map((k) => m.catalog.features[k]),
     }))
     .filter((g) => g.items.length);
-  const booking = FEATURE_GROUPS[0].options;
 
   return (
     <div className={`${styles.page} ${styles.detailPage}`}>
@@ -36,28 +39,25 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
           Stugora
         </a>
         <div className={styles.detailTopLinks}>
-          <a className={styles.langButton} href={cottageHref(other, l.id)} hrefLang={other}>
-            <Globe className={styles.icon18} />
-            {t.langOther.label}
-          </a>
-          <a className={styles.hostLink} href={t.becomeHost.href}>
-            {t.becomeHost.label}
+          <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langButton} />
+          <a className={styles.hostLink} href={paths.hosts(lang)}>
+            {t.becomeHost}
           </a>
         </div>
       </header>
 
       <main className={styles.detail}>
-        <nav className={styles.crumbs} aria-label="Breadcrumb">
+        <nav className={styles.crumbs} aria-label={d.breadcrumb}>
           <a href={home}>
             <ArrowLeft className={styles.icon16} />
             {d.back}
           </a>
           <span aria-hidden="true">/</span>
-          <span>{t.countries[l.country]}</span>
+          <span>{country}</span>
           {region ? (
             <>
               <span aria-hidden="true">/</span>
-              <span>{region.name[lang]}</span>
+              <span>{regionLabel(region, l.country, lang)}</span>
             </>
           ) : null}
           <span aria-hidden="true">/</span>
@@ -65,14 +65,14 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
         </nav>
 
         <div className={styles.detailHead}>
-          <h1>{l.name[lang]}</h1>
+          <h1>{name}</h1>
           <p>
-            {l.place}, {t.countries[l.country]}
+            {l.place}, {country}
             <span aria-hidden="true"> · </span>
             {l.rating ? (
               <span className={styles.rating}>
                 <Star className={styles.icon16} />
-                {l.rating.toLocaleString(t.locale, { minimumFractionDigits: 1 })}
+                {number(lang, l.rating, { min: 1, max: 1 })}
               </span>
             ) : (
               <span className={styles.newTag}>{t.card.isNew}</span>
@@ -81,19 +81,19 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
         </div>
 
         <figure className={styles.detailPhoto}>
-          <img src={unsplash(l.photo, 1600, 760, l.photoCrop)} alt="" width={1600} height={760} />
+          <img src={unsplash(l.photo, 1600, 760, l.photoCrop)} alt={name} width={1600} height={760} />
         </figure>
 
         <div className={styles.detailColumns}>
           <div className={styles.detailMain}>
-            <section className={styles.detailFacts} aria-label={t.filters.filters}>
+            <section className={styles.detailFacts} aria-label={d.facts}>
               <span>
                 <People className={styles.icon20} />
-                {t.card.guests(l.guests)}
+                {plural(lang, t.units.guests, l.guests)}
               </span>
               <span>
                 <Bed className={styles.icon20} />
-                {t.card.bedrooms(l.bedrooms)}
+                {plural(lang, t.units.bedrooms, l.bedrooms)}
               </span>
               {l.categories.map((c) => (
                 <span key={c}>
@@ -116,7 +116,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                       <h3>{a.title}</h3>
                       <p>{a.body}</p>
                       <span className={styles.season} data-season={a.season}>
-                        {SEASON_LABEL[a.season][lang]}
+                        {m.activities.seasons[a.season]}
                       </span>
                     </div>
                   </li>
@@ -124,7 +124,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
               </ul>
             </section>
 
-            <Surroundings lang={lang} lat={l.lat} lng={l.lng} />
+            <Surroundings lang={lang} t={d} lat={l.lat} lng={l.lng} />
 
             <section className={styles.detailSection} aria-labelledby="amenities-title">
               <h2 id="amenities-title">{d.amenitiesTitle}</h2>
@@ -148,7 +148,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
 
           <aside className={styles.bookCard}>
             <p className={styles.bookPrice}>
-              <strong>{money.format(l.price)}</strong> {t.card.night}
+              <strong>{money(lang, l.price)}</strong> {t.card.night}
             </p>
             <ul className={styles.bookFlags}>
               {(["instantBook", "freeCancellation"] as const)
@@ -156,7 +156,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                 .map((k) => (
                   <li key={k}>
                     <Check className={styles.icon16} />
-                    {booking[k][lang]}
+                    {m.catalog.features[k]}
                   </li>
                 ))}
             </ul>
@@ -180,9 +180,9 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
       </main>
 
       <footer className={styles.footer}>
-        <p>{t.footer.note}</p>
+        <p>{m.common.footer.note}</p>
         <p>
-          {t.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
+          {m.common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
         </p>
       </footer>
     </div>

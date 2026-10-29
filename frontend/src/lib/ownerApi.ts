@@ -91,5 +91,3 @@ export const ownerApi = {
   logout: () => call<{ ok: boolean }>("auth/logout/", { method: "POST" }),
 };
 
-export const dashboardHref = (lang: "fi" | "en") => (lang === "fi" ? "/hallinta" : "/en/hosting");
-export const loginHref = (lang: "fi" | "en") => (lang === "fi" ? "/hallinta/kirjaudu" : "/en/hosting/login");
