@@ -27,7 +27,7 @@ import { type City, PLACES } from "@/lib/places";
 import ChannelIcons from "./ChannelIcons";
 import type { MapFocus } from "./CottageMap";
 import FiltersModal, { countFilters, EMPTY_FILTERS, type FilterState } from "./FiltersModal";
-import { DatePanel, GuestPanel, type Guests } from "./Pickers";
+import { DatePanel, GuestPanel, type Guests, PricePanel, type PriceRange, priceLabel } from "./Pickers";
 import {
   Bed,
   CalendarIcon,
@@ -54,7 +54,7 @@ const CottageMap = dynamic(() => import("./CottageMap"), {
 });
 
 type Sort = "recommended" | "priceLow" | "priceHigh" | "guests";
-type Menu = null | "dates" | "guests" | "guestsBar" | "account";
+type Menu = null | "dates" | "guests" | "guestsBar" | "price" | "account";
 
 // Which filter section each option belongs to, and whether a cottage needs one or all of them.
 const GROUP_OF = new Map<FeatureKey, { id: string; match: "any" | "all" }>(
@@ -102,12 +102,14 @@ type UrlState = {
   country: Country | "";
   region: string;
   city: string;
-  maxPrice: number;
+  price: PriceRange;
   sort: Sort;
   view: "list" | "map";
   filters: FilterState;
   savedOnly: boolean;
 };
+
+const inPriceRange = (p: number, r: PriceRange) => (!r.min || p >= r.min) && (!r.max || p <= r.max);
 
 const isoDay = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -137,7 +139,8 @@ function readUrl(search: string): Partial<UrlState> {
     country: (COUNTRIES as readonly string[]).includes(country) ? (country as Country) : "",
     region: q.get("region") ?? "",
     city: q.get("city") ?? "",
-    maxPrice: num("price"),
+    // pmin/pmax; "price" is the old "up to" link and still works as a maximum.
+    price: { min: num("pmin"), max: num("pmax") || num("price") },
     sort: ["recommended", "priceLow", "priceHigh", "guests"].includes(sort) ? (sort as Sort) : "recommended",
     view: q.get("view") === "map" ? "map" : "list",
     filters: {
@@ -163,7 +166,8 @@ function writeUrl(s: UrlState) {
   set("country", s.country);
   set("region", s.region);
   set("city", s.city);
-  set("price", s.maxPrice);
+  set("pmin", s.price.min);
+  set("pmax", s.price.max);
   set("sort", s.sort);
   set("view", s.view);
   set("f", s.filters.features.join(","));
@@ -259,7 +263,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
   const [city, setCity] = useState("");
   const [view, setView] = useState<"list" | "map">("list");
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [maxPrice, setMaxPrice] = useState(0);
+  const [price, setPrice] = useState<PriceRange>({ min: 0, max: 0 });
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sort, setSort] = useState<Sort>("recommended");
@@ -288,7 +292,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         if (s.city) setCity(s.city);
       }
     }
-    if (s.maxPrice) setMaxPrice(s.maxPrice);
+    if (s.price && (s.price.min || s.price.max)) setPrice(s.price);
     if (s.sort) setSort(s.sort);
     if (s.view) setView(s.view);
     if (s.filters) setFilters(s.filters);
@@ -309,13 +313,13 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
       country,
       region,
       city,
-      maxPrice,
+      price,
       sort,
       view,
       filters,
       savedOnly,
     });
-  }, [urlRead, where, dates, party, category, country, region, city, maxPrice, sort, view, filters, savedOnly]);
+  }, [urlRead, where, dates, party, category, country, region, city, price, sort, view, filters, savedOnly]);
 
   useEffect(() => {
     if (!menu) return;
@@ -375,32 +379,36 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
     setCountry("");
     setRegion("");
     setCity("");
-    setMaxPrice(0);
+    setPrice({ min: 0, max: 0 });
     setFilters(EMPTY_FILTERS);
     setSavedOnly(false);
     setMenu(null);
   }
 
-  const results = useMemo(() => {
+  // Everything but the price, so the price panel can show what each range would leave.
+  const beforePrice = useMemo(() => {
     const q = normalise(where.trim());
-    const list = LISTINGS.filter((l) => {
+    return LISTINGS.filter((l) => {
       const haystack = `${l.place} ${listingName(names, l)} ${PLACE_WORDS.get(l.id) ?? ""} ${REGION_NAMES.get(l.region) ?? ""}`;
       if (q && !normalise(haystack).includes(q)) return false;
       if (category !== "all" && !l.categories.includes(category)) return false;
       if (country && l.country !== country) return false;
       if (region && l.region !== region) return false;
       if (city && l.city !== city) return false;
-      if (maxPrice && l.price > maxPrice) return false;
       if (guests && l.guests < guests) return false;
       if (!matchesFilters(l.features, l.bedrooms, l.rating, filters)) return false;
       if (savedOnly && !saved.includes(l.id)) return false;
       return true;
     });
+  }, [where, names, category, country, region, city, guests, filters, savedOnly, saved]);
+
+  const results = useMemo(() => {
+    const list = beforePrice.filter((l) => inPriceRange(l.price, price));
     if (sort === "priceLow") list.sort((a, b) => a.price - b.price);
     if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [where, names, category, country, region, city, maxPrice, guests, filters, savedOnly, saved, sort]);
+  }, [beforePrice, price, sort]);
 
   const advancedCount = countFilters(filters);
 
@@ -739,17 +747,35 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 <Chevron className={styles.icon16} />
               </span>
             ) : null}
-            <span className={styles.selectChip} data-active={!!maxPrice}>
-              <select aria-label={f.price} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))}>
-                <option value={0}>{f.price}</option>
-                {[150, 180, 200].map((n) => (
-                  <option key={n} value={n}>
-                    {fill(lang, f.upTo, { price: money.format(n) })}
-                  </option>
-                ))}
-              </select>
-              <Chevron className={styles.icon16} />
-            </span>
+            <div className={styles.menuWrap} data-menu>
+              <button
+                type="button"
+                className={styles.chip}
+                data-active={!!(price.min || price.max)}
+                aria-expanded={menu === "price"}
+                onClick={() => setMenu(menu === "price" ? null : "price")}
+              >
+                {priceLabel(lang, f, price)}
+                <Chevron className={styles.icon16} />
+              </button>
+              {menu === "price" ? (
+                <div className={styles.popoverBare}>
+                  <PricePanel
+                    lang={lang}
+                    t={f}
+                    clear={t.guestPicker.clear}
+                    use={(n) => fill(lang, t.filterPanel.show, { cottages: plural(lang, u.cottages, n) })}
+                    prices={beforePrice.map((l) => l.price)}
+                    value={price}
+                    count={(r) => beforePrice.filter((l) => inPriceRange(l.price, r)).length}
+                    onApply={(r) => {
+                      setPrice(r);
+                      setMenu(null);
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
             <div className={styles.menuWrap} data-menu>
               <button
                 type="button"

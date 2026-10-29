@@ -473,6 +473,175 @@
   background: var(--g-green-deep);
 }
 
+/* ---------- price range ---------- */
+.pricePanel {
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  padding: 18px 20px 0;
+  border: 1px solid var(--g-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--g-float);
+}
+
+.pricePanel .panelFooter {
+  margin: 14px -20px 0;
+  border-top: 1px solid var(--g-line);
+}
+
+.applyButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.priceTitle {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.histogram {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 56px;
+  padding: 0 9px;
+}
+
+.histogram span {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: #d8ddda;
+}
+
+.histogram span[data-inside="true"] {
+  background: var(--g-green);
+}
+
+/* Two range inputs laid over one track; only their thumbs take the pointer. */
+.dualRange {
+  position: relative;
+  height: 22px;
+  margin-top: -2px;
+}
+
+.dualRange::before,
+.dualRange::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+}
+
+.dualRange::before {
+  right: 9px;
+  left: 9px;
+  background: #d8ddda;
+}
+
+.dualRange::after {
+  right: calc(9px + (100% - 18px) * (100 - var(--hi)) / 100);
+  left: calc(9px + (100% - 18px) * var(--lo) / 100);
+  background: var(--g-green);
+}
+
+.dualRange input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 22px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+}
+
+.dualRange input::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #b9c2bf;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: grab;
+  appearance: none;
+}
+
+.dualRange input::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #b9c2bf;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.dualRange input:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--g-green);
+  outline-offset: 1px;
+}
+
+.priceScale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  color: var(--g-soft);
+  font-size: 12px;
+}
+
+.priceBoxes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.priceBoxes label {
+  display: grid;
+  gap: 6px;
+  color: var(--g-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.priceBoxes label > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid #b9c2bf;
+  border-radius: 10px;
+  color: var(--g-ink);
+}
+
+.priceBoxes label > span:focus-within {
+  border-color: var(--g-green);
+  outline: 2px solid var(--g-green);
+}
+
+.priceBoxes input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+}
+
+.priceDash {
+  padding-bottom: 12px;
+  color: var(--g-soft);
+}
+
 /* ---------- date picker ---------- */
 .datePanel {
   width: max-content;

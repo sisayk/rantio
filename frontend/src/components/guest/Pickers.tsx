@@ -5,7 +5,7 @@ import { useState } from "react";
 import { type DateRange, DayPicker } from "react-day-picker";
 import { da, enIE, et, fi, is, lt, lv, nb, nn, sv } from "react-day-picker/locale";
 import type { Messages } from "@/i18n";
-import { type Plural, plural } from "@/i18n/format";
+import { fill, money, type Plural, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import styles from "./guest.module.css";
 
@@ -141,4 +141,140 @@ export function DatePanel({
       </div>
     </div>
   );
+}
+
+export type PriceRange = { min: number; max: number }; // 0 = no limit
+
+/**
+ * Price per night as a range: a two-handle slider over how the cottages' prices are spread,
+ * and boxes for exact amounts. The slider runs on a square-root scale, so the common
+ * 80–300 € range gets room while the top still reaches villas at 1 000 €+; typed amounts
+ * have no ceiling at all.
+ */
+export function PricePanel({
+  lang,
+  t,
+  clear,
+  use,
+  prices,
+  value,
+  count,
+  onApply,
+}: {
+  lang: Lang;
+  t: Messages["guest"]["filters"];
+  clear: string;
+  use: (n: number) => string;
+  prices: number[];
+  value: PriceRange;
+  count: (r: PriceRange) => number;
+  onApply: (r: PriceRange) => void;
+}) {
+  const top = Math.max(1000, Math.ceil(Math.max(0, ...prices) / 100) * 100);
+  const toPrice = (pos: number) => (pos >= 100 ? 0 : Math.round((top * (pos / 100) ** 2) / 10) * 10);
+  const toPos = (price: number, end: "min" | "max") =>
+    price <= 0 ? (end === "min" ? 0 : 100) : Math.min(100, Math.round(100 * Math.sqrt(price / top)));
+  const [draft, setDraft] = useState<PriceRange>(value);
+  const lo = toPos(draft.min, "min");
+  const hi = toPos(draft.max, "max");
+  const eur = (n: number) => money(lang, n);
+
+  // A small histogram of where the cottages' prices fall on the slider.
+  const BINS = 28;
+  const bins = Array.from({ length: BINS }, () => 0);
+  for (const p of prices) bins[Math.min(BINS - 1, Math.floor((toPos(p, "min") / 100) * BINS))] += 1;
+  const tallest = Math.max(1, ...bins);
+
+  const setLo = (pos: number) => setDraft((d) => ({ ...d, min: Math.min(pos, hi - 2) <= 0 ? 0 : toPrice(Math.min(pos, hi - 2)) }));
+  const setHi = (pos: number) => setDraft((d) => ({ ...d, max: toPrice(Math.max(pos, lo + 2)) }));
+  const typed = (s: string) => {
+    const n = Math.floor(Number(s.replace(/[^\d]/g, "")));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  const invalid = draft.min > 0 && draft.max > 0 && draft.min > draft.max;
+
+  return (
+    <div className={styles.pricePanel} role="dialog" aria-label={t.priceTitle}>
+      <p className={styles.priceTitle}>{t.priceTitle}</p>
+      <div className={styles.histogram} aria-hidden="true">
+        {bins.map((n, i) => {
+          const inside = (i + 0.5) * (100 / BINS) >= lo && (i + 0.5) * (100 / BINS) <= hi;
+          return <span key={i} data-inside={inside} style={{ height: n ? `${12 + (88 * n) / tallest}%` : 0 }} />;
+        })}
+      </div>
+      <div className={styles.dualRange} style={{ "--lo": lo, "--hi": hi } as React.CSSProperties}>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={lo}
+          aria-label={t.priceMin}
+          aria-valuetext={draft.min ? eur(draft.min) : eur(0)}
+          onChange={(e) => setLo(Number(e.target.value))}
+        />
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={hi}
+          aria-label={t.priceMax}
+          aria-valuetext={draft.max ? eur(draft.max) : fill(lang, t.priceAndUp, { price: eur(top) })}
+          onChange={(e) => setHi(Number(e.target.value))}
+        />
+      </div>
+      <div className={styles.priceScale} aria-hidden="true">
+        <span>{eur(0)}</span>
+        <span>{fill(lang, t.priceAndUp, { price: eur(top) })}</span>
+      </div>
+      <div className={styles.priceBoxes}>
+        <label>
+          {t.priceMin}
+          <span>
+            <input
+              inputMode="numeric"
+              value={draft.min || ""}
+              placeholder="0"
+              onChange={(e) => setDraft({ ...draft, min: typed(e.target.value) })}
+            />
+            €
+          </span>
+        </label>
+        <span className={styles.priceDash} aria-hidden="true">–</span>
+        <label>
+          {t.priceMax}
+          <span>
+            <input
+              inputMode="numeric"
+              value={draft.max || ""}
+              placeholder={`${top}+`}
+              onChange={(e) => setDraft({ ...draft, max: typed(e.target.value) })}
+            />
+            €
+          </span>
+        </label>
+      </div>
+      <div className={styles.panelFooter}>
+        <button type="button" className={styles.textButton} onClick={() => onApply({ min: 0, max: 0 })}>
+          {clear}
+        </button>
+        <button
+          type="button"
+          className={styles.applyButton}
+          disabled={invalid}
+          onClick={() => onApply(draft)}
+        >
+          {use(invalid ? 0 : count(draft))}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** "€100 – €400", "From €400", "Up to €200" or just "Price". */
+export function priceLabel(lang: Lang, t: Messages["guest"]["filters"], r: PriceRange) {
+  const eur = (n: number) => money(lang, n);
+  if (r.min && r.max) return fill(lang, t.priceRange, { min: eur(r.min), max: eur(r.max) });
+  if (r.min) return fill(lang, t.priceFrom, { price: eur(r.min) });
+  if (r.max) return fill(lang, t.upTo, { price: eur(r.max) });
+  return t.price;
 }
