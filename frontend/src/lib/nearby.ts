@@ -95,7 +95,8 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
   });
   const res = await fetch(`https://${wiki}.wikipedia.org/w/api.php?${params}`, { signal });
   if (!res.ok) throw new Error(`Wikipedia ${res.status}`);
-  const data: { query?: { pages?: WikiPage[] } } = await res.json();
+  const data: { query?: { pages?: WikiPage[] }; error?: { code: string } } = await res.json();
+  if (data.error) throw new Error(`Wikipedia ${data.error.code}`); // e.g. "too busy"
   return (data.query?.pages ?? [])
     .map((p) => ({ p, text: blurb(p) }))
     .filter(({ p, text }) => p.coordinates?.length && text && !SKIP.test(text.slice(0, 90)))
@@ -117,15 +118,18 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
 
 /** Up to `limit` places, sights first and then nearest. Finnish pages add English
  *  articles that Finnish Wikipedia lacks, since it covers fewer places abroad. */
-export async function findNearby(lat: number, lng: number, lang: Lang, signal: AbortSignal, limit = 16) {
+async function lookUp(lat: number, lng: number, lang: Lang, signal: AbortSignal, limit: number) {
   // If Finnish Wikipedia doesn't answer, the English results still fill the list.
+  let complete = true; // false when one language had to be skipped
   let places = await search(lang, lat, lng, signal).catch((e) => {
     if (lang !== "fi" || signal.aborted) throw e;
+    complete = false;
     return [];
   });
   if (lang === "fi") {
     const more = await search("en", lat, lng, signal).catch((e) => {
       if (!places.length) throw e; // neither language answered
+      complete = false;
       return [];
     });
     // The same place in both languages has the same name or sits at the same spot.
@@ -149,5 +153,28 @@ export async function findNearby(lat: number, lng: number, lang: Lang, signal: A
     picked.push(p);
     if (picked.length === limit) break;
   }
-  return picked;
+  return { places: picked, complete };
+}
+
+// Each guest's browser keeps a cottage's places for a week, so Wikipedia is asked rarely.
+const CACHE_DAYS = 7;
+const cacheKey = (lat: number, lng: number, lang: Lang) => `stugora:nearby:v1:${lang}:${lat.toFixed(3)},${lng.toFixed(3)}`;
+
+export async function findNearby(lat: number, lng: number, lang: Lang, signal: AbortSignal, limit = 16) {
+  const key = cacheKey(lat, lng, lang);
+  try {
+    const hit = JSON.parse(localStorage.getItem(key) ?? "null") as { at: number; places: NearbyPlace[] } | null;
+    if (hit && Date.now() - hit.at < CACHE_DAYS * 86_400_000) return hit.places.slice(0, limit);
+  } catch {
+    // storage blocked or unreadable: just ask Wikipedia
+  }
+  const { places, complete } = await lookUp(lat, lng, lang, signal, limit);
+  if (complete) {
+    try {
+      localStorage.setItem(key, JSON.stringify({ at: Date.now(), places }));
+    } catch {
+      // full or blocked storage only costs a repeat lookup
+    }
+  }
+  return places;
 }
