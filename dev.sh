@@ -4,9 +4,32 @@
 set -e
 cd "$(dirname "$0")"
 
+# Django 5.2 needs Python 3.10+; macOS's own python3 is 3.9, so look for a newer one.
+PY=""
+for candidate in python3.13 python3.12 python3.11 python3.10 python3 \
+    /opt/homebrew/bin/python3 /usr/local/bin/python3; do
+  if command -v "$candidate" >/dev/null 2>&1 &&
+     "$candidate" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+    PY="$candidate"; break
+  fi
+done
+if [ -z "$PY" ]; then
+  echo "Stugora needs Python 3.10 or newer. Install it with:  brew install python@3.12"
+  exit 1
+fi
+if ! command -v node >/dev/null 2>&1 ||
+   ! node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=9)?0:1)'; then
+  echo "Stugora needs Node.js 20.9 or newer. Install it with:  brew install node"
+  exit 1
+fi
+echo "Using $("$PY" --version) and Node $(node --version)"
+
 echo "Setting up the backend…"
 cd backend
-[ -d .venv ] || python3 -m venv .venv
+if [ -d .venv ] && ! .venv/bin/python -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+  rm -rf .venv
+fi
+[ -d .venv ] || "$PY" -m venv .venv
 .venv/bin/pip install -q --upgrade pip
 .venv/bin/pip install -q -r requirements.txt
 .venv/bin/python manage.py migrate -v0
