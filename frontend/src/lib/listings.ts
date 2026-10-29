@@ -1,4 +1,5 @@
 // Example cottages for the guest homepage until real owners are live.
+import { type ChannelId, CHANNELS_BY_COUNTRY, type FeatureKey } from "./catalog";
 // Photos: Unsplash (Unsplash License), served from Unsplash's image CDN.
 
 export const unsplash = (id: string, w: number, h: number, crop = "entropy") =>
@@ -27,10 +28,6 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-export const AMENITIES = ["sauna", "lake", "fireplace", "wifi", "hotTub"] as const;
-export type Amenity = (typeof AMENITIES)[number];
-
-export const CHANNELS = ["Airbnb", "Booking.com", "Vrbo", "Nettimökki"] as const;
 
 export type Listing = {
   id: string;
@@ -48,15 +45,11 @@ export type Listing = {
   price: number; // EUR per night
   badge: Exclude<Category, "all">;
   categories: Exclude<Category, "all">[];
-  amenities: Amenity[];
-  instantBook: boolean;
-  freeCancellation: boolean;
-  channels: (typeof CHANNELS)[number][];
+  features: FeatureKey[];
+  channels: ChannelId[];
   rating?: number; // only real review averages, never invented
 };
 
-const INTERNATIONAL: Listing["channels"] = ["Airbnb", "Booking.com", "Vrbo"];
-const FINLAND_ALL: Listing["channels"] = ["Airbnb", "Booking.com", "Vrbo", "Nettimökki"];
 
 export const LISTINGS: Listing[] = [
   {
@@ -74,10 +67,8 @@ export const LISTINGS: Listing[] = [
     price: 180,
     badge: "waterfront",
     categories: ["waterfront", "sauna", "family"],
-    amenities: ["sauna", "lake", "wifi", "hotTub"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["instantBook", "freeCancellation", "lake", "privateShore", "electricSauna", "woodSauna", "jetty", "boat", "canoe", "hotTub", "dishwasher", "washingMachine", "grillHut", "highChair", "babyBed", "heatPump", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "lofoten-rorbu",
@@ -95,10 +86,8 @@ export const LISTINGS: Listing[] = [
     price: 210,
     badge: "waterfront",
     categories: ["waterfront", "unique", "aurora", "traditional"],
-    amenities: ["lake", "wifi"],
-    instantBook: true,
-    freeCancellation: false,
-    channels: INTERNATIONAL,
+    features: ["instantBook", "sea", "sharedShore", "waterAccess", "boat", "fireplace", "loft", "dryingCabinet", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.NO,
   },
   {
     id: "red-stuga",
@@ -115,10 +104,8 @@ export const LISTINGS: Listing[] = [
     price: 130,
     badge: "traditional",
     categories: ["traditional", "forest", "pets", "family"],
-    amenities: ["fireplace", "wifi"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["freeCancellation", "pets", "fireplace", "loft", "grillHut", "outdoorWc", "indoorWc", "shower", "fridge", "stove", "oven", "cooking", "coffeeMaker"],
+    channels: CHANNELS_BY_COUNTRY.SE,
   },
   {
     id: "arctic-cabin",
@@ -135,10 +122,8 @@ export const LISTINGS: Listing[] = [
     price: 190,
     badge: "aurora",
     categories: ["aurora", "skiing", "sauna", "unique"],
-    amenities: ["sauna", "fireplace", "wifi"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["instantBook", "freeCancellation", "woodSauna", "nearSki", "fireplace", "dryingCabinet", "washingMachine", "tumbleDryer", "evCharging", "outdoorJacuzzi", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "dune-cabin",
@@ -156,10 +141,8 @@ export const LISTINGS: Listing[] = [
     price: 160,
     badge: "family",
     categories: ["family", "waterfront", "pets"],
-    amenities: ["wifi", "hotTub"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["instantBook", "freeCancellation", "sea", "shoreAccess", "pets", "hotTub", "dishwasher", "washingMachine", "highChair", "babyBed", "heatPump", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.DK,
   },
   {
     id: "fjord-house",
@@ -177,10 +160,8 @@ export const LISTINGS: Listing[] = [
     price: 240,
     badge: "unique",
     categories: ["unique", "waterfront", "aurora"],
-    amenities: ["lake", "wifi"],
-    instantBook: false,
-    freeCancellation: false,
-    channels: INTERNATIONAL,
+    features: ["sea", "shoreAccess", "fireplace", "jacuzzi", "dryingCabinet", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.IS,
   },
   {
     id: "modern-forest-retreat",
@@ -197,10 +178,8 @@ export const LISTINGS: Listing[] = [
     price: 175,
     badge: "sauna",
     categories: ["modern", "forest", "sauna"],
-    amenities: ["sauna", "fireplace", "wifi"],
-    instantBook: true,
-    freeCancellation: false,
-    channels: FINLAND_ALL,
+    features: ["instantBook", "electricSauna", "fireplace", "dishwasher", "washingMachine", "tumbleDryer", "evCharging", "jacuzzi", "heatPump", "nearSki", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "ivy-cottage",
@@ -217,10 +196,8 @@ export const LISTINGS: Listing[] = [
     price: 95,
     badge: "traditional",
     categories: ["traditional", "sauna", "pets"],
-    amenities: ["sauna", "wifi"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["instantBook", "freeCancellation", "sea", "shoreAccess", "woodSauna", "pets", "grillHut", "indoorWc", "shower", "internet", "fridge", "stove", "oven", "cooking", "coffeeMaker"],
+    channels: CHANNELS_BY_COUNTRY.EE,
   },
   {
     id: "fjord-cabin",
@@ -238,10 +215,8 @@ export const LISTINGS: Listing[] = [
     price: 185,
     badge: "waterfront",
     categories: ["waterfront", "traditional", "family"],
-    amenities: ["lake", "fireplace"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["freeCancellation", "sea", "privateShore", "jetty", "boat", "canoe", "fireplace", "highChair", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.NO,
   },
   {
     id: "lake-house-latgale",
@@ -258,10 +233,8 @@ export const LISTINGS: Listing[] = [
     price: 90,
     badge: "sauna",
     categories: ["sauna", "waterfront", "forest", "family"],
-    amenities: ["sauna", "lake", "hotTub"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["freeCancellation", "lake", "privateShore", "woodSauna", "smokeSauna", "jetty", "boat", "hotTub", "grillHut", "highChair", "babyBed", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet"],
+    channels: CHANNELS_BY_COUNTRY.LV,
   },
   {
     id: "ski-stuga",
@@ -278,10 +251,8 @@ export const LISTINGS: Listing[] = [
     price: 220,
     badge: "skiing",
     categories: ["skiing", "family", "sauna", "forest"],
-    amenities: ["sauna", "fireplace", "wifi"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["instantBook", "freeCancellation", "electricSauna", "nearSki", "fireplace", "dryingCabinet", "washingMachine", "tumbleDryer", "dishwasher", "highChair", "babyBed", "evCharging", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.SE,
   },
   {
     id: "thatched-homestead",
@@ -298,10 +269,8 @@ export const LISTINGS: Listing[] = [
     price: 120,
     badge: "traditional",
     categories: ["traditional", "family", "pets", "unique"],
-    amenities: ["sauna", "fireplace", "wifi"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: INTERNATIONAL,
+    features: ["freeCancellation", "sea", "shoreAccess", "woodSauna", "pets", "fireplace", "grillHut", "highChair", "babyBed", "wheelchair", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.LT,
   },
   {
     id: "archipelago-villa",
@@ -318,10 +287,8 @@ export const LISTINGS: Listing[] = [
     price: 195,
     badge: "waterfront",
     categories: ["waterfront", "sauna", "family"],
-    amenities: ["sauna", "lake", "wifi"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["instantBook", "freeCancellation", "sea", "privateShore", "jetty", "boat", "canoe", "woodSauna", "electricSauna", "dishwasher", "washingMachine", "highChair", "babyBed", "heatPump", "wheelchair", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "lohja-lake-cabin",
@@ -338,10 +305,8 @@ export const LISTINGS: Listing[] = [
     price: 135,
     badge: "sauna",
     categories: ["sauna", "waterfront", "forest", "traditional"],
-    amenities: ["sauna", "lake"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["freeCancellation", "lake", "privateShore", "woodSauna", "jetty", "boat", "loft", "outdoorWc", "solarPower", "carriedWater", "fridge", "stove", "cooking", "coffeeMaker", "grillHut"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "nuuksio-forest-cabin",
@@ -358,10 +323,8 @@ export const LISTINGS: Listing[] = [
     price: 150,
     badge: "forest",
     categories: ["forest", "sauna", "pets"],
-    amenities: ["sauna", "fireplace", "wifi"],
-    instantBook: true,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["instantBook", "freeCancellation", "pond", "shoreAccess", "woodSauna", "pets", "fireplace", "canoe", "dryingCabinet", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
   {
     id: "sipoo-seaside-cottage",
@@ -378,9 +341,7 @@ export const LISTINGS: Listing[] = [
     price: 170,
     badge: "waterfront",
     categories: ["waterfront", "traditional", "family"],
-    amenities: ["sauna", "lake", "wifi"],
-    instantBook: false,
-    freeCancellation: true,
-    channels: FINLAND_ALL,
+    features: ["freeCancellation", "sea", "privateShore", "jetty", "boat", "canoe", "woodSauna", "highChair", "grillHut", "heatPump", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
+    channels: CHANNELS_BY_COUNTRY.FI,
   },
 ];

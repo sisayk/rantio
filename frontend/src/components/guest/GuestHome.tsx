@@ -5,9 +5,9 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { CONTACT_EMAIL, type Lang } from "@/lib/content";
 import { guestContent } from "@/lib/guestContent";
+import type { DateRange } from "react-day-picker";
+import { FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import {
-  AMENITIES,
-  type Amenity,
   CATEGORIES,
   type Category,
   COUNTRIES,
@@ -18,7 +18,10 @@ import {
   unsplash,
 } from "@/lib/listings";
 import { type City, PLACES } from "@/lib/places";
+import ChannelIcons from "./ChannelIcons";
 import type { MapFocus } from "./CottageMap";
+import FiltersModal, { countFilters, EMPTY_FILTERS, type FilterState } from "./FiltersModal";
+import { DatePanel, GuestPanel, type Guests } from "./Pickers";
 import {
   Bed,
   CalendarIcon,
@@ -45,7 +48,29 @@ const CottageMap = dynamic(() => import("./CottageMap"), {
 });
 
 type Sort = "recommended" | "priceLow" | "priceHigh" | "guests";
-type Menu = null | "filters" | "amenities" | "account";
+type Menu = null | "dates" | "guests" | "guestsBar" | "account";
+
+// Which filter section each option belongs to, and whether a cottage needs one or all of them.
+const GROUP_OF = new Map<FeatureKey, { id: string; match: "any" | "all" }>(
+  FEATURE_GROUPS.flatMap((g) =>
+    Object.keys(g.options).map((k) => [k as FeatureKey, { id: g.id, match: g.match }] as const),
+  ),
+);
+
+function matchesFilters(features: FeatureKey[], bedrooms: number, rating: number | undefined, f: FilterState) {
+  const byGroup = new Map<string, FeatureKey[]>();
+  for (const k of f.features) {
+    const g = GROUP_OF.get(k);
+    if (g) byGroup.set(g.id, [...(byGroup.get(g.id) ?? []), k]);
+  }
+  for (const [id, keys] of byGroup) {
+    const any = FEATURE_GROUPS.find((g) => g.id === id)?.match === "any";
+    if (any ? !keys.some((k) => features.includes(k)) : !keys.every((k) => features.includes(k))) return false;
+  }
+  if (f.bedrooms.length && !f.bedrooms.some((n) => (n === 4 ? bedrooms >= 4 : bedrooms === n))) return false;
+  if (f.rating4 && !(rating && rating > 4)) return false;
+  return true;
+}
 
 // Suggestions under the search box; countries are added in the visitor's language.
 const SUGGESTED = Array.from(new Set(LISTINGS.flatMap((l) => l.place.split(", "))));
@@ -116,9 +141,10 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   );
 
   const [where, setWhere] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(0);
+  const [dates, setDates] = useState<DateRange | undefined>();
+  const [today, setToday] = useState<Date | null>(null);
+  const [party, setParty] = useState<Guests>({ adults: 0, children: 0 });
+  const guests = party.adults + party.children;
   const [category, setCategory] = useState<Category>("all");
   const [country, setCountry] = useState<Country | "">("");
   const [region, setRegion] = useState("");
@@ -126,10 +152,8 @@ export default function GuestHome({ lang }: { lang: Lang }) {
   const [view, setView] = useState<"list" | "map">("list");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState(0);
-  const [bedrooms, setBedrooms] = useState(0);
-  const [instantBook, setInstantBook] = useState(false);
-  const [freeCancellation, setFreeCancellation] = useState(false);
-  const [amenities, setAmenities] = useState<Amenity[]>([]);
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [sort, setSort] = useState<Sort>("recommended");
   const [savedOnly, setSavedOnly] = useState(false);
   const savedRaw = useSyncExternalStore(savedStore.subscribe, savedStore.read, () => "[]");
@@ -158,24 +182,41 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     savedStore.write(saved.includes(id) ? saved.filter((x) => x !== id) : [...saved, id]);
   }
 
-  function toggleAmenity(a: Amenity) {
-    setAmenities((current) => (current.includes(a) ? current.filter((x) => x !== a) : [...current, a]));
+  function toggleFeature(k: FeatureKey, on: boolean) {
+    setFilters((f) => ({
+      ...f,
+      features: on ? [...f.features.filter((x) => x !== k), k] : f.features.filter((x) => x !== k),
+    }));
   }
+
+  function openDates() {
+    if (!today) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      setToday(d);
+    }
+    setMenu(menu === "dates" ? null : "dates");
+  }
+
+  const dayFormat = useMemo(
+    () => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "short" }),
+    [t.locale],
+  );
+  const datesText = dates?.from
+    ? `${dayFormat.format(dates.from)}${dates.to ? ` – ${dayFormat.format(dates.to)}` : ""}`
+    : "";
+  const guestsText = guests ? t.guestSummary(party.adults, party.children) : "";
 
   function clearAll() {
     setWhere("");
-    setCheckIn("");
-    setCheckOut("");
-    setGuests(0);
+    setDates(undefined);
+    setParty({ adults: 0, children: 0 });
     setCategory("all");
     setCountry("");
     setRegion("");
     setCity("");
     setMaxPrice(0);
-    setBedrooms(0);
-    setInstantBook(false);
-    setFreeCancellation(false);
-    setAmenities([]);
+    setFilters(EMPTY_FILTERS);
     setSavedOnly(false);
     setMenu(null);
   }
@@ -192,10 +233,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
       if (city && l.city !== city) return false;
       if (maxPrice && l.price > maxPrice) return false;
       if (guests && l.guests < guests) return false;
-      if (bedrooms && l.bedrooms < bedrooms) return false;
-      if (instantBook && !l.instantBook) return false;
-      if (freeCancellation && !l.freeCancellation) return false;
-      if (amenities.some((a) => !l.amenities.includes(a))) return false;
+      if (!matchesFilters(l.features, l.bedrooms, l.rating, filters)) return false;
       if (savedOnly && !saved.includes(l.id)) return false;
       return true;
     });
@@ -203,9 +241,9 @@ export default function GuestHome({ lang }: { lang: Lang }) {
     if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [where, category, country, region, city, maxPrice, guests, bedrooms, instantBook, freeCancellation, amenities, savedOnly, saved, sort]);
+  }, [where, category, country, region, city, maxPrice, guests, filters, savedOnly, saved, sort]);
 
-  const advancedCount = [instantBook, freeCancellation].filter(Boolean).length + amenities.length;
+  const advancedCount = countFilters(filters);
 
   const regions = country ? PLACES[country] : [];
   const regionData = useMemo(
@@ -287,29 +325,13 @@ export default function GuestHome({ lang }: { lang: Lang }) {
           <p className={styles.cardPrice}>
             <strong>{money.format(l.price)}</strong> {t.card.night}
           </p>
-          <p className={styles.channels} aria-label={`${t.card.bookOn}: ${l.channels.join(", ")}`}>
-            {l.channels.map((c) => (
-              <span key={c} className={styles.channel}>
-                {c}
-              </span>
-            ))}
-          </p>
+          <ChannelIcons ids={l.channels} label={t.card.bookOn} more={t.card.moreSites} />
         </div>
       </li>
     );
   }
   const f = t.filters;
 
-  const amenityChecks = (
-    <div className={styles.checkList}>
-      {AMENITIES.map((a) => (
-        <label key={a} className={styles.checkRow}>
-          <input type="checkbox" checked={amenities.includes(a)} onChange={() => toggleAmenity(a)} />
-          {f.amenityNames[a]}
-        </label>
-      ))}
-    </div>
-  );
 
   return (
     <div className={styles.page}>
@@ -394,7 +416,7 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               resultsRef.current?.scrollIntoView({ behavior: "smooth" });
             }}
           >
-            <label className={styles.searchField}>
+            <label className={`${styles.searchField} ${styles.searchCell}`}>
               <Pin className={styles.icon22} />
               <span className={styles.searchText}>
                 <span className={styles.searchLabel}>{t.search.where}</span>
@@ -412,45 +434,55 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                 </datalist>
               </span>
             </label>
-            <div className={styles.searchField}>
-              <CalendarIcon className={styles.icon22} />
-              <span className={styles.searchText}>
-                <span className={styles.searchLabel}>{t.search.dates}</span>
-                <span className={styles.dateRow}>
-                  <input
-                    type="date"
-                    aria-label={t.search.checkIn}
-                    value={checkIn}
-                    onChange={(e) => {
-                      setCheckIn(e.target.value);
-                      if (checkOut && e.target.value >= checkOut) setCheckOut("");
+            <div className={styles.searchCell} data-menu>
+              <button
+                type="button"
+                className={styles.searchField}
+                aria-expanded={menu === "dates"}
+                onClick={openDates}
+              >
+                <CalendarIcon className={styles.icon22} />
+                <span className={styles.searchText}>
+                  <span className={styles.searchLabel}>{t.search.dates}</span>
+                  <span className={styles.searchValue} data-empty={!datesText}>
+                    {datesText || t.datePicker.addDates}
+                  </span>
+                </span>
+              </button>
+              {menu === "dates" && today ? (
+                <div className={`${styles.searchPopover} ${styles.searchPopoverDates}`}>
+                  <DatePanel lang={lang} value={dates} today={today} onChange={setDates} onDone={() => setMenu(null)} />
+                </div>
+              ) : null}
+            </div>
+            <div className={styles.searchCell} data-menu>
+              <button
+                type="button"
+                className={styles.searchField}
+                aria-expanded={menu === "guests"}
+                onClick={() => setMenu(menu === "guests" ? null : "guests")}
+              >
+                <People className={styles.icon22} />
+                <span className={styles.searchText}>
+                  <span className={styles.searchLabel}>{t.search.guests}</span>
+                  <span className={styles.searchValue} data-empty={!guestsText}>
+                    {guestsText || t.search.guestsPlaceholder}
+                  </span>
+                </span>
+              </button>
+              {menu === "guests" ? (
+                <div className={`${styles.searchPopover} ${styles.searchPopoverRight}`}>
+                  <GuestPanel
+                    lang={lang}
+                    value={party}
+                    onApply={(g) => {
+                      setParty(g);
+                      setMenu(null);
                     }}
                   />
-                  <span aria-hidden="true">–</span>
-                  <input
-                    type="date"
-                    aria-label={t.search.checkOut}
-                    min={checkIn || undefined}
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                  />
-                </span>
-              </span>
+                </div>
+              ) : null}
             </div>
-            <label className={styles.searchField}>
-              <People className={styles.icon22} />
-              <span className={styles.searchText}>
-                <span className={styles.searchLabel}>{t.search.guests}</span>
-                <select value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
-                  <option value={0}>{t.search.guestsPlaceholder}</option>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                    <option key={n} value={n}>
-                      {t.search.guestsValue(n)}
-                    </option>
-                  ))}
-                </select>
-              </span>
-            </label>
             <button type="submit" className={styles.searchButton}>
               <SearchIcon className={styles.icon20} />
               {t.search.button}
@@ -479,36 +511,17 @@ export default function GuestHome({ lang }: { lang: Lang }) {
       <div className={styles.listingArea} ref={resultsRef}>
         <div className={styles.filterBar}>
           <div className={styles.filterChips}>
-            <div className={styles.menuWrap} data-menu>
-              <button
-                type="button"
-                className={styles.chip}
-                data-active={advancedCount > 0}
-                aria-expanded={menu === "filters"}
-                onClick={() => setMenu(menu === "filters" ? null : "filters")}
-              >
-                <Sliders className={styles.icon18} />
-                {f.filters}
-                {advancedCount ? <span className={styles.chipCount}>{advancedCount}</span> : null}
-              </button>
-              {menu === "filters" ? (
-                <div className={styles.popover}>
-                  <label className={styles.checkRow}>
-                    <input type="checkbox" checked={instantBook} onChange={(e) => setInstantBook(e.target.checked)} />
-                    {f.instantBook}
-                  </label>
-                  <label className={styles.checkRow}>
-                    <input type="checkbox" checked={freeCancellation} onChange={(e) => setFreeCancellation(e.target.checked)} />
-                    {f.freeCancellation}
-                  </label>
-                  <p className={styles.popoverHeading}>{f.amenities}</p>
-                  {amenityChecks}
-                  <button type="button" className={styles.clearButton} onClick={clearAll}>
-                    {f.clear}
-                  </button>
-                </div>
-              ) : null}
-            </div>
+            <button
+              type="button"
+              className={styles.chip}
+              data-active={advancedCount > 0}
+              aria-haspopup="dialog"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <Sliders className={styles.icon18} />
+              {f.filters}
+              {advancedCount ? <span className={styles.chipCount}>{advancedCount}</span> : null}
+            </button>
 
             <span className={styles.selectChip} data-active={!!country}>
               <select aria-label={f.location} value={country} onChange={(e) => pickCountry(e.target.value as Country | "")}>
@@ -560,52 +573,51 @@ export default function GuestHome({ lang }: { lang: Lang }) {
               </select>
               <Chevron className={styles.icon16} />
             </span>
-            <span className={styles.selectChip} data-active={!!guests}>
-              <select aria-label={f.guests} value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
-                <option value={0}>{f.guests}</option>
-                {[2, 4, 6, 8].map((n) => (
-                  <option key={n} value={n}>
-                    {t.search.guestsValue(n)}+
-                  </option>
-                ))}
-              </select>
-              <Chevron className={styles.icon16} />
-            </span>
-            <span className={styles.selectChip} data-active={!!bedrooms}>
-              <select aria-label={f.bedrooms} value={bedrooms} onChange={(e) => setBedrooms(Number(e.target.value))}>
-                <option value={0}>{f.bedrooms}</option>
-                {[2, 3, 4].map((n) => (
-                  <option key={n} value={n}>
-                    {f.bedroomsMin(n)}
-                  </option>
-                ))}
-              </select>
-              <Chevron className={styles.icon16} />
-            </span>
-            <label className={styles.toggleChip}>
-              {f.instantBook}
-              <input type="checkbox" role="switch" checked={instantBook} onChange={(e) => setInstantBook(e.target.checked)} />
-              <span className={styles.switch} aria-hidden="true" />
-            </label>
-            <label className={styles.toggleChip}>
-              {f.freeCancellation}
-              <input type="checkbox" role="switch" checked={freeCancellation} onChange={(e) => setFreeCancellation(e.target.checked)} />
-              <span className={styles.switch} aria-hidden="true" />
-            </label>
             <div className={styles.menuWrap} data-menu>
               <button
                 type="button"
                 className={styles.chip}
-                data-active={amenities.length > 0}
-                aria-expanded={menu === "amenities"}
-                onClick={() => setMenu(menu === "amenities" ? null : "amenities")}
+                data-active={guests > 0}
+                aria-expanded={menu === "guestsBar"}
+                onClick={() => setMenu(menu === "guestsBar" ? null : "guestsBar")}
               >
-                {f.amenities}
-                {amenities.length ? <span className={styles.chipCount}>{amenities.length}</span> : null}
+                <People className={styles.icon18} />
+                {guestsText || f.guests}
                 <Chevron className={styles.icon16} />
               </button>
-              {menu === "amenities" ? <div className={styles.popover}>{amenityChecks}</div> : null}
+              {menu === "guestsBar" ? (
+                <div className={styles.popoverBare}>
+                  <GuestPanel
+                    lang={lang}
+                    value={party}
+                    onApply={(g) => {
+                      setParty(g);
+                      setMenu(null);
+                    }}
+                  />
+                </div>
+              ) : null}
             </div>
+            <label className={styles.toggleChip}>
+              {f.instantBook}
+              <input
+                type="checkbox"
+                role="switch"
+                checked={filters.features.includes("instantBook")}
+                onChange={(e) => toggleFeature("instantBook", e.target.checked)}
+              />
+              <span className={styles.switch} aria-hidden="true" />
+            </label>
+            <label className={styles.toggleChip}>
+              {f.freeCancellation}
+              <input
+                type="checkbox"
+                role="switch"
+                checked={filters.features.includes("freeCancellation")}
+                onChange={(e) => toggleFeature("freeCancellation", e.target.checked)}
+              />
+              <span className={styles.switch} aria-hidden="true" />
+            </label>
           </div>
 
           <div className={styles.filterEnd}>
@@ -682,6 +694,16 @@ export default function GuestHome({ lang }: { lang: Lang }) {
           </a>
         </section>
       </div>
+
+      {filtersOpen ? (
+        <FiltersModal
+          lang={lang}
+          value={filters}
+          resultCount={results.length}
+          onChange={setFilters}
+          onClose={() => setFiltersOpen(false)}
+        />
+      ) : null}
 
       <footer className={styles.footer}>
         <p>{t.footer.note}</p>
