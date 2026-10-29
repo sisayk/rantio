@@ -11,6 +11,7 @@ import {
   CATEGORIES,
   type Category,
   COUNTRIES,
+  cottageHref,
   type Country,
   HERO_PHOTO,
   LISTINGS,
@@ -301,7 +302,11 @@ export default function GuestHome({ lang }: { lang: Lang }) {
         </div>
         <div className={styles.cardBody}>
           <div className={styles.cardHead}>
-            <h3 className={styles.cardTitle}>{l.name[lang]}</h3>
+            <h3 className={styles.cardTitle}>
+              <a className={styles.cardLink} href={cottageHref(lang, l.id)}>
+                {l.name[lang]}
+              </a>
+            </h3>
             {l.rating ? (
               <span className={styles.rating}>
                 <Star className={styles.icon16} />

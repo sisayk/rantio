@@ -345,3 +345,8 @@ export const LISTINGS: Listing[] = [
     channels: CHANNELS_BY_COUNTRY.FI,
   },
 ];
+
+export const getListing = (id: string) => LISTINGS.find((l) => l.id === id);
+
+/** A cottage's own page: /mokit/<id> in Finnish, /en/cottages/<id> in English. */
+export const cottageHref = (lang: "fi" | "en", id: string) => (lang === "fi" ? `/mokit/${id}` : `/en/cottages/${id}`);

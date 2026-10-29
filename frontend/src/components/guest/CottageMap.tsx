@@ -6,7 +6,7 @@ import L, { type LatLngBoundsExpression } from "leaflet";
 import { useEffect, useMemo } from "react";
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer, Tooltip, useMap } from "react-leaflet";
 import type { Listing } from "@/lib/listings";
-import { unsplash } from "@/lib/listings";
+import { cottageHref, unsplash } from "@/lib/listings";
 import type { City } from "@/lib/places";
 import styles from "./guest.module.css";
 
@@ -109,7 +109,7 @@ export default function CottageMap(props: Props) {
           }}
         >
           <Popup className="stugora-popup" closeButton={false} offset={[0, -8]}>
-            <div className={styles.popupCard}>
+            <a className={`${styles.popupCard} ${styles.popupLink}`} href={cottageHref(lang, l.id)}>
               <img src={unsplash(l.photo, 480, 300, l.photoCrop)} alt="" width={240} height={150} />
               <div className={styles.popupBody}>
                 <strong>{l.name[lang]}</strong>
@@ -118,7 +118,7 @@ export default function CottageMap(props: Props) {
                   <b>{props.price(l.price)}</b> {props.nightLabel}
                 </span>
               </div>
-            </div>
+            </a>
           </Popup>
         </Marker>
       ))}

@@ -1,4 +1,5 @@
 import type { Category } from "@/lib/listings";
+import type { ActivityId } from "@/lib/activities";
 
 type P = { className?: string };
 const base = (className?: string) => ({
@@ -79,4 +80,39 @@ export const Logo = ({ className }: P) => (
     <path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
     <path d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
+);
+
+const wave = "M3 18c1.5-1.2 3-1.2 4.5 0s3 1.2 4.5 0 3-1.2 4.5 0 3 1.2 4.5 0";
+const activityPaths: Record<ActivityId, React.ReactNode> = {
+  swim: <><circle cx="15.5" cy="6.5" r="2" /><path d="m5 13 4.5-3.5 3 2.5 3-1.5" /><path d={wave} /></>,
+  beach: <><path d="M12 20V9" /><path d="M4.5 9.5a7.5 7.5 0 0 1 15 0h-15Z" /><path d="M3 20.5h18" /></>,
+  sauna: categoryPaths.sauna,
+  rowing: <><path d="M3 14h18l-2.5 4h-13L3 14Z" /><path d="m7 7 10 10M5.5 5.5l2 2" /><path d={wave} transform="translate(0 2.5)" /></>,
+  paddling: <><path d="M2.5 15.5c3 1.5 16 1.5 19 0-3-1.5-16-1.5-19 0Z" /><path d="m6 6 12 12M4.5 4.5 7 7M17 17l2.5 2.5" /></>,
+  fishing: <><path d="M4 20 15 4" /><path d="M15 4c3 1 5 4 5 8v4" /><path d="M20 16a1.5 1.5 0 1 1-3 0" /></>,
+  iceFishing: <><path d="M3 15h18" /><ellipse cx="12" cy="15" rx="3" ry="1" /><path d="M12 3v11M9 5h6" /><path d="M12 15v3.5a1.5 1.5 0 0 1-3 0" /></>,
+  hiking: <><path d="m3 20 6-10 4 6 2.5-3.5L21 20H3Z" /><circle cx="17" cy="6" r="2" /></>,
+  foraging: <><circle cx="8" cy="15" r="3" /><circle cx="14.5" cy="16.5" r="2.5" /><circle cx="12.5" cy="10.5" r="2.5" /><path d="M12.5 8c0-2 1-3.5 3-4.5M15.5 3.5c1.5.5 2.5 1.5 3 3-2 .5-3.5 0-4.5-1" /></>,
+  downhill: categoryPaths.skiing,
+  crossCountry: <><circle cx="14" cy="4.5" r="1.8" /><path d="m9 21 2.5-7.5L9 10l4-2.5 2.5 3 3 1M11.5 13.5l3.5 2.5-1 5" /><path d="M2.5 20.5h19M6 9l-2 11.5" /></>,
+  snowshoe: <><ellipse cx="8" cy="12" rx="3.5" ry="7" /><ellipse cx="16" cy="12" rx="3.5" ry="7" /><path d="M5 10h6M5 14h6M13 10h6M13 14h6" /></>,
+  aurora: categoryPaths.aurora,
+  hotTub: <><path d="M3.5 12h17v3.5a4.5 4.5 0 0 1-4.5 4.5H8a4.5 4.5 0 0 1-4.5-4.5V12Z" /><path d="M8 9c-.8-1 .8-2 0-3M12 9c-.8-1 .8-2 0-3M16 9c-.8-1 .8-2 0-3" /></>,
+  campfire: <><path d="M12 3c2.5 3 4.5 5.5 4.5 8.5a4.5 4.5 0 0 1-9 0c0-1.8.8-3.2 2-4.3.2 1.6 1 2.6 2 2.8-.5-2.5 0-4.8.5-7Z" /><path d="m4 21 16-4M20 21 4 17" /></>,
+  fireside: <><path d="M4 21V6l8-3 8 3v15" /><path d="M8 21v-7a4 4 0 0 1 8 0v7" /><path d="M12 20c-1.4 0-2-1-2-2 0-1.3 1-1.8 2-3.5 1 1.7 2 2.2 2 3.5 0 1-.6 2-2 2Z" /></>,
+  dogs: categoryPaths.pets,
+};
+
+export const ActivityIcon = ({ activity, className }: P & { activity: ActivityId }) => (
+  <svg {...base(className)} strokeWidth={1.5}>{activityPaths[activity]}</svg>
+);
+
+export const ArrowLeft = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={2}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+);
+export const External = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={1.8}><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+);
+export const Check = ({ className }: P) => (
+  <svg {...base(className)} strokeWidth={2}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
 );
