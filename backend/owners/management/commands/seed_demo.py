@@ -17,6 +17,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from owners import alerts
 from owners.models import Booking, Conversation, Cottage, Country, Message, Owner, Region
 
 DEMO_EMAIL = "demo@stugora.fi"
@@ -68,7 +69,11 @@ class Command(BaseCommand):
         parser.add_argument("--only-if-empty", action="store_true", help="Do nothing if any owner exists.")
 
     @transaction.atomic
-    def handle(self, *args, reset=False, only_if_empty=False, **options):
+    def handle(self, *args, **options):
+        with alerts.muted():  # demo bookings shouldn't email anyone
+            self._handle(*args, **options)
+
+    def _handle(self, *args, reset=False, only_if_empty=False, **options):
         if only_if_empty and Owner.objects.exists():
             return
         existing = Owner.objects.filter(email=DEMO_EMAIL).first()

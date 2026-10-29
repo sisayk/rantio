@@ -13,6 +13,8 @@ export const sv: Translation = {
     footer: {
       note: "Stugora är en bifirma till Elda-Auto Tmi.",
       contact: "Kontakt",
+      privacy: "Integritet",
+      terms: "Villkor",
     },
     apps: {
       title: "Skaffa Stugora-appen",
@@ -486,6 +488,7 @@ export const sv: Translation = {
       message: "Vill du berätta något mer?",
       optional: "valfritt",
       consent: "Stugora får spara uppgifterna och kontakta mig.",
+      privacyLink: "Läs vår integritetspolicy",
       submit: "Lägg ut din stuga",
       sending: "Skickar…",
       successTitle: "Tack!",

@@ -1,0 +1,37 @@
+# Django API + admin under gunicorn, on 127.0.0.1:8000 (nginx sends /api/ and /admin/ here).
+# Installed to /etc/systemd/system/ by deploy/setup-server.sh and deploy/deploy.sh.
+[Unit]
+Description=Stugora Django (gunicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/gunicorn config.wsgi:application \
+    --bind 127.0.0.1:8000 \
+    --workers 3 \
+    --timeout 120 \
+    --worker-tmp-dir /dev/shm \
+    --graceful-timeout 30 \
+    --max-requests 1000 --max-requests-jitter 100 \
+    --forwarded-allow-ips 127.0.0.1 \
+    --access-logfile - --error-logfile - \
+    --no-control-socket
+ExecReload=/bin/kill -s HUP $MAINPID
+# Uploaded files must stay readable by nginx (www-data), which serves /media/.
+UMask=0022
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=40
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

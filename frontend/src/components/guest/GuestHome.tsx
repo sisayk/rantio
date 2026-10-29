@@ -1000,8 +1000,12 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
       <footer className={styles.footer}>
         <AppBadges t={common.apps} />
         <p>{common.footer.note}</p>
-        <p>
-          {common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
+        <p className={styles.footerLinks}>
+          <span>
+            {common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
+          </span>
+          <a href={paths.privacy(lang)}>{common.footer.privacy}</a>
+          <a href={paths.terms(lang)}>{common.footer.terms}</a>
         </p>
       </footer>
 

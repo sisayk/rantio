@@ -13,6 +13,8 @@ export const da: Translation = {
     footer: {
       note: "Stugora er et binavn for Elda-Auto Tmi.",
       contact: "Kontakt",
+      privacy: "Privatliv",
+      terms: "Vilkår",
     },
     apps: {
       title: "Hent Stugora-appen",
@@ -486,6 +488,7 @@ export const da: Translation = {
       message: "Er der andet, du vil fortælle os?",
       optional: "valgfrit",
       consent: "Stugora må gemme disse oplysninger og kontakte mig.",
+      privacyLink: "Læs vores privatlivspolitik",
       submit: "Udlej dit sommerhus",
       sending: "Sender…",
       successTitle: "Tak!",

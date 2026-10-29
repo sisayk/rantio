@@ -1,0 +1,20 @@
+# Reads the Nettimökki booking emails owners forward to the bookings mailbox (IMAP).
+# Relies on the management command `read_booking_emails` (backend/owners/management/commands/).
+# setup-server.sh / deploy.sh only enable the timer once that command exists.
+[Unit]
+Description=Stugora: read forwarded booking emails
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py read_booking_emails
+TimeoutStartSec=4min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

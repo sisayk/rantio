@@ -1,0 +1,10 @@
+[Unit]
+Description=Make monthly invoices on the 1st of each month at 06:00 Finnish time
+
+[Timer]
+OnCalendar=*-*-01 06:00:00 Europe/Helsinki
+# If the server was off at that moment, run as soon as it is back.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

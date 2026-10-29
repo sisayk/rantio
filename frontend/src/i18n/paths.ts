@@ -10,6 +10,8 @@ export const paths = {
   hostingMessages: (lang: Lang) => `/${lang}/hosting/messages`,
   /** A guest's private conversation page; the token is its only key. */
   guestChat: (lang: Lang, token: string) => `/${lang}/messages/${token}`,
+  privacy: (lang: Lang) => `/${lang}/privacy`,
+  terms: (lang: Lang) => `/${lang}/terms`,
 };
 
 /** The same page in another language: swaps the first path segment. */

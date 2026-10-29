@@ -22,6 +22,8 @@ export const en = {
     footer: {
       note: "Stugora is a trading name of Elda-Auto Tmi.",
       contact: "Contact",
+      privacy: "Privacy",
+      terms: "Terms",
     },
     apps: {
       title: "Get the Stugora app",
@@ -499,6 +501,7 @@ export const en = {
       message: "Anything else you'd like to tell us?",
       optional: "optional",
       consent: "Stugora may store these details and contact me.",
+      privacyLink: "Read our privacy policy",
       submit: "List your cottage",
       sending: "Sending…",
       successTitle: "Thank you!",

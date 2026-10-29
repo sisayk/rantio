@@ -1,0 +1,170 @@
+/* Privacy policy and website terms: a quiet header and one readable column. */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1d4c3c;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+}
+
+.langButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--pill);
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.langButton:hover {
+  background: var(--surface);
+}
+
+.main {
+  flex: 1;
+  padding: 48px 32px 72px;
+}
+
+.article {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.languageNote {
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.article h1 {
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.updated {
+  margin-top: 10px;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.intro {
+  margin-top: 24px;
+  font-size: 19px;
+  color: var(--ink);
+}
+
+.article section {
+  margin-top: 40px;
+}
+
+.article h2 {
+  margin-bottom: 10px;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.article p + p {
+  margin-top: 12px;
+}
+
+.article ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+
+.article li + li {
+  margin-top: 6px;
+}
+
+.article li::marker {
+  color: var(--lake);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 32px 48px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.footerLinks a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .header {
+    padding: 10px 16px;
+  }
+  .brand {
+    font-size: 22px;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+  .main {
+    padding: 32px 16px 56px;
+  }
+  .article {
+    font-size: 16px;
+  }
+  .intro {
+    font-size: 17px;
+  }
+  .footer {
+    padding: 28px 16px 40px;
+  }
+}

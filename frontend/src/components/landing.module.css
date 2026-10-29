@@ -934,6 +934,12 @@
   color: var(--ink-soft);
 }
 
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
 /* ---------- tablet ---------- */
 @media (max-width: 1024px) {
   .hero,

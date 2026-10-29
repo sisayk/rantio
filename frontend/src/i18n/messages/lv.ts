@@ -13,6 +13,8 @@ export const lv: Translation = {
     footer: {
       note: "Stugora ir uzņēmuma Elda-Auto Tmi papildu nosaukums.",
       contact: "Kontakti",
+      privacy: "Privātums",
+      terms: "Noteikumi",
     },
     apps: {
       title: "Lejupielādējiet Stugora lietotni",
@@ -486,6 +488,7 @@ export const lv: Translation = {
       message: "Vai vēlaties vēl ko pastāstīt?",
       optional: "nav obligāti",
       consent: "Stugora drīkst saglabāt šos datus un sazināties ar mani.",
+      privacyLink: "Izlasiet mūsu privātuma politiku",
       submit: "Pieteikt savu māju",
       sending: "Sūta…",
       successTitle: "Paldies!",

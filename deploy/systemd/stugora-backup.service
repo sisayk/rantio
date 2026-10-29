@@ -1,0 +1,11 @@
+# Nightly backup: database dump + media archive into /var/backups/stugora (deploy/backup.sh).
+[Unit]
+Description=Stugora backup (database + media)
+After=postgresql.service
+
+[Service]
+Type=oneshot
+# deploy.sh copies deploy/backup.sh here (root-owned, so the app user can't change what root runs).
+ExecStart=/usr/local/sbin/stugora-backup
+Nice=10
+IOSchedulingClass=idle

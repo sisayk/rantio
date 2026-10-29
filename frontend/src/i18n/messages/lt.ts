@@ -13,6 +13,8 @@ export const lt: Translation = {
     footer: {
       note: "Stugora yra Elda-Auto Tmi prekinis pavadinimas.",
       contact: "Kontaktai",
+      privacy: "Privatumas",
+      terms: "Sąlygos",
     },
     apps: {
       title: "Atsisiųskite Stugora programėlę",
@@ -491,6 +493,7 @@ export const lt: Translation = {
       message: "Ar norėtumėte dar ką nors mums pasakyti?",
       optional: "neprivaloma",
       consent: "Stugora gali saugoti šiuos duomenis ir susisiekti su manimi.",
+      privacyLink: "Perskaitykite mūsų privatumo politiką",
       submit: "Paskelbkite namelį",
       sending: "Siunčiama…",
       successTitle: "Ačiū!",

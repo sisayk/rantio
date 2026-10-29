@@ -115,7 +115,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# On the server: /srv/stugora/static, outside the code folder, so nginx can serve it.
+STATIC_ROOT = Path(os.environ.get("STATIC_ROOT") or BASE_DIR / "staticfiles")
 
 # Uploads (homepage slides). The site reaches them at /media/ through its proxy to
 # this server; in production the web server should serve MEDIA_ROOT at /media/.
@@ -172,6 +173,74 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    # nginx already sends http:// to https://; this is a second line of defence.
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+    # ...except the health check, so `curl http://127.0.0.1:8000/api/health/` works on the server.
+    SECURE_REDIRECT_EXEMPT = [r"^api/health/$"]
+    # Only turn these on once every *.stugora.fi subdomain serves HTTPS.
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_HSTS_INCLUDE_SUBDOMAINS", False)
+    SECURE_HSTS_PRELOAD = env_bool("DJANGO_HSTS_PRELOAD", False)
+    # Behind nginx every request comes from 127.0.0.1; take the visitor's address from
+    # the X-Forwarded-For entry nginx adds, so sign-up/login throttles count per visitor.
+    REST_FRAMEWORK["NUM_PROXIES"] = int(os.environ.get("DRF_NUM_PROXIES") or 1)
+
+
+# ---------- production: email, error reports, logging ----------
+# SMTP (EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend). Any transactional
+# service with SMTP works (Postmark, Mailgun, Brevo ...). Local dev prints emails to the console.
+EMAIL_HOST = os.environ.get("EMAIL_HOST") or "localhost"
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT") or 587)
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT") or 20)
+# Server error emails (500s) go to ADMINS, sent from SERVER_EMAIL.
+SERVER_EMAIL = os.environ.get("SERVER_EMAIL") or DEFAULT_FROM_EMAIL
+ADMINS = [(email, email) for email in env_list("DJANGO_ADMINS")]
+
+if not DEBUG:
+    # Everything to stdout/stderr, where systemd's journal picks it up
+    # (journalctl -u stugora-django); errors also emailed to ADMINS when set.
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "plain": {"format": "{levelname} {name}: {message}", "style": "{"},
+        },
+        "filters": {
+            "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+        },
+        "handlers": {
+            "console": {"class": "logging.StreamHandler", "stream": "ext://sys.stdout", "formatter": "plain"},
+            "mail_admins": {
+                "class": "django.utils.log.AdminEmailHandler",
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+            },
+        },
+        "root": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO")},
+        "loggers": {
+            "django": {
+                "handlers": ["console", "mail_admins"],
+                "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
+            },
+        },
+    }
+
+# Optional error tracking: set SENTRY_DSN (sentry-sdk is in requirements-prod.txt).
+# Without the variable, sentry_sdk is never imported, so local dev doesn't need it.
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+if SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=os.environ.get("SENTRY_ENVIRONMENT", "production"),
+        traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE") or 0),
+        send_default_pii=False,
+    )
 
 
 # Admin look: django-unfold, set up like Bona's operations admin, in Stugora's green.
@@ -217,3 +286,24 @@ UNFOLD = {
         "navigation": "config.admin_nav.navigation",
     },
 }
+
+
+# ---------- booking emails and invoices ----------
+# Owners forward Nettimökki booking emails to bookings+<cottage code>@stugora.fi.
+# They are read from that mailbox over IMAP (manage.py read_booking_emails) or posted
+# by an inbound-email service to /api/inbound/booking-email/ with INBOUND_EMAIL_SECRET.
+BOOKING_FORWARD_ADDRESS = os.environ.get("BOOKING_FORWARD_ADDRESS", "bookings@stugora.fi")
+BOOKING_EMAIL_IMAP_HOST = os.environ.get("BOOKING_EMAIL_IMAP_HOST", "")
+BOOKING_EMAIL_IMAP_USER = os.environ.get("BOOKING_EMAIL_IMAP_USER", "")
+BOOKING_EMAIL_IMAP_PASSWORD = os.environ.get("BOOKING_EMAIL_IMAP_PASSWORD", "")
+BOOKING_EMAIL_IMAP_FOLDER = os.environ.get("BOOKING_EMAIL_IMAP_FOLDER", "INBOX")
+INBOUND_EMAIL_SECRET = os.environ.get("INBOUND_EMAIL_SECRET", "")
+# Email owners when a booking arrives on any channel.
+BOOKING_ALERTS = env_bool("BOOKING_ALERTS", True)
+
+# Monthly commission invoices (manage.py make_monthly_invoices). Without a key they
+# stay drafts in the admin. STRIPE_TAX_RATE_ID: a 25.5 % Finnish VAT tax rate made
+# once in the Stripe dashboard; without it VAT goes on the invoice as its own line.
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_TAX_RATE_ID = os.environ.get("STRIPE_TAX_RATE_ID", "")
+INVOICE_DAYS_UNTIL_DUE = int(os.environ.get("INVOICE_DAYS_UNTIL_DUE", "14"))

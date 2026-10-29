@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
+import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL, REGIONS } from "@/lib/content";
 import { COUNTRIES } from "@/lib/listings";
 import styles from "./landing.module.css";
@@ -225,7 +226,12 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
           aria-invalid={!!errors.privacy_consent}
           aria-describedby={described("privacy_consent")}
         />
-        <span>{f.consent}</span>
+        <span>
+          {f.consent}{" "}
+          <a href={paths.privacy(lang)} target="_blank" rel="noopener">
+            {f.privacyLink}
+          </a>
+        </span>
       </label>
       {err("privacy_consent")}
 

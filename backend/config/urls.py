@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
-from owners import inbox, portal
+from owners import inbound, inbox, portal
 from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Stugora admin"
@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/owner/assistant/", inbox.AssistantStatusView.as_view(), name="owner-assistant"),
     path("api/rates/", RatesView.as_view(), name="rates"),
     path("api/hero/", HeroSlidesView.as_view(), name="hero-slides"),
+    path("api/inbound/booking-email/", inbound.booking_email, name="inbound-booking-email"),
     path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
 ]
 

@@ -13,6 +13,8 @@ export const et: Translation = {
     footer: {
       note: "Stugora on Elda-Auto Tmi kõrvalärinimi.",
       contact: "Kontakt",
+      privacy: "Privaatsus",
+      terms: "Tingimused",
     },
     apps: {
       title: "Laadi alla Stugora äpp",
@@ -486,6 +488,7 @@ export const et: Translation = {
       message: "Kas soovid meile veel midagi öelda?",
       optional: "valikuline",
       consent: "Stugora võib neid andmeid säilitada ja minuga ühendust võtta.",
+      privacyLink: "Loe meie privaatsuspoliitikat",
       submit: "Lisa oma puhkemaja",
       sending: "Saadame…",
       successTitle: "Aitäh!",

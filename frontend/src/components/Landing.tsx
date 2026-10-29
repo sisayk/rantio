@@ -270,8 +270,12 @@ export default function Landing({ lang }: { lang: Lang }) {
       <footer className={styles.footer}>
         <AppBadges t={m.common.apps} />
         <p>{m.common.footer.note}</p>
-        <p>
-          {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        <p className={styles.footerLinks}>
+          <span>
+            {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </span>
+          <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
+          <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
         </p>
       </footer>
     </>

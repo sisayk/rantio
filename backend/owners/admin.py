@@ -12,7 +12,12 @@ from django.utils.html import format_html
 from unfold.decorators import display
 
 from . import media_checks
-from .models import Booking, Conversation, Cottage, ExchangeRate, HeroSlide, LoginCode, Message, Owner, OwnerSignup
+from django.contrib import messages
+
+from . import booking_emails, invoicing, stripe_api
+from .models import (
+    Booking, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode, Message, Owner, OwnerSignup,
+)
 
 
 @admin.register(OwnerSignup)
@@ -44,11 +49,12 @@ class OwnerAdmin(ModelAdmin):
     list_filter = ["is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
-    readonly_fields = ["created_at"]
+    readonly_fields = ["created_at", "stripe_customer_id"]
     fieldsets = [
         ("Owner", {"fields": ["name", "email", "phone", "language", "user", "signup"], "classes": ["st-grid-2"]}),
         ("Agreement", {"fields": ["is_pilot", "commission_rate", "vat_registered", "agreement_signed_on", "created_at"],
                        "classes": ["st-grid-2"]}),
+        ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id"], "classes": ["st-grid-2"]}),
     ]
 
 
@@ -56,11 +62,17 @@ class OwnerAdmin(ModelAdmin):
 class CottageAdmin(ModelAdmin):
     list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "currency", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
-    search_fields = ["name", "owner__name", "municipality"]
+    search_fields = ["name", "owner__name", "municipality", "inbound_code"]
     autocomplete_fields = ["owner"]
+    readonly_fields = ["forwarding_address"]
     fieldsets = [
         ("Cottage", {"fields": ["owner", "name", "status", "listing_slug", "listing_started_on"], "classes": ["st-grid-2"]}),
         ("Where", {"fields": ["country", "region", "municipality", "nettimokki_url"], "classes": ["st-grid-2"]}),
+        ("Nettimökki booking emails", {
+            "fields": ["forwarding_address"],
+            "description": "Set up a forwarding rule in the owner's email so Nettimökki's booking emails go to this "
+                           "address. Their dates are then blocked here automatically.",
+        }),
         ("Size", {"fields": ["max_guests", "bedrooms", "beds", "has_sauna", "has_lake_or_sea_access"], "classes": ["st-grid-3"]}),
         ("Price, in the cottage's currency", {"fields": ["price_per_night", "cleaning_fee", "min_nights"], "classes": ["st-grid-3"]}),
         ("For guests and the AI helper", {"fields": ["amenities", "house_rules", "description_fi", "description_en"]}),
@@ -228,3 +240,83 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
+
+
+@admin.register(InboundEmail)
+class InboundEmailAdmin(ModelAdmin):
+    list_display = ["received_at", "subject", "cottage", "status", "note"]
+    list_filter = ["status"]
+    search_fields = ["subject", "from_address", "to_address", "body"]
+    readonly_fields = ["received_at", "message_id", "from_address", "to_address", "subject", "body", "booking", "note"]
+    autocomplete_fields = ["cottage"]
+    exclude = ["raw"]
+    actions = ["read_again"]
+    fieldsets = [
+        ("Result", {"fields": ["status", "note", "cottage", "booking"], "classes": ["st-grid-2"],
+                    "description": "Wrong or missing cottage? Pick it, save, then use “Read again” in the list."}),
+        ("Email", {"fields": ["received_at", "from_address", "to_address", "subject", "message_id", "body"]}),
+    ]
+
+    @admin.action(description="Read again")
+    def read_again(self, request, queryset):
+        for email in queryset.exclude(raw=""):
+            booking_emails.reread(email)
+        self.message_user(request, f"Read {queryset.count()} email(s) again.")
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(ModelAdmin):
+    list_display = ["number", "owner", "month", "subtotal", "vat", "total", "status", "sent_at"]
+    list_filter = ["status", "month"]
+    search_fields = ["number", "owner__name", "owner__email"]
+    readonly_fields = ["number", "owner", "month", "line_table", "subtotal", "vat", "total", "rates_date",
+                       "stripe_invoice_id", "stripe_link", "created_at", "sent_at"]
+    exclude = ["lines", "stripe_url"]
+    actions = ["rebuild", "send_with_stripe", "mark_paid"]
+    fieldsets = [
+        ("Invoice", {"fields": ["number", "owner", "month", "status"], "classes": ["st-grid-2"]}),
+        ("Lines, in euros before VAT", {"fields": ["line_table", "subtotal", "vat", "total", "rates_date"],
+                                        "classes": ["st-grid-2"]}),
+        ("Stripe", {"fields": ["stripe_invoice_id", "stripe_link", "created_at", "sent_at"], "classes": ["st-grid-2"]}),
+    ]
+
+    def has_add_permission(self, request):  # made by make_monthly_invoices
+        return False
+
+    @display(description="Lines")
+    def line_table(self, obj):
+        rows = "".join(
+            format_html("<tr><td style='padding:2px 12px 2px 0'>{}</td><td style='text-align:right'>{} €</td><td style='padding-left:8px;color:#888'>{}</td></tr>",
+                        x["description"], x["amount"], x.get("original", ""))
+            for x in obj.lines
+        )
+        return format_html("<table>{}</table>", format_html(rows)) if rows else "—"
+
+    @display(description="Stripe page")
+    def stripe_link(self, obj):
+        return format_html('<a href="{}" target="_blank" rel="noopener">Open</a>', obj.stripe_url) if obj.stripe_url else "—"
+
+    @admin.action(description="Rebuild drafts from the latest bookings")
+    def rebuild(self, request, queryset):
+        for inv in queryset.filter(status=Invoice.Status.DRAFT):
+            invoicing.build(inv.owner, inv.month)
+        self.message_user(request, "Drafts rebuilt. A draft with nothing left to charge is removed.")
+
+    @admin.action(description="Send through Stripe")
+    def send_with_stripe(self, request, queryset):
+        if not stripe_api.enabled():
+            self.message_user(request, "Set STRIPE_SECRET_KEY first; nothing was sent.", messages.ERROR)
+            return
+        sent = 0
+        for inv in queryset.filter(status=Invoice.Status.DRAFT):
+            try:
+                stripe_api.send(inv)
+                sent += 1
+            except stripe_api.StripeError as e:
+                self.message_user(request, f"{inv.number}: {e}", messages.ERROR)
+        self.message_user(request, f"Sent {sent} invoice(s).")
+
+    @admin.action(description="Mark as paid")
+    def mark_paid(self, request, queryset):
+        n = queryset.filter(status=Invoice.Status.SENT).update(status=Invoice.Status.PAID)
+        self.message_user(request, f"Marked {n} invoice(s) paid.")

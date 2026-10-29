@@ -1,4 +1,5 @@
 import calendar
+import secrets
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -26,6 +27,10 @@ def add_months(day: date, months: int) -> date:
     total = day.month - 1 + months
     year, month = day.year + total // 12, total % 12 + 1
     return date(year, month, min(day.day, calendar.monthrange(year, month)[1]))
+
+
+def new_inbound_code() -> str:
+    return secrets.token_hex(4)
 
 
 def vat_on(amount: Decimal) -> Decimal:
@@ -135,6 +140,12 @@ class Owner(models.Model):
         default=False, help_text="Owner can reclaim VAT (business owners only)."
     )
     agreement_signed_on = models.DateField(null=True, blank=True)
+    airbnb_cohost_payout = models.BooleanField(
+        default=True,
+        help_text="Stugora is co-host on the owner's Airbnb listings and Airbnb pays the commission to Stugora "
+        "directly, so Airbnb stays are left off the monthly invoice.",
+    )
+    stripe_customer_id = models.CharField(max_length=40, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -184,6 +195,10 @@ class Cottage(models.Model):
     description_fi = models.TextField(blank=True)
     description_en = models.TextField(blank=True)
     nettimokki_url = models.URLField(blank=True)
+    inbound_code = models.CharField(
+        max_length=16, unique=True, default=new_inbound_code, editable=False,
+        help_text="Identifies the cottage in its booking-email forwarding address.",
+    )
     listing_slug = models.SlugField(
         max_length=60, blank=True, db_index=True,
         help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
@@ -199,6 +214,12 @@ class Cottage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.owner})"
+
+    @property
+    def forwarding_address(self) -> str:
+        """Where the owner forwards Nettimökki booking emails, e.g. bookings+3f9a1c2e@stugora.fi."""
+        local, _, domain = settings.BOOKING_FORWARD_ADDRESS.partition("@")
+        return f"{local}+{self.inbound_code}@{domain}"
 
     @property
     def currency(self) -> str:
@@ -449,3 +470,64 @@ class HeroSlide(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class InboundEmail(models.Model):
+    """A booking email forwarded to Stugora (Nettimökki has no calendar sync), and what was read from it."""
+
+    class Status(models.TextChoices):
+        BOOKED = "booked", "Booking added"
+        CANCELLED = "cancelled", "Booking cancelled"
+        CONFLICT = "conflict", "Added — overlaps another booking"
+        REVIEW = "review", "Needs a look"
+        DUPLICATE = "duplicate", "Already read"
+        IGNORED = "ignored", "Ignored"
+
+    message_id = models.CharField(max_length=300, blank=True, db_index=True)
+    received_at = models.DateTimeField(default=timezone.now)
+    from_address = models.CharField(max_length=300, blank=True)
+    to_address = models.CharField(max_length=500, blank=True)
+    subject = models.CharField(max_length=300, blank=True)
+    body = models.TextField(blank=True, help_text="The email as plain text.")
+    raw = models.TextField(blank=True, help_text="The whole email as received, for reading it again.")
+    cottage = models.ForeignKey(Cottage, on_delete=models.SET_NULL, null=True, blank=True, related_name="inbound_emails")
+    booking = models.ForeignKey(Booking, on_delete=models.SET_NULL, null=True, blank=True, related_name="inbound_emails")
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.REVIEW, db_index=True)
+    note = models.CharField(max_length=300, blank=True, help_text="Why it needs a look, or what was found.")
+
+    class Meta:
+        ordering = ["-received_at"]
+
+    def __str__(self) -> str:
+        return self.subject or f"Email {self.pk}"
+
+
+class Invoice(models.Model):
+    """One owner's monthly bill: commission on stays from Stugora's channels and yearly fees, in euros with VAT."""
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        SENT = "sent", "Sent"
+        PAID = "paid", "Paid"
+        VOID = "void", "Cancelled"
+
+    owner = models.ForeignKey(Owner, on_delete=models.PROTECT, related_name="invoices")
+    month = models.DateField(help_text="First day of the month the invoice covers (stays by check-in day).")
+    number = models.CharField(max_length=20, unique=True)
+    status = models.CharField(max_length=5, choices=Status.choices, default=Status.DRAFT, db_index=True)
+    lines = models.JSONField(default=list)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    vat = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    rates_date = models.CharField(max_length=10, blank=True, help_text="ECB rate date used for non-euro stays.")
+    stripe_invoice_id = models.CharField(max_length=40, blank=True)
+    stripe_url = models.URLField(blank=True, help_text="The invoice page Stripe sends the owner.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-month", "owner__name"]
+        constraints = [models.UniqueConstraint(fields=["owner", "month"], name="invoice_one_per_owner_month")]
+
+    def __str__(self) -> str:
+        return f"{self.number} · {self.owner} · {self.month:%m/%Y}"

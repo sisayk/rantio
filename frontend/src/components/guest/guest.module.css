@@ -1422,6 +1422,12 @@
   user-select: all;
 }
 
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 1240px) {
   .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

@@ -20,6 +20,7 @@ GROUPS = [
     ]),
     ("Stays", [
         ("Bookings", "event", ("owners", "booking", ""), None),
+        ("Booking emails", "mark_email_read", ("owners", "inboundemail", ""), "booking_emails"),
     ]),
     ("Guests", [
         ("Conversations", "forum", ("owners", "conversation", ""), "team_inbox"),
@@ -28,6 +29,7 @@ GROUPS = [
         ("Homepage slides", "slideshow", ("owners", "heroslide", ""), None),
     ]),
     ("Money", [
+        ("Invoices", "receipt_long", ("owners", "invoice", ""), "draft_invoices"),
         ("Exchange rates", "currency_exchange", ("owners", "exchangerate", ""), None),
     ]),
     ("People & access", [
@@ -67,12 +69,27 @@ def _team_inbox():
     )
 
 
-BADGES = {"signups": _signups, "setup": _setup, "team_inbox": _team_inbox}
+def _booking_emails():
+    from owners.models import InboundEmail
+
+    return InboundEmail.objects.filter(status__in=[InboundEmail.Status.REVIEW, InboundEmail.Status.CONFLICT]).count()
+
+
+def _draft_invoices():
+    from owners.models import Invoice
+
+    return Invoice.objects.filter(status=Invoice.Status.DRAFT).count()
+
+
+BADGES = {"signups": _signups, "setup": _setup, "team_inbox": _team_inbox, "booking_emails": _booking_emails,
+          "draft_invoices": _draft_invoices}
 
 BADGE_LINKS = {
     "signups": "status__exact=new",
     "setup": "status__in=intake,listing",
     "team_inbox": "cottage__isnull=True&archived__exact=0",
+    "booking_emails": "status__in=review,conflict",
+    "draft_invoices": "status__exact=draft",
 }
 
 

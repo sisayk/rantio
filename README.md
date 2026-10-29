@@ -116,17 +116,17 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 | --- | --- |
 | `DJANGO_DEBUG` | `false` |
 | `DJANGO_SECRET_KEY` | a long random string |
-| `DJANGO_ALLOWED_HOSTS` | `api.stugora.fi` |
+| `DJANGO_ALLOWED_HOSTS` | `stugora.fi,www.stugora.fi` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` (the dashboard posts through the site) |
 | `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
 | `ANTHROPIC_API_KEY` | key for AI reply suggestions (optional; the button says it's off without it) |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` (default) |
 | `SITE_URL` | `https://stugora.fi` (links in emails) |
-| `ADMIN_URL` | `https://api.stugora.fi/admin` |
+| `ADMIN_URL` | `https://stugora.fi/admin` |
 | `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
 | `SIGNUP_NOTIFY_EMAILS` | `sisay@…,juha@…` |
 | `EMAIL_BACKEND` | your transactional email backend |
-| `NEXT_PUBLIC_API_URL` (frontend) | `https://api.stugora.fi` |
+| `NEXT_PUBLIC_API_URL` (frontend) | `https://stugora.fi` |
 | `NEXT_PUBLIC_SITE_URL` (frontend) | `https://stugora.fi` (canonical URLs, hreflang, sitemaps) |
 | Owner dashboard (sign in as demo@stugora.fi; the code shows on the page) | http://localhost:3100/fi/hosting, /en/hosting … |
 

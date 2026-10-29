@@ -13,6 +13,8 @@ export const is: Translation = {
     footer: {
       note: "Stugora er aukanafn Elda-Auto Tmi.",
       contact: "Hafa samband",
+      privacy: "Persónuvernd",
+      terms: "Skilmálar",
     },
     apps: {
       title: "Sæktu Stugora-appið",
@@ -486,6 +488,7 @@ export const is: Translation = {
       message: "Eitthvað fleira sem þú vilt segja okkur?",
       optional: "valfrjálst",
       consent: "Stugora má geyma þessar upplýsingar og hafa samband við mig.",
+      privacyLink: "Lestu persónuverndarstefnuna okkar",
       submit: "Skráðu bústaðinn þinn",
       sending: "Sendi…",
       successTitle: "Takk fyrir!",

@@ -1,0 +1,25 @@
+# Next.js site (next start) on 127.0.0.1:3000; nginx sends everything except /api/, /admin/,
+# /media/ and /static/ here. The keep-alive timeout is longer than nginx's so a reused
+# connection is never closed under it (which would show as a random 502). Built with `npm run build` by setup-server.sh / deploy.sh.
+[Unit]
+Description=Stugora Next.js site
+After=network.target stugora-django.service
+
+[Service]
+Type=simple
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/frontend
+EnvironmentFile=/srv/stugora/.env
+Environment=NODE_ENV=production
+Environment=NEXT_TELEMETRY_DISABLED=1
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000 --keepAliveTimeout 65000
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
