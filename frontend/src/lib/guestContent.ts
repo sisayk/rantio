@@ -13,7 +13,7 @@ const fi = {
   langOther: { label: "English", href: "/en" },
   becomeHost: { label: "Ilmoita mökkisi", href: "/omistajille" },
   saved: "Tallennetut",
-  menu: { label: "Valikko", owners: "Mökin omistajille", saved: "Tallennetut mökit", all: "Kaikki mökit" },
+  menu: { label: "Valikko", owners: "Mökin omistajille", login: "Omistajan kirjautuminen", loginHref: "/hallinta/kirjaudu", saved: "Tallennetut mökit", all: "Kaikki mökit" },
   hero: {
     title: "Löydä Pohjolan kauneimmat mökit",
     lead: "Järviä, vuonoja, metsiä ja rannikoita Islannista Liettuaan.",
@@ -163,7 +163,7 @@ const en: GuestContent = {
   langOther: { label: "Suomi", href: "/" },
   becomeHost: { label: "Become a host", href: "/en/hosts" },
   saved: "Saved",
-  menu: { label: "Menu", owners: "For cottage owners", saved: "Saved cottages", all: "All cottages" },
+  menu: { label: "Menu", owners: "For cottage owners", login: "Owner sign-in", loginHref: "/en/hosting/login", saved: "Saved cottages", all: "All cottages" },
   hero: {
     title: "Discover the North's most beautiful cottages",
     lead: "Lakes, fjords, forests and coasts from Iceland to Lithuania.",

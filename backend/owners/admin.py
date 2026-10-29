@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Booking, Cottage, Owner, OwnerSignup
+from .models import Booking, Cottage, LoginCode, Owner, OwnerSignup
 
 
 @admin.register(OwnerSignup)
@@ -40,3 +40,14 @@ class BookingAdmin(admin.ModelAdmin):
     list_filter = ["channel", "cancelled"]
     date_hierarchy = "check_in"
     search_fields = ["cottage__name", "external_id"]
+
+
+@admin.register(LoginCode)
+class LoginCodeAdmin(admin.ModelAdmin):
+    """Read-only: who asked for a sign-in code, and whether it was used."""
+
+    list_display = ["owner", "created_at", "expires_at", "attempts", "used_at"]
+    readonly_fields = ["owner", "code_hash", "created_at", "expires_at", "attempts", "used_at"]
+
+    def has_add_permission(self, request):
+        return False

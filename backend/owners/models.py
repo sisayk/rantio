@@ -202,11 +202,16 @@ class Booking(models.Model):
         AIRBNB = "airbnb", "Airbnb"
         BOOKING = "booking", "Booking.com"
         VRBO = "vrbo", "Vrbo"
+        EXPEDIA = "expedia", "Expedia"
         GOOGLE = "google", "Google Vacation Rentals"
+        HOLIDU = "holidu", "Holidu"
+        HOMETOGO = "hometogo", "HomeToGo"
         DIRECT = "direct", "Stugora direct"
         NETTIMOKKI = "nettimokki", "Nettimökki"
+        OWNER = "owner", "Owner's own booking"
 
-    UNCHARGED_CHANNELS = {Channel.NETTIMOKKI}
+    # Sites the owner already used before Stugora: we sync their calendar but never charge.
+    UNCHARGED_CHANNELS = {Channel.NETTIMOKKI, Channel.OWNER}
 
     cottage = models.ForeignKey(Cottage, on_delete=models.PROTECT, related_name="bookings")
     channel = models.CharField(max_length=12, choices=Channel.choices)
@@ -259,3 +264,24 @@ class Booking(models.Model):
     @property
     def commission_total(self) -> Decimal:
         return self.commission + self.commission_vat
+
+
+class LoginCode(models.Model):
+    """A six-digit code emailed to an owner; signing in needs no password."""
+
+    LIFETIME_MINUTES = 15
+    MAX_ATTEMPTS = 5
+
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name="login_codes")
+    code_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["owner", "-created_at"])]
+
+    def __str__(self) -> str:
+        return f"Login code for {self.owner} at {self.created_at:%Y-%m-%d %H:%M}"

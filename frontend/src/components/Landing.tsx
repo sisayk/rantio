@@ -48,6 +48,9 @@ export default function Landing({ lang }: { lang: Lang }) {
             <a className={styles.langLink} href={t.nav.otherHref} hrefLang={lang === "fi" ? "en" : "fi"}>
               {t.nav.otherLang}
             </a>
+            <a className={styles.langLink} href={t.nav.loginHref}>
+              {t.nav.login}
+            </a>
             <a className={styles.headerCta} href="#ilmoita">
               {t.nav.cta}
             </a>

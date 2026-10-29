@@ -33,6 +33,8 @@ fi
 .venv/bin/pip install -q --upgrade pip
 .venv/bin/pip install -q -r requirements.txt
 .venv/bin/python manage.py migrate -v0
+# A demo owner to try the owner dashboard with (only on a fresh database).
+.venv/bin/python manage.py seed_demo --only-if-empty
 cd ..
 
 echo "Setting up the frontend…"
@@ -52,6 +54,7 @@ echo
 echo "Stugora is running:"
 echo "  Guest site:   http://localhost:3100"
 echo "  Owner page:   http://localhost:3100/omistajille"
+echo "  Dashboard:    http://localhost:3100/hallinta  (sign in as demo@stugora.fi; the code shows on the page)"
 echo "  Admin:        http://localhost:8100/admin  (create a login: backend/.venv/bin/python backend/manage.py createsuperuser)"
 echo "Press Ctrl+C to stop."
 if [ "$(uname)" = "Darwin" ]; then open http://localhost:3100 || true; fi

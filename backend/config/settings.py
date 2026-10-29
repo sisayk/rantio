@@ -26,7 +26,9 @@ if not DEBUG and SECRET_KEY.startswith("dev-only"):
     raise RuntimeError("Set DJANGO_SECRET_KEY in production.")
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+# The owner dashboard reaches the API through the Next.js site's /api proxy, so the
+# browser's Origin is the site, not the API.
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost:3100")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -107,8 +109,16 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "signup": os.environ.get("SIGNUP_THROTTLE_RATE", "10/hour"),
+        "login": os.environ.get("LOGIN_THROTTLE_RATE", "20/hour"),
+        "login-verify": os.environ.get("LOGIN_VERIFY_THROTTLE_RATE", "30/hour"),
     },
 }
+
+# Owners stay signed in for 30 days on their own device.
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
+SESSION_COOKIE_SAMESITE = "Lax"
+# Local development shows the emailed sign-in code on the login page too.
+DEV_LOGIN_CODES = env_bool("DEV_LOGIN_CODES", DEBUG)
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")

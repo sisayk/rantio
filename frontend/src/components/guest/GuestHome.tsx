@@ -397,6 +397,9 @@ export default function GuestHome({ lang }: { lang: Lang }) {
                   <a role="menuitem" href={t.becomeHost.href}>
                     {t.menu.owners}
                   </a>
+                  <a role="menuitem" href={t.menu.loginHref}>
+                    {t.menu.login}
+                  </a>
                   <button role="menuitem" type="button" onClick={() => { setSavedOnly(true); setMenu(null); resultsRef.current?.scrollIntoView({ behavior: "smooth" }); }}>
                     {t.menu.saved}
                   </button>

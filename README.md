@@ -13,6 +13,12 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
   - `owners` app: `OwnerSignup` (the stugora.fi form), `Owner`, `Cottage` (intake),
     `Booking` (commission and VAT per stay, yearly fee per listing year)
   - `POST /api/signups/` — public, throttled (10/hour per IP), honeypot field, emails the team
+  - owner dashboard API, signed in with a six-digit code emailed to the owner
+    (no passwords; 15 minutes, 5 tries, at most 5 codes an hour):
+    `POST /api/auth/request-code/`, `POST /api/auth/verify-code/`, `POST /api/auth/logout/`,
+    `GET /api/owner/summary/?year=`, `GET /api/owner/bookings/?year=`
+  - `python manage.py seed_demo` — a demo owner (demo@stugora.fi) with three cottages and a
+    year of bookings; `./dev.sh` creates it on a fresh database
   - `/admin/` — work the sign-ups, owners, cottages and bookings
 - `frontend/` — Next.js 16 site for stugora.fi
   - guest homepage at `/` (Finnish) and `/en`: search, categories, filters, saved cottages,
@@ -23,6 +29,10 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     `cd ~/stugora/scripts && npm install && node build-places.js`
   - owner page at `/omistajille` and `/en/hosts`: earnings estimator and sign-up form;
     copy in `src/lib/content.ts`
+  - owner dashboard at `/hallinta` and `/en/hosting` (sign in at `/hallinta/kirjaudu`):
+    stays now and coming up, earnings, Stugora's share, earnings by month, sites, cottages,
+    the year's bookings with CSV download, yearly fees; copy in `src/lib/ownerContent.ts`.
+    The browser reaches Django through the site's own `/api/*` path (`next.config.ts`).
 
 ## Run it locally
 
@@ -40,6 +50,7 @@ packages, which takes a few minutes. It then opens http://localhost:3100.
 | --- | --- |
 | Guest site (Finnish / English) | http://localhost:3100 and /en |
 | Owner sign-up page | http://localhost:3100/omistajille and /en/hosts |
+| Owner dashboard (sign in as demo@stugora.fi; the code shows on the page) | http://localhost:3100/hallinta and /en/hosting |
 | Admin (sign-ups, owners, bookings) | http://localhost:8100/admin |
 
 Ports 3100 and 8100 leave 3000 and 8000 free for Bona. Press Ctrl+C to stop.
@@ -62,12 +73,13 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 | `DJANGO_DEBUG` | `false` |
 | `DJANGO_SECRET_KEY` | a long random string |
 | `DJANGO_ALLOWED_HOSTS` | `api.stugora.fi` |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://api.stugora.fi` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` (the dashboard posts through the site) |
 | `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
 | `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
 | `SIGNUP_NOTIFY_EMAILS` | `sisay@…,juha@…` |
 | `EMAIL_BACKEND` | your transactional email backend |
 | `NEXT_PUBLIC_API_URL` (frontend) | `https://api.stugora.fi` |
+| `API_URL` (frontend, set when building) | `http://127.0.0.1:8000`, where the Next.js server forwards `/api/*` |
 
 ## Before the page goes public
 
