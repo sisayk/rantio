@@ -17,6 +17,11 @@ export const sv: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Pausa bildspelet",
+      play: "Spela bildspelet",
+      slide: "Bild {n} av {total}",
+    },
     currency: {
       button: "Valuta",
       title: "Välj valuta",

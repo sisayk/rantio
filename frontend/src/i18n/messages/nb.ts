@@ -17,6 +17,11 @@ export const nb: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Sett lysbildefremvisningen på pause",
+      play: "Spill av lysbildefremvisningen",
+      slide: "Bilde {n} av {total}",
+    },
     currency: {
       button: "Valuta",
       title: "Velg valuta",

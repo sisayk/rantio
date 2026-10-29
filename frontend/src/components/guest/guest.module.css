@@ -2131,3 +2131,84 @@
   color: var(--g-soft);
   font-size: 14px;
 }
+
+/* ---------- Homepage slides (HeroSlides.tsx) ---------- */
+/* Over the built-in photo once the first slide has loaded, under the header and
+   search; the same white wash as the photo keeps the title readable. */
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.heroMedia[data-shown="true"] { opacity: 1; }
+.heroMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.72) 30%, rgba(255, 255, 255, 0) 58%);
+  pointer-events: none;
+}
+.heroSlide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.heroSlide[data-on="true"] { opacity: 1; }
+.hero > .topbar { position: relative; z-index: 3; }
+.hero > .heroInner { position: relative; z-index: 2; }
+.heroControls {
+  position: absolute;
+  right: 24px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(20, 30, 26, 0.38);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+.heroDot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+.heroDot[aria-current="true"] { width: 22px; background: #fff; }
+.heroDot:focus-visible, .heroPause:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.heroPause {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.heroPause svg { width: 16px; height: 16px; fill: currentColor; }
+@media (max-width: 600px) {
+  .heroMedia::after {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.55) 45%, rgba(255, 255, 255, 0) 70%);
+  }
+  .heroControls { right: 12px; bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .heroMedia, .heroSlide { transition: none; }
+}

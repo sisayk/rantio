@@ -30,6 +30,7 @@ import {
 import { type City, PLACES } from "@/lib/places";
 import ChannelIcons from "./ChannelIcons";
 import type { MapFocus } from "./CottageMap";
+import HeroSlides from "./HeroSlides";
 import FiltersModal, { countFilters, EMPTY_FILTERS, type FilterState } from "./FiltersModal";
 import { DatePanel, GuestPanel, type Guests, PricePanel, type PriceRange, priceLabel } from "./Pickers";
 import {
@@ -534,6 +535,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
   return (
     <div className={styles.page}>
       <section className={styles.hero} style={{ "--hero": `url(${HERO_PHOTO})` } as React.CSSProperties}>
+        <HeroSlides lang={lang} t={t.slides} />
         <header className={styles.topbar}>
           <a className={styles.brand} href={paths.home(lang)}>
             <Logo className={styles.logo} />

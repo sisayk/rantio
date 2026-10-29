@@ -26,6 +26,11 @@ export const en = {
   },
 
   guest: {
+    slides: {
+      pause: "Pause the slideshow",
+      play: "Play the slideshow",
+      slide: "Slide {n} of {total}",
+    },
     currency: {
       button: "Currency",
       title: "Choose a currency",

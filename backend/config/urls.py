@@ -1,10 +1,12 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
 from owners import inbox, portal
-from owners.views import OwnerSignupCreateView, RatesView
+from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Stugora admin"
 admin.site.site_title = "Stugora"
@@ -26,5 +28,10 @@ urlpatterns = [
     path("api/owner/conversations/<int:pk>/draft/", inbox.OwnerDraftView.as_view(), name="owner-draft"),
     path("api/owner/assistant/", inbox.AssistantStatusView.as_view(), name="owner-assistant"),
     path("api/rates/", RatesView.as_view(), name="rates"),
+    path("api/hero/", HeroSlidesView.as_view(), name="hero-slides"),
     path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
 ]
+
+# Uploaded files in development; in production the web server serves /media/.
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

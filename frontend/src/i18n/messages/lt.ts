@@ -17,6 +17,11 @@ export const lt: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Pristabdyti skaidrių peržiūrą",
+      play: "Tęsti skaidrių peržiūrą",
+      slide: "Skaidrė {n} iš {total}",
+    },
     currency: {
       button: "Valiuta",
       title: "Pasirinkite valiutą",

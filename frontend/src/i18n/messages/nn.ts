@@ -17,6 +17,11 @@ export const nn: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Set biletframsyninga på pause",
+      play: "Spel av biletframsyninga",
+      slide: "Bilete {n} av {total}",
+    },
     currency: {
       button: "Valuta",
       title: "Vel valuta",

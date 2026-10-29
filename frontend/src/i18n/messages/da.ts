@@ -17,6 +17,11 @@ export const da: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Sæt diasshowet på pause",
+      play: "Afspil diasshowet",
+      slide: "Billede {n} af {total}",
+    },
     currency: {
       button: "Valuta",
       title: "Vælg valuta",

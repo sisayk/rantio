@@ -24,6 +24,9 @@ GROUPS = [
     ("Guests", [
         ("Conversations", "forum", ("owners", "conversation", ""), "team_inbox"),
     ]),
+    ("Website", [
+        ("Homepage slides", "slideshow", ("owners", "heroslide", ""), None),
+    ]),
     ("Money", [
         ("Exchange rates", "currency_exchange", ("owners", "exchangerate", ""), None),
     ]),

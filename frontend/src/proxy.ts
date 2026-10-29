@@ -25,5 +25,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Not for Next.js internals, the API, sitemaps, robots.txt or files such as favicon.ico.
-  matcher: ["/((?!_next|api|sitemap|robots\\.txt|.*\\..*).*)"],
+  matcher: ["/((?!_next|api|media|sitemap|robots\\.txt|.*\\..*).*)"],
 };

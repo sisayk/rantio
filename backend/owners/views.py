@@ -55,3 +55,32 @@ class RatesView(views.APIView):
                         "rates": {code: float(v) for code, v in per_eur.items()}})
         res["Cache-Control"] = "public, max-age=3600"
         return res
+
+
+class HeroSlidesView(views.APIView):
+    """The homepage slides, in order. An empty list means the site's built-in photo."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        from .models import HeroSlide
+
+        slides = []
+        for s in HeroSlide.objects.filter(active=True):
+            if s.kind == HeroSlide.Kind.VIDEO and not s.video:
+                continue
+            if s.kind == HeroSlide.Kind.IMAGE and not s.image:
+                continue
+            slides.append({
+                "id": s.pk,
+                "kind": s.kind,
+                "src": s.video.url if s.kind == HeroSlide.Kind.VIDEO else s.image.url,
+                "poster": s.image.url if s.kind == HeroSlide.Kind.VIDEO and s.image else None,
+                "alt": s.alt,
+                "focus": s.focus,
+                "seconds": float(s.video_seconds) if s.kind == HeroSlide.Kind.VIDEO and s.video_seconds else s.seconds,
+            })
+        res = Response({"slides": slides})
+        res["Cache-Control"] = "public, max-age=60"
+        return res

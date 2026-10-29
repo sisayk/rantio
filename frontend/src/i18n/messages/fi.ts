@@ -17,6 +17,11 @@ export const fi: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Pysäytä diaesitys",
+      play: "Jatka diaesitystä",
+      slide: "Dia {n}/{total}",
+    },
     currency: {
       button: "Valuutta",
       title: "Valitse valuutta",

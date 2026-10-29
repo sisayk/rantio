@@ -17,6 +17,11 @@ export const et: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Peata slaidiseanss",
+      play: "Jätka slaidiseanssi",
+      slide: "Slaid {n}/{total}",
+    },
     currency: {
       button: "Valuuta",
       title: "Vali valuuta",

@@ -395,3 +395,53 @@ class ExchangeRate(models.Model):
 
     def __str__(self) -> str:
         return f"1 EUR = {self.per_eur} {self.currency} ({self.rate_date})"
+
+
+class HeroSlide(models.Model):
+    """A photo or a short video at the top of the stugora.fi homepage, in the order set in the admin."""
+
+    class Kind(models.TextChoices):
+        IMAGE = "image", "Photo"
+        VIDEO = "video", "Video"
+
+    class Focus(models.TextChoices):
+        CENTER = "center", "Centre"
+        LEFT = "left center", "Left"
+        RIGHT = "right center", "Right"
+        TOP = "center top", "Top"
+        BOTTOM = "center bottom", "Bottom"
+
+    title = models.CharField(max_length=120, help_text="For you in the admin, e.g. 'Saimaa at sunset'.")
+    kind = models.CharField(max_length=5, choices=Kind.choices, default=Kind.IMAGE)
+    image = models.FileField(
+        upload_to="hero/", blank=True,
+        help_text="JPG, PNG or WebP, up to 8 MB. Best 2400 × 1200 px or larger, landscape. "
+                  "For a video this is the still shown before it plays and on phones saving data.",
+    )
+    video = models.FileField(
+        upload_to="hero/", blank=True,
+        help_text="MP4 (H.264), up to 20 seconds and 40 MB. Plays without sound, so it needs none.",
+    )
+    alt = models.CharField(
+        "Description", max_length=200, blank=True,
+        help_text="What the picture shows, for people using screen readers, e.g. 'Red cottages by a calm lake'.",
+    )
+    focus = models.CharField(
+        max_length=16, choices=Focus.choices, default=Focus.CENTER,
+        help_text="Which part stays in view when the screen crops the picture (phones crop the sides).",
+    )
+    seconds = models.PositiveSmallIntegerField(
+        default=7, validators=[MinValueValidator(3)],
+        help_text="How long a photo stays before the next slide. A video plays to its end.",
+    )
+    video_seconds = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, editable=False)
+    active = models.BooleanField(default=True, help_text="Shown on the homepage.")
+    order = models.PositiveIntegerField(default=0, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "homepage slide"
+
+    def __str__(self) -> str:
+        return self.title

@@ -17,6 +17,11 @@ export const is: Translation = {
   },
 
   guest: {
+    slides: {
+      pause: "Gera hlé á myndasýningu",
+      play: "Spila myndasýningu",
+      slide: "Mynd {n} af {total}",
+    },
     currency: {
       button: "Gjaldmiðill",
       title: "Veldu gjaldmiðil",

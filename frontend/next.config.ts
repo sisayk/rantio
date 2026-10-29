@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
       // Keep the trailing slash Django expects (Next drops it from :path* otherwise).
       { source: "/api/:path*/", destination: `${API_URL}/api/:path*/` },
       { source: "/api/:path*", destination: `${API_URL}/api/:path*` },
+      // Uploads (homepage slides) come from Django in development; in production
+      // the web server serves them before this rule is reached.
+      { source: "/media/:path*", destination: `${API_URL}/media/:path*` },
     ];
   },
   // Finnish pages used to live at the root; keep old links and bookmarks working.
