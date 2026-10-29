@@ -17,6 +17,13 @@ export const et: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valuuta",
+      title: "Vali valuuta",
+      note: "Maja omast erinevas valuutas hinnad on arvutatud päeva kursiga ja ümardatud. Maksad broneerimissaidil, mis kasutab oma kurssi.",
+      about: "umbes {price}",
+      original: "Maja enda hind: {price}",
+    },
     contact: {
       button: "Kirjuta omanikule",
       title: "Küsi omanikult",
@@ -190,7 +197,7 @@ export const et: Translation = {
       map: "Puhkemaja ja selle ümbruse kaart",
       cottage: "Puhkemaja",
     },
-    examples: "Näidismajutused. Hinnad eurodes. Fotod: Unsplash.",
+    examples: "Näidismajutused. Fotod: Unsplash.",
     hostBand: {
       title: "Kas sul on puhkemaja?",
       body: "Paneme selle üles Airbnb-sse, Booking.com-i ja Vrbo-sse ning hoiame kõik kalendrid kooskõlas kohalike saitidega, mida juba kasutad – kõikjal Põhjamaades ja Baltikumis.",

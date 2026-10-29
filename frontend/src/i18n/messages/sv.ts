@@ -17,6 +17,13 @@ export const sv: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valuta",
+      title: "Välj valuta",
+      note: "Priser i en annan valuta än stugans egen är omräknade efter dagens kurs och avrundade. Du betalar på bokningssajten, som använder sin egen kurs.",
+      about: "ca {price}",
+      original: "Stugans eget pris: {price}",
+    },
     contact: {
       button: "Skicka meddelande till ägaren",
       title: "Fråga ägaren",
@@ -190,7 +197,7 @@ export const sv: Translation = {
       map: "Karta över stugan och omgivningen",
       cottage: "Stuga",
     },
-    examples: "Exempelboenden. Priser i euro. Bilder: Unsplash.",
+    examples: "Exempelboenden. Bilder: Unsplash.",
     hostBand: {
       title: "Äger du en stuga?",
       body: "Vi lägger ut den på Airbnb, Booking.com och Vrbo och håller alla kalendrar i takt med de lokala sajter du redan använder, var som helst i Norden och Baltikum.",

@@ -130,3 +130,23 @@ export function languageNamesIn(inLang: Lang): Record<Lang, { local: string; eng
     LANGS.map((code) => [code, { local: languageName(inLang, code), english: languageName("en", code) }]),
   ) as Record<Lang, { local: string; english: string }>;
 }
+
+const currencyDisplay = new Map<Lang, Intl.DisplayNames>();
+
+/** Currency names in the language ("Swedish krona", "ruotsin kruunu"); call on the server
+ *  and pass the result to client components, like countryName. */
+export function currencyName(lang: Lang, code: string): string {
+  let names = currencyDisplay.get(lang);
+  if (!names) {
+    names = new Intl.DisplayNames([LANG_INFO[lang].intl], { type: "currency" });
+    currencyDisplay.set(lang, names);
+  }
+  const name = names.of(code) ?? code;
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+/** The site's currencies by name in the language, for the currency picker. */
+export function currencyNames(lang: Lang): Record<"EUR" | "SEK" | "NOK" | "DKK" | "ISK", string> {
+  const codes = ["EUR", "SEK", "NOK", "DKK", "ISK"] as const;
+  return Object.fromEntries(codes.map((c) => [c, currencyName(lang, c)])) as Record<(typeof codes)[number], string>;
+}

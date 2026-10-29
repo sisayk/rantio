@@ -17,6 +17,13 @@ export const lt: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valiuta",
+      title: "Pasirinkite valiutą",
+      note: "Kainos kita nei namelio valiuta perskaičiuotos šios dienos kursu ir suapvalintos. Mokate užsakymų svetainėje, kuri taiko savo kursą.",
+      about: "apie {price}",
+      original: "Namelio kaina: {price}",
+    },
     contact: {
       button: "Parašyti savininkui",
       title: "Paklauskite savininko",
@@ -190,7 +197,7 @@ export const lt: Translation = {
       map: "Namelio ir jo apylinkių žemėlapis",
       cottage: "Namelis",
     },
-    examples: "Nakvynių pavyzdžiai. Kainos eurais. Nuotraukos: Unsplash.",
+    examples: "Nakvynių pavyzdžiai. Nuotraukos: Unsplash.",
     hostBand: {
       title: "Turite poilsio namelį?",
       body: "Paskelbsime jį Airbnb, Booking.com ir Vrbo bei suderinsime visus kalendorius su vietinėmis svetainėmis, kuriomis jau naudojatės – bet kurioje Šiaurės ar Baltijos šalyje.",

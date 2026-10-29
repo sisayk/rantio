@@ -58,6 +58,12 @@ class Country(models.TextChoices):
     LITHUANIA = "LT", "Lithuania"
 
 
+# The currency each country uses. Cottages are priced, and owners paid, in it;
+# Stugora's own yearly fee is set and invoiced in euros.
+COUNTRY_CURRENCY = {"FI": "EUR", "EE": "EUR", "LV": "EUR", "LT": "EUR", "SE": "SEK", "NO": "NOK", "DK": "DKK", "IS": "ISK"}
+CURRENCIES = ("EUR", "SEK", "NOK", "DKK", "ISK")
+
+
 class Region(models.TextChoices):
     """Finnish regions only; other countries leave region blank."""
 
@@ -164,9 +170,11 @@ class Cottage(models.Model):
     has_sauna = models.BooleanField(default=True)
     has_lake_or_sea_access = models.BooleanField(default=False)
     price_per_night = models.DecimalField(
-        max_digits=8, decimal_places=2, help_text="EUR the owner wants to net per night."
+        max_digits=9, decimal_places=2, help_text="What the owner wants to net per night, in the cottage's currency."
     )
-    cleaning_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal("0.00"))
+    cleaning_fee = models.DecimalField(
+        max_digits=9, decimal_places=2, default=Decimal("0.00"), help_text="In the cottage's currency."
+    )
     min_nights = models.PositiveSmallIntegerField(default=2)
     house_rules = models.TextField(blank=True)
     amenities = models.JSONField(
@@ -191,6 +199,11 @@ class Cottage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.owner})"
+
+    @property
+    def currency(self) -> str:
+        """Prices and payouts are in the cottage country's currency (Swedish cottages in SEK)."""
+        return COUNTRY_CURRENCY.get(self.country, "EUR")
 
     def listing_year_on(self, day: date) -> int | None:
         """1 for the first 12 months after listing_started_on, 2 for the next, and so on."""
@@ -362,3 +375,18 @@ class Message(models.Model):
 
     def __str__(self) -> str:
         return f"{self.get_sender_display()}: {self.body[:40]}"
+
+
+class ExchangeRate(models.Model):
+    """The European Central Bank's reference rate for the day: units of a currency per 1 EUR."""
+
+    currency = models.CharField(max_length=3, primary_key=True)
+    per_eur = models.DecimalField(max_digits=12, decimal_places=4)
+    rate_date = models.DateField(help_text="The day the ECB published the rate.")
+    fetched_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ["currency"]
+
+    def __str__(self) -> str:
+        return f"1 EUR = {self.per_eur} {self.currency} ({self.rate_date})"

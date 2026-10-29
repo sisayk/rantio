@@ -24,7 +24,8 @@ type Props = {
   names: Record<string, string>;
   label: string;
   placeLabel: (l: Listing) => string;
-  price: (n: number) => string;
+  price: (l: Listing) => string; // "about €130" where converted
+  pinPrice: (l: Listing) => string; // shorter, for the pins: "≈ €130"
   nightLabel: string;
   onHover: (id: string | null) => void;
   onCity: (name: string) => void;
@@ -56,11 +57,13 @@ function pin(text: string, active: boolean) {
 
 export default function CottageMap(props: Props) {
   const { listings, focus, cities, selectedCity, activeId, lang, names } = props;
+  const pinTexts = listings.map((l) => props.pinPrice(l)).join("\n");
   const icons = useMemo(
-    () => new Map(listings.map((l) => [l.id, pin(props.price(l.price), l.id === activeId)])),
-    // icons depend only on the listing, its price text and whether it is active
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [listings, activeId],
+    () => {
+      const texts = pinTexts.split("\n");
+      return new Map(listings.map((l, i) => [l.id, pin(texts[i], l.id === activeId)]));
+    },
+    [listings, activeId, pinTexts],
   );
 
   return (
@@ -118,7 +121,7 @@ export default function CottageMap(props: Props) {
                 <strong>{listingName(names, l)}</strong>
                 <span>{props.placeLabel(l)}</span>
                 <span>
-                  <b>{props.price(l.price)}</b> {props.nightLabel}
+                  <b>{props.price(l)}</b> {props.nightLabel}
                 </span>
               </div>
             </a>

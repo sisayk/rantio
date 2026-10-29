@@ -17,6 +17,13 @@ export const nn: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valuta",
+      title: "Vel valuta",
+      note: "Prisar i ein annan valuta enn hytta sin eigen er rekna om etter dagens kurs og avrunda. Du betaler på bookingnettstaden, som brukar sin eigen kurs.",
+      about: "ca. {price}",
+      original: "Hytta sin eigen pris: {price}",
+    },
     contact: {
       button: "Send melding til eigaren",
       title: "Spør eigaren",
@@ -190,7 +197,7 @@ export const nn: Translation = {
       map: "Kart over hytta og området rundt",
       cottage: "Hytte",
     },
-    examples: "Eksempel på opphald. Prisar i euro. Bilete: Unsplash.",
+    examples: "Eksempel på opphald. Bilete: Unsplash.",
     hostBand: {
       title: "Har du ei hytte?",
       body: "Vi legg hytta di ut på Airbnb, Booking.com og Vrbo og held alle kalendrane i takt med dei lokale sidene du alt brukar, kvar som helst i Norden og Baltikum.",

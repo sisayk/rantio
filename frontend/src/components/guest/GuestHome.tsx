@@ -2,10 +2,13 @@
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { Messages } from "@/i18n";
-import { fill, money as formatMoney, number, plural } from "@/i18n/format";
+import { fill, number, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { type Currency, convert } from "@/lib/currency";
+import { useMoney } from "@/lib/useMoney";
+import CurrencyButton from "../CurrencyButton";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { cityNames, countryNamesAll, regionLabel } from "@/lib/placeNames";
@@ -20,6 +23,7 @@ import {
   HERO_PHOTO,
   LISTINGS,
   type Listing,
+  listingCurrency,
   listingName,
   unsplash,
 } from "@/lib/listings";
@@ -102,7 +106,7 @@ type UrlState = {
   country: Country | "";
   region: string;
   city: string;
-  price: PriceRange;
+  price: PriceRange; // in euros
   sort: Sort;
   view: "list" | "map";
   filters: FilterState;
@@ -117,6 +121,11 @@ const parseDay = (s: string | null) => {
   if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return undefined;
   const [y, m, d] = s.split("-").map(Number);
   return new Date(y, m - 1, d);
+};
+
+const eurAmount = (v: string | null) => {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
 };
 
 function readUrl(search: string): Partial<UrlState> {
@@ -139,8 +148,9 @@ function readUrl(search: string): Partial<UrlState> {
     country: (COUNTRIES as readonly string[]).includes(country) ? (country as Country) : "",
     region: q.get("region") ?? "",
     city: q.get("city") ?? "",
-    // pmin/pmax; "price" is the old "up to" link and still works as a maximum.
-    price: { min: num("pmin"), max: num("pmax") || num("price") },
+    // pmin/pmax in euros, so a link means the same in every currency; "price" is the old
+    // "up to" link and still works as a maximum.
+    price: { min: eurAmount(q.get("pmin")), max: eurAmount(q.get("pmax")) || num("price") },
     sort: ["recommended", "priceLow", "priceHigh", "guests"].includes(sort) ? (sort as Sort) : "recommended",
     view: q.get("view") === "map" ? "map" : "list",
     filters: {
@@ -244,11 +254,19 @@ type Props = {
    *  own locale data (which can differ) never changes them after the page loads. */
   countries: Record<Country, string>;
   languages: LanguageNames;
+  currencies: Record<Currency, string>;
 };
 
-export default function GuestHome({ lang, t, catalog, names, common, countries, languages }: Props) {
+export default function GuestHome({ lang, t, catalog, names, common, countries, languages, currencies }: Props) {
   const intl = LANG_INFO[lang].intl;
-  const money = useMemo(() => ({ format: (n: number) => formatMoney(lang, n) }), [lang]);
+  const money = useMoney(lang);
+  /** What a cottage costs a night in the visitor's currency, as shown on its card. */
+  const { toViewer, fromEur } = money;
+  const shownPrice = useCallback((l: Listing) => toViewer(l.price, listingCurrency(l)), [toViewer]);
+  const priceText = (l: Listing) => {
+    const p = money.show(l.price, listingCurrency(l));
+    return p.converted ? fill(lang, t.currency.about, { price: p.text }) : p.text;
+  };
   const u = t.units;
   const [langOpen, setLangOpen] = useState(false);
 
@@ -402,13 +420,19 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
     });
   }, [where, names, category, country, region, city, guests, filters, savedOnly, saved]);
 
+  // The price filter is kept in euros and shown in the visitor's currency.
+  const viewerRange = useMemo<PriceRange>(
+    () => ({ min: price.min ? Math.round(fromEur(price.min)) : 0, max: price.max ? Math.round(fromEur(price.max)) : 0 }),
+    [price, fromEur],
+  );
   const results = useMemo(() => {
-    const list = beforePrice.filter((l) => inPriceRange(l.price, price));
-    if (sort === "priceLow") list.sort((a, b) => a.price - b.price);
-    if (sort === "priceHigh") list.sort((a, b) => b.price - a.price);
+    const list = beforePrice.filter((l) => inPriceRange(shownPrice(l), viewerRange));
+    const eur = (l: Listing) => convert(l.price, listingCurrency(l), "EUR", money.rates);
+    if (sort === "priceLow") list.sort((a, b) => eur(a) - eur(b));
+    if (sort === "priceHigh") list.sort((a, b) => eur(b) - eur(a));
     if (sort === "guests") list.sort((a, b) => b.guests - a.guests);
     return list;
-  }, [beforePrice, price, sort]);
+  }, [beforePrice, viewerRange, shownPrice, sort, money.rates]);
 
   const advancedCount = countFilters(filters);
 
@@ -494,7 +518,10 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
             </span>
           </p>
           <p className={styles.cardPrice}>
-            <strong>{money.format(l.price)}</strong> {t.card.night}
+            <strong title={money.show(l.price, listingCurrency(l)).converted ? money.format(l.price, listingCurrency(l)) : undefined}>
+              {priceText(l)}
+            </strong>{" "}
+            {t.card.night}
           </p>
           <ChannelIcons ids={l.channels} label={t.card.bookOn} more={(n) => `+${n}`} />
         </div>
@@ -527,6 +554,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
           </nav>
           <div className={styles.userPill}>
             <LanguageButton lang={lang} t={common.language} names={languages} className={styles.langButton} />
+            <CurrencyButton lang={lang} t={t.currency} names={currencies} className={styles.langButton} />
             <span className={styles.pillDivider} aria-hidden="true" />
             <a className={styles.hostLink} href={paths.hosts(lang)}>
               {t.becomeHost}
@@ -581,6 +609,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                     <span>{t.menu.language}</span>
                     <span className={styles.menuLanguageValue}>{LANG_INFO[lang].native}</span>
                   </button>
+                  <CurrencyButton lang={lang} t={t.currency} names={currencies} row className={styles.menuCurrency} />
                 </div>
               ) : null}
             </div>
@@ -755,7 +784,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 aria-expanded={menu === "price"}
                 onClick={() => setMenu(menu === "price" ? null : "price")}
               >
-                {priceLabel(lang, f, price)}
+                {priceLabel(lang, f, viewerRange, money.currency)}
                 <Chevron className={styles.icon16} />
               </button>
               {menu === "price" ? (
@@ -765,11 +794,14 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                     t={f}
                     clear={t.guestPicker.clear}
                     use={(n) => fill(lang, t.filterPanel.show, { cottages: plural(lang, u.cottages, n) })}
-                    prices={beforePrice.map((l) => l.price)}
-                    value={price}
-                    count={(r) => beforePrice.filter((l) => inPriceRange(l.price, r)).length}
+                    currency={money.currency}
+                    floor={money.fromEur(1000)}
+                    prices={beforePrice.map(shownPrice)}
+                    value={viewerRange}
+                    count={(r) => beforePrice.filter((l) => inPriceRange(shownPrice(l), r)).length}
                     onApply={(r) => {
-                      setPrice(r);
+                      const eur = (n: number) => (n ? Math.round(money.toEur(n, money.currency) * 100) / 100 : 0);
+                      setPrice({ min: eur(r.min), max: eur(r.max) });
                       setMenu(null);
                     }}
                   />
@@ -878,7 +910,11 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 names={names}
                 label={t.view.map}
                 placeLabel={placeLabel}
-                price={(n) => money.format(n)}
+                price={priceText}
+                pinPrice={(l) => {
+                  const p = money.show(l.price, listingCurrency(l));
+                  return p.converted ? `≈${"\u00a0"}${p.text}` : p.text;
+                }}
                 nightLabel={t.card.night}
                 onHover={setActiveId}
                 onCity={(name) => setCity(name === city ? "" : name)}
@@ -886,7 +922,9 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
             </div>
           ) : null}
         </div>
-        <p className={styles.examples}>{t.examples}</p>
+        <p className={styles.examples}>
+          {t.examples} {t.currency.note}
+        </p>
 
         <section className={styles.hostBand}>
           <div>

@@ -1,0 +1,43 @@
+/* A pill that looks like the language button; the native select on top does the choosing. */
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sign {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  font-weight: 800;
+}
+
+.select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px; /* no zoom on iPhone */
+}
+
+.wrap:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.row {
+  width: 100%;
+  gap: 10px;
+}
+
+.rowValue {
+  margin-left: auto;
+  color: var(--g-muted, #6b6b6b);
+  font-weight: 500;
+}

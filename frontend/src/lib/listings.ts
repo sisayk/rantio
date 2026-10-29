@@ -1,5 +1,6 @@
 // Example cottages for the guest homepage until real owners are live.
 import { type ChannelId, CHANNELS_BY_COUNTRY, type FeatureKey } from "./catalog";
+import { COUNTRY_CURRENCY, type Currency } from "./currency";
 // Photos: Unsplash (Unsplash License), served from Unsplash's image CDN.
 
 export const unsplash = (id: string, w: number, h: number, crop = "entropy") =>
@@ -42,7 +43,7 @@ export type Listing = {
   lng: number;
   guests: number;
   bedrooms: number;
-  price: number; // EUR per night
+  price: number; // per night, in the country's currency (listingCurrency)
   badge: Exclude<Category, "all">;
   categories: Exclude<Category, "all">[];
   features: FeatureKey[];
@@ -81,7 +82,7 @@ export const LISTINGS: Listing[] = [
     lng: 13.088,
     guests: 4,
     bedrooms: 2,
-    price: 310,
+    price: 3200,
     badge: "waterfront",
     categories: ["waterfront", "unique", "aurora", "traditional"],
     features: ["instantBook", "sea", "sharedShore", "waterAccess", "boat", "fireplace", "loft", "dryingCabinet", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
@@ -98,7 +99,7 @@ export const LISTINGS: Listing[] = [
     lng: 14.735,
     guests: 5,
     bedrooms: 2,
-    price: 130,
+    price: 1450,
     badge: "traditional",
     categories: ["traditional", "forest", "pets", "family"],
     features: ["freeCancellation", "pets", "fireplace", "loft", "grillHut", "outdoorWc", "indoorWc", "shower", "fridge", "stove", "oven", "cooking", "coffeeMaker"],
@@ -133,7 +134,7 @@ export const LISTINGS: Listing[] = [
     lng: 8.195,
     guests: 6,
     bedrooms: 3,
-    price: 160,
+    price: 1200,
     badge: "family",
     categories: ["family", "waterfront", "pets"],
     features: ["instantBook", "freeCancellation", "sea", "shoreAccess", "pets", "hotTub", "dishwasher", "washingMachine", "highChair", "babyBed", "heatPump", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
@@ -151,7 +152,7 @@ export const LISTINGS: Listing[] = [
     lng: -23.16,
     guests: 4,
     bedrooms: 2,
-    price: 380,
+    price: 52000,
     badge: "unique",
     categories: ["unique", "waterfront", "aurora"],
     features: ["sea", "shoreAccess", "fireplace", "jacuzzi", "dryingCabinet", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
@@ -203,7 +204,7 @@ export const LISTINGS: Listing[] = [
     lng: 6.93,
     guests: 5,
     bedrooms: 2,
-    price: 185,
+    price: 1900,
     badge: "waterfront",
     categories: ["waterfront", "traditional", "family"],
     features: ["freeCancellation", "sea", "privateShore", "jetty", "boat", "canoe", "fireplace", "highChair", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
@@ -237,7 +238,7 @@ export const LISTINGS: Listing[] = [
     lng: 13.05,
     guests: 8,
     bedrooms: 4,
-    price: 520,
+    price: 5750,
     badge: "skiing",
     categories: ["skiing", "family", "sauna", "forest"],
     features: ["instantBook", "freeCancellation", "electricSauna", "nearSki", "fireplace", "dryingCabinet", "washingMachine", "tumbleDryer", "dishwasher", "highChair", "babyBed", "evCharging", "fridge", "freezer", "stove", "oven", "cooking", "coffeeMaker", "microwave", "indoorWc", "shower", "internet", "tv"],
@@ -329,6 +330,9 @@ export const LISTINGS: Listing[] = [
     channels: CHANNELS_BY_COUNTRY.FI,
   },
 ];
+
+/** A cottage is priced in its own country's currency: kronor in Sweden, euros in Finland. */
+export const listingCurrency = (l: { country: Country }): Currency => COUNTRY_CURRENCY[l.country] ?? "EUR";
 
 export const getListing = (id: string) => LISTINGS.find((l) => l.id === id);
 

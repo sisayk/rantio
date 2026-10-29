@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from owners import inbox, portal
-from owners.views import OwnerSignupCreateView
+from owners.views import OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Stugora admin"
 admin.site.site_title = "Stugora"
@@ -23,5 +23,6 @@ urlpatterns = [
     path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),
     path("api/owner/conversations/<int:pk>/draft/", inbox.OwnerDraftView.as_view(), name="owner-draft"),
     path("api/owner/assistant/", inbox.AssistantStatusView.as_view(), name="owner-assistant"),
+    path("api/rates/", RatesView.as_view(), name="rates"),
     path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
 ]

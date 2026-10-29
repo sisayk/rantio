@@ -5,7 +5,8 @@ import { useState } from "react";
 import { type DateRange, DayPicker } from "react-day-picker";
 import { da, enIE, et, fi, is, lt, lv, nb, nn, sv } from "react-day-picker/locale";
 import type { Messages } from "@/i18n";
-import { fill, money, type Plural, plural } from "@/i18n/format";
+import { fill, type Plural, plural } from "@/i18n/format";
+import { type Currency, currencySign, formatPrice } from "@/lib/currency";
 import type { Lang } from "@/i18n/locales";
 import styles from "./guest.module.css";
 
@@ -145,11 +146,18 @@ export function DatePanel({
 
 export type PriceRange = { min: number; max: number }; // 0 = no limit
 
+/** A round number at the slider's top: 1 000 €, 10 000 kr, 150 000 kr. */
+function niceTop(n: number) {
+  const unit = 10 ** Math.max(1, Math.floor(Math.log10(n)) - 1);
+  return Math.ceil(n / unit) * unit;
+}
+
 /**
  * Price per night as a range: a two-handle slider over how the cottages' prices are spread,
  * and boxes for exact amounts. The slider runs on a square-root scale, so the common
  * 80–300 € range gets room while the top still reaches villas at 1 000 €+; typed amounts
- * have no ceiling at all.
+ * have no ceiling at all. Amounts are in the visitor's currency; `floor` is the lowest top
+ * of the scale in it (about 1 000 €).
  */
 export function PricePanel({
   lang,
@@ -160,8 +168,12 @@ export function PricePanel({
   value,
   count,
   onApply,
+  currency,
+  floor,
 }: {
   lang: Lang;
+  currency: Currency;
+  floor: number;
   t: Messages["guest"]["filters"];
   clear: string;
   use: (n: number) => string;
@@ -170,14 +182,16 @@ export function PricePanel({
   count: (r: PriceRange) => number;
   onApply: (r: PriceRange) => void;
 }) {
-  const top = Math.max(1000, Math.ceil(Math.max(0, ...prices) / 100) * 100);
-  const toPrice = (pos: number) => (pos >= 100 ? 0 : Math.round((top * (pos / 100) ** 2) / 10) * 10);
+  const top = niceTop(Math.max(floor, ...prices));
+  const step = 10 ** Math.max(0, Math.floor(Math.log10(top)) - 2); // 10 € steps up to 1 000 €
+  const toPrice = (pos: number) => (pos >= 100 ? 0 : Math.round((top * (pos / 100) ** 2) / step) * step);
   const toPos = (price: number, end: "min" | "max") =>
     price <= 0 ? (end === "min" ? 0 : 100) : Math.min(100, Math.round(100 * Math.sqrt(price / top)));
   const [draft, setDraft] = useState<PriceRange>(value);
   const lo = toPos(draft.min, "min");
   const hi = toPos(draft.max, "max");
-  const eur = (n: number) => money(lang, n);
+  const eur = (n: number) => formatPrice(lang, n, currency);
+  const sign = currencySign(lang, currency);
 
   // A small histogram of where the cottages' prices fall on the slider.
   const BINS = 28;
@@ -236,7 +250,7 @@ export function PricePanel({
               placeholder="0"
               onChange={(e) => setDraft({ ...draft, min: typed(e.target.value) })}
             />
-            €
+            {sign}
           </span>
         </label>
         <span className={styles.priceDash} aria-hidden="true">–</span>
@@ -249,7 +263,7 @@ export function PricePanel({
               placeholder={`${top}+`}
               onChange={(e) => setDraft({ ...draft, max: typed(e.target.value) })}
             />
-            €
+            {sign}
           </span>
         </label>
       </div>
@@ -271,8 +285,8 @@ export function PricePanel({
 }
 
 /** "€100 – €400", "From €400", "Up to €200" or just "Price". */
-export function priceLabel(lang: Lang, t: Messages["guest"]["filters"], r: PriceRange) {
-  const eur = (n: number) => money(lang, n);
+export function priceLabel(lang: Lang, t: Messages["guest"]["filters"], r: PriceRange, currency: Currency = "EUR") {
+  const eur = (n: number) => formatPrice(lang, n, currency);
   if (r.min && r.max) return fill(lang, t.priceRange, { min: eur(r.min), max: eur(r.max) });
   if (r.min) return fill(lang, t.priceFrom, { price: eur(r.min) });
   if (r.max) return fill(lang, t.upTo, { price: eur(r.max) });

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Booking, Conversation, Cottage, LoginCode, Message, Owner, OwnerSignup
+from .models import Booking, Conversation, Cottage, ExchangeRate, LoginCode, Message, Owner, OwnerSignup
 
 
 @admin.register(OwnerSignup)
@@ -69,3 +69,14 @@ class ConversationAdmin(admin.ModelAdmin):
     search_fields = ["guest_name", "guest_email", "listing_slug", "cottage__name"]
     readonly_fields = ["token", "created_at", "last_message_at", "owner_read_at", "guest_read_at"]
     inlines = [MessageInline]
+
+
+@admin.register(ExchangeRate)
+class ExchangeRateAdmin(admin.ModelAdmin):
+    list_display = ("currency", "per_eur", "rate_date", "fetched_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

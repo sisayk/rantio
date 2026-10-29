@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { Messages } from "@/i18n";
-import { money, plural } from "@/i18n/format";
+import { plural } from "@/i18n/format";
+import { type Currency, formatPrice } from "@/lib/currency";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import type { Summary } from "@/lib/ownerApi";
 import styles from "./owner.module.css";
@@ -39,13 +40,15 @@ export default function EarningsChart({
   year,
   lang,
   t,
+  currency,
 }: {
   months: Summary["months"];
   year: number;
   lang: Lang;
   t: Messages["dashboard"];
+  currency: Currency;
 }) {
-  const eur = (v: number) => money(lang, v);
+  const eur = (v: number) => formatPrice(lang, v, currency);
   const [hover, setHover] = useState<number | null>(null);
   const rows = months.map((m) => ({ ...m, stugora: Number(m.stugora), own: Number(m.own) }));
   const top = niceMax(Math.max(...rows.map((r) => r.stugora + r.own)));

@@ -20,6 +20,8 @@ from django.utils import timezone
 from owners.models import Booking, Conversation, Cottage, Country, Message, Owner, Region
 
 DEMO_EMAIL = "demo@stugora.fi"
+# A Swedish owner, to see the dashboard in kronor.
+DEMO_SE_EMAIL = "demo-se@stugora.fi"
 
 COTTAGES = [
     # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up), stugora.fi page
@@ -42,6 +44,11 @@ HOUSE_RULES = {
 CHANNELS = [
     (Booking.Channel.AIRBNB, 34), (Booking.Channel.BOOKING, 24), (Booking.Channel.NETTIMOKKI, 22),
     (Booking.Channel.VRBO, 10), (Booking.Channel.EXPEDIA, 5), (Booking.Channel.HOLIDU, 3), (Booking.Channel.OWNER, 2),
+]
+# No Nettimökki in Sweden.
+CHANNELS_SE = [
+    (Booking.Channel.AIRBNB, 38), (Booking.Channel.BOOKING, 34), (Booking.Channel.VRBO, 10),
+    (Booking.Channel.EXPEDIA, 6), (Booking.Channel.HOMETOGO, 6), (Booking.Channel.OWNER, 6),
 ]
 # Summer and the Christmas-to-March season fill up; November is quiet.
 BUSY = {1: 0.5, 2: 0.6, 3: 0.55, 4: 0.3, 5: 0.35, 6: 0.75, 7: 0.9, 8: 0.7, 9: 0.4, 10: 0.3, 11: 0.15, 12: 0.55}
@@ -68,10 +75,10 @@ class Command(BaseCommand):
         if existing and not reset:
             self.stdout.write(f"Demo owner already exists: {DEMO_EMAIL} (use --reset to recreate)")
             return
-        if existing:
-            Booking.objects.filter(cottage__owner=existing).delete()
-            user = existing.user
-            existing.delete()
+        for old in Owner.objects.filter(email__in=[DEMO_EMAIL, DEMO_SE_EMAIL]):
+            Booking.objects.filter(cottage__owner=old).delete()
+            user = old.user
+            old.delete()
             if user:
                 user.delete()
 
@@ -94,6 +101,19 @@ class Command(BaseCommand):
                 count += self.book(cottage, guests, price, today, rng)
         talks = self.talk(owner, timezone.now())
         self.stdout.write(self.style.SUCCESS(f"Demo owner {DEMO_EMAIL} with {count} bookings and {talks} conversations."))
+
+        erik = Owner.objects.create(
+            name="Erik Demo", email=DEMO_SE_EMAIL, language="sv", is_pilot=False, agreement_signed_on=months_ago(today, 7)
+        )
+        stuga = Cottage.objects.create(
+            owner=erik, name="Röda stugan", municipality="Växjö", country=Country.SWEDEN, max_guests=4, bedrooms=2,
+            beds=4, price_per_night=Decimal(1450), status=Cottage.Status.LIVE, listing_started_on=months_ago(today, 7),
+            listing_slug="red-stuga", amenities=["lake", "woodSauna", "boat", "grillHut", "internet"],
+            house_rules="Incheckning från 15:00, utcheckning senast 11:00. Ingen rökning inomhus.",
+            has_lake_or_sea_access=True,
+        )
+        n = self.book(stuga, 4, 1450, today, rng, CHANNELS_SE)
+        self.stdout.write(self.style.SUCCESS(f"Swedish demo owner {DEMO_SE_EMAIL} with {n} bookings (in kronor)."))
 
     def talk(self, owner: Owner, now) -> int:
         """A few guest conversations: one from each kind of place guests write from."""
@@ -133,10 +153,10 @@ class Command(BaseCommand):
                 Message.objects.create(conversation=c, sender=sender, body=text, created_at=h(hours))
         return len(threads)
 
-    def book(self, cottage: Cottage, max_guests: int, price: int, today: date, rng: random.Random) -> int:
+    def book(self, cottage: Cottage, max_guests: int, price: int, today: date, rng: random.Random, sites=CHANNELS) -> int:
         """Back-to-back stays from the listing start to three months ahead, plus one stay right now."""
         day, end, n = cottage.listing_started_on, today + timedelta(days=90), 0
-        channels, weights = zip(*CHANNELS)
+        channels, weights = zip(*sites)
         stays = []
         while day < end:
             if rng.random() < BUSY[day.month]:

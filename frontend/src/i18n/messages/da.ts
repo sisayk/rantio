@@ -17,6 +17,13 @@ export const da: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valuta",
+      title: "Vælg valuta",
+      note: "Priser i en anden valuta end sommerhusets egen er omregnet efter dagens kurs og afrundet. Du betaler på bookingsiden, som bruger sin egen kurs.",
+      about: "ca. {price}",
+      original: "Sommerhusets egen pris: {price}",
+    },
     contact: {
       button: "Send besked til ejeren",
       title: "Spørg ejeren",
@@ -190,7 +197,7 @@ export const da: Translation = {
       map: "Kort over sommerhuset og omgivelserne",
       cottage: "Sommerhus",
     },
-    examples: "Eksempler på ophold. Priser i euro. Billeder: Unsplash.",
+    examples: "Eksempler på ophold. Billeder: Unsplash.",
     hostBand: {
       title: "Har du et sommerhus?",
       body: "Vi lægger det på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sider, du allerede bruger – overalt i Norden og Baltikum.",

@@ -2,7 +2,8 @@ import logging
 
 from django.conf import settings
 from django.core.mail import send_mail
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, views
+from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
 from .models import OwnerSignup
@@ -38,3 +39,19 @@ class OwnerSignupCreateView(generics.CreateAPIView):
                 )
             except Exception:  # a mail outage must not lose the sign-up
                 logger.exception("Could not send sign-up notification for %s", signup.pk)
+
+
+class RatesView(views.APIView):
+    """Today's exchange rates for showing guests prices in their own currency."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        from . import rates
+
+        per_eur, day = rates.current()
+        res = Response({"base": "EUR", "date": day, "source": "European Central Bank",
+                        "rates": {code: float(v) for code, v in per_eur.items()}})
+        res["Cache-Control"] = "public, max-age=3600"
+        return res

@@ -17,6 +17,13 @@ export const lv: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valūta",
+      title: "Izvēlieties valūtu",
+      note: "Cenas, kas nav mājas valūtā, ir pārrēķinātas pēc dienas kursa un noapaļotas. Jūs maksājat rezervēšanas vietnē, kas izmanto savu kursu.",
+      about: "aptuveni {price}",
+      original: "Mājas cena: {price}",
+    },
     contact: {
       button: "Rakstīt īpašniekam",
       title: "Jautājiet īpašniekam",
@@ -190,7 +197,7 @@ export const lv: Translation = {
       map: "Brīvdienu mājas un apkārtnes karte",
       cottage: "Brīvdienu māja",
     },
-    examples: "Naktsmītņu piemēri. Cenas eiro. Fotoattēli: Unsplash.",
+    examples: "Naktsmītņu piemēri. Fotoattēli: Unsplash.",
     hostBand: {
       title: "Jums pieder brīvdienu māja?",
       body: "Mēs to ievietojam Airbnb, Booking.com un Vrbo un saskaņojam visus kalendārus ar vietējām vietnēm, kuras jau izmantojat, jebkur Ziemeļvalstīs un Baltijā.",

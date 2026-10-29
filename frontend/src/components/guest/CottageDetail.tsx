@@ -1,15 +1,17 @@
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 import { getMessages } from "@/i18n";
-import { countryName, languageNamesIn, money, number, plural } from "@/i18n/format";
+import { countryName, currencyNames, languageNamesIn, number, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
 import { CONTACT_EMAIL } from "@/lib/content";
-import { type Listing, listingName, unsplash } from "@/lib/listings";
+import { type Listing, listingCurrency, listingName, unsplash } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
+import CurrencyButton from "../CurrencyButton";
 import LanguageButton from "../LanguagePicker";
+import ListingPrice from "./ListingPrice";
 import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
@@ -41,6 +43,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
         </a>
         <div className={styles.detailTopLinks}>
           <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langButton} />
+          <CurrencyButton lang={lang} t={t.currency} names={currencyNames(lang)} className={styles.langButton} />
           <a className={styles.hostLink} href={paths.hosts(lang)}>
             {t.becomeHost}
           </a>
@@ -148,9 +151,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
           </div>
 
           <aside className={styles.bookCard}>
-            <p className={styles.bookPrice}>
-              <strong>{money(lang, l.price)}</strong> {t.card.night}
-            </p>
+            <ListingPrice lang={lang} amount={l.price} currency={listingCurrency(l)} night={t.card.night} t={t.currency} />
             <ul className={styles.bookFlags}>
               {(["instantBook", "freeCancellation"] as const)
                 .filter((k) => (l.features as string[]).includes(k))

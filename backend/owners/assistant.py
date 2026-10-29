@@ -51,7 +51,7 @@ def _facts(c: Conversation, today) -> str:
             f"Cottage: {cottage.name}, {cottage.municipality or ''} ({cottage.get_country_display()})".replace(" ,", ","),
             f"Sleeps up to {cottage.max_guests} guests; {cottage.bedrooms} bedrooms, {cottage.beds} beds",
             f"Sauna: {'yes' if cottage.has_sauna else 'no'}; own lake or sea shore: {'yes' if cottage.has_lake_or_sea_access else 'no'}",
-            f"Price the owner nets per night: {cottage.price_per_night} EUR; cleaning fee {cottage.cleaning_fee} EUR; minimum stay {cottage.min_nights} nights",
+            f"Price the owner nets per night: {cottage.price_per_night} {cottage.currency}; cleaning fee {cottage.cleaning_fee} {cottage.currency}; minimum stay {cottage.min_nights} nights",
         ]
         if cottage.amenities:
             # Feature keys read well enough as words: "privateShore" -> "private shore".

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Messages } from "@/i18n";
-import { fill, money, number, plural } from "@/i18n/format";
+import { fill, number, plural } from "@/i18n/format";
+import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { type BookingRow, ownerApi, SignedOut, type Summary } from "@/lib/ownerApi";
@@ -33,23 +34,26 @@ export default function OwnerDashboard({
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [attempt, setAttempt] = useState(0);
   const [allRows, setAllRows] = useState(false);
+  // Figures come in the owner's currency (a Swedish owner's in kronor); each stay in its cottage's.
+  const currency: Currency = load.state === "ready" && isCurrency(load.summary.currency) ? load.summary.currency : "EUR";
+  const cur = (b: BookingRow): Currency => (isCurrency(b.currency) ? b.currency : currency);
 
   // The dashboard renders only in the browser, after the figures load, so Intl dates are safe here;
-  // numbers and euros use the site's own formatting (src/i18n/format.ts).
+  // numbers and money use the site's own formatting (src/i18n/format.ts, src/lib/currency.ts).
   const fmt = useMemo(() => {
     const intl = LANG_INFO[lang].intl;
     const day = new Intl.DateTimeFormat(intl, { day: "numeric", month: "short" });
     const full = new Intl.DateTimeFormat(intl, { day: "numeric", month: lang === "fi" ? "numeric" : "short", year: "numeric" });
-    const cents = (v: number) => number(lang, v, { min: 2, max: 2 });
     return {
-      eur: (v: string | number) => money(lang, Number(v)),
-      eurCents: (v: string | number) => (lang === "en" ? `€${cents(Number(v))}` : `${cents(Number(v))}\u00a0€`),
+      /** Whole amounts in the owner's currency (or the booking's own). */
+      cur: (v: string | number, c: Currency = currency) => formatPrice(lang, Number(v), c),
+      cents: (v: string | number, c: Currency = currency) => formatPrice(lang, Number(v), c, true),
       date: (iso: string) => full.format(parse(iso)),
       range: (a: string, b: string) => `${day.format(parse(a))} – ${day.format(parse(b))}`,
       pct: (v: number) => number(lang, Math.round(v * 100)),
       rate: (r: string) => number(lang, Number(r), { max: 2 }),
     };
-  }, [lang]);
+  }, [lang, currency]);
 
   useEffect(() => {
     let live = true;
@@ -81,10 +85,10 @@ export default function OwnerDashboard({
     const num = (v: string) => (fi ? v.replace(".", ",") : v);
     const st = t.statement;
     const lines = [
-      [st.cottage, "check-in", "check-out", st.site, st.nights, st.guests, st.payout, st.commission, st.vat, st.cancelled],
+      [st.cottage, "check-in", "check-out", st.site, st.nights, st.guests, st.payout, st.commission, st.vat, "currency", st.cancelled],
       ...rows.map((r) => [
         r.cottage, r.check_in, r.check_out, r.channel_label, String(r.nights), String(r.guests),
-        num(r.payout), num(r.commission), num(r.commission_vat), r.cancelled ? "x" : "",
+        num(r.payout), num(r.commission), num(r.commission_vat), r.currency, r.cancelled ? "x" : "",
       ]),
     ];
     const csv = lines.map((l) => l.map((c) => `"${c.replaceAll('"', '""')}"`).join(sep)).join("\r\n");
@@ -176,7 +180,7 @@ export default function OwnerDashboard({
                     </span>
                     <span className={styles.stayFoot}>
                       <SiteIcon channel={b.channel} label={b.channel_label} ownBooking={t.ownBooking} />
-                      <b>{fmt.eur(b.payout)}</b>
+                      <b>{fmt.cur(b.payout, cur(b))}</b>
                     </span>
                   </li>
                 );
@@ -190,8 +194,8 @@ export default function OwnerDashboard({
         <section className={styles.kpis} aria-label={String(s.year)}>
           <div className={styles.kpi}>
             <span>{t.kpi.payout}</span>
-            <strong>{fmt.eur(tt.payout)}</strong>
-            <small>{fill(lang, t.kpi.payoutSub, { stugora: fmt.eur(tt.payout_stugora), own: fmt.eur(tt.payout_own) })}</small>
+            <strong>{fmt.cur(tt.payout)}</strong>
+            <small>{fill(lang, t.kpi.payoutSub, { stugora: fmt.cur(tt.payout_stugora), own: fmt.cur(tt.payout_own) })}</small>
           </div>
           <div className={styles.kpi}>
             <span>{t.kpi.bookings}</span>
@@ -203,12 +207,12 @@ export default function OwnerDashboard({
           </div>
           <div className={styles.kpi}>
             <span>{t.kpi.stugora}</span>
-            <strong>{fmt.eur(tt.stugora_total)}</strong>
+            <strong>{fmt.cur(tt.stugora_total)}</strong>
             <small>{fill(lang, t.kpi.stugoraSub, { rate: fmt.rate(s.owner.commission_rate) })}</small>
           </div>
           <div className={`${styles.kpi} ${styles.kpiNet}`}>
             <span>{t.kpi.net}</span>
-            <strong>{fmt.eur(tt.net)}</strong>
+            <strong>{fmt.cur(tt.net)}</strong>
             <small>{t.kpi.netSub}</small>
           </div>
         </section>
@@ -216,7 +220,7 @@ export default function OwnerDashboard({
         <section aria-labelledby="chart-title" className={`${styles.section} ${styles.card}`}>
           <h2 id="chart-title">{t.chart.title}</h2>
           <p className={styles.lead}>{t.chart.lead}</p>
-          <EarningsChart months={s.months} year={s.year} lang={lang} t={t} />
+          <EarningsChart months={s.months} year={s.year} lang={lang} t={t} currency={currency} />
         </section>
 
         <div className={styles.columns}>
@@ -240,8 +244,8 @@ export default function OwnerDashboard({
                         <th scope="row"><SiteIcon channel={c.channel} label={c.label} ownBooking={t.ownBooking} /></th>
                         <td className={styles.num}>{c.bookings}</td>
                         <td className={styles.num}>{c.nights}</td>
-                        <td className={styles.num}>{fmt.eur(c.payout)}</td>
-                        <td className={styles.num}>{c.charged ? fmt.eur(c.commission) : <span className={styles.free}>{t.sites.free}</span>}</td>
+                        <td className={styles.num}>{fmt.cur(c.payout)}</td>
+                        <td className={styles.num}>{c.charged ? fmt.cur(c.commission) : <span className={styles.free}>{t.sites.free}</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -277,7 +281,7 @@ export default function OwnerDashboard({
                       ) : null}
                       {c.next_fee_on && c.next_fee ? (
                         <span className={styles.muted}>
-                          {fill(lang, t.cottages.nextFee, { date: fmt.date(c.next_fee_on), fee: fmt.eurCents(c.next_fee) })}
+                          {fill(lang, t.cottages.nextFee, { date: fmt.date(c.next_fee_on), fee: fmt.cents(c.next_fee, "EUR") })}
                         </span>
                       ) : null}
                     </>
@@ -325,9 +329,9 @@ export default function OwnerDashboard({
                       <td><SiteIcon channel={b.channel} label={b.channel_label} ownBooking={t.ownBooking} /></td>
                       <td className={styles.num}>{b.nights}</td>
                       <td className={styles.num}>{b.guests}</td>
-                      <td className={styles.num}>{fmt.eurCents(b.payout)}</td>
-                      <td className={styles.num}>{b.charged ? fmt.eurCents(b.commission) : "–"}</td>
-                      <td className={styles.num}>{b.charged ? fmt.eurCents(b.commission_vat) : "–"}</td>
+                      <td className={styles.num}>{fmt.cents(b.payout, cur(b))}</td>
+                      <td className={styles.num}>{b.charged ? fmt.cents(b.commission, cur(b)) : "–"}</td>
+                      <td className={styles.num}>{b.charged ? fmt.cents(b.commission_vat, cur(b)) : "–"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -358,7 +362,10 @@ export default function OwnerDashboard({
                   <span className={styles.num}>
                     {Number(f.fee) === 0
                       ? t.fees.free
-                      : `${fmt.eurCents(f.fee)} ${fill(lang, t.fees.plusVat, { vat: fmt.eurCents(f.vat) })}`}
+                      : `${fmt.cents(f.fee, "EUR")} ${fill(lang, t.fees.plusVat, { vat: fmt.cents(f.vat, "EUR") })}`}
+                    {Number(f.fee) !== 0 && currency !== "EUR" ? (
+                      <small className={styles.muted}> ≈ {fmt.cur(f.fee_local)}</small>
+                    ) : null}
                   </span>
                 </li>
               ))}

@@ -26,6 +26,13 @@ export const en = {
   },
 
   guest: {
+    currency: {
+      button: "Currency",
+      title: "Choose a currency",
+      note: "Prices in another currency than the cottage's own are converted at today's rate and rounded. You pay on the booking site, which uses its own rate.",
+      about: "about {price}",
+      original: "The cottage's own price: {price}",
+    },
     contact: {
       button: "Message the owner",
       title: "Ask the owner",
@@ -199,7 +206,7 @@ export const en = {
       map: "Map of the cottage and its surroundings",
       cottage: "Cottage",
     },
-    examples: "Example stays. Prices in euros. Photos: Unsplash.",
+    examples: "Example stays. Photos: Unsplash.",
     hostBand: {
       title: "Own a cottage?",
       body: "We put it on Airbnb, Booking.com and Vrbo and keep every calendar in step with the local sites you already use, anywhere in the Nordics and the Baltics.",

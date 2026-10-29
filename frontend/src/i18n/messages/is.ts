@@ -17,6 +17,13 @@ export const is: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Gjaldmiðill",
+      title: "Veldu gjaldmiðil",
+      note: "Verð í öðrum gjaldmiðli en bústaðarins er umreiknað á gengi dagsins og námundað. Þú greiðir á bókunarsíðunni, sem notar sitt eigið gengi.",
+      about: "um {price}",
+      original: "Eigið verð bústaðarins: {price}",
+    },
     contact: {
       button: "Senda eiganda skilaboð",
       title: "Spyrðu eigandann",
@@ -190,7 +197,7 @@ export const is: Translation = {
       map: "Kort af bústaðnum og umhverfi hans",
       cottage: "Bústaður",
     },
-    examples: "Dæmi um gistingu. Verð í evrum. Myndir: Unsplash.",
+    examples: "Dæmi um gistingu. Myndir: Unsplash.",
     hostBand: {
       title: "Áttu sumarbústað?",
       body: "Við setjum hann á Airbnb, Booking.com og Vrbo og höldum öllum dagatölum í takt við þær innlendu síður sem þú notar nú þegar, hvar sem er á Norðurlöndum og í Eystrasaltslöndunum.",

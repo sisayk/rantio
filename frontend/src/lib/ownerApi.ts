@@ -13,6 +13,7 @@ export type BookingRow = {
   nights: number;
   guests: number;
   payout: Money;
+  currency: string; // the cottage's: EUR, SEK, NOK, DKK or ISK
   charged: boolean;
   commission: Money;
   commission_vat: Money;
@@ -22,6 +23,10 @@ export type BookingRow = {
 
 export type Summary = {
   owner: { name: string; first_name: string; email: string; language: string; is_pilot: boolean; commission_rate: string };
+  /** The owner's currency; bookings and totals are in it. Stugora's yearly fee is in EUR. */
+  currency: string;
+  fee_currency: "EUR";
+  rate: { per_eur: string; date: string | null } | null;
   year: number;
   years: number[];
   today: string;
@@ -48,6 +53,7 @@ export type Summary = {
     country: string;
     status: "intake" | "listing" | "live" | "paused";
     status_label: string;
+    currency: string;
     price_per_night: Money;
     listing_started_on: string | null;
     listing_year: number | null;
@@ -58,7 +64,7 @@ export type Summary = {
     payout: Money;
     occupancy: number | null;
   }[];
-  fees: { cottage: string; listing_year: number; starts_on: string; fee: Money; vat: Money }[];
+  fees: { cottage: string; listing_year: number; starts_on: string; fee: Money; vat: Money; fee_local: Money }[];
   upcoming: BookingRow[];
   unread_messages: number;
 };

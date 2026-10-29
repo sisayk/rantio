@@ -2113,3 +2113,21 @@
   color: var(--g-soft);
   font-size: 14px;
 }
+
+/* Currency row under the language row in the account menu. */
+.popover > label.menuCurrency {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.popover > label.menuCurrency:hover {
+  background: var(--g-ground);
+}
+
+.bookOriginal {
+  margin: -6px 0 12px;
+  color: var(--g-soft);
+  font-size: 14px;
+}

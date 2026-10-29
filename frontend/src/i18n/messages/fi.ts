@@ -17,6 +17,13 @@ export const fi: Translation = {
   },
 
   guest: {
+    currency: {
+      button: "Valuutta",
+      title: "Valitse valuutta",
+      note: "Muuhun kuin mökin omaan valuuttaan muunnetut hinnat on laskettu päivän kurssilla ja pyöristetty. Maksat varaussivustolla, joka käyttää omaa kurssiaan.",
+      about: "noin {price}",
+      original: "Mökin oma hinta: {price}",
+    },
     contact: {
       button: "Lähetä viesti omistajalle",
       title: "Kysy omistajalta",
@@ -190,7 +197,7 @@ export const fi: Translation = {
       map: "Mökki ja lähialue kartalla",
       cottage: "Mökki",
     },
-    examples: "Esimerkkikohteita. Hinnat euroina. Kuvat: Unsplash.",
+    examples: "Esimerkkikohteita. Kuvat: Unsplash.",
     hostBand: {
       title: "Onko sinulla mökki?",
       body: "Viemme sen Airbnbhin, Booking.comiin ja Vrbo:hon ja pidämme kalenterit samassa tahdissa jo käyttämiesi sivustojen, kuten Nettimökin, kanssa. Pohjoismaissa ja Baltiassa.",
