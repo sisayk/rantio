@@ -18,6 +18,7 @@ urlpatterns = [
     path("api/auth/request-code/", portal.RequestCodeView.as_view(), name="login-request-code"),
     path("api/auth/verify-code/", portal.VerifyCodeView.as_view(), name="login-verify-code"),
     path("api/auth/logout/", portal.LogoutView.as_view(), name="logout"),
+    path("api/owner/device/", portal.DeviceView.as_view(), name="owner-device"),
     path("api/owner/me/", portal.MeView.as_view(), name="owner-me"),
     path("api/owner/summary/", portal.SummaryView.as_view(), name="owner-summary"),
     path("api/owner/bookings/", portal.BookingsView.as_view(), name="owner-bookings"),

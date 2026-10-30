@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 
+from . import app
 from .models import Booking, Conversation, Cottage, Message
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,9 @@ def _notify_owner(c: Conversation, name: str, text: str) -> None:
     if owner:
         _send(OWNER_NEW, owner.language, [owner.email], name=name, cottage=cottage_label(c), text=_excerpt(text),
               link=inbox_link(owner.language, c))
+        subject = (OWNER_NEW.get(owner.language) or OWNER_NEW["en"])[0]
+        app.notify(owner, subject.format(name=name, cottage=cottage_label(c)), _excerpt(text),
+                   {"type": "message", "conversation": c.pk})
     elif settings.SIGNUP_NOTIFY_EMAILS:  # an example cottage with no owner yet: the team answers in the admin
         _send(OWNER_NEW, "en", settings.SIGNUP_NOTIFY_EMAILS, name=name, cottage=cottage_label(c), text=_excerpt(text),
               link=f"{settings.ADMIN_URL}/owners/conversation/{c.pk}/change/")

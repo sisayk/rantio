@@ -133,6 +133,7 @@ CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:3100,h
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
+        "owners.app.AppKeyAuthentication",  # the phone app
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAdminUser",
@@ -147,6 +148,9 @@ REST_FRAMEWORK = {
         "booking-request": os.environ.get("BOOKING_REQUEST_THROTTLE_RATE", "10/hour"),
     },
 }
+
+# Push notifications to owners' phones through Expo (off in tests).
+APP_PUSH = env_bool("APP_PUSH", True)
 
 # Owners stay signed in for 30 days on their own device.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30

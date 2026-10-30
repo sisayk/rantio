@@ -16,7 +16,7 @@ from django.contrib import messages
 
 from . import booking_emails, invoicing, stripe_api
 from .models import (
-    Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
+    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
     Message, Owner, OwnerSignup,
 )
 
@@ -91,6 +91,22 @@ class BookingAdmin(ModelAdmin):
         ("Stay", {"fields": ["cottage", "channel", "external_id", "check_in", "check_out", "guests"], "classes": ["st-grid-2"]}),
         ("Money, in the cottage's currency", {"fields": ["owner_payout", "cancelled"], "classes": ["st-grid-2"]}),
     ]
+
+
+@admin.register(AppDevice)
+class AppDeviceAdmin(ModelAdmin):
+    list_display = ("owner", "name", "platform", "has_push", "last_used_at", "created_at")
+    list_filter = ("platform",)
+    search_fields = ("owner__name", "owner__email", "name")
+    readonly_fields = ("owner", "name", "platform", "push_token", "created_at", "last_used_at")
+    exclude = ("token_hash",)
+
+    @admin.display(boolean=True, description="Notifications")
+    def has_push(self, obj):
+        return bool(obj.push_token)
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(LoginCode)

@@ -12,9 +12,10 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from . import app
 from . import login as owner_login
 from . import messaging
-from .models import Language
+from .models import AppDevice, Language
 from .statements import booking_row, bookings_for, summary
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,10 @@ class EmailSerializer(serializers.Serializer):
 class CodeSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.RegexField(r"^\s*\d{6}\s*$")
+    # The phone app asks for a sign-in key instead of a session cookie.
+    app = serializers.BooleanField(default=False)
+    device = serializers.CharField(max_length=80, required=False, allow_blank=True, default="")
+    platform = serializers.ChoiceField(choices=["ios", "android", ""], required=False, default="")
 
 
 class RequestCodeView(APIView):
@@ -71,6 +76,10 @@ class VerifyCodeView(APIView):
         owner = owner_login.find_owner(data.validated_data["email"])
         if not owner or not owner_login.check_code(owner, data.validated_data["code"]):
             return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
+        owner_login.user_for(owner)
+        if data.validated_data["app"]:
+            key = app.issue_key(owner, name=data.validated_data["device"], platform=data.validated_data["platform"])
+            return Response({"ok": True, "token": key})
         login(request._request, owner_login.user_for(owner), backend="django.contrib.auth.backends.ModelBackend")
         return Response({"ok": True})
 
@@ -85,12 +94,47 @@ class MeView(APIView):
         o = request.user.owner
         return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot})
 
+    def patch(self, request):
+        """The app's language setting also sets the language of the owner's emails."""
+        lang = request.data.get("language")
+        if lang not in Language.values:
+            return Response({"detail": "language"}, status=status.HTTP_400_BAD_REQUEST)
+        o = request.user.owner
+        o.language = lang
+        o.save(update_fields=["language"])
+        return self.get(request)
+
 
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        logout(request._request)
+        if isinstance(request.auth, AppDevice):
+            request.auth.delete()  # this phone only
+        else:
+            logout(request._request)
+        return Response({"ok": True})
+
+
+class DeviceSerializer(serializers.Serializer):
+    push_token = serializers.RegexField(r"^(ExponentPushToken\[[\w-]+\]|ExpoPushToken\[[\w-]+\])?$", allow_blank=True)
+
+
+class DeviceView(APIView):
+    """The app tells us where to push (or, with an empty token, that notifications are off)."""
+
+    permission_classes = [IsOwner]
+
+    def post(self, request):
+        if not isinstance(request.auth, AppDevice):
+            return Response({"detail": "app_only"}, status=status.HTTP_400_BAD_REQUEST)
+        data = DeviceSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        token = data.validated_data["push_token"]
+        if token:  # a token moves with the phone, not the owner: one row keeps it
+            AppDevice.objects.filter(push_token=token).exclude(pk=request.auth.pk).update(push_token="")
+        request.auth.push_token = token
+        request.auth.save(update_fields=["push_token"])
         return Response({"ok": True})
 
 

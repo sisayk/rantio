@@ -17,6 +17,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+from . import app
 from .models import Booking
 
 logger = logging.getLogger(__name__)
@@ -104,6 +105,8 @@ def booking_created(b: Booking) -> None:
         lines.append(t[7])
     lines += ["", f"{t[9]}: {settings.SITE_URL}/{lang}/hosting", "", t[10]]
     _send(t[0].format(cottage=b.cottage.name, dates=dates), "\n".join(lines), [owner.email])
+    app.notify(owner, t[0].format(cottage=b.cottage.name, dates=dates), f"{b.get_channel_display()} · {t[5]}: {b.guests}",
+               {"type": "booking", "booking": b.pk})
     if other and settings.SIGNUP_NOTIFY_EMAILS:
         _send(
             f"Double booking? {b.cottage.name}",

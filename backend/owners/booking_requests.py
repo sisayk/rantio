@@ -20,6 +20,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from . import alerts, calendar, messaging
+from . import app
 from .models import Booking, Conversation, Cottage, Message, RequestStatus
 
 logger = logging.getLogger(__name__)
@@ -139,6 +140,9 @@ def create(cottage: Cottage, *, name: str, email: str, phone: str, lang: str, ch
     _send(OWNER_REQUESTED, owner.language, [owner.email], name=name, cottage=cottage.name, guests=guests,
           dates=dates_text(c, owner.language), text=messaging._excerpt(text),
           link=f"{settings.SITE_URL}/{owner.language}/hosting/calendar?request={c.pk}")
+    subject = (OWNER_REQUESTED.get(owner.language) or OWNER_REQUESTED["en"])[0]
+    values = {"name": name, "cottage": cottage.name, "guests": guests, "dates": dates_text(c, owner.language)}
+    app.notify(owner, subject.format(**values), cottage.name, {"type": "request", "conversation": c.pk})
     return c
 
 

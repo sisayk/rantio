@@ -412,6 +412,26 @@ class RequestStatus(models.TextChoices):
     DECLINED = "declined", "Declined"
 
 
+class AppDevice(models.Model):
+    """An owner signed in on the Stugora phone app: its sign-in key (stored hashed) and push address."""
+
+    LIFETIME_DAYS = 180  # unused this long, the phone has to sign in again
+
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name="app_devices")
+    token_hash = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=80, blank=True, help_text="The phone's model, as the app reports it.")
+    platform = models.CharField(max_length=10, blank=True)
+    push_token = models.CharField(max_length=200, blank=True, help_text="Expo push token; empty if notifications are off.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-last_used_at"]
+
+    def __str__(self) -> str:
+        return f"{self.owner} · {self.name or self.platform or 'phone'}"
+
+
 class Conversation(models.Model):
     """One guest talking with one cottage's owner.
 
