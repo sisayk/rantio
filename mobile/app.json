@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "Stugora",
+    "slug": "stugora",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "stugora",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#ffffff",
+    "primaryColor": "#1d4c3c",
+    "description": "Cottages across the Nordics and the Baltics, and the owner's one calendar for every booking site.",
+    "ios": {
+      "bundleIdentifier": "fi.stugora.app",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "config": { "usesNonExemptEncryption": false },
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"]
+      }
+    },
+    "android": {
+      "package": "fi.stugora.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#1d4c3c",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": ["android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW"]
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#1d4c3c",
+          "defaultChannel": "default"
+        }
+      ],
+      "expo-secure-store",
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": false,
+      "reactCompiler": true
+    }
+  }
+}

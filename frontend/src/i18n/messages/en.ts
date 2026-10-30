@@ -829,6 +829,72 @@ export const en = {
     howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is €99 + VAT per cottage; pilot owners' first year is free. VAT is 25.5%.",
     ownBooking: "Own booking",
   },
+  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  app: {
+    tabs: {
+      explore: "Explore",
+      saved: "Saved",
+      messages: "Messages",
+      profile: "Profile",
+      today: "Today",
+      calendar: "Calendar",
+      inbox: "Inbox",
+      earnings: "Earnings",
+      menu: "Menu",
+    },
+    explore: {
+      search: "Country, region or town",
+      all: "All",
+      clear: "Clear",
+    },
+    saved: {
+      empty: "Nothing saved yet",
+      emptyLead: "Tap the heart on a cottage you like and it waits for you here.",
+      browse: "Explore cottages",
+    },
+    messages: {
+      empty: "No conversations yet",
+      emptyLead: "When you message an owner, the conversation shows up here. You get the answer by email too.",
+    },
+    profile: {
+      settings: "Settings",
+      language: "Language",
+      currency: "Currency",
+      hosting: "Hosting",
+      switchToHosting: "Switch to hosting",
+      ownerSignIn: "Owner sign-in",
+      listCottage: "List your cottage",
+      listLead: "We put your cottage on Airbnb, Booking.com and Vrbo and keep every calendar in step.",
+      legal: "About",
+      privacy: "Privacy",
+      terms: "Terms",
+      contact: "Contact us",
+      version: "Version {version}",
+    },
+    today: {
+      requests: p({ one: "{n} booking request waiting", other: "{n} booking requests waiting" }),
+      unread: p({ one: "{n} unread message", other: "{n} unread messages" }),
+      thisYear: "This year",
+      seeEarnings: "See earnings",
+    },
+    menu: {
+      cottages: "Your cottages",
+      settings: "Booking link and sites",
+      bookings: "All bookings",
+      notifications: "Notifications",
+      notificationsLead: "New bookings, messages and booking requests on this phone.",
+      notificationsBlocked: "Notifications for Stugora are off in your phone's settings.",
+      openSettings: "Open settings",
+      web: "Stugora on the web",
+    },
+    common: {
+      cancel: "Cancel",
+      done: "Done",
+      back: "Back",
+      share: "Share",
+      offline: "No connection. Check your internet and try again.",
+    },
+  },
 };
 
 export type Messages = typeof en;

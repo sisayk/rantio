@@ -56,6 +56,13 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     `/<lang>/messages/<token>`. The browser reaches Django through the
     site's own `/api/*` path (`next.config.ts`), so the sign-in cookie is first-party.
 
+- `mobile/` — the iPhone and Android app (Expo), travelling and hosting in one app; see
+  `mobile/README.md`. It signs owners in with the same emailed code and then a per-phone
+  key (`Authorization: Bearer`, `owners/app.py`); `POST /api/owner/device/` registers the
+  phone for push notifications about new bookings, messages and booking requests, and
+  `PATCH /api/owner/me/` sets the owner's language. Signed-in phones are listed in the admin
+  under App devices.
+
 ## Calendar and booking link
 
 Each cottage has one calendar, the master (Hosting › Calendar, `/<lang>/hosting/calendar`):
