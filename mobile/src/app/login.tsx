@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 
 import { ApiError, Offline, ownerApi } from "@/api";
 import { usePrefs } from "@/state/prefs";
@@ -66,7 +66,7 @@ export default function Login() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
       <SheetBar title={m.app.profile.ownerSignIn} onClose={() => (router.canGoBack() ? router.back() : router.replace("/explore"))} />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }} keyboardShouldPersistTaps="handled">
           <Logo size={48} />
           <Text v="title">{t.title}</Text>

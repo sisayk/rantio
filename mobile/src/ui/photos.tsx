@@ -1,14 +1,16 @@
 // The photo tour, as on Airbnb: every photo in a grid by room, and a full-screen
-// viewer to swipe through them and pinch to zoom (zoom works on iPhone).
+// viewer to swipe through them, pinch or double-tap to zoom.
 import { Image } from "expo-image";
 import { useState } from "react";
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { type ListingPhoto, type PhotoKind, unsplash, unsplashWhole } from "@/lib/listings";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
 import { Button, IconButton, Text } from "@/ui/kit";
+import { Zoomable } from "@/ui/zoom";
 
 const ORDER: PhotoKind[] = ["exterior", "living", "bedroom", "kitchen", "sauna", "outside"];
 
@@ -81,31 +83,44 @@ export function PhotoViewer({ photos, start, onClose }: { photos: ListingPhoto[]
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
+  const shown = () => {
+    setIndex(start ?? 0);
+    setZoomed(false);
+  };
   return (
-    <Modal visible={start !== null} animationType="fade" presentationStyle="overFullScreen" transparent={false} onRequestClose={onClose} onShow={() => setIndex(start ?? 0)}>
-      <View style={{ flex: 1, backgroundColor: "#000" }}>
+    <Modal visible={start !== null} animationType="fade" presentationStyle="overFullScreen" transparent={false} onRequestClose={onClose} onShow={shown}>
+      {/* Android draws a modal in a window of its own, which needs its own gesture root. */}
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#000" }}>
         <FlatList
           data={photos}
           horizontal
           pagingEnabled
+          scrollEnabled={!zoomed}
           initialScrollIndex={start ?? 0}
           getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
           keyExtractor={(p) => p.id}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={(e) => setIndex(Math.round(e.nativeEvent.contentOffset.x / width))}
-          renderItem={({ item }) => (
-            <ScrollView
-              style={{ width, height }}
-              contentContainerStyle={{ width, height, alignItems: "center", justifyContent: "center" }}
-              maximumZoomScale={4}
-              minimumZoomScale={1}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              centerContent
-            >
-              <Image source={{ uri: unsplashWhole(item.id, 1600) }} style={{ width, height: height * 0.8 }} contentFit="contain" transition={200} />
-            </ScrollView>
-          )}
+          renderItem={({ item }) =>
+            Platform.OS === "android" ? (
+              <Zoomable width={width} height={height} contentHeight={height * 0.8} onZoomed={setZoomed}>
+                <Image source={{ uri: unsplashWhole(item.id, 1600) }} style={{ width, height: height * 0.8 }} contentFit="contain" transition={200} />
+              </Zoomable>
+            ) : (
+              <ScrollView
+                style={{ width, height }}
+                contentContainerStyle={{ width, height, alignItems: "center", justifyContent: "center" }}
+                maximumZoomScale={4}
+                minimumZoomScale={1}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                centerContent
+              >
+                <Image source={{ uri: unsplashWhole(item.id, 1600) }} style={{ width, height: height * 0.8 }} contentFit="contain" transition={200} />
+              </ScrollView>
+            )
+          }
         />
         <View style={[styles.viewerBar, { top: insets.top + space.sm }]}>
           <IconButton name="close" label={m.app.detail.close} onPress={onClose} />
@@ -117,7 +132,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: ListingPhoto[]
         <Text v="small" color="rgba(255,255,255,0.8)" style={[styles.kind, { bottom: insets.bottom + space.xl }]}>
           {photos[index] ? m.guest.photos[photos[index].kind] : ""}
         </Text>
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }

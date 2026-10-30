@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, type BookingLinkInfo, guestApi, Offline } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
@@ -111,7 +111,7 @@ export default function BookingRequest() {
 
   return (
     <Frame title={info.name}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: space.xl, paddingBottom: space.xxl * 2 }} keyboardShouldPersistTaps="handled">
           <Text v="title">{info.name}</Text>
           <Text v="small">{[info.municipality, country(info.country)].filter(Boolean).join(", ")}</Text>

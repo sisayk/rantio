@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { getListing, listingName } from "@/lib/listings";
@@ -72,7 +72,7 @@ export default function Contact() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
       <SheetBar title={c.title} onClose={() => router.back()} />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }} keyboardShouldPersistTaps="handled">
           <Text v="h2">{listingName(m.listingNames, l)}</Text>
           <Text v="small">{c.lead}</Text>

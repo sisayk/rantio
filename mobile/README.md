@@ -41,6 +41,25 @@ asks whether Python may accept incoming connections, allow it. Sign in as
 talk to https://stugora.fi; `EXPO_PUBLIC_API_URL` in `mobile/.env` overrides both
 (see `.env.example`).
 
+### Android
+
+Android Studio brings the SDK, the emulator and the Java it builds with. Once it is
+installed (and has finished its first-run setup), in a normal terminal:
+
+```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+cd ~/stugora/mobile
+npx expo run:android            # the emulator (start one from Android Studio's Device Manager first)
+npx expo run:android --device   # or an Android phone plugged in by USB, with USB debugging on
+```
+
+What differs from the iPhone: the map is OpenStreetMap drawn with Leaflet in a web view,
+as on the website (`src/ui/maps.android.tsx`), because Android's native maps need a
+Google Maps key and billing account; photos zoom with pinch and double-tap
+(`src/ui/zoom.tsx`) because Android scroll views can't zoom.
+
 Checks, in a normal terminal:
 
 ```bash

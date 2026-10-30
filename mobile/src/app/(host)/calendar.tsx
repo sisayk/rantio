@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { type CalendarData, type CalendarEntry, ownerApi, SignedOut } from "@/api";
@@ -266,7 +266,7 @@ export default function HostCalendar() {
       </TabScreen>
 
       {pick ? (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.pickPanelWrap}>
+        <KeyboardAvoidingView behavior="padding" style={styles.pickPanelWrap}>
           <SafeAreaView edges={["bottom"]} style={styles.pickPanel}>
             {pick.end ? (
               <>

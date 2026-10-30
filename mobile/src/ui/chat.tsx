@@ -1,6 +1,6 @@
 // A conversation: messages by day, the reader's own on the right, and a reply box.
 import { type ComponentRef, type ReactNode, useEffect, useRef } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { ChatMessage } from "@/api";
@@ -118,7 +118,7 @@ export function Composer({
 /** Keeps the reply box above the keyboard. */
 export function ChatFrame({ children }: { children: ReactNode }) {
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       {children}
     </KeyboardAvoidingView>
   );

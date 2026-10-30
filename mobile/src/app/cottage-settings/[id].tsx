@@ -80,7 +80,7 @@ export default function CottageSettings() {
           <Loading />
         )
       ) : (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={{ padding: space.xl, paddingBottom: space.xxl * 2 }} keyboardShouldPersistTaps="handled">
             <Text v="title">{c.link.title}</Text>
             <Text v="small" style={{ marginTop: space.sm }}>

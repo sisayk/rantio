@@ -1,4 +1,4 @@
-// Maps: Apple Maps on iPhone, Google Maps on Android (react-native-maps).
+// Maps on iPhone: Apple Maps (react-native-maps). Android has its own, in maps.android.tsx.
 // Cottages show as price pins, as on Airbnb's map.
 import { Component, type ComponentRef, type ReactNode, useEffect, useRef } from "react";
 import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
