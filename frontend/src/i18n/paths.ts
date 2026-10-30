@@ -13,6 +13,10 @@ export const paths = {
   book: (lang: Lang, token: string) => `/${lang}/book/${token}`,
   /** A guest's private conversation page; the token is its only key. */
   guestChat: (lang: Lang, token: string) => `/${lang}/messages/${token}`,
+  experiences: (lang: Lang) => `/${lang}/experiences`,
+  destinations: (lang: Lang) => `/${lang}/destinations`,
+  inspiration: (lang: Lang) => `/${lang}/inspiration`,
+  guide: (lang: Lang, id: string) => `/${lang}/inspiration/${id}`,
   privacy: (lang: Lang) => `/${lang}/privacy`,
   terms: (lang: Lang) => `/${lang}/terms`,
 };

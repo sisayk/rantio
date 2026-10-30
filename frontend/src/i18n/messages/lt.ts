@@ -1,4 +1,5 @@
 import type { Translation } from "../translation";
+import { explore } from "./explore/lt";
 
 export const lt: Translation = {
   common: {
@@ -928,4 +929,5 @@ export const lt: Translation = {
       offline: "Nėra ryšio. Patikrinkite internetą ir bandykite dar kartą.",
     },
   },
+  explore,
 };

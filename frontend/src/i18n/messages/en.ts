@@ -6,6 +6,7 @@ import type { FeatureKey, GroupId } from "@/lib/catalog";
 import type { Region } from "@/lib/content";
 import type { Category } from "@/lib/listings";
 import type { Plural } from "../format";
+import { explore } from "./explore/en";
 
 const p = (forms: Plural) => forms;
 
@@ -936,6 +937,7 @@ export const en = {
       offline: "No connection. Check your internet and try again.",
     },
   },
+  explore,
 };
 
 export type Messages = typeof en;

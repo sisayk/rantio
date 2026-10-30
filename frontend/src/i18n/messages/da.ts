@@ -1,4 +1,5 @@
 import type { Translation } from "../translation";
+import { explore } from "./explore/da";
 
 export const da: Translation = {
   common: {
@@ -923,4 +924,5 @@ export const da: Translation = {
       offline: "Ingen forbindelse. Tjek internettet, og prøv igen.",
     },
   },
+  explore,
 };

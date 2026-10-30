@@ -33,6 +33,7 @@ import ChannelIcons from "./ChannelIcons";
 import type { MapFocus } from "./CottageMap";
 import CardPhotos from "./CardPhotos";
 import HeroSlides from "./HeroSlides";
+import MainNav from "./MainNav";
 import FiltersModal, { countFilters, EMPTY_FILTERS, type FilterState } from "./FiltersModal";
 import { DatePanel, GuestPanel, type Guests, PricePanel, type PriceRange, priceLabel } from "./Pickers";
 import {
@@ -555,19 +556,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
             <Logo className={styles.logo} />
             <span>Stugora</span>
           </a>
-          <nav className={styles.mainNav} aria-label="Stugora">
-            {t.nav.map((item, i) =>
-              i === 0 ? (
-                <a key={item} href="#majoitus" aria-current="page">
-                  {item}
-                </a>
-              ) : (
-                <span key={item} className={styles.navSoon} title={t.comingSoon}>
-                  {item}
-                </span>
-              ),
-            )}
-          </nav>
+          <MainNav lang={lang} labels={t.nav} active="stays" staysHref="#majoitus" className={styles.mainNav} />
           <div className={styles.userPill}>
             <LanguageButton lang={lang} t={common.language} names={languages} className={styles.langButton} />
             <CurrencyButton lang={lang} t={t.currency} names={currencies} className={styles.langButton} />

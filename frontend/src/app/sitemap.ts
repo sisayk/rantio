@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { LANGS } from "@/i18n/locales";
 import { alternates } from "@/i18n/seo";
+import { GUIDE_IDS } from "@/lib/explore";
 import { LISTINGS } from "@/lib/listings";
 
 // One sitemap per language at /sitemap/<lang>.xml, each URL listing its
@@ -9,7 +10,17 @@ export function generateSitemaps() {
   return LANGS.map((id) => ({ id }));
 }
 
-const PAGES = ["", "/hosts", ...LISTINGS.map((l) => `/cottages/${l.id}`), "/privacy", "/terms"];
+const PAGES = [
+  "",
+  "/hosts",
+  "/experiences",
+  "/destinations",
+  "/inspiration",
+  ...GUIDE_IDS.map((id) => `/inspiration/${id}`),
+  ...LISTINGS.map((l) => `/cottages/${l.id}`),
+  "/privacy",
+  "/terms",
+];
 
 export default async function sitemap(props: { id: Promise<string> }): Promise<MetadataRoute.Sitemap> {
   const id = await props.id;
