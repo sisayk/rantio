@@ -1,16 +1,16 @@
 import { useRouter } from "expo-router";
-import { View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePrefs } from "@/state/prefs";
 import { useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
-import { colors, space } from "@/theme";
-import { Avatar, Button, Card, Logo, Row, Section, Text } from "@/ui/kit";
-import { TabScreen } from "@/ui/screen";
+import { colors, radius, shadowFloat, space } from "@/theme";
+import { Avatar, Button, Icon, Logo, Text } from "@/ui/kit";
+import { SwitchPill, TabScreen } from "@/ui/screen";
 import { AboutRows, openSite, SettingsRows } from "@/ui/settings";
 
 export default function Profile() {
-  const { m, lang, f } = useT();
+  const { m, lang } = useT();
   const { setMode } = usePrefs();
   const { signedIn, owner } = useSession();
   const router = useRouter();
@@ -22,40 +22,65 @@ export default function Profile() {
   };
 
   return (
-    <TabScreen title={m.app.tabs.profile}>
-      {signedIn ? (
-        <Card style={{ gap: space.lg }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
-            <Avatar name={owner?.name ?? ""} size={56} />
-            <View style={{ flex: 1 }}>
-              <Text v="h2">{owner?.name ?? ""}</Text>
-              <Text v="small">{owner ? f(m.guest.menu.signedInAs, { name: owner.email }) : ""}</Text>
-            </View>
-          </View>
-          <Button label={m.app.profile.switchToHosting} icon="swap-horizontal" onPress={toHosting} />
-        </Card>
-      ) : (
-        <Card style={{ gap: space.md, backgroundColor: colors.greenTint, borderColor: colors.greenTint }}>
-          <Logo size={40} />
-          <Text v="h2">{m.guest.hostBand.title}</Text>
-          <Text v="body" color={colors.soft}>
-            {m.app.profile.listLead}
-          </Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.xs }}>
-            <Button label={m.app.profile.listCottage} onPress={() => openSite(`/${lang}/hosts`)} />
-            <Button kind="secondary" label={m.app.profile.ownerSignIn} onPress={() => router.push("/login")} />
-          </View>
-        </Card>
-      )}
+    <View style={{ flex: 1 }}>
+      <TabScreen title={m.app.tabs.profile} contentStyle={{ paddingBottom: 140 }}>
+        <View style={[styles.card, shadowFloat]}>
+          {signedIn ? (
+            <>
+              <Avatar name={owner?.name ?? ""} size={96} />
+              <Text v="title" style={{ textAlign: "center" }}>
+                {owner?.name ?? ""}
+              </Text>
+              <Text v="small">{owner?.email ?? ""}</Text>
+            </>
+          ) : (
+            <>
+              <View style={styles.logoRing}>
+                <Logo size={56} />
+              </View>
+              <Text v="title">Stugora</Text>
+              <Text v="small" style={{ textAlign: "center" }}>
+                {m.guest.hero.lead}
+              </Text>
+              <Button kind="secondary" label={m.app.profile.ownerSignIn} onPress={() => router.push("/login")} style={{ marginTop: space.sm }} />
+            </>
+          )}
+        </View>
 
-      {signedIn ? (
-        <Section title={m.app.profile.hosting}>
-          <Row icon="home-outline" label={m.app.profile.switchToHosting} onPress={toHosting} last />
-        </Section>
-      ) : null}
+        <Pressable onPress={() => openSite(`/${lang}/hosts`)} style={({ pressed }) => [styles.hostCard, shadowFloat, pressed && { opacity: 0.85 }]} accessibilityRole="link">
+          <Text style={{ fontSize: 44, lineHeight: 52 }}>🏡</Text>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text v="h3">{m.guest.becomeHost}</Text>
+            <Text v="small">{m.app.profile.listLead}</Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={colors.faint} />
+        </Pressable>
 
-      <SettingsRows />
-      <AboutRows />
-    </TabScreen>
+        <SettingsRows />
+        <AboutRows />
+      </TabScreen>
+      <SwitchPill label={m.app.profile.switchToHosting} onPress={toHosting} />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    alignItems: "center",
+    gap: space.xs,
+    padding: space.xl,
+    paddingVertical: space.xxl,
+    borderRadius: 28,
+    backgroundColor: colors.page,
+  },
+  logoRing: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.greenTint, alignItems: "center", justifyContent: "center", marginBottom: space.sm },
+  hostCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.lg,
+    padding: space.xl,
+    borderRadius: radius.lg,
+    backgroundColor: colors.page,
+    marginTop: space.lg,
+  },
+});

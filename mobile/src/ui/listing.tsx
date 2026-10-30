@@ -9,6 +9,7 @@ import { useMoney } from "@/state/money";
 import { usePrefs } from "@/state/prefs";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
+import { ChannelStack } from "@/ui/channels";
 import { Icon, type IconName, tap, Text } from "@/ui/kit";
 
 export const CATEGORY_ICONS: Record<Category, IconName> = {
@@ -23,6 +24,21 @@ export const CATEGORY_ICONS: Record<Category, IconName> = {
   pets: "paw-outline",
   family: "people-outline",
   unique: "diamond-outline",
+};
+
+/** Category chips with emoji, the way Airbnb's app uses small 3D pictures. */
+export const CATEGORY_EMOJI: Record<Category, string> = {
+  all: "🏡",
+  waterfront: "🌊",
+  forest: "🌲",
+  modern: "🏙️",
+  traditional: "🛖",
+  sauna: "🧖",
+  aurora: "🌌",
+  skiing: "⛷️",
+  pets: "🐕",
+  family: "👨‍👩‍👧",
+  unique: "✨",
 };
 
 export function HeartButton({ id, size = 26, onPhoto = true }: { id: string; size?: number; onPhoto?: boolean }) {
@@ -46,12 +62,12 @@ export function HeartButton({ id, size = 26, onPhoto = true }: { id: string; siz
   );
 }
 
-function Photos({ listing, width, height }: { listing: Listing; width: number; height: number }) {
+function Photos({ listing, width, height, dots = true }: { listing: Listing; width: number; height: number; dots?: boolean }) {
   const [index, setIndex] = useState(0);
   const photos = listingPhotos(listing).slice(0, 6);
   const router = useRouter();
   return (
-    <View style={{ width, height, borderRadius: radius.md, overflow: "hidden", backgroundColor: colors.ground }}>
+    <View style={{ width, height, borderRadius: dots ? radius.lg : 16, overflow: "hidden", backgroundColor: colors.ground }}>
       <FlatList
         data={photos}
         horizontal
@@ -71,7 +87,7 @@ function Photos({ listing, width, height }: { listing: Listing; width: number; h
           </Pressable>
         )}
       />
-      {photos.length > 1 ? (
+      {dots && photos.length > 1 ? (
         <View style={styles.dots} pointerEvents="none">
           {photos.map((p, i) => (
             <View key={p.id} style={[styles.dot, i === index && styles.dotOn]} />
@@ -82,33 +98,49 @@ function Photos({ listing, width, height }: { listing: Listing; width: number; h
   );
 }
 
-export const ListingCard = memo(function ListingCard({ listing, width }: { listing: Listing; width?: number }) {
-  const { m, p, country } = useT();
+type CardProps = {
+  listing: Listing;
+  width?: number;
+  /** Compact: the small cards in a sideways row, as on Airbnb's home screen. */
+  compact?: boolean;
+  /** Nights chosen in the search: the price is then shown for the whole stay. */
+  nights?: number;
+};
+
+export const ListingCard = memo(function ListingCard({ listing, width, compact = false, nights = 0 }: CardProps) {
+  const { m, p, f, country } = useT();
   const money = useMoney();
   const router = useRouter();
   const screen = useWindowDimensions();
   const w = width ?? screen.width - space.xl * 2;
-  const h = Math.round(w * 0.95);
-  const price = money.show(listing.price, listingCurrency(listing));
+  const h = Math.round(w * (compact ? 0.95 : 0.9));
+  const cur = listingCurrency(listing);
+  const price = money.show(listing.price, cur);
+  const total = nights ? money.show(listing.price * nights, cur) : null;
+  const shown = total ?? price;
+  const priceText = `${shown.converted ? "≈ " : ""}${shown.text}`;
   return (
-    <View style={{ width: w, marginBottom: space.xxl }}>
+    <View style={{ width: w, marginBottom: compact ? 0 : space.xxl }}>
       <View>
-        <Photos listing={listing} width={w} height={h} />
-        <View style={styles.badge} pointerEvents="none">
-          <Text v="tiny" color={colors.ink}>
+        <Photos listing={listing} width={w} height={h} dots={!compact} />
+        <View style={[styles.badge, compact && styles.badgeSmall]} pointerEvents="none">
+          <Text v={compact ? "tiny" : "smallMedium"} color={colors.ink}>
             {m.guest.badges[listing.badge]}
           </Text>
         </View>
         <View style={styles.heart}>
-          <HeartButton id={listing.id} />
+          <HeartButton id={listing.id} size={compact ? 24 : 28} />
+        </View>
+        <View style={[styles.channels, compact && { left: 8, bottom: 8 }]} pointerEvents="none">
+          <ChannelStack channels={listing.channels} max={compact ? 3 : 4} size={compact ? 18 : 22} />
         </View>
       </View>
-      <Pressable onPress={() => router.push(`/cottage/${listing.id}`)} style={{ paddingTop: space.md, gap: 2 }} accessibilityRole="link">
-        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: space.md }}>
-          <Text v="h3" numberOfLines={1} style={{ flex: 1 }}>
+      <Pressable onPress={() => router.push(`/cottage/${listing.id}`)} style={{ paddingTop: space.sm, gap: 1 }} accessibilityRole="link">
+        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: space.sm }}>
+          <Text v="h3" numberOfLines={1} style={{ flex: 1, fontSize: compact ? 15 : 16 }}>
             {listingName(m.listingNames, listing)}
           </Text>
-          {listing.rating ? (
+          {!compact && listing.rating ? (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               <Icon name="star" size={13} />
               <Text v="smallMedium">{listing.rating.toFixed(1)}</Text>
@@ -116,13 +148,24 @@ export const ListingCard = memo(function ListingCard({ listing, width }: { listi
           ) : null}
         </View>
         <Text v="small" numberOfLines={1}>
-          {listing.place}, {country(listing.country)}
+          {compact ? `${listing.city}, ${country(listing.country)}` : `${listing.place}, ${country(listing.country)}`}
         </Text>
-        <Text v="small">
-          {p(m.guest.units.guests, listing.guests)} · {p(m.guest.units.bedrooms, listing.bedrooms)}
-        </Text>
-        <Text v="body" style={{ marginTop: 4 }}>
-          <Text v="h3">{price.converted ? `≈ ${price.text}` : price.text}</Text> {m.guest.card.night}
+        {!compact ? (
+          <Text v="small">
+            {p(m.guest.units.guests, listing.guests)} · {p(m.guest.units.bedrooms, listing.bedrooms)}
+          </Text>
+        ) : null}
+        <Text v="small" color={colors.ink} numberOfLines={1} style={{ marginTop: 2 }}>
+          {total ? (
+            <Text v="smallMedium" style={{ textDecorationLine: "underline" }}>
+              {f(m.app.explore.forNights, { price: priceText, nights: p(m.guest.units.nights, nights) })}
+            </Text>
+          ) : (
+            <>
+              <Text v="smallMedium">{priceText}</Text> {m.guest.card.night}
+            </>
+          )}
+          {compact && listing.rating ? ` · ★ ${listing.rating.toFixed(1)}` : ""}
         </Text>
       </Pressable>
     </View>
@@ -138,10 +181,12 @@ const styles = StyleSheet.create({
     top: 14,
     left: 14,
     backgroundColor: "rgba(255,255,255,0.95)",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: radius.pill,
   },
+  badgeSmall: { top: 10, left: 10, paddingHorizontal: 9, paddingVertical: 4 },
+  channels: { position: "absolute", left: 12, bottom: 12 },
   heart: { position: "absolute", top: 12, right: 14 },
   heartShadow: { shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
 });

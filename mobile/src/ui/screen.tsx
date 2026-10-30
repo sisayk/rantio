@@ -1,7 +1,8 @@
 // Page frames: a tab page with a large title, and a pushed page with a back bar.
 import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
-import { RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useT } from "@/text/i18n";
@@ -86,6 +87,21 @@ export function SheetBar({ title, onClose }: { title: string; onClose: () => voi
 }
 
 export const styles = StyleSheet.create({
+  switchWrap: { position: "absolute", left: 0, right: 0, alignItems: "center" },
+  switchPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    backgroundColor: colors.ink,
+    paddingHorizontal: space.xl,
+    height: 52,
+    borderRadius: 26,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
   content: { paddingHorizontal: space.xl, paddingBottom: space.xxl * 2 },
   head: { flexDirection: "row", alignItems: "flex-end", gap: space.md, paddingTop: space.lg, paddingBottom: space.lg },
   bar: {
@@ -107,3 +123,22 @@ export const styles = StyleSheet.create({
     borderBottomColor: colors.line,
   },
 });
+
+/** The dark "Switch to hosting / travelling" pill floating above the tab bar, as in Airbnb's app. */
+export function SwitchPill({ label, onPress }: { label: string; onPress: () => void }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View pointerEvents="box-none" style={[styles.switchWrap, { bottom: insets.bottom + space.lg }]}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        style={({ pressed }) => [styles.switchPill, pressed && { transform: [{ scale: 0.97 }] }]}
+      >
+        <Ionicons name="swap-horizontal" size={20} color="#fff" />
+        <Text v="bodyMedium" color="#fff">
+          {label}
+        </Text>
+      </Pressable>
+    </View>
+  );
+}

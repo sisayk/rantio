@@ -1,90 +1,122 @@
-import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { CATEGORIES, HERO_PHOTO } from "@/lib/listings";
+import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listings";
+import { regionLabel } from "@/lib/placeNames";
+import { PLACES } from "@/lib/places";
 import { usePrefs } from "@/state/prefs";
 import { activeFilters, BEDROOM_CHOICES, COUNTRIES, type Filters, NO_FILTERS, search, type Sort } from "@/state/search";
-import { useT } from "@/text/i18n";
-import { colors, fonts, radius, shadow, space } from "@/theme";
-import { Button, Empty, Icon, Logo, tap, Text } from "@/ui/kit";
+import { daysBetween, formatRange } from "@/text/dates";
+import { type T, useT } from "@/text/i18n";
+import { colors, fonts, radius, shadow, shadowFloat, space } from "@/theme";
 import { Chip, Stepper } from "@/ui/controls";
-import { CATEGORY_ICONS, ListingCard } from "@/ui/listing";
+import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
+import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
+import { RangeCalendar } from "@/ui/range-calendar";
 import { SheetBar } from "@/ui/screen";
+import { openSite } from "@/ui/settings";
+
+type Stay = { start: string | null; end: string | null; adults: number; children: number };
+const NO_STAY: Stay = { start: null, end: null, adults: 0, children: 0 };
+
+type Section = { key: string; title: string; listings: Listing[]; query: string };
+
+/** Rows on the home screen: regions with several cottages, then countries, then the rest. */
+function sections(t: T): Section[] {
+  const out: Section[] = [];
+  let left = [...LISTINGS];
+  const byRegion = new Map<string, Listing[]>();
+  for (const l of left) byRegion.set(`${l.country}:${l.region}`, [...(byRegion.get(`${l.country}:${l.region}`) ?? []), l]);
+  for (const [k, ls] of [...byRegion].sort((a, b) => b[1].length - a[1].length)) {
+    if (ls.length < 2) continue;
+    const r = PLACES[ls[0].country]?.find((x) => x.id === ls[0].region);
+    const place = r ? regionLabel(r, ls[0].country, t.lang) : ls[0].city;
+    out.push({ key: k, title: t.f(t.m.app.explore.sectionIn, { place }), listings: ls, query: place });
+    left = left.filter((l) => !ls.includes(l));
+  }
+  for (const c of COUNTRIES) {
+    const ls = left.filter((l) => l.country === c);
+    if (ls.length < 2) continue;
+    out.push({ key: c, title: t.f(t.m.app.explore.sectionIn, { place: t.country(c) }), listings: ls, query: t.country(c) });
+    left = left.filter((l) => !ls.includes(l));
+  }
+  if (left.length) out.push({ key: "more", title: t.m.app.explore.more, listings: left, query: "" });
+  return out;
+}
 
 export default function Explore() {
-  const { m, p, country } = useT();
+  const t = useT();
+  const { m, p, lang } = t;
   const { rates } = usePrefs();
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const [f, setF] = useState<Filters>(NO_FILTERS);
+  const [stay, setStay] = useState<Stay>(NO_STAY);
+  const [searching, setSearching] = useState(false);
   const [panel, setPanel] = useState(false);
   const results = useMemo(() => search(f, m.listingNames, rates), [f, m.listingNames, rates]);
+  const rows = useMemo(() => sections(t), [t]);
+  const nights = stay.start && stay.end ? daysBetween(stay.start, stay.end) : 0;
+  const browsing = !f.query && f.category === "all" && !activeFilters(f) && !nights;
   const columns = width >= 700 ? 2 : 1;
   const cardWidth = (width - space.xl * 2 - (columns - 1) * space.lg) / columns;
-  const count = activeFilters(f);
+  const compactWidth = Math.min(220, Math.round((width - space.xl) * 0.44));
+
+  const summary = [
+    f.query || null,
+    stay.start && stay.end ? formatRange(lang, stay.start, stay.end) : null,
+    f.guests ? p(m.guest.units.guests, f.guests) : null,
+  ].filter(Boolean);
+
+  const clear = () => {
+    setF(NO_FILTERS);
+    setStay(NO_STAY);
+  };
 
   const header = (
-    <View>
-      <View style={styles.hero}>
-        <Image source={HERO_PHOTO} style={StyleSheet.absoluteFill} contentFit="cover" />
-        <View style={styles.heroShade} />
-        <SafeAreaView edges={["top"]} style={{ paddingHorizontal: space.xl, paddingBottom: space.xl }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm, marginTop: space.sm }}>
-            <Logo size={30} color="#fff" />
-            <Text v="h2" color="#fff" style={{ fontFamily: fonts.bold, letterSpacing: -0.6 }}>
-              Stugora
-            </Text>
-          </View>
-          <Text v="title" color="#fff" style={{ marginTop: space.xl, maxWidth: 420 }}>
-            {m.guest.hero.title}
-          </Text>
-          <Text v="body" color="rgba(255,255,255,0.92)" style={{ marginTop: space.xs }}>
-            {m.guest.hero.lead}
-          </Text>
-          <View style={styles.searchRow}>
-            <View style={styles.search}>
-              <Icon name="search" size={20} />
-              <TextInput
-                value={f.query}
-                onChangeText={(query) => setF((c) => ({ ...c, query }))}
-                placeholder={m.app.explore.search}
-                placeholderTextColor={colors.soft}
-                style={styles.searchInput}
-                returnKeyType="search"
-                autoCorrect={false}
-                accessibilityLabel={m.guest.search.where}
-              />
-              {f.query ? (
-                <Pressable onPress={() => setF((c) => ({ ...c, query: "" }))} hitSlop={10} accessibilityLabel={m.app.explore.clear}>
-                  <Icon name="close-circle" size={20} color={colors.faint} />
-                </Pressable>
+    <View style={{ backgroundColor: colors.page }}>
+      <SafeAreaView edges={["top"]}>
+        <View style={styles.searchRow}>
+          <Pressable
+            onPress={() => {
+              tap();
+              setSearching(true);
+            }}
+            style={({ pressed }) => [styles.searchPill, pressed && { transform: [{ scale: 0.99 }] }]}
+            accessibilityRole="search"
+            accessibilityLabel={m.app.explore.start}
+          >
+            <Icon name="search" size={20} />
+            <View style={{ alignItems: "center", flexShrink: 1 }}>
+              <Text v="bodyMedium" numberOfLines={1}>
+                {summary.length ? summary[0] : m.app.explore.start}
+              </Text>
+              {summary.length > 1 ? (
+                <Text v="tiny" numberOfLines={1}>
+                  {summary.slice(1).join(" · ")}
+                </Text>
               ) : null}
             </View>
-            <Pressable
-              onPress={() => {
-                tap();
-                setPanel(true);
-              }}
-              style={styles.filterButton}
-              accessibilityRole="button"
-              accessibilityLabel={m.guest.filters.filters}
-            >
-              <Icon name="options-outline" size={22} />
-              {count ? (
-                <View style={styles.filterCount}>
+          </Pressable>
+          {!browsing ? (
+            <Pressable onPress={() => setPanel(true)} style={styles.roundButton} accessibilityRole="button" accessibilityLabel={m.guest.filters.filters}>
+              <Icon name="options-outline" size={20} />
+              {activeFilters(f) ? (
+                <View style={styles.count}>
                   <Text v="tiny" color="#fff">
-                    {count}
+                    {activeFilters(f)}
                   </Text>
                 </View>
               ) : null}
             </Pressable>
-          </View>
-        </SafeAreaView>
-      </View>
+          ) : null}
+        </View>
+      </SafeAreaView>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categories}>
-        {CATEGORIES.map((c) => {
+        {CATEGORIES.map((c: Category) => {
           const on = f.category === c;
           return (
             <Pressable
@@ -97,54 +129,261 @@ export default function Explore() {
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
             >
-              <Icon name={CATEGORY_ICONS[c]} size={22} color={on ? colors.ink : colors.soft} />
-              <Text v="tiny" color={on ? colors.ink : colors.soft} numberOfLines={1}>
+              <Text style={{ fontSize: 20, lineHeight: 26 }}>{CATEGORY_EMOJI[c]}</Text>
+              <Text v="smallMedium" color={on ? colors.ink : colors.soft} numberOfLines={1}>
                 {m.guest.categories[c]}
               </Text>
             </Pressable>
           );
         })}
       </ScrollView>
-      <Text v="small" style={{ paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md }}>
-        {p(m.guest.units.cottages, results.length)}
-        {f.country ? ` · ${country(f.country)}` : ""}
-      </Text>
+
+      {!browsing ? (
+        <View style={styles.resultsHead}>
+          <Text v="h3">{p(m.guest.units.cottages, results.length)}</Text>
+          <Button small kind="ghost" label={m.guest.filterPanel.clearAll} onPress={clear} />
+        </View>
+      ) : null}
     </View>
   );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      <FlatList
-        key={columns}
-        data={results}
-        numColumns={columns}
-        keyExtractor={(l) => l.id}
-        ListHeaderComponent={header}
-        columnWrapperStyle={columns > 1 ? { gap: space.lg, paddingHorizontal: space.xl } : undefined}
-        contentContainerStyle={{ paddingBottom: space.xxl * 2 }}
-        renderItem={({ item }) => (
-          <View style={columns === 1 ? { paddingHorizontal: space.xl } : null}>
-            <ListingCard listing={item} width={cardWidth} />
+      {browsing ? (
+        <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl * 2 }}>
+          {header}
+          {rows.map((s) => (
+            <View key={s.key} style={{ marginTop: space.xl }}>
+              <View style={styles.sectionHead}>
+                <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
+                  {s.title}
+                </Text>
+                {s.query ? (
+                  <IconButton name="arrow-forward" label={s.title} onPress={() => setF((c) => ({ ...c, query: s.query }))} size={18} />
+                ) : null}
+              </View>
+              <FlatList
+                horizontal
+                data={s.listings}
+                keyExtractor={(l) => l.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: space.xl, gap: space.md }}
+                renderItem={({ item }) => <ListingCard listing={item} width={compactWidth} compact />}
+              />
+            </View>
+          ))}
+
+          <Card style={styles.hostBand}>
+            <Logo size={36} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text v="h3">{m.guest.hostBand.title}</Text>
+              <Text v="small">{m.guest.hostBand.body}</Text>
+            </View>
+          </Card>
+          <View style={{ flexDirection: "row", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
+            <Button small label={m.guest.hostBand.cta} onPress={() => openSite(`/${lang}/hosts`)} />
+            <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
           </View>
-        )}
-        ListEmptyComponent={
-          <Empty
-            icon="search-outline"
-            title={m.guest.empty.title}
-            action={<Button kind="secondary" label={m.guest.empty.action} onPress={() => setF(NO_FILTERS)} />}
-          />
-        }
-        ListFooterComponent={
-          results.length ? (
-            <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl }}>
-              {m.guest.examples}
-            </Text>
-          ) : undefined
-        }
-        keyboardDismissMode="on-drag"
+          <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl, marginTop: space.xl }}>
+            {m.guest.examples}
+          </Text>
+        </ScrollView>
+      ) : (
+        <FlatList
+          key={columns}
+          data={results}
+          numColumns={columns}
+          keyExtractor={(l) => l.id}
+          ListHeaderComponent={header}
+          stickyHeaderIndices={[0]}
+          columnWrapperStyle={columns > 1 ? { gap: space.lg, paddingHorizontal: space.xl } : undefined}
+          contentContainerStyle={{ paddingBottom: space.xxl * 2 }}
+          renderItem={({ item }) => (
+            <View style={columns === 1 ? { paddingHorizontal: space.xl } : null}>
+              <ListingCard listing={item} width={cardWidth} nights={nights} />
+            </View>
+          )}
+          ListEmptyComponent={<Empty icon="search-outline" title={m.guest.empty.title} action={<Button kind="secondary" label={m.guest.empty.action} onPress={clear} />} />}
+          keyboardDismissMode="on-drag"
+        />
+      )}
+
+      <SearchSheet
+        visible={searching}
+        value={{ query: f.query, stay }}
+        onClose={() => setSearching(false)}
+        onSearch={(query, s) => {
+          setF((c) => ({ ...c, query, guests: s.adults + s.children }));
+          setStay(s);
+          setSearching(false);
+        }}
       />
       <FilterPanel visible={panel} value={f} onClose={() => setPanel(false)} onChange={setF} />
     </View>
+  );
+}
+
+/** "Where? When? Who?", one card open at a time, as in Airbnb's search. */
+function SearchSheet({
+  visible,
+  value,
+  onClose,
+  onSearch,
+}: {
+  visible: boolean;
+  value: { query: string; stay: Stay };
+  onClose: () => void;
+  onSearch: (query: string, stay: Stay) => void;
+}) {
+  const t = useT();
+  const { m, p, lang, country } = t;
+  const e = m.app.explore;
+  const [step, setStep] = useState<"where" | "when" | "who">("where");
+  const [query, setQuery] = useState(value.query);
+  const [stay, setStay] = useState<Stay>(value.stay);
+
+  const destinations = useMemo(() => {
+    const seen = new Map<string, { label: string; sub: string; emoji: string; n: number }>();
+    for (const l of LISTINGS) {
+      const r = PLACES[l.country]?.find((x) => x.id === l.region);
+      const label = r ? regionLabel(r, l.country, lang) : l.city;
+      const k = `${l.country}:${l.region}`;
+      const cur = seen.get(k);
+      seen.set(k, { label, sub: country(l.country), emoji: CATEGORY_EMOJI[l.badge], n: (cur?.n ?? 0) + 1 });
+    }
+    const q = query.trim().toLowerCase();
+    return [...seen.values()]
+      .filter((d) => !q || `${d.label} ${d.sub}`.toLowerCase().includes(q))
+      .sort((a, b) => b.n - a.n)
+      .slice(0, 8);
+  }, [lang, country, query]);
+
+  const guests = stay.adults + stay.children;
+  const dates = stay.start && stay.end ? formatRange(lang, stay.start, stay.end) : m.guest.datePicker.addDates;
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onShow={() => {
+        setQuery(value.query);
+        setStay(value.stay);
+        setStep("where");
+      }}
+      onRequestClose={onClose}
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.ground }}>
+        <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: space.lg, paddingTop: space.sm }}>
+          <IconButton name="close" label={m.guest.contact.close} onPress={onClose} />
+        </View>
+        <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.md }} keyboardShouldPersistTaps="handled">
+          {step === "where" ? (
+            <View style={[styles.sheetCard, shadowFloat]}>
+              <Text v="title">{e.where}</Text>
+              <View style={styles.destInput}>
+                <Icon name="search" size={20} />
+                <TextInput
+                  value={query}
+                  onChangeText={setQuery}
+                  placeholder={e.searchDest}
+                  placeholderTextColor={colors.soft}
+                  style={styles.destText}
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  onSubmitEditing={() => setStep("when")}
+                />
+                {query ? (
+                  <Pressable onPress={() => setQuery("")} hitSlop={10} accessibilityLabel={e.clear}>
+                    <Icon name="close-circle" size={20} color={colors.faint} />
+                  </Pressable>
+                ) : null}
+              </View>
+              <Text v="smallMedium" style={{ marginTop: space.sm }}>
+                {e.suggested}
+              </Text>
+              {destinations.map((d) => (
+                <Pressable
+                  key={`${d.label}-${d.sub}`}
+                  onPress={() => {
+                    tap();
+                    setQuery(d.label);
+                    setStep("when");
+                  }}
+                  style={({ pressed }) => [styles.dest, pressed && { opacity: 0.6 }]}
+                >
+                  <View style={styles.destIcon}>
+                    <Text style={{ fontSize: 26, lineHeight: 32 }}>{d.emoji}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text v="bodyMedium">
+                      {d.label}, {d.sub}
+                    </Text>
+                    <Text v="small">{p(m.guest.units.cottages, d.n)}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          ) : (
+            <Collapsed label={e.where.replace("?", "")} value={query || m.app.explore.all} onPress={() => setStep("where")} />
+          )}
+
+          {step === "when" ? (
+            <View style={[styles.sheetCard, shadowFloat]}>
+              <Text v="title">{m.guest.datePicker.title}</Text>
+              <RangeCalendar lang={lang} start={stay.start} end={stay.end} onChange={(a, b) => setStay((s) => ({ ...s, start: a, end: b }))} months={12} />
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Button small kind="ghost" label={m.guest.datePicker.clear} onPress={() => setStay((s) => ({ ...s, start: null, end: null }))} />
+                <Button small label={m.guest.datePicker.done} onPress={() => setStep("who")} />
+              </View>
+            </View>
+          ) : (
+            <Collapsed label={e.when} value={dates} onPress={() => setStep("when")} />
+          )}
+
+          {step === "who" ? (
+            <View style={[styles.sheetCard, shadowFloat]}>
+              <Text v="title">{e.who}</Text>
+              <View style={styles.whoRow}>
+                <Text v="bodyMedium">{m.guest.guestPicker.adults}</Text>
+                <Stepper value={stay.adults} max={16} onChange={(adults) => setStay((s) => ({ ...s, adults }))} label={m.guest.guestPicker.adults} />
+              </View>
+              <View style={[styles.whoRow, { borderBottomWidth: 0 }]}>
+                <Text v="bodyMedium">{m.guest.guestPicker.children}</Text>
+                <Stepper value={stay.children} max={10} onChange={(children) => setStay((s) => ({ ...s, children }))} label={m.guest.guestPicker.children} />
+              </View>
+            </View>
+          ) : (
+            <Collapsed label={e.who} value={guests ? p(m.guest.units.guests, guests) : m.guest.search.guestsPlaceholder} onPress={() => setStep("who")} />
+          )}
+        </ScrollView>
+        <View style={styles.sheetFoot}>
+          <Button
+            kind="ghost"
+            label={m.guest.filterPanel.clearAll}
+            onPress={() => {
+              setQuery("");
+              setStay(NO_STAY);
+              setStep("where");
+            }}
+          />
+          <Button icon="search" label={m.guest.search.button} onPress={() => onSearch(query.trim(), stay)} />
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+}
+
+function Collapsed({ label, value, onPress }: { label: string; value: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={[styles.collapsed, shadow]} accessibilityRole="button">
+      <Text v="body" color={colors.soft}>
+        {label}
+      </Text>
+      <Text v="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, textAlign: "right" }}>
+        {value}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -218,36 +457,93 @@ function FilterPanel({ visible, value, onClose, onChange }: { visible: boolean; 
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: "hidden", backgroundColor: colors.greenDeep },
-  heroShade: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(10, 30, 24, 0.38)" },
-  searchRow: { flexDirection: "row", gap: space.sm, marginTop: space.xl },
-  search: {
+  searchRow: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.md },
+  searchPill: {
     flex: 1,
+    minHeight: 56,
+    borderRadius: radius.pill,
+    backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: space.sm,
-    backgroundColor: "#fff",
-    borderRadius: radius.pill,
-    paddingHorizontal: space.lg,
-    height: 52,
-    ...shadow,
+    paddingHorizontal: space.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    ...shadowFloat,
   },
-  searchInput: { flex: 1, fontFamily: fonts.medium, fontSize: 16, color: colors.ink, paddingVertical: 0 },
-  filterButton: { width: 52, height: 52, borderRadius: 26, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", ...shadow },
-  filterCount: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.green,
+  roundButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
-  categories: { paddingHorizontal: space.lg, gap: space.xs, paddingTop: space.md, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-  category: { alignItems: "center", gap: 4, paddingHorizontal: space.md, paddingBottom: space.md, paddingTop: space.xs, borderBottomWidth: 2, borderBottomColor: "transparent", minWidth: 64 },
-  categoryOn: { borderBottomColor: colors.ink },
+  count: { position: "absolute", top: 2, right: 2, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.green, alignItems: "center", justifyContent: "center" },
+  categories: { paddingHorizontal: space.lg, gap: space.sm, paddingBottom: space.md },
+  category: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: space.lg,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: "#fff",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    ...shadow,
+  },
+  categoryOn: { backgroundColor: colors.ground, borderColor: colors.faint },
+  resultsHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: space.xl,
+    paddingBottom: space.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.line,
+    marginBottom: space.md,
+  },
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.xl, marginBottom: space.md },
+  hostBand: { flexDirection: "row", gap: space.lg, alignItems: "center", marginHorizontal: space.xl, marginTop: space.xxl },
+  sheetCard: { backgroundColor: "#fff", borderRadius: 28, padding: space.xl, gap: space.md },
+  destInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    borderWidth: 1,
+    borderColor: colors.faint,
+    borderRadius: radius.md,
+    paddingHorizontal: space.lg,
+    height: 56,
+  },
+  destText: { flex: 1, fontFamily: fonts.regular, fontSize: 17, color: colors.ink, paddingVertical: 0 },
+  dest: { flexDirection: "row", alignItems: "center", gap: space.lg, paddingVertical: 6 },
+  destIcon: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: colors.ground, alignItems: "center", justifyContent: "center" },
+  collapsed: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: space.lg,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    paddingHorizontal: space.xl,
+    height: 64,
+  },
+  whoRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: space.md, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  sheetFoot: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: space.xl,
+    paddingVertical: space.md,
+    backgroundColor: colors.page,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.line,
+  },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
   line: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
   panelFoot: {

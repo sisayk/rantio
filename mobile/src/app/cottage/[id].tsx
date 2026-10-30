@@ -1,12 +1,12 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View } from "react-native";
+import { FlatList, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
-import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
+import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
 import { findNearby, type NearbyPlace } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
@@ -14,8 +14,10 @@ import { PLACES } from "@/lib/places";
 import { useMoney } from "@/state/money";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadowFloat, space } from "@/theme";
-import { Button, Empty, Icon, IconButton, Pill, Text } from "@/ui/kit";
+import { ChannelStack, ChannelTile } from "@/ui/channels";
+import { Button, Empty, Icon, IconButton, Pill, Problem, Text } from "@/ui/kit";
 import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
+import { SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
 const SEASON_TONE = { summer: "green", winter: "neutral", autumn: "berry", darkSeason: "neutral", allYear: "green" } as const;
@@ -31,6 +33,8 @@ export default function Cottage() {
   const [photo, setPhoto] = useState(0);
   const [nearby, setNearby] = useState<NearbyPlace[] | null | "error">(null);
   const [showAll, setShowAll] = useState(false);
+  const [booking, setBooking] = useState(false);
+  const [note, setNote] = useState(false);
 
   useEffect(() => {
     if (!l) return;
@@ -143,6 +147,14 @@ export default function Cottage() {
             </View>
           ) : null}
 
+          <Pressable onPress={() => setBooking(true)} style={styles.listedOn} accessibilityRole="button">
+            <View style={{ flex: 1, gap: 6 }}>
+              <Text v="smallMedium">{m.app.explore.listedOn}</Text>
+              <ChannelStack channels={l.channels} max={6} size={26} onPhoto={false} />
+            </View>
+            <Icon name="chevron-forward" size={18} color={colors.faint} />
+          </Pressable>
+
           <Divider />
           <Text v="h2">{m.guest.detail.activitiesTitle}</Text>
           <Text v="small" style={{ marginBottom: space.md }}>
@@ -222,12 +234,9 @@ export default function Cottage() {
 
           <Divider />
           <Text v="h2">{m.guest.detail.bookTitle}</Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.md }}>
-            {l.channels.map((c) => (
-              <View key={c} style={styles.channel}>
-                <Image source={{ uri: channelIcon(c) }} style={{ width: 18, height: 18, borderRadius: 4 }} />
-                <Text v="smallMedium">{CHANNELS[c].name}</Text>
-              </View>
+          <View style={{ marginTop: space.sm }}>
+            {l.channels.map((c, i) => (
+              <SiteRow key={c} channel={c} last={i === l.channels.length - 1} onPress={() => setBooking(true)} />
             ))}
           </View>
           <Text v="small" style={{ marginTop: space.md }}>
@@ -244,9 +253,59 @@ export default function Cottage() {
           </Text>
           {price.converted ? <Text v="tiny">{f(m.guest.currency.original, { price: money.format(l.price, listingCurrency(l)) })}</Text> : null}
         </View>
-        <Button label={m.guest.contact.button} icon="chatbubble-ellipses-outline" onPress={() => router.push(`/contact/${l.id}`)} />
+        <IconButton name="chatbubble-ellipses-outline" filled={false} label={m.guest.contact.button} onPress={() => router.push(`/contact/${l.id}`)} size={24} />
+        <Button label={m.app.explore.book} onPress={() => setBooking(true)} style={{ paddingHorizontal: space.xxl }} />
       </SafeAreaView>
+
+      <Modal visible={booking} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setBooking(false)}>
+        <View style={{ flex: 1, backgroundColor: colors.page }}>
+          <SheetBar title={m.app.explore.chooseSite} onClose={() => setBooking(false)} />
+          <ScrollView contentContainerStyle={{ padding: space.xl }}>
+            <Text v="h2">{name}</Text>
+            <Text v="small" style={{ marginTop: space.xs, marginBottom: space.md }}>
+              {m.app.explore.chooseLead}
+            </Text>
+            {l.channels.map((c, i) => (
+              <SiteRow key={c} channel={c} last={i === l.channels.length - 1} onPress={() => setNote(true)} big />
+            ))}
+            {note ? <Problem text={m.guest.detail.bookNote} /> : null}
+            <Text v="tiny" style={{ marginTop: space.lg }}>
+              {m.guest.detail.bookNote}
+            </Text>
+            <Button
+              kind="secondary"
+              icon="chatbubble-ellipses-outline"
+              label={m.guest.contact.button}
+              onPress={() => {
+                setBooking(false);
+                router.push(`/contact/${l.id}`);
+              }}
+              style={{ marginTop: space.xl }}
+            />
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
+  );
+}
+
+function SiteRow({ channel, last, onPress, big }: { channel: ChannelId; last?: boolean; onPress: () => void; big?: boolean }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={({ pressed }) => [styles.siteRow, !last && styles.siteLine, pressed && { opacity: 0.6 }]}
+    >
+      {big ? (
+        <ChannelTile channel={channel} />
+      ) : (
+        <Image source={{ uri: channelIcon(channel) }} style={{ width: 24, height: 24, borderRadius: 6 }} />
+      )}
+      <Text v={big ? "h3" : "bodyMedium"} style={{ flex: 1 }}>
+        {CHANNELS[channel].name}
+      </Text>
+      <Icon name={big ? "open-outline" : "chevron-forward"} size={18} color={colors.soft} />
+    </Pressable>
   );
 }
 
@@ -273,7 +332,18 @@ const styles = StyleSheet.create({
   amenity: { flexDirection: "row", alignItems: "center", gap: 6, width: "50%", paddingRight: space.sm },
   nearby: { width: 230, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.line, overflow: "hidden", backgroundColor: colors.page },
   nearbyPhoto: { width: 230, height: 130 },
-  channel: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: space.md, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line },
+  listedOn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    marginTop: space.lg,
+    padding: space.lg,
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+  },
+  siteRow: { flexDirection: "row", alignItems: "center", gap: space.lg, paddingVertical: space.md },
+  siteLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   footer: {
     position: "absolute",
     left: 0,
