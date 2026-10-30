@@ -10,6 +10,8 @@ import Estimator from "./Estimator";
 import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
 import HostSwitchLink from "./guest/HostSwitchLink";
+import { Logo } from "./guest/icons";
+import g from "./guest/guest.module.css";
 import styles from "./landing.module.css";
 import AppBadges from "./AppBadges";
 
@@ -21,16 +23,6 @@ const ADDED: Record<number, string> = {
   17: "Booking.com", 18: "Booking.com", 19: "Booking.com", 20: "Booking.com", 21: "Booking.com",
 };
 const RUN_STARTS = new Set([11, 17]);
-
-function Mark() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-      <path d="M4 14 14 5l10 9" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7.5 12.5V23h13V12.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
-      <path d="M12 23v-5h4v5" fill="none" stroke="var(--berry)" strokeWidth="2.4" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 const STEP_ICONS = [
   <svg key="a" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5" /><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4" /></svg>,
@@ -68,18 +60,18 @@ export default function Landing({ lang }: { lang: Lang }) {
     <>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <a className={styles.brand} href={paths.home(lang)}>
-            <Mark />
+          <a className={g.brand} href={paths.home(lang)}>
+            <Logo className={g.logo} />
             <span>Stugora</span>
           </a>
-          <nav className={styles.headerNav}>
-            <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langLink} />
+          <nav className={`${g.detailTopLinks} ${styles.headerNav}`}>
+            <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={g.langButton} />
             <HostSwitchLink
               lang={lang}
               becomeHost={t.nav.login}
               switchToHosting={m.guest.menu.switchToHosting}
               signedOutHref={paths.hostingLogin(lang)}
-              className={styles.langLink}
+              className={g.hostLink}
             />
             <a className={styles.headerCta} href="#ilmoita">
               {t.nav.cta}

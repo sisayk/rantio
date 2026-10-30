@@ -2,12 +2,21 @@
    pill buttons, hairline lists. Content width 1200px. */
 
 /* ---------- header ---------- */
+/* Header: the same as the guest pages' (logo, language and host buttons come from
+   guest.module.css, whose colours are set here). */
 .header {
+  --g-ink: #1d2a2e;
+  --g-soft: #5d6a6e;
+  --g-line: #e1e5e3;
+  --g-ground: #f5f6f5;
+  --g-green: #1d4c3c;
+  --g-green-deep: #143a2d;
   position: sticky;
   top: 0;
   z-index: 20;
   background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--g-line);
+  color: var(--g-ink);
   backdrop-filter: blur(8px);
 }
 
@@ -17,40 +26,16 @@
   justify-content: space-between;
   gap: 16px;
   max-width: 1280px;
-  height: 76px;
   margin: 0 auto;
-  padding: 0 40px;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--lake);
-  text-decoration: none;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  padding: 10px 40px;
 }
 
 .headerNav {
-  display: flex;
   align-items: center;
-  gap: 24px;
-}
-
-.langLink {
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--ink);
-}
-
-.langLink:hover {
-  text-decoration: underline;
 }
 
 .headerCta {
+  margin-left: 8px;
   padding: 11px 20px;
   border-radius: var(--pill);
   background: var(--lake);
@@ -972,12 +957,16 @@
 /* ---------- phone ---------- */
 @media (max-width: 600px) {
   .headerInner {
-    height: 64px;
-    padding: 0 16px;
+    gap: 8px;
+    padding: 10px 16px;
   }
   /* Globe only on phones; the button's label still names the language. */
-  .langLink span {
+  .headerNav button span {
     display: none;
+  }
+  .headerCta {
+    margin-left: 0;
+    padding: 10px 14px;
   }
   .hero {
     padding: 32px 16px 16px;
