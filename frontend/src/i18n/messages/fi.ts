@@ -1,5 +1,6 @@
 import type { Translation } from "../translation";
 import { explore } from "./explore/fi";
+import { listings } from "./listings/fi";
 
 export const fi: Translation = {
   common: {
@@ -585,6 +586,7 @@ export const fi: Translation = {
     nav: {
       overview: "Yleiskatsaus",
       calendar: "Kalenteri",
+      listings: "Omat kohteet",
       messages: "Viestit",
     },
     calendar: {
@@ -790,6 +792,7 @@ export const fi: Translation = {
         listing: "Ilmoituksia tehdään",
         live: "Näkyvissä",
         paused: "Tauolla",
+        archived: "Arkistoitu",
       },
       listingYear: "{n}. ilmoitusvuosi",
       nightsBooked: { one: "{n} yö varattu", other: "{n} yötä varattu" },
@@ -922,4 +925,5 @@ export const fi: Translation = {
     },
   },
   explore,
+  listings,
 };

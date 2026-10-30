@@ -89,7 +89,7 @@ def public_cottage(cottage: Cottage) -> dict:
         "price_per_night": money(cottage.price_per_night),
         "cleaning_fee": money(cottage.cleaning_fee),
         "currency": cottage.currency,
-        "open": cottage.booking_requests_open and cottage.status != Cottage.Status.PAUSED,
+        "open": cottage.booking_requests_open and cottage.status not in (Cottage.Status.PAUSED, Cottage.Status.ARCHIVED),
         "today": today.isoformat(),
         "busy": [[s.isoformat(), e.isoformat()] for s, e in busy],
     }

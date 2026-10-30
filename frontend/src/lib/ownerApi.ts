@@ -51,7 +51,7 @@ export type Summary = {
     name: string;
     municipality: string;
     country: string;
-    status: "intake" | "listing" | "live" | "paused";
+    status: ListingStatus;
     status_label: string;
     currency: string;
     price_per_night: Money;
@@ -230,6 +230,132 @@ export type EnquiryDraft = {
   draft?: string;
 };
 
+export type PhotoKind = "exterior" | "living" | "bedroom" | "kitchen" | "sauna" | "outside";
+export type ListingPhoto = { id: number; url: string; kind: PhotoKind; caption: string };
+export type ListingStatus = "intake" | "listing" | "live" | "paused" | "archived";
+export type PropertyType = "cottage" | "cabin" | "villa" | "holiday_home" | "apartment" | "farmhouse" | "other";
+export type ChecklistKey =
+  | "cover" | "description" | "location" | "price" | "photos" | "pin" | "amenities" | "rules" | "arrival" | "availability";
+export type ChannelState = "connected" | "attention" | "failed" | "pending" | "not_connected" | "email";
+export type ListingChannel = {
+  channel: "airbnb" | "booking" | "vrbo" | "nettimokki";
+  state: ChannelState;
+  last_synced_at: string | null;
+  error: string;
+  url: string;
+  feed_id: number | null;
+};
+export type ListingStay = { id: number; channel: string; check_in: string; check_out: string; guests: number };
+
+/** One of the owner's properties in My listings. */
+export type ListingSummary = {
+  id: number;
+  name: string;
+  property_type: PropertyType;
+  country: string;
+  region: string;
+  municipality: string;
+  status: ListingStatus;
+  max_guests: number;
+  bedrooms: number;
+  bathrooms: number;
+  beds: number;
+  price_per_night: Money;
+  currency: string;
+  cover: string | null;
+  photo_count: number;
+  amenity_count: number;
+  has_description: boolean;
+  completeness: number;
+  missing: ChecklistKey[];
+  channels: ListingChannel[];
+  attention: boolean;
+  updated_at: string;
+  upcoming_count: number;
+  next_check_in: string | null;
+  next_check_out: string | null;
+  occupancy_30: number;
+  upcoming: ListingStay[];
+};
+
+export type NearbyKind =
+  | "lake" | "beach" | "ski" | "hiking" | "grocery" | "restaurant" | "transport" | "evCharging" | "airport" | "station" | "other";
+export type Nearby = { kind: NearbyKind; name: string; distance_km: string | null };
+export type Season = { name: string; start: string; end: string; price: Money };
+export type AmenityNote = { note: string; fee: Money | null };
+
+/** Everything the owner edits in the listing editor. */
+export type ListingFields = {
+  name: string;
+  property_type: PropertyType;
+  country: string;
+  municipality: string;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  show_exact_location: boolean;
+  max_guests: number;
+  bedrooms: number;
+  bathrooms: number;
+  beds: number;
+  floor_area: number | null;
+  floors: number;
+  host_languages: string[];
+  descriptions: Record<string, string>;
+  nearby: Nearby[];
+  amenities: string[];
+  amenity_notes: Record<string, AmenityNote>;
+  min_nights: number;
+  max_nights: number | null;
+  price_per_night: Money;
+  weekend_price: Money | null;
+  cleaning_fee: Money;
+  extra_guest_fee: Money;
+  extra_guest_from: number | null;
+  pet_fee: Money;
+  weekly_discount: number;
+  monthly_discount: number;
+  security_deposit: Money;
+  seasonal_prices: Season[];
+  taxes_note: string;
+  check_in_from: string | null;
+  check_in_until: string | null;
+  check_out_by: string | null;
+  self_check_in: boolean;
+  min_age: number | null;
+  pets_allowed: boolean;
+  smoking_allowed: boolean;
+  events_allowed: boolean;
+  quiet_hours: string;
+  house_rules: string;
+  waste_instructions: string;
+  sauna_instructions: string;
+  fireplace_instructions: string;
+  arrival_instructions: string;
+  departure_instructions: string;
+  access_details: string;
+  nettimokki_url: string;
+};
+
+export type ListingChange = { at: string; by: string; action: string; fields: string[] };
+
+export type ListingDetail = ListingSummary &
+  ListingFields & {
+    checklist: { key: ChecklistKey; done: boolean; essential: boolean }[];
+    photos: ListingPhoto[];
+    history: ListingChange[];
+    booking_link_open: boolean;
+    forwarding_address: string;
+    nettimokki_url: string;
+  };
+
+/** The listing as guests see it: no address, codes or arrival notes; the location rounded unless shown exactly. */
+export type ListingPreview = Omit<ListingDetail, "address" | "arrival_instructions" | "departure_instructions" | "access_details" | "history" | "checklist" | "channels"> & {
+  busy: { start: string; end: string }[];
+};
+
+export type StatusAction = "publish" | "pause" | "relist" | "archive" | "restore";
+
 export class SignedOut extends Error {}
 
 function csrfToken() {
@@ -248,7 +374,57 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
+/** A photo upload with progress: multipart, so the browser sets the content type and boundary. */
+function sendPhoto(url: string, file: Blob, name: string, fields: Record<string, string>, onProgress?: (pct: number) => void) {
+  return new Promise<ListingPhoto>((resolve, reject) => {
+    const form = new FormData();
+    form.append("file", file, name);
+    for (const [k, v] of Object.entries(fields)) form.append(k, v);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.withCredentials = true;
+    xhr.setRequestHeader("X-CSRFToken", csrfToken());
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      let body: unknown = {};
+      try {
+        body = JSON.parse(xhr.responseText || "{}");
+      } catch {
+        body = {};
+      }
+      if (xhr.status === 401 || xhr.status === 403) reject(new SignedOut());
+      else if (xhr.status >= 200 && xhr.status < 300) resolve(body as ListingPhoto);
+      else reject(Object.assign(new Error(`HTTP ${xhr.status}`), { status: xhr.status, body }));
+    };
+    xhr.onerror = () => reject(Object.assign(new Error("network"), { status: 0, body: {} }));
+    xhr.send(form);
+  });
+}
+
 export const ownerApi = {
+  listings: () => call<{ cottages: ListingSummary[] }>("owner/cottages/"),
+  createListing: (name: string) => call<ListingDetail>("owner/cottages/", { method: "POST", body: JSON.stringify({ name }) }),
+  listing: (id: number) => call<ListingDetail>(`owner/cottages/${id}/`),
+  listingPreview: (id: number) => call<ListingPreview>(`owner/cottages/${id}/preview/`),
+  saveListing: (id: number, fields: Partial<ListingFields>) =>
+    call<ListingDetail>(`owner/cottages/${id}/`, { method: "PATCH", body: JSON.stringify(fields) }),
+  setListingStatus: (id: number, action: StatusAction) =>
+    call<ListingDetail>(`owner/cottages/${id}/status/`, { method: "POST", body: JSON.stringify({ action }) }),
+  duplicateListing: (id: number) => call<ListingDetail>(`owner/cottages/${id}/duplicate/`, { method: "POST" }),
+  deleteListing: (id: number, confirm: string) =>
+    call<Record<string, never>>(`owner/cottages/${id}/`, { method: "DELETE", body: JSON.stringify({ confirm }) }),
+  addPhoto: (cottage: number, file: Blob, name: string, kind: PhotoKind, onProgress?: (pct: number) => void) =>
+    sendPhoto(`/api/owner/cottages/${cottage}/photos/`, file, name, { kind }, onProgress),
+  replacePhoto: (cottage: number, photo: number, file: Blob, name: string, onProgress?: (pct: number) => void) =>
+    sendPhoto(`/api/owner/cottages/${cottage}/photos/${photo}/replace/`, file, name, {}, onProgress),
+  updatePhoto: (cottage: number, photo: number, fields: { kind?: PhotoKind; caption?: string }) =>
+    call<ListingPhoto>(`owner/cottages/${cottage}/photos/${photo}/`, { method: "PATCH", body: JSON.stringify(fields) }),
+  removePhoto: (cottage: number, photo: number) =>
+    call<Record<string, never>>(`owner/cottages/${cottage}/photos/${photo}/`, { method: "DELETE" }),
+  orderPhotos: (cottage: number, ids: number[]) =>
+    call<{ photos: ListingPhoto[] }>(`owner/cottages/${cottage}/photos/order/`, { method: "POST", body: JSON.stringify({ ids }) }),
   requestCode: (email: string, lang: string) =>
     call<{ sent: boolean; dev_code?: string }>("auth/request-code/", { method: "POST", body: JSON.stringify({ email, lang }) }),
   verifyCode: (email: string, code: string) =>

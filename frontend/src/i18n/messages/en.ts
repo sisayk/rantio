@@ -7,6 +7,7 @@ import type { Region } from "@/lib/content";
 import type { Category } from "@/lib/listings";
 import type { Plural } from "../format";
 import { explore } from "./explore/en";
+import { listings } from "./listings/en";
 
 const p = (forms: Plural) => forms;
 
@@ -601,6 +602,7 @@ export const en = {
     nav: {
       overview: "Overview",
       calendar: "Calendar",
+      listings: "My listings",
       messages: "Messages",
     },
     calendar: {
@@ -806,6 +808,7 @@ export const en = {
         listing: "Listings in progress",
         live: "Live",
         paused: "Paused",
+        archived: "Archived",
       },
       listingYear: "Listing year {n}",
       nightsBooked: p({ one: "{n} night booked", other: "{n} nights booked" }),
@@ -938,6 +941,7 @@ export const en = {
     },
   },
   explore,
+  listings,
 };
 
 export type Messages = typeof en;

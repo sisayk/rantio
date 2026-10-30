@@ -10,6 +10,7 @@ import { type BookingRow, ownerApi, SignedOut, type Summary } from "@/lib/ownerA
 import { Bed, CalendarIcon, People } from "../guest/icons";
 import EarningsChart from "./EarningsChart";
 import HostingHeader from "./HostingHeader";
+import ListingsPanel from "./listing/ListingsPanel";
 import SiteIcon from "./SiteIcon";
 import styles from "./owner.module.css";
 
@@ -24,10 +25,12 @@ type T = Messages["dashboard"];
 export default function OwnerDashboard({
   lang,
   t,
+  l,
   languageButton,
 }: {
   lang: Lang;
   t: T;
+  l: Messages["listings"];
   languageButton: React.ReactNode;
 }) {
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -191,6 +194,8 @@ export default function OwnerDashboard({
           )}
         </section>
 
+        <ListingsPanel lang={lang} l={l} />
+
         <section className={styles.kpis} aria-label={String(s.year)}>
           <div className={styles.kpi}>
             <span>{t.kpi.payout}</span>
@@ -262,7 +267,11 @@ export default function OwnerDashboard({
               {s.cottages.map((c) => (
                 <li key={c.id}>
                   <div className={styles.cottageHead}>
-                    <strong>{c.name}</strong>
+                    <strong>
+                      <a className={styles.cottageLink} href={paths.hostingListing(lang, c.id)}>
+                        {c.name}
+                      </a>
+                    </strong>
                     <span className={styles.status} data-status={c.status}>{t.cottages.status[c.status]}</span>
                   </div>
                   <span className={styles.muted}>{c.municipality}</span>

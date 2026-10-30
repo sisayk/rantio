@@ -82,7 +82,9 @@ export default function OwnerCalendar({
         const res = await ownerApi.calendar(from, 2);
         setData(res);
         setFailed(false);
-        setCottageId((id) => id ?? res.cottages[0]?.id ?? null);
+        // ?cottage=<id> opens that cottage (from the listing editor); otherwise the first.
+        const wanted = Number(new URLSearchParams(window.location.search).get("cottage"));
+        setCottageId((id) => id ?? res.cottages.find((x) => x.id === wanted)?.id ?? res.cottages[0]?.id ?? null);
       } catch (err) {
         fail(err);
       }

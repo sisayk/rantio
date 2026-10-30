@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
-from owners import calendar_views, inbound, inbox, portal
+from owners import calendar_views, inbound, inbox, listings, portal
 from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Stugora admin"
@@ -36,6 +36,15 @@ urlpatterns = [
     path("api/owner/calendar/blocks/<int:pk>/", calendar_views.OwnerBlockView.as_view(), name="owner-block"),
     path("api/owner/calendar/feeds/", calendar_views.OwnerFeedsView.as_view(), name="owner-feeds"),
     path("api/owner/calendar/feeds/<int:pk>/", calendar_views.OwnerFeedView.as_view(), name="owner-feed"),
+    path("api/owner/cottages/", listings.OwnerCottagesView.as_view(), name="owner-cottages"),
+    path("api/owner/cottages/<int:pk>/", listings.OwnerCottageView.as_view(), name="owner-cottage"),
+    path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
+    path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),
+    path("api/owner/cottages/<int:pk>/preview/", listings.OwnerPreviewView.as_view(), name="owner-cottage-preview"),
+    path("api/owner/cottages/<int:pk>/photos/", listings.OwnerPhotosView.as_view(), name="owner-photos"),
+    path("api/owner/cottages/<int:pk>/photos/<int:photo_pk>/replace/", listings.OwnerPhotoReplaceView.as_view(), name="owner-photo-replace"),
+    path("api/owner/cottages/<int:pk>/photos/order/", listings.OwnerPhotoOrderView.as_view(), name="owner-photo-order"),
+    path("api/owner/cottages/<int:pk>/photos/<int:photo_pk>/", listings.OwnerPhotoView.as_view(), name="owner-photo"),
     path("api/owner/cottages/<int:pk>/booking-link/", calendar_views.OwnerBookingLinkView.as_view(), name="owner-booking-link"),
     path("api/owner/conversations/<int:pk>/accept/", calendar_views.OwnerRequestView.as_view(), {"action": "accept"}, name="owner-request-accept"),
     path("api/owner/conversations/<int:pk>/decline/", calendar_views.OwnerRequestView.as_view(), {"action": "decline"}, name="owner-request-decline"),

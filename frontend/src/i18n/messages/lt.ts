@@ -1,5 +1,6 @@
 import type { Translation } from "../translation";
 import { explore } from "./explore/lt";
+import { listings } from "./listings/lt";
 
 export const lt: Translation = {
   common: {
@@ -593,6 +594,7 @@ export const lt: Translation = {
     nav: {
       overview: "Apžvalga",
       calendar: "Kalendorius",
+      listings: "Mano skelbimai",
       messages: "Žinutės",
     },
     calendar: {
@@ -798,6 +800,7 @@ export const lt: Translation = {
         listing: "Skelbimai ruošiami",
         live: "Paskelbta",
         paused: "Sustabdyta",
+        archived: "Archyvuotas",
       },
       listingYear: "{n}-ieji skelbimo metai",
       nightsBooked: { one: "Užsakyta {n} naktis", few: "Užsakytos {n} naktys", many: "Užsakyta {n} nakties", other: "Užsakyta {n} naktų" },
@@ -930,4 +933,5 @@ export const lt: Translation = {
     },
   },
   explore,
+  listings,
 };

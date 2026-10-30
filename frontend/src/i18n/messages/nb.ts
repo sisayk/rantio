@@ -1,5 +1,6 @@
 import type { Translation } from "../translation";
 import { explore } from "./explore/nb";
+import { listings } from "./listings/nb";
 
 export const nb: Translation = {
   common: {
@@ -588,6 +589,7 @@ export const nb: Translation = {
     nav: {
       overview: "Oversikt",
       calendar: "Kalender",
+      listings: "Mine annonser",
       messages: "Meldinger",
     },
     calendar: {
@@ -793,6 +795,7 @@ export const nb: Translation = {
         listing: "Annonser på vei",
         live: "Publisert",
         paused: "På pause",
+        archived: "Arkivert",
       },
       listingYear: "Annonseår {n}",
       nightsBooked: { one: "{n} natt booket", other: "{n} netter booket" },
@@ -925,4 +928,5 @@ export const nb: Translation = {
     },
   },
   explore,
+  listings,
 };

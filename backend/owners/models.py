@@ -5,7 +5,9 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, transaction
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.utils import timezone
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
@@ -174,6 +176,16 @@ class Cottage(models.Model):
         LISTING = "listing", "Setting up listings"
         LIVE = "live", "Live"
         PAUSED = "paused", "Paused"
+        ARCHIVED = "archived", "Archived"
+
+    class PropertyType(models.TextChoices):
+        COTTAGE = "cottage", "Cottage"
+        CABIN = "cabin", "Cabin"
+        VILLA = "villa", "Villa"
+        HOLIDAY_HOME = "holiday_home", "Holiday home"
+        APARTMENT = "apartment", "Apartment"
+        FARMHOUSE = "farmhouse", "Farmhouse"
+        OTHER = "other", "Other"
 
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name="cottages")
     name = models.CharField(max_length=120)
@@ -220,6 +232,58 @@ class Cottage(models.Model):
         help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
     )
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.INTAKE)
+
+    # ---------- the listing, as the owner edits it in Hosting → Listings ----------
+    property_type = models.CharField(max_length=14, choices=PropertyType.choices, default=PropertyType.COTTAGE)
+    bathrooms = models.PositiveSmallIntegerField(default=1)
+    floor_area = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Square metres.")
+    floors = models.PositiveSmallIntegerField(default=1)
+    host_languages = models.JSONField(default=list, blank=True, help_text="Language codes the owner speaks with guests.")
+    descriptions = models.JSONField(
+        default=dict, blank=True,
+        help_text="The description in each language the owner wrote, {\"en\": \"…\", \"sv\": \"…\"}. "
+        "description_en and description_fi mirror the en and fi entries.",
+    )
+    address = models.CharField(max_length=200, blank=True, help_text="Street address. Never shown to guests before a booking.")
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    show_exact_location = models.BooleanField(
+        default=False, help_text="Guests see the exact pin before booking; otherwise an area about 1 km across."
+    )
+    nearby = models.JSONField(default=list, blank=True, help_text="[{\"kind\": \"lake\", \"name\": \"…\", \"distance_km\": 0.2}]")
+    amenity_notes = models.JSONField(
+        default=dict, blank=True, help_text="{amenity key: {\"note\": \"…\", \"fee\": \"10.00\"}} for amenities with conditions or a price."
+    )
+    # Prices Stugora sets on its own pages and booking link. The booking sites keep their own prices.
+    weekend_price = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True, help_text="Friday and Saturday nights.")
+    max_nights = models.PositiveSmallIntegerField(null=True, blank=True)
+    extra_guest_fee = models.DecimalField(max_digits=9, decimal_places=2, default=Decimal("0.00"))
+    extra_guest_from = models.PositiveSmallIntegerField(null=True, blank=True, help_text="The fee is per night for each guest above this many.")
+    pet_fee = models.DecimalField(max_digits=9, decimal_places=2, default=Decimal("0.00"))
+    weekly_discount = models.PositiveSmallIntegerField(default=0, help_text="Percent off stays of 7 nights or more.")
+    monthly_discount = models.PositiveSmallIntegerField(default=0, help_text="Percent off stays of 28 nights or more.")
+    security_deposit = models.DecimalField(max_digits=9, decimal_places=2, default=Decimal("0.00"))
+    seasonal_prices = models.JSONField(default=list, blank=True, help_text="[{\"name\", \"start\": \"MM-DD\", \"end\": \"MM-DD\", \"price\"}]")
+    taxes_note = models.CharField(max_length=300, blank=True)
+    # House rules
+    check_in_from = models.TimeField(null=True, blank=True)
+    check_in_until = models.TimeField(null=True, blank=True)
+    check_out_by = models.TimeField(null=True, blank=True)
+    self_check_in = models.BooleanField(default=False)
+    min_age = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Youngest age of the guest who books.")
+    pets_allowed = models.BooleanField(default=False)
+    smoking_allowed = models.BooleanField(default=False)
+    events_allowed = models.BooleanField(default=False)
+    quiet_hours = models.CharField(max_length=60, blank=True)
+    waste_instructions = models.TextField(blank=True, max_length=2000)
+    sauna_instructions = models.TextField(blank=True, max_length=2000)
+    fireplace_instructions = models.TextField(blank=True, max_length=2000)
+    # Only for guests with a confirmed stay; never in public pages, feeds or previews of the listing.
+    arrival_instructions = models.TextField(blank=True, max_length=4000)
+    departure_instructions = models.TextField(blank=True, max_length=4000)
+    access_details = models.TextField(blank=True, max_length=1000, help_text="Door codes, key box, Wi-Fi password. Private.")
+    updated_at = models.DateTimeField(default=timezone.now)
+
     listing_started_on = models.DateField(
         null=True, blank=True, help_text="First day of listing year 1; each year renews with the yearly fee."
     )
@@ -261,6 +325,64 @@ class Cottage(models.Model):
 
     def yearly_fee_vat(self, year: int) -> Decimal:
         return vat_on(self.yearly_fee(year))
+
+
+
+def cottage_photo_path(photo: "CottagePhoto", filename: str) -> str:
+    """A random name in the cottage's own folder; the extension comes from the checked file type."""
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
+    return f"cottages/{photo.cottage_id}/{secrets.token_hex(8)}.{ext}"
+
+
+class CottageChange(models.Model):
+    """What changed in a cottage's listing, and who changed it: the owner, or the team in the admin."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="changes")
+    at = models.DateTimeField(auto_now_add=True)
+    by = models.CharField(max_length=120)
+    action = models.CharField(max_length=30, help_text="edit, publish, pause, archive, photo_add …")
+    fields = models.JSONField(default=list, blank=True, help_text="Which fields an edit touched (names only, no values).")
+
+    class Meta:
+        ordering = ["-at", "-pk"]
+
+    def __str__(self) -> str:
+        return f"{self.cottage.name}: {self.action} by {self.by}"
+
+
+class CottagePhoto(models.Model):
+    """A photo the owner added for the cottage's listings. The first one (lowest position) is the cover."""
+
+    class Kind(models.TextChoices):
+        # The same kinds as the guest site's photo tour (frontend/src/lib/listings.ts PhotoKind).
+        EXTERIOR = "exterior", "Outside"
+        LIVING = "living", "Living room"
+        BEDROOM = "bedroom", "Bedroom"
+        KITCHEN = "kitchen", "Kitchen and dining"
+        SAUNA = "sauna", "Sauna"
+        OUTSIDE = "outside", "Surroundings"
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="photos")
+    image = models.FileField(upload_to=cottage_photo_path)
+    kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.EXTERIOR)
+    caption = models.CharField(max_length=200, blank=True)
+    position = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["position", "pk"]
+
+    def __str__(self) -> str:
+        return f"{self.cottage.name}: {self.get_kind_display()} #{self.position + 1}"
+
+
+@receiver(post_delete, sender=CottagePhoto)
+def _remove_photo_file(sender, instance: CottagePhoto, **kwargs):
+    """The file goes with the row, also when a whole cottage is deleted, but only once the
+    deletion is committed: a rolled-back delete keeps its file."""
+    if instance.image:
+        storage, name = instance.image.storage, instance.image.name
+        transaction.on_commit(lambda: storage.delete(name))
 
 
 class Booking(models.Model):

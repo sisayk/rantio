@@ -9,6 +9,11 @@ export const paths = {
   hostingLogin: (lang: Lang) => `/${lang}/hosting/login`,
   hostingMessages: (lang: Lang) => `/${lang}/hosting/messages`,
   hostingCalendar: (lang: Lang) => `/${lang}/hosting/calendar`,
+  hostingListings: (lang: Lang) => `/${lang}/hosting/listings`,
+  hostingListing: (lang: Lang, id: number) => `/${lang}/hosting/listings/${id}`,
+  hostingListingPreview: (lang: Lang, id: number) => `/${lang}/hosting/listings/${id}/preview`,
+  /** The calendar opened on one cottage. */
+  hostingCalendarFor: (lang: Lang, id: number) => `/${lang}/hosting/calendar?cottage=${id}`,
   /** A cottage's booking-request page, from the link the owner shares. */
   book: (lang: Lang, token: string) => `/${lang}/book/${token}`,
   /** A guest's private conversation page; the token is its only key. */

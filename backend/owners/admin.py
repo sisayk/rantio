@@ -16,7 +16,7 @@ from django.contrib import messages
 
 from . import booking_emails, invoicing, stripe_api
 from .models import (
-    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
+    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
     Message, Owner, OwnerSignup,
 )
 
@@ -59,8 +59,35 @@ class OwnerAdmin(ModelAdmin):
     ]
 
 
+class CottagePhotoInline(TabularInline):
+    model = CottagePhoto
+    extra = 0
+    fields = ["preview", "image", "kind", "position"]
+    readonly_fields = ["preview"]
+    ordering = ["position", "pk"]
+
+    @display(description="Photo")
+    def preview(self, obj):
+        if not obj.pk or not obj.image:
+            return "-"
+        return format_html('<img src="{}" style="height:64px;border-radius:6px">', obj.image.url)
+
+
+class CottageChangeInline(TabularInline):
+    """What the owner changed in Hosting → My listings (field names only)."""
+
+    model = CottageChange
+    extra = 0
+    fields = ["at", "by", "action", "fields"]
+    readonly_fields = fields
+    can_delete = False
+    ordering = ["-at"]
+    max_num = 0
+
+
 @admin.register(Cottage)
 class CottageAdmin(ModelAdmin):
+    inlines = [CottagePhotoInline, CottageChangeInline]
     list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "currency", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality", "inbound_code"]

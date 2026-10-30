@@ -122,7 +122,7 @@ def check_dates(cottage: Cottage, check_in: date, check_out: date, guests: int) 
 @transaction.atomic
 def create(cottage: Cottage, *, name: str, email: str, phone: str, lang: str, check_in: date, check_out: date,
            adults: int, children: int, text: str) -> Conversation:
-    if not cottage.booking_requests_open or cottage.status == Cottage.Status.PAUSED:
+    if not cottage.booking_requests_open or cottage.status in (Cottage.Status.PAUSED, Cottage.Status.ARCHIVED):
         raise RequestError("closed")
     Cottage.objects.select_for_update().get(pk=cottage.pk)  # two requests at once can't both pass the check
     check_dates(cottage, check_in, check_out, adults + children)

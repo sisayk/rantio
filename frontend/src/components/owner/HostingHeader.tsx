@@ -9,7 +9,16 @@ import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import { Logo } from "../guest/icons";
 import styles from "./owner.module.css";
 
-/** Top of every hosting page: brand, the Overview / Calendar / Messages tabs, the switch to the guest
+function TabIcon({ d }: { d: string }) {
+  return (
+    <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
+
+/** Top of every hosting page: brand, the Overview / Calendar / My listings / Messages tabs (a bar at
+ *  the bottom of the screen on phones), the switch to the guest
  *  side (as on Airbnb), language and sign-out. */
 export default function HostingHeader({
   lang,
@@ -22,7 +31,7 @@ export default function HostingHeader({
   lang: Lang;
   t: Messages["dashboard"];
   languageButton: React.ReactNode;
-  active: "overview" | "calendar" | "messages";
+  active: "overview" | "calendar" | "listings" | "messages";
   ownerName?: string;
   unread?: number;
 }) {
@@ -41,13 +50,20 @@ export default function HostingHeader({
         </a>
         <nav className={styles.tabs} aria-label={t.area}>
           <a href={paths.hosting(lang)} aria-current={active === "overview" ? "page" : undefined}>
-            {t.nav.overview}
+            <TabIcon d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z" />
+            <span>{t.nav.overview}</span>
           </a>
           <a href={paths.hostingCalendar(lang)} aria-current={active === "calendar" ? "page" : undefined}>
-            {t.nav.calendar}
+            <TabIcon d="M5 6h14v14H5zM5 10h14M9 3v4M15 3v4" />
+            <span>{t.nav.calendar}</span>
+          </a>
+          <a href={paths.hostingListings(lang)} aria-current={active === "listings" ? "page" : undefined}>
+            <TabIcon d="M4 11 12 4l8 7M6 9.5V20h12V9.5M10 20v-5h4v5" />
+            <span>{t.nav.listings}</span>
           </a>
           <a href={paths.hostingMessages(lang)} aria-current={active === "messages" ? "page" : undefined}>
-            {t.nav.messages}
+            <TabIcon d="M4 5h16v11H9l-5 4V5Z" />
+            <span>{t.nav.messages}</span>
             {unread ? <span className={styles.badge}>{number(lang, unread)}</span> : null}
           </a>
         </nav>

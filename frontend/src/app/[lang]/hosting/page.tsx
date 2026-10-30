@@ -24,6 +24,7 @@ export default async function Page({ params }: Props) {
     <OwnerDashboard
       lang={lang}
       t={m.dashboard}
+      l={m.listings}
       languageButton={
         <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.quietLink} />
       }
