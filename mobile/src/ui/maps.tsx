@@ -1,18 +1,72 @@
 // Maps: Apple Maps on iPhone, Google Maps on Android (react-native-maps).
 // Cottages show as price pins, as on Airbnb's map.
-import { type ComponentRef, useEffect, useRef } from "react";
+import { Component, type ComponentRef, type ReactNode, useEffect, useRef } from "react";
 import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import type MapViewType from "react-native-maps";
+import type { MapMarker } from "react-native-maps";
 
 import { type Listing, listingCurrency } from "@/lib/listings";
 import { useMoney } from "@/state/money";
 import { colors, fonts } from "@/theme";
-import { Logo, Text } from "@/ui/kit";
+import { Icon, Logo, Text } from "@/ui/kit";
+
+// Loaded on first use, so an app build that doesn't carry the map yet shows a
+// placeholder instead of failing to start.
+type Maps = { MapView: typeof MapViewType; Marker: typeof MapMarker };
+let maps: Maps | null | undefined;
+function loadMaps(): Maps | null {
+  if (maps === undefined) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mod = require("react-native-maps");
+      maps = { MapView: mod.default, Marker: mod.Marker };
+    } catch {
+      maps = null;
+    }
+  }
+  return maps;
+}
+
+function NoMap({ style }: { style?: ViewStyle }) {
+  return (
+    <View style={[{ backgroundColor: colors.greenTint, alignItems: "center", justifyContent: "center" }, style]}>
+      <Icon name="map-outline" size={40} color={colors.faint} />
+    </View>
+  );
+}
+
+/** A map that fails to draw (e.g. its native part is missing) falls back to the placeholder. */
+class MapBoundary extends Component<{ children: ReactNode; style?: ViewStyle }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? <NoMap style={this.props.style} /> : this.props.children;
+  }
+}
 
 /** Finland to Iceland and the Baltics. */
 const NORTH = { latitude: 62, longitude: 15, latitudeDelta: 22, longitudeDelta: 40 };
 
-export function CottagesMap({
+export function CottagesMap(props: CottagesMapProps) {
+  return (
+    <MapBoundary style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
+      <CottagesMapInner {...props} />
+    </MapBoundary>
+  );
+}
+
+type CottagesMapProps = {
+  listings: Listing[];
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+  style?: ViewStyle;
+  bottomPadding?: number;
+  topPadding?: number;
+};
+
+function CottagesMapInner({
   listings,
   selected,
   onSelect,
@@ -27,7 +81,7 @@ export function CottagesMap({
   bottomPadding?: number;
   topPadding?: number;
 }) {
-  const ref = useRef<ComponentRef<typeof MapView>>(null);
+  const ref = useRef<ComponentRef<typeof MapViewType>>(null);
   const money = useMoney();
   const ids = listings.map((l) => l.id).join(",");
 
@@ -44,6 +98,9 @@ export function CottagesMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids]);
 
+  const lib = loadMaps();
+  if (!lib) return <NoMap style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, ...style }} />;
+  const { MapView, Marker } = lib;
   return (
     <MapView
       ref={ref}
@@ -82,7 +139,18 @@ export function CottagesMap({
 }
 
 /** One cottage's spot, for its page. Not interactive; tapping the frame opens the phone's maps app. */
-export function PinMap({ lat, lng, style }: { lat: number; lng: number; style?: ViewStyle }) {
+export function PinMap(props: { lat: number; lng: number; style?: ViewStyle }) {
+  return (
+    <MapBoundary style={props.style}>
+      <PinMapInner {...props} />
+    </MapBoundary>
+  );
+}
+
+function PinMapInner({ lat, lng, style }: { lat: number; lng: number; style?: ViewStyle }) {
+  const lib = loadMaps();
+  if (!lib) return <NoMap style={style} />;
+  const { MapView, Marker } = lib;
   return (
     <MapView
       style={style}
