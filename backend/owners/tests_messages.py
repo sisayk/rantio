@@ -42,6 +42,13 @@ class MessagingTests(TestCase):
         self.assertIsNone(Conversation.objects.get().cottage)
         self.assertIn("team@stugora.fi", [m.to[0] for m in mail.outbox])
 
+    def test_enquiry_with_adults_and_children(self):
+        c = Conversation.objects.get(token=self.enquire(adults=2, children=1).json()["token"])
+        self.assertEqual((c.guests, c.children), (2, 1))
+        self.assertEqual(self.enquire(children=2).status_code, 400)  # children travel with an adult
+        old = Conversation.objects.get(token=self.enquire(guests=3).json()["token"])  # one head count still works
+        self.assertEqual((old.guests, old.children), (3, 0))
+
     def test_enquiry_validation_and_honeypot(self):
         self.assertEqual(self.enquire(check_in="2027-02-20", check_out="2027-02-15").status_code, 400)
         self.assertEqual(self.enquire(website="http://spam").status_code, 400)

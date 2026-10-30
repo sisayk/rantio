@@ -147,6 +147,7 @@ REST_FRAMEWORK = {
         "enquiry": os.environ.get("ENQUIRY_THROTTLE_RATE", "10/hour"),
         "guest-message": os.environ.get("GUEST_MESSAGE_THROTTLE_RATE", "60/hour"),
         "ai-draft": os.environ.get("AI_DRAFT_THROTTLE_RATE", "60/hour"),
+        "guest-ai-draft": os.environ.get("GUEST_AI_DRAFT_THROTTLE_RATE", "20/hour"),
         "booking-request": os.environ.get("BOOKING_REQUEST_THROTTLE_RATE", "10/hour"),
     },
 }

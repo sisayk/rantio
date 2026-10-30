@@ -8,7 +8,8 @@ import { guestApi } from "@/lib/ownerApi";
 import chat from "../chat.module.css";
 import styles from "./guest.module.css";
 
-/** "Message the owner" on a cottage page: a short form that opens a private conversation. */
+/** "Message the owner" on a cottage page: a short form that opens a private conversation.
+ *  AI writing help turns a few words into the message; the guest checks it and sends it. */
 export default function ContactOwner({
   lang,
   listingId,
@@ -49,8 +50,12 @@ function ContactDialog({
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDivElement>(null);
+  const form = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [body, setBody] = useState("");
+  const [writing, setWriting] = useState(false);
+  const [ai, setAi] = useState<"idle" | "done" | "failed" | "off">("idle");
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -66,10 +71,41 @@ function ContactDialog({
     };
   }, [onClose]);
 
+  const fields = (el: HTMLFormElement) => {
+    const f = new FormData(el);
+    const text = (name: string) => String(f.get(name) ?? "").trim();
+    const adults = text("adults") ? Number(text("adults")) : null;
+    return { text, adults, children: adults && text("children") ? Number(text("children")) : adults ? 0 : null };
+  };
+
+  async function help() {
+    if (!form.current) return;
+    const { text, adults, children } = fields(form.current);
+    setWriting(true);
+    try {
+      const { draft } = await guestApi.draftEnquiry({
+        listing: listingId,
+        cottage,
+        lang,
+        name: text("name"),
+        check_in: (text("check_in") && text("check_out") && text("check_in")) || null,
+        check_out: (text("check_in") && text("check_out") && text("check_out")) || null,
+        adults,
+        children,
+        draft: body.trim(),
+      });
+      setBody(draft);
+      setAi("done");
+    } catch (err) {
+      setAi((err as { status?: number }).status === 503 ? "off" : "failed");
+    } finally {
+      setWriting(false);
+    }
+  }
+
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const text = (name: string) => String(f.get(name) ?? "").trim();
+    const { text, adults, children } = fields(e.currentTarget);
     setBusy(true);
     setError("");
     try {
@@ -81,7 +117,8 @@ function ContactDialog({
         body: text("body"),
         check_in: text("check_in") || null,
         check_out: text("check_out") || null,
-        guests: text("guests") ? Number(text("guests")) : null,
+        adults,
+        children,
         website: text("website"),
       });
       window.location.assign(paths.guestChat(lang, token));
@@ -100,7 +137,7 @@ function ContactDialog({
           </button>
           <h2 id="contact-title">{t.title}</h2>
         </header>
-        <form className={chat.contactForm} onSubmit={submit}>
+        <form ref={form} className={chat.contactForm} onSubmit={submit}>
           <p className={chat.contactLead}>
             <strong>{cottage}</strong> · {t.lead}
           </p>
@@ -115,7 +152,7 @@ function ContactDialog({
             </label>
           </div>
           <p className={chat.fieldHint}>{t.emailHint}</p>
-          <div className={chat.fieldRow3}>
+          <div className={chat.fieldRow}>
             <label>
               {t.checkIn} <span className={chat.optional}>({t.optional})</span>
               <input name="check_in" type="date" disabled={busy} />
@@ -124,15 +161,46 @@ function ContactDialog({
               {t.checkOut} <span className={chat.optional}>({t.optional})</span>
               <input name="check_out" type="date" disabled={busy} />
             </label>
+          </div>
+          <div className={chat.fieldRow}>
             <label>
-              {t.guests} <span className={chat.optional}>({t.optional})</span>
-              <input name="guests" type="number" min={1} max={maxGuests} inputMode="numeric" disabled={busy} />
+              {t.adults} <span className={chat.optional}>({t.optional})</span>
+              <input name="adults" type="number" min={1} max={maxGuests} inputMode="numeric" disabled={busy} />
+            </label>
+            <label>
+              {t.children} <span className={chat.optional}>({t.optional})</span>
+              <input name="children" type="number" min={0} max={Math.max(0, maxGuests - 1)} inputMode="numeric" disabled={busy} />
             </label>
           </div>
           <label>
             {t.message}
-            <textarea name="body" required rows={5} maxLength={4000} placeholder={t.placeholder} disabled={busy} />
+            <textarea
+              name="body"
+              required
+              rows={5}
+              maxLength={4000}
+              placeholder={t.placeholder}
+              disabled={busy || writing}
+              value={body}
+              onChange={(e) => {
+                setBody(e.target.value);
+                if (ai !== "idle") setAi("idle");
+              }}
+            />
           </label>
+          <div className={chat.aiRow}>
+            <button type="button" className={chat.aiButton} onClick={help} disabled={busy || writing} aria-busy={writing}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3zM19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z" />
+              </svg>
+              {writing ? t.aiWorking : body.trim() ? t.aiImprove : t.aiWrite}
+            </button>
+            {ai !== "idle" || !body.trim() ? (
+              <p className={chat.fieldHint} role={ai === "failed" || ai === "off" ? "alert" : undefined}>
+                {ai === "done" ? t.aiNote : ai === "off" ? t.aiOff : ai === "failed" ? t.aiFailed : t.aiHint}
+              </p>
+            ) : null}
+          </div>
           {/* Hidden from people; bots that fill every field are turned away. */}
           <input name="website" tabIndex={-1} autoComplete="off" className={chat.trap} aria-hidden="true" />
           {error ? (

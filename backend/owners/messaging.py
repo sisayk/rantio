@@ -83,13 +83,13 @@ def _excerpt(text: str) -> str:
 
 @transaction.atomic
 def start(*, listing_slug: str, name: str, email: str, lang: str, text: str, check_in=None, check_out=None,
-          guests=None) -> Conversation:
+          guests=None, children=0) -> Conversation:
     """A guest writes from a cottage page; the owner (or, for cottages not yet with an owner, the team) is told."""
     cottage = Cottage.objects.filter(listing_slug=listing_slug).select_related("owner").first()
     c = Conversation.objects.create(
         cottage=cottage, listing_slug=listing_slug, channel=Booking.Channel.DIRECT, guest_name=name,
         guest_email=email, guest_language=lang, check_in=check_in, check_out=check_out, guests=guests,
-        token=secrets.token_urlsafe(24), guest_read_at=timezone.now(),
+        children=children or 0, token=secrets.token_urlsafe(24), guest_read_at=timezone.now(),
     )
     add(c, Message.Sender.GUEST, text, notify=False)
     _send(GUEST_STARTED, lang, [email], name=name.split()[0], cottage=cottage_label(c), link=guest_link(c))

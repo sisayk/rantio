@@ -1,7 +1,8 @@
 """Messages API.
 
 Guests: POST /api/enquiries/ starts a conversation from a cottage page; the private
-token then reads and continues it at /api/conversations/<token>/.
+token then reads and continues it at /api/conversations/<token>/. POST
+/api/enquiries/draft/ has Claude write (or tidy up) the guest's first message.
 Owners: /api/owner/conversations/ lists their own conversations, one by id with its
 messages, and posts replies.
 """
@@ -30,7 +31,10 @@ class EnquirySerializer(serializers.Serializer):
     body = serializers.CharField(max_length=4000, trim_whitespace=True)
     check_in = serializers.DateField(required=False, allow_null=True)
     check_out = serializers.DateField(required=False, allow_null=True)
+    # Either adults and children (the app, the website) or one head count (older pages).
     guests = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=30)
+    adults = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=30)
+    children = serializers.IntegerField(required=False, allow_null=True, min_value=0, max_value=20)
     website = serializers.CharField(required=False, allow_blank=True)  # honeypot
 
     def validate(self, attrs):
@@ -40,7 +44,19 @@ class EnquirySerializer(serializers.Serializer):
         if ci and co and co <= ci:
             raise serializers.ValidationError({"check_out": "Check-out must be after check-in."})
         attrs["email"] = attrs["email"].strip().lower()
+        party(attrs)
         return attrs
+
+
+def party(attrs: dict) -> None:
+    """Stores the party as booking requests do: `guests` = adults, plus `children`."""
+    adults, children = attrs.pop("adults", None), attrs.pop("children", None) or 0
+    if adults:
+        attrs["guests"], attrs["children"] = adults, children
+    elif children:
+        raise serializers.ValidationError({"adults": "Children travel with at least one adult."})
+    else:
+        attrs["children"] = 0
 
 
 class BodySerializer(serializers.Serializer):
@@ -72,9 +88,43 @@ class EnquiryView(APIView):
         v = data.validated_data
         c = messaging.start(
             listing_slug=v["listing"], name=v["name"], email=v["email"], lang=v["lang"], text=v["body"],
-            check_in=v.get("check_in"), check_out=v.get("check_out"), guests=v.get("guests"),
+            check_in=v.get("check_in"), check_out=v.get("check_out"), guests=v.get("guests"), children=v["children"],
         )
         return Response({"token": c.token}, status=status.HTTP_201_CREATED)
+
+
+class EnquiryDraftSerializer(serializers.Serializer):
+    listing = serializers.SlugField(max_length=60)
+    # Example cottages aren't in the database yet: the page says what it shows.
+    cottage = serializers.CharField(max_length=120, required=False, allow_blank=True)
+    place = serializers.CharField(max_length=160, required=False, allow_blank=True)
+    lang = serializers.ChoiceField(choices=Language.values, default=Language.ENGLISH)
+    name = serializers.CharField(max_length=120, required=False, allow_blank=True)
+    check_in = serializers.DateField(required=False, allow_null=True)
+    check_out = serializers.DateField(required=False, allow_null=True)
+    adults = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=30)
+    children = serializers.IntegerField(required=False, allow_null=True, min_value=0, max_value=20)
+    draft = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+
+
+class EnquiryDraftView(APIView):
+    """The guest's message to the owner, written by Claude from a few words; nothing is sent from here."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "guest-ai-draft"
+
+    def post(self, request):
+        data = EnquiryDraftSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        try:
+            text = assistant.suggest_enquiry(**data.validated_data)
+        except assistant.NotConfigured:
+            return Response({"detail": "ai_not_configured"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        except assistant.DraftFailed:
+            return Response({"detail": "ai_failed"}, status=status.HTTP_502_BAD_GATEWAY)
+        return Response({"draft": text})
 
 
 class GuestThreadView(APIView):

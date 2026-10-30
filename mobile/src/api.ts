@@ -11,6 +11,7 @@ import type {
   CalendarFeed,
   ConversationRow,
   Enquiry,
+  EnquiryDraft,
   Summary,
   Thread,
 } from "@/lib/ownerApi";
@@ -126,6 +127,7 @@ export const ownerApi = {
 
 export const guestApi = {
   enquire: (e: Enquiry) => call<{ token: string }>("enquiries/", json("POST", e)),
+  draftEnquiry: (e: EnquiryDraft) => call<{ draft: string }>("enquiries/draft/", json("POST", e)),
   thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
   send: (token: string, body: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`, json("POST", { body })),
   bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),

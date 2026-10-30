@@ -211,7 +211,23 @@ export type Enquiry = {
   check_in?: string | null;
   check_out?: string | null;
   guests?: number | null;
+  adults?: number | null;
+  children?: number | null;
   website?: string;
+};
+
+/** What the AI writing help gets: the stay so far and the guest's own few words. */
+export type EnquiryDraft = {
+  listing: string;
+  cottage?: string;
+  place?: string;
+  lang: string;
+  name?: string;
+  check_in?: string | null;
+  check_out?: string | null;
+  adults?: number | null;
+  children?: number | null;
+  draft?: string;
 };
 
 export class SignedOut extends Error {}
@@ -268,6 +284,7 @@ export const ownerApi = {
 /** The guest's side: no account, the conversation's token is the key. */
 export const guestApi = {
   enquire: (e: Enquiry) => call<{ token: string }>("enquiries/", { method: "POST", body: JSON.stringify(e) }),
+  draftEnquiry: (e: EnquiryDraft) => call<{ draft: string }>("enquiries/draft/", { method: "POST", body: JSON.stringify(e) }),
   thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
   send: (token: string, body: string) =>
     call<Thread>(`conversations/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify({ body }) }),

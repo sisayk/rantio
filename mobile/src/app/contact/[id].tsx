@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { getListing, listingName } from "@/lib/listings";
@@ -16,7 +16,8 @@ import { ModalFoot, SheetBar } from "@/ui/screen";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** "Message the owner" from a cottage page; the answer comes by email and in Messages. */
+/** "Message the owner" from a cottage page; the answer comes by email and in Messages.
+ *  AI writing help turns a few words into the message (the guest checks it and sends it). */
 export default function Contact() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const l = getListing(id);
@@ -27,7 +28,10 @@ export default function Contact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
-  const [guests, setGuests] = useState(0);
+  const [adults, setAdults] = useState(0);
+  const [children, setChildren] = useState(0);
+  const [writing, setWriting] = useState(false);
+  const [aiState, setAiState] = useState<"idle" | "done" | "failed" | "off">("idle");
   const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -57,7 +61,8 @@ export default function Contact() {
         body: body.trim(),
         check_in: check_in && check_out ? check_in : null,
         check_out: check_in && check_out ? check_out : null,
-        guests: guests || null,
+        adults: adults || null,
+        children: adults ? children : null,
         website: "",
       });
       addChat({ token, listing: l.id, at: new Date().toISOString(), kind: "enquiry" });
@@ -68,6 +73,35 @@ export default function Contact() {
       setBusy(false);
     }
   };
+
+  const [checkIn, checkOut] = dates[0] && dates[1] ? dates : [null, null];
+
+  const help = async () => {
+    setWriting(true);
+    try {
+      const { draft } = await guestApi.draftEnquiry({
+        listing: l.id,
+        cottage: listingName(m.listingNames, l),
+        place: `${l.city}, ${l.country}`,
+        lang,
+        name: name.trim(),
+        check_in: checkIn,
+        check_out: checkOut,
+        adults: adults || null,
+        children: adults ? children : null,
+        draft: body.trim(),
+      });
+      setBody(draft);
+      setAiState("done");
+    } catch (e) {
+      setAiState(e instanceof ApiError && e.status === 503 ? "off" : "failed");
+    } finally {
+      setWriting(false);
+    }
+  };
+
+  const aiLine =
+    aiState === "done" ? c.aiNote : aiState === "off" ? c.aiOff : aiState === "failed" ? c.aiFailed : body.trim() ? null : c.aiHint;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
@@ -100,14 +134,64 @@ export default function Contact() {
               <Icon name="chevron-forward" size={18} color={colors.faint} />
             </Pressable>
           </View>
-          <View style={styles.guests}>
-            <View>
-              <Text v="smallMedium">{c.guests}</Text>
-              <Text v="small">{guests ? p(m.guest.units.guests, guests) : c.optional}</Text>
+          <View style={{ gap: space.md }}>
+            <Text v="smallMedium">
+              {c.guests} <Text v="small">({adults ? p(m.guest.units.guests, adults + children) : c.optional})</Text>
+            </Text>
+            <View style={styles.guests}>
+              <Text v="body">{c.adults}</Text>
+              <Stepper
+                value={adults}
+                min={children ? 1 : 0}
+                max={l.guests - children}
+                onChange={setAdults}
+                label={c.adults}
+              />
             </View>
-            <Stepper value={guests} max={l.guests} onChange={setGuests} label={c.guests} />
+            <View style={styles.guests}>
+              <Text v="body">{c.children}</Text>
+              <Stepper
+                value={children}
+                max={Math.max(0, l.guests - Math.max(adults, 1))}
+                onChange={(n) => {
+                  // Children travel with at least one adult.
+                  if (n > 0 && !adults) setAdults(1);
+                  setChildren(n);
+                }}
+                label={c.children}
+              />
+            </View>
           </View>
-          <Field label={c.message} value={body} onChangeText={setBody} placeholder={c.placeholder} multiline error={tried ? errors.body : null} />
+          <View style={{ gap: space.sm }}>
+            <Field
+              label={c.message}
+              value={body}
+              onChangeText={(t) => {
+                setBody(t);
+                if (aiState !== "idle") setAiState("idle");
+              }}
+              placeholder={c.placeholder}
+              multiline
+              error={tried ? errors.body : null}
+            />
+            <Pressable
+              onPress={help}
+              disabled={writing}
+              style={({ pressed }) => [styles.ai, pressed && { backgroundColor: colors.greenTint }]}
+              accessibilityRole="button"
+              accessibilityState={{ busy: writing }}
+            >
+              {writing ? <ActivityIndicator size="small" color={colors.green} /> : <Icon name="sparkles" size={18} color={colors.green} />}
+              <Text v="smallMedium" color={colors.green}>
+                {writing ? c.aiWorking : body.trim() ? c.aiImprove : c.aiWrite}
+              </Text>
+            </Pressable>
+            {aiLine ? (
+              <Text v="tiny" color={aiState === "failed" || aiState === "off" ? colors.error : undefined}>
+                {aiLine}
+              </Text>
+            ) : null}
+          </View>
           {problem ? <Problem text={problem} /> : null}
           <Button label={busy ? c.sending : c.send} busy={busy} onPress={send} icon="send" />
         </ScrollView>
@@ -132,6 +216,18 @@ export default function Contact() {
 const styles = StyleSheet.create({
   pick: { flexDirection: "row", alignItems: "center", gap: space.md, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, padding: space.md },
   guests: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  ai: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    paddingHorizontal: space.lg,
+    paddingVertical: 10,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.green,
+    backgroundColor: "#fff",
+  },
   foot: {
     flexDirection: "row",
     justifyContent: "space-between",

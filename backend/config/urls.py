@@ -23,6 +23,7 @@ urlpatterns = [
     path("api/owner/summary/", portal.SummaryView.as_view(), name="owner-summary"),
     path("api/owner/bookings/", portal.BookingsView.as_view(), name="owner-bookings"),
     path("api/enquiries/", inbox.EnquiryView.as_view(), name="enquiry"),
+    path("api/enquiries/draft/", inbox.EnquiryDraftView.as_view(), name="enquiry-draft"),
     path("api/conversations/<str:token>/", inbox.GuestThreadView.as_view(), name="guest-thread"),
     path("api/owner/conversations/", inbox.OwnerConversationsView.as_view(), name="owner-conversations"),
     path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),

@@ -93,3 +93,47 @@ class AssistantTests(TestCase):
         self.client.logout()
         self.assertEqual(self.draft().status_code, 403)
         self.assertEqual(FakeClaude.calls, [])
+
+
+@override_settings(ANTHROPIC_API_KEY="test-key", ANTHROPIC_MODEL="claude-sonnet-5-5")
+class GuestDraftTests(TestCase):
+    """A traveller's first message, written from a few words."""
+
+    def setUp(self):
+        cache.clear()
+        FakeClaude.calls, FakeClaude.fail = [], False
+        FakeClaude.reply = "Hei! Onko mökki vapaa 12.–15.11. kahdelle aikuiselle ja lapselle? Kiitos, Emma"
+        self._real = sys.modules.get("anthropic")
+        sys.modules["anthropic"] = types.SimpleNamespace(Anthropic=FakeClaude)
+
+    def tearDown(self):
+        if self._real is not None:
+            sys.modules["anthropic"] = self._real
+        else:
+            sys.modules.pop("anthropic", None)
+
+    def draft(self, **kw):
+        data = {"listing": "nuuksio-forest-cabin", "cottage": "Nuuksio Forest Cabin", "place": "Espoo, Finland", "lang": "fi", **kw}
+        return self.client.post("/api/enquiries/draft/", data, content_type="application/json")
+
+    def test_writes_from_notes_in_the_travellers_language(self):
+        res = self.draft(name="Emma Virtanen", check_in="2026-11-12", check_out="2026-11-15", adults=2, children=1,
+                         draft="dog ok? arriving late ~22")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()["draft"], FakeClaude.reply)
+        call = FakeClaude.calls[0]
+        self.assertIn("Suomi (language code fi)", call["system"])
+        content = call["messages"][0]["content"]
+        for text in ("Nuuksio Forest Cabin, Espoo, Finland", "2 adults and 1 children", "3 nights", "Emma", "dog ok? arriving late ~22"):
+            self.assertIn(text, content)
+
+    def test_without_notes_asks_about_availability(self):
+        res = self.draft()
+        self.assertEqual(res.status_code, 200)
+        self.assertNotIn("traveller_notes", FakeClaude.calls[0]["messages"][0]["content"])
+
+    def test_not_configured_and_failure(self):
+        with self.settings(ANTHROPIC_API_KEY=""):
+            self.assertEqual(self.draft().json()["detail"], "ai_not_configured")
+        FakeClaude.fail = True
+        self.assertEqual(self.draft().status_code, 502)
