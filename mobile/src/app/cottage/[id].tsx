@@ -6,18 +6,22 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
-import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
+import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
 import { findNearby, type NearbyPlace } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import { useMoney } from "@/state/money";
+import { daysBetween, formatRange } from "@/text/dates";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadowFloat, space } from "@/theme";
 import { ChannelStack, ChannelTile } from "@/ui/channels";
+import { AmenityRow, NOT_INCLUDED } from "@/ui/amenities";
 import { Button, Empty, Icon, IconButton, Pill, Problem, Text } from "@/ui/kit";
 import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
+import { PhotoTour } from "@/ui/photos";
+import { RangeCalendar } from "@/ui/range-calendar";
 import { SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
@@ -36,6 +40,10 @@ export default function Cottage() {
   const [showAll, setShowAll] = useState(false);
   const [booking, setBooking] = useState(false);
   const [note, setNote] = useState(false);
+  const [tour, setTour] = useState(false);
+  const [allAmenities, setAllAmenities] = useState(false);
+  const [picking, setPicking] = useState(false);
+  const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
 
   useEffect(() => {
     if (!l) return;
@@ -60,13 +68,14 @@ export default function Cottage() {
   const photoHeight = Math.round(Math.min(width * 0.82, 520));
   const price = money.show(l.price, listingCurrency(l));
   const activities = activitiesFor(l, m.activities);
+  const has = (k: FeatureKey) => (l.features as string[]).includes(k);
   const amenities = FEATURE_GROUPS.filter((g) => g.id !== "booking")
-    .map((g) => ({
-      id: g.id,
-      title: m.catalog.groups[g.id],
-      items: g.options.filter((k) => (l.features as string[]).includes(k)).map((k) => m.catalog.features[k]),
-    }))
+    .map((g) => ({ id: g.id, title: m.catalog.groups[g.id], items: (g.options as readonly FeatureKey[]).filter(has) }))
     .filter((g) => g.items.length);
+  const amenityCount = amenities.reduce((n, g) => n + g.items.length, 0);
+  const missing = NOT_INCLUDED.filter((k) => !has(k));
+  const nights = dates[0] && dates[1] ? daysBetween(dates[0], dates[1]) : 0;
+  const total = nights ? money.show(l.price * nights, listingCurrency(l)) : null;
   const flags = (["instantBook", "freeCancellation"] as const).filter((k) => (l.features as string[]).includes(k));
   const pageUrl = `${SITE_URL}/${lang}/cottages/${l.id}`;
   const shownActivities = showAll ? activities : activities.slice(0, 4);
@@ -83,21 +92,24 @@ export default function Cottage() {
             keyExtractor={(x) => x.id}
             onMomentumScrollEnd={(e) => setPhoto(Math.round(e.nativeEvent.contentOffset.x / width))}
             renderItem={({ item }) => (
-              <Image
-                source={{ uri: unsplash(item.id, Math.round(width * 2), photoHeight * 2, item.crop) }}
-                placeholder={{ uri: unsplashWhole(item.id, 40) }}
-                style={{ width, height: photoHeight }}
-                contentFit="cover"
-                transition={250}
-                accessibilityLabel={m.guest.photos[item.kind]}
-              />
+              <Pressable onPress={() => setTour(true)} accessibilityRole="imagebutton" accessibilityLabel={m.app.detail.photos}>
+                <Image
+                  source={{ uri: unsplash(item.id, Math.round(width * 2), photoHeight * 2, item.crop) }}
+                  placeholder={{ uri: unsplashWhole(item.id, 40) }}
+                  style={{ width, height: photoHeight }}
+                  contentFit="cover"
+                  transition={250}
+                  accessibilityLabel={m.guest.photos[item.kind]}
+                />
+              </Pressable>
             )}
           />
-          <View style={styles.counter} pointerEvents="none">
+          <Pressable style={styles.counter} onPress={() => setTour(true)} accessibilityRole="button" accessibilityLabel={f(m.guest.photos.showAll, { n: photos.length })}>
+            <Icon name="grid-outline" size={13} color="#fff" />
             <Text v="tiny" color="#fff">
               {photo + 1} / {photos.length}
             </Text>
-          </View>
+          </Pressable>
           <View style={[styles.topButtons, { top: insets.top + space.sm }]}>
             <IconButton name="chevron-back" label={m.guest.detail.back} onPress={() => (router.canGoBack() ? router.back() : router.replace("/explore"))} />
             <View style={{ flexDirection: "row", gap: space.sm }}>
@@ -177,24 +189,25 @@ export default function Cottage() {
           ) : null}
 
           <Divider />
-          <Text v="h2">{m.guest.detail.amenitiesTitle}</Text>
-          {amenities.map((g) => (
-            <View key={g.id} style={{ marginTop: space.lg }}>
-              <Text v="h3" style={{ marginBottom: space.xs }}>
-                {g.title}
-              </Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", rowGap: space.xs }}>
-                {g.items.map((item) => (
-                  <View key={item} style={styles.amenity}>
-                    <Icon name="checkmark" size={16} color={colors.green} />
-                    <Text v="small" color={colors.ink} style={{ flexShrink: 1 }}>
-                      {item}
-                    </Text>
-                  </View>
-                ))}
-              </View>
+          <Text v="h2">{m.app.detail.offers}</Text>
+          <View style={{ marginTop: space.sm }}>
+            {amenities
+              .flatMap((g) => g.items)
+              .slice(0, 6)
+              .map((k, i, a) => (
+                <AmenityRow key={k} feature={k} label={m.catalog.features[k]} last={i === a.length - 1} />
+              ))}
+          </View>
+          <Button kind="secondary" label={f(m.app.detail.showAmenities, { n: amenityCount })} onPress={() => setAllAmenities(true)} style={{ marginTop: space.md }} />
+
+          <Divider />
+          <Pressable onPress={() => setPicking(true)} style={styles.availability} accessibilityRole="button">
+            <View style={{ flex: 1 }}>
+              <Text v="h2">{m.app.detail.availability}</Text>
+              <Text v="small">{dates[0] && dates[1] ? `${formatRange(lang, dates[0], dates[1])} · ${p(m.guest.units.nights, nights)}` : m.guest.datePicker.addDates}</Text>
             </View>
-          ))}
+            <Icon name="chevron-forward" size={20} color={colors.soft} />
+          </Pressable>
 
           <Divider />
           <Text v="h2">{m.app.explore.whereYoullBe}</Text>
@@ -252,6 +265,16 @@ export default function Cottage() {
           ) : null}
 
           <Divider />
+          <Text v="h2">{m.app.detail.know}</Text>
+          <Know emoji="💳" title={m.app.detail.paidOn} lead={m.app.detail.paidOnLead} />
+          <Know
+            emoji="🗓️"
+            title={m.app.detail.cancellation}
+            lead={has("freeCancellation") ? m.catalog.features.freeCancellation : m.app.detail.cancelSite}
+          />
+          <Know emoji="💬" title={m.app.detail.ask} lead={m.guest.contact.lead} onPress={() => router.push(`/contact/${l.id}`)} />
+
+          <Divider />
           <Text v="h2">{m.guest.detail.bookTitle}</Text>
           <View style={{ marginTop: space.sm }}>
             {l.channels.map((c, i) => (
@@ -266,12 +289,25 @@ export default function Cottage() {
       </ScrollView>
 
       <SafeAreaView edges={["bottom"]} style={[styles.footer, shadowFloat]}>
-        <View style={{ flex: 1 }}>
-          <Text v="h3">
-            {price.converted ? `≈ ${price.text}` : price.text} <Text v="small">{m.guest.card.night}</Text>
-          </Text>
-          {price.converted ? <Text v="tiny">{f(m.guest.currency.original, { price: money.format(l.price, listingCurrency(l)) })}</Text> : null}
-        </View>
+        <Pressable style={{ flex: 1 }} onPress={() => setPicking(true)} accessibilityRole="button">
+          {total && dates[0] && dates[1] ? (
+            <>
+              <Text v="h3" style={{ textDecorationLine: "underline" }}>
+                {f(m.app.explore.forNights, { price: `${total.converted ? "≈ " : ""}${total.text}`, nights: p(m.guest.units.nights, nights) })}
+              </Text>
+              <Text v="tiny">{formatRange(lang, dates[0], dates[1])}</Text>
+            </>
+          ) : (
+            <>
+              <Text v="h3">
+                {price.converted ? `≈ ${price.text}` : price.text} <Text v="small">{m.guest.card.night}</Text>
+              </Text>
+              <Text v="tiny" style={{ textDecorationLine: "underline" }}>
+                {m.guest.datePicker.addDates}
+              </Text>
+            </>
+          )}
+        </Pressable>
         <IconButton name="chatbubble-ellipses-outline" filled={false} label={m.guest.contact.button} onPress={() => router.push(`/contact/${l.id}`)} size={24} />
         <Button label={m.app.explore.book} onPress={() => setBooking(true)} style={{ paddingHorizontal: space.xxl }} />
       </SafeAreaView>
@@ -304,7 +340,76 @@ export default function Cottage() {
           </ScrollView>
         </View>
       </Modal>
+
+      <PhotoTour
+        visible={tour}
+        photos={photos}
+        name={name}
+        onClose={() => setTour(false)}
+        onBook={() => {
+          setTour(false);
+          setBooking(true);
+        }}
+      />
+
+      <Modal visible={allAmenities} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAllAmenities(false)}>
+        <View style={{ flex: 1, backgroundColor: colors.page }}>
+          <SheetBar title="" onClose={() => setAllAmenities(false)} />
+          <ScrollView contentContainerStyle={{ padding: space.xl, paddingBottom: space.xxl * 2 }}>
+            <Text v="title">{m.app.detail.offers}</Text>
+            {amenities.map((g) => (
+              <View key={g.id} style={{ marginTop: space.xl }}>
+                <Text v="h3">{g.title}</Text>
+                {g.items.map((k, i) => (
+                  <AmenityRow key={k} feature={k} label={m.catalog.features[k]} last={i === g.items.length - 1} />
+                ))}
+              </View>
+            ))}
+            {missing.length ? (
+              <View style={{ marginTop: space.xl }}>
+                <Text v="h3">{m.app.detail.notIncluded}</Text>
+                {missing.map((k, i) => (
+                  <AmenityRow key={k} feature={k} label={m.catalog.features[k]} missing last={i === missing.length - 1} />
+                ))}
+              </View>
+            ) : null}
+          </ScrollView>
+        </View>
+      </Modal>
+
+      <Modal visible={picking} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setPicking(false)}>
+        <View style={{ flex: 1, backgroundColor: colors.page }}>
+          <SheetBar title={m.guest.datePicker.title} onClose={() => setPicking(false)} />
+          <ScrollView contentContainerStyle={{ padding: space.lg }}>
+            <RangeCalendar lang={lang} start={dates[0]} end={dates[1]} onChange={(a, b) => setDates([a, b])} months={12} />
+          </ScrollView>
+          <SafeAreaView edges={["bottom"]} style={styles.pickFoot}>
+            <Button kind="ghost" label={m.guest.datePicker.clear} onPress={() => setDates([null, null])} />
+            <Button label={m.guest.datePicker.done} onPress={() => setPicking(false)} />
+          </SafeAreaView>
+        </View>
+      </Modal>
     </View>
+  );
+}
+
+function Know({ emoji, title, lead, onPress }: { emoji: string; title: string; lead: string; onPress?: () => void }) {
+  const body = (
+    <View style={styles.know}>
+      <Text style={{ fontSize: 28, lineHeight: 34 }}>{emoji}</Text>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text v="h3">{title}</Text>
+        <Text v="small">{lead}</Text>
+      </View>
+      {onPress ? <Icon name="chevron-forward" size={18} color={colors.soft} /> : null}
+    </View>
+  );
+  return onPress ? (
+    <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => pressed && { opacity: 0.6 }}>
+      {body}
+    </Pressable>
+  ) : (
+    body
   );
 }
 
@@ -342,7 +447,18 @@ const Divider = () => <View style={styles.divider} />;
 const styles = StyleSheet.create({
   topButtons: { position: "absolute", left: space.lg, right: space.lg, flexDirection: "row", justifyContent: "space-between" },
   heartWrap: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.94)", alignItems: "center", justifyContent: "center" },
-  counter: { position: "absolute", right: space.lg, bottom: space.lg, backgroundColor: "rgba(0,0,0,0.55)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill },
+  availability: { flexDirection: "row", alignItems: "center", gap: space.md },
+  know: { flexDirection: "row", alignItems: "flex-start", gap: space.lg, paddingVertical: space.md },
+  pickFoot: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: space.xl,
+    paddingVertical: space.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.line,
+  },
+  counter: { position: "absolute", right: space.lg, bottom: space.xxl, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill },
   body: { padding: space.xl, marginTop: -space.lg, backgroundColor: colors.page, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg },
   facts: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.lg },
   fact: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: space.md, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: colors.ground },
