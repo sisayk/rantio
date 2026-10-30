@@ -31,8 +31,11 @@ Every command block says where it runs: **On your Mac, in a normal terminal** or
 In the Hetzner Cloud console (console.hetzner.cloud):
 
 1. New project "Stugora", then **Add Server**.
-2. Location **Helsinki**, image **Ubuntu 24.04**, type **CX22** (2 vCPU, 4 GB RAM) or
-   bigger. Keep IPv4 and IPv6 on.
+2. Location **Helsinki**, image **Ubuntu 24.04**. Pick a server with at least
+   **2 vCPU and 4 GB RAM**: a Cost-Optimized (CX) one if Helsinki has it in stock,
+   otherwise Regular Performance (CPX). The old CX22 can no longer be ordered, and
+   the 1–2 GB plans (CPX02, CPX12) are too small for the site build and the database.
+   Keep IPv4 and IPv6 on.
 3. Under SSH keys add your Mac's public key. If you don't have one yet:
 
    On your Mac, in a normal terminal:
