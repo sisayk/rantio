@@ -1,0 +1,200 @@
+/* A guest's booking request: the calendar and details on the left, the price beside them. */
+
+.main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+  color: #1d2a2e;
+}
+
+.head h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 38px);
+  letter-spacing: -0.02em;
+}
+
+.head p { margin: 6px 0 0; color: #5d6a6e; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 32px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.left { display: grid; gap: 20px; }
+
+.block,
+.summary,
+.done {
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(29, 42, 46, 0.05), 0 6px 18px rgba(29, 42, 46, 0.06);
+}
+
+.block h2,
+.done h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.blockHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.blockHead span { color: #5d6a6e; font-size: 14px; }
+
+.datesLine { margin: 0 0 8px; font-weight: 600; }
+
+.picker {
+  --rdp-accent-color: #1d4c3c;
+  --rdp-accent-background-color: #dbe9e2;
+  --rdp-day-height: 44px;
+  --rdp-day-width: 44px;
+  --rdp-day_button-height: 42px;
+  --rdp-day_button-width: 42px;
+  margin: 0;
+}
+
+.picker :global(.rdp-months) { gap: 32px; }
+.picker :global(.rdp-disabled) { opacity: 1; color: #b3bbb8; text-decoration: line-through; }
+
+.textBtn {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1d2a2e;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #e3e7e5;
+}
+
+.count:first-of-type { border-top: 0; }
+
+.count > div { display: flex; align-items: center; gap: 14px; }
+
+.count button {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #b3bbb8;
+  border-radius: 50%;
+  background: #fff;
+  color: #1d2a2e;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.count button:disabled { opacity: 0.35; cursor: default; }
+.count output { min-width: 20px; text-align: center; font-weight: 600; }
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field i { font-style: normal; font-weight: 400; color: #5d6a6e; }
+
+.field input,
+.field textarea {
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid #c9d0cd;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2a2e;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.field textarea { resize: vertical; }
+.field input:focus,
+.field textarea:focus { outline: 2px solid #1d4c3c; outline-offset: 1px; }
+.field [aria-invalid="true"] { border-color: #b42318; }
+.field em { color: #b42318; font-style: normal; font-weight: 400; }
+.field small { color: #5d6a6e; font-weight: 400; }
+
+.trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+.summary {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.nightly { margin: 0; font-size: 18px; }
+
+.lines { display: grid; gap: 8px; margin: 0; font-size: 15px; }
+.lines div { display: flex; justify-content: space-between; gap: 12px; }
+.lines dt { color: #5d6a6e; }
+.lines dd { margin: 0; }
+
+.total {
+  padding-top: 10px;
+  border-top: 1px solid #e3e7e5;
+  font-weight: 700;
+}
+
+.total dt { color: #1d2a2e; }
+
+.sendBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: #1d4c3c;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sendBtn:hover { background: #143a2d; }
+.sendBtn:disabled { opacity: 0.6; cursor: default; }
+
+.small { margin: 0; color: #5d6a6e; font-size: 13px; }
+.error { margin: 6px 0 0; color: #b42318; font-size: 14px; }
+
+.done { display: grid; gap: 12px; justify-items: start; max-width: 620px; margin-top: 24px; }
+.done p { margin: 0; color: #5d6a6e; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .summary { position: static; order: 2; }
+}
+
+@media (max-width: 600px) {
+  .main { padding: 16px 16px 48px; }
+  .block, .summary, .done { padding: 18px 16px; }
+  .picker { --rdp-day-width: 40px; --rdp-day-height: 40px; --rdp-day_button-width: 38px; --rdp-day_button-height: 38px; }
+}

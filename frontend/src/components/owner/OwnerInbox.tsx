@@ -9,6 +9,7 @@ import { type ConversationRow, ownerApi, SignedOut, type Thread } from "@/lib/ow
 import { ArrowLeft } from "../guest/icons";
 import ChatThread from "../ChatThread";
 import HostingHeader from "./HostingHeader";
+import RequestCard from "./RequestCard";
 import SiteIcon from "./SiteIcon";
 import chat from "../chat.module.css";
 import styles from "./owner.module.css";
@@ -238,6 +239,26 @@ export default function OwnerInbox({
                     {thread.archived ? i.unarchive : i.archive}
                   </button>
                 </div>
+                {thread.request ? (
+                  <div className={chat.requestSlot}>
+                    <RequestCard
+                      key={`req-${thread.id}`}
+                      lang={lang}
+                      t={t.calendar.requests}
+                      nightsWord={t.nights}
+                      req={thread.request}
+                      showChatLink={false}
+                      onDone={() => {
+                        void loadThread(thread.id);
+                        void loadList();
+                      }}
+                    />
+                  </div>
+                ) : thread.request_status === "accepted" || thread.request_status === "declined" ? (
+                  <p className={chat.requestDone} data-status={thread.request_status}>
+                    {t.calendar.requests[thread.request_status]}
+                  </p>
+                ) : null}
                 <ChatThread
                   key={thread.id}
                   lang={lang}

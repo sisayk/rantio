@@ -82,6 +82,11 @@ export type ConversationRow = {
   check_in: string | null;
   check_out: string | null;
   guests: number | null;
+  children: number;
+  /** Set for a booking request sent through the owner's booking link. */
+  request_status: "" | "pending" | "accepted" | "declined";
+  guest_phone: string;
+  booking_id: number | null;
   archived: boolean;
   unread: boolean;
   last_at: string | null;
@@ -93,6 +98,108 @@ export type Thread = ConversationRow & {
   listing_slug: string;
   messages: ChatMessage[];
   viewer: "guest" | "host";
+  /** For the owner, while a booking request waits for an answer. */
+  request?: BookingRequestRow | null;
+};
+
+export type CalendarEntry = {
+  /** booking: a stay from any site; site: dates taken on a site we read by calendar link;
+   *  block: dates the owner closed; request: a booking request waiting for an answer. */
+  kind: "booking" | "site" | "block" | "request";
+  id: number;
+  cottage_id: number;
+  start: string; // first night
+  end: string; // check-out day, the first free day
+  channel: string;
+  label: string;
+  guests: number | null;
+  note: string;
+};
+
+export type CalendarFeed = {
+  id: number;
+  cottage_id: number;
+  channel: string;
+  label: string;
+  url: string;
+  last_synced_at: string | null;
+  last_error: string;
+};
+
+export type CalendarCottage = {
+  id: number;
+  name: string;
+  status: string;
+  currency: string;
+  price_per_night: Money;
+  cleaning_fee: Money;
+  min_nights: number;
+  max_guests: number;
+  booking_link: string;
+  booking_requests_open: boolean;
+  forwarding_address: string;
+  export: Record<"airbnb" | "booking" | "vrbo" | "all", string>;
+  feeds: CalendarFeed[];
+};
+
+export type BookingRequestRow = {
+  id: number;
+  cottage_id: number;
+  guest_name: string;
+  guest_phone: string;
+  guest_language: string;
+  check_in: string;
+  check_out: string;
+  nights: number;
+  adults: number;
+  children: number;
+  message: string;
+  estimate: Money;
+  currency: string;
+  free: boolean;
+  created_at: string;
+};
+
+export type CalendarData = {
+  today: string;
+  from: string;
+  to: string;
+  cottages: CalendarCottage[];
+  entries: CalendarEntry[];
+  /** Pairs of "kind-id" keys of entries that overlap: double bookings. */
+  conflicts: [string, string][];
+  requests: BookingRequestRow[];
+};
+
+/** What a guest with an owner's booking link sees. */
+export type BookingLinkInfo = {
+  name: string;
+  municipality: string;
+  country: string;
+  listing_slug: string;
+  host: string;
+  max_guests: number;
+  min_nights: number;
+  max_nights: number;
+  price_per_night: Money;
+  cleaning_fee: Money;
+  currency: string;
+  open: boolean;
+  today: string;
+  busy: [string, string][];
+};
+
+export type BookingRequestForm = {
+  name: string;
+  email: string;
+  phone: string;
+  lang: string;
+  check_in: string;
+  check_out: string;
+  adults: number;
+  children: number;
+  body: string;
+  website?: string;
 };
 
 export type Enquiry = {
@@ -143,6 +250,19 @@ export const ownerApi = {
     call<{ draft: string }>(`owner/conversations/${id}/draft/`, { method: "POST", body: JSON.stringify({ notes, draft }) }),
   archive: (id: number, archived: boolean) =>
     call<ConversationRow>(`owner/conversations/${id}/`, { method: "PATCH", body: JSON.stringify({ archived }) }),
+  calendar: (from: string, months: number) => call<CalendarData>(`owner/calendar/?from=${from}&months=${months}`),
+  closeDates: (cottage: number, start: string, end: string, note: string) =>
+    call<{ id: number }>("owner/calendar/blocks/", { method: "POST", body: JSON.stringify({ cottage, start, end, note }) }),
+  reopenDates: (id: number) => call<unknown>(`owner/calendar/blocks/${id}/`, { method: "DELETE" }),
+  saveFeed: (cottage: number, channel: string, url: string) =>
+    call<CalendarFeed>("owner/calendar/feeds/", { method: "POST", body: JSON.stringify({ cottage, channel, url }) }),
+  removeFeed: (id: number) => call<unknown>(`owner/calendar/feeds/${id}/`, { method: "DELETE" }),
+  setBookingLink: (cottage: number, open: boolean) =>
+    call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "PATCH", body: JSON.stringify({ open }) }),
+  renewBookingLink: (cottage: number) => call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "POST" }),
+  acceptRequest: (id: number, payout: string) =>
+    call<ConversationRow>(`owner/conversations/${id}/accept/`, { method: "POST", body: JSON.stringify({ payout }) }),
+  declineRequest: (id: number) => call<ConversationRow>(`owner/conversations/${id}/decline/`, { method: "POST" }),
 };
 
 /** The guest's side: no account, the conversation's token is the key. */
@@ -151,5 +271,8 @@ export const guestApi = {
   thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
   send: (token: string, body: string) =>
     call<Thread>(`conversations/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify({ body }) }),
+  bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),
+  requestBooking: (token: string, form: BookingRequestForm) =>
+    call<{ token: string }>(`book/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify(form) }),
 };
 

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
-from owners import inbound, inbox, portal
+from owners import calendar_views, inbound, inbox, portal
 from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Stugora admin"
@@ -27,6 +27,16 @@ urlpatterns = [
     path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),
     path("api/owner/conversations/<int:pk>/draft/", inbox.OwnerDraftView.as_view(), name="owner-draft"),
     path("api/owner/assistant/", inbox.AssistantStatusView.as_view(), name="owner-assistant"),
+    path("api/calendar/<str:token>.ics", calendar_views.calendar_export, name="calendar-export"),
+    path("api/book/<str:token>/", calendar_views.BookingLinkView.as_view(), name="booking-link"),
+    path("api/owner/calendar/", calendar_views.OwnerCalendarView.as_view(), name="owner-calendar"),
+    path("api/owner/calendar/blocks/", calendar_views.OwnerBlocksView.as_view(), name="owner-blocks"),
+    path("api/owner/calendar/blocks/<int:pk>/", calendar_views.OwnerBlockView.as_view(), name="owner-block"),
+    path("api/owner/calendar/feeds/", calendar_views.OwnerFeedsView.as_view(), name="owner-feeds"),
+    path("api/owner/calendar/feeds/<int:pk>/", calendar_views.OwnerFeedView.as_view(), name="owner-feed"),
+    path("api/owner/cottages/<int:pk>/booking-link/", calendar_views.OwnerBookingLinkView.as_view(), name="owner-booking-link"),
+    path("api/owner/conversations/<int:pk>/accept/", calendar_views.OwnerRequestView.as_view(), {"action": "accept"}, name="owner-request-accept"),
+    path("api/owner/conversations/<int:pk>/decline/", calendar_views.OwnerRequestView.as_view(), {"action": "decline"}, name="owner-request-decline"),
     path("api/rates/", RatesView.as_view(), name="rates"),
     path("api/hero/", HeroSlidesView.as_view(), name="hero-slides"),
     path("api/inbound/booking-email/", inbound.booking_email, name="inbound-booking-email"),

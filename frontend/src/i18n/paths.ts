@@ -8,6 +8,9 @@ export const paths = {
   hosting: (lang: Lang) => `/${lang}/hosting`,
   hostingLogin: (lang: Lang) => `/${lang}/hosting/login`,
   hostingMessages: (lang: Lang) => `/${lang}/hosting/messages`,
+  hostingCalendar: (lang: Lang) => `/${lang}/hosting/calendar`,
+  /** A cottage's booking-request page, from the link the owner shares. */
+  book: (lang: Lang, token: string) => `/${lang}/book/${token}`,
   /** A guest's private conversation page; the token is its only key. */
   guestChat: (lang: Lang, token: string) => `/${lang}/messages/${token}`,
   privacy: (lang: Lang) => `/${lang}/privacy`,

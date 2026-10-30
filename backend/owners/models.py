@@ -33,6 +33,11 @@ def new_inbound_code() -> str:
     return secrets.token_hex(4)
 
 
+def new_link_token() -> str:
+    """A long random key for a link that works without signing in (calendar feed, booking link)."""
+    return secrets.token_urlsafe(18)
+
+
 def vat_on(amount: Decimal) -> Decimal:
     return (amount * VAT_RATE / Decimal(100)).quantize(CENT, rounding=ROUND_HALF_UP)
 
@@ -199,6 +204,17 @@ class Cottage(models.Model):
         max_length=16, unique=True, default=new_inbound_code, editable=False,
         help_text="Identifies the cottage in its booking-email forwarding address.",
     )
+    calendar_token = models.CharField(
+        max_length=32, unique=True, default=new_link_token, editable=False,
+        help_text="Key in the cottage's calendar link (iCal) that the booking sites read.",
+    )
+    booking_link_token = models.CharField(
+        max_length=32, unique=True, default=new_link_token, editable=False,
+        help_text="Key in the booking-request link the owner shares with their own guests.",
+    )
+    booking_requests_open = models.BooleanField(
+        default=True, help_text="Whether guests with the booking link can send a booking request."
+    )
     listing_slug = models.SlugField(
         max_length=60, blank=True, db_index=True,
         help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
@@ -323,6 +339,52 @@ class Booking(models.Model):
         return self.commission + self.commission_vat
 
 
+class CalendarFeed(models.Model):
+    """A booking site's calendar link (iCal) that Stugora reads, so its bookings close the dates everywhere."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="feeds")
+    channel = models.CharField(max_length=12, choices=Booking.Channel.choices)
+    url = models.URLField(max_length=1000)
+    last_synced_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["cottage", "channel"]
+        constraints = [models.UniqueConstraint(fields=["cottage", "channel"], name="feed_one_per_channel")]
+
+    def __str__(self) -> str:
+        return f"{self.cottage.name}: {self.get_channel_display()} calendar"
+
+
+class CalendarBlock(models.Model):
+    """Dates that aren't free without being a booking here: closed by the owner, or taken
+    on a booking site whose calendar we read. `end` is the first free day again."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="blocks")
+    feed = models.ForeignKey(CalendarFeed, on_delete=models.CASCADE, null=True, blank=True, related_name="blocks")
+    uid = models.CharField(max_length=255, blank=True, help_text="The event's id in the site's calendar.")
+    start = models.DateField()
+    end = models.DateField()
+    note = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["start"]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(end__gt=models.F("start")), name="block_end_after_start"),
+            models.UniqueConstraint(fields=["feed", "uid"], condition=models.Q(feed__isnull=False), name="block_unique_uid_per_feed"),
+        ]
+
+    def __str__(self) -> str:
+        source = self.feed.get_channel_display() if self.feed else "Owner"
+        return f"{self.cottage.name} {self.start}–{self.end} ({source})"
+
+    @property
+    def is_owners(self) -> bool:
+        return self.feed_id is None
+
+
 class LoginCode(models.Model):
     """A six-digit code emailed to an owner; signing in needs no password."""
 
@@ -342,6 +404,12 @@ class LoginCode(models.Model):
 
     def __str__(self) -> str:
         return f"Login code for {self.owner} at {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class RequestStatus(models.TextChoices):
+    PENDING = "pending", "Waiting for the owner"
+    ACCEPTED = "accepted", "Accepted"
+    DECLINED = "declined", "Declined"
 
 
 class Conversation(models.Model):
@@ -364,6 +432,12 @@ class Conversation(models.Model):
     check_out = models.DateField(null=True, blank=True)
     guests = models.PositiveSmallIntegerField(null=True, blank=True)
     token = models.CharField(max_length=48, unique=True, help_text="The guest's private link to this conversation.")
+    request_status = models.CharField(
+        max_length=10, choices=RequestStatus.choices, blank=True, default="",
+        help_text="Set when the guest asked to book through the owner's booking link.",
+    )
+    guest_phone = models.CharField(max_length=40, blank=True)
+    children = models.PositiveSmallIntegerField(default=0)
     archived = models.BooleanField(default=False)
     owner_read_at = models.DateTimeField(null=True, blank=True)
     guest_read_at = models.DateTimeField(null=True, blank=True)

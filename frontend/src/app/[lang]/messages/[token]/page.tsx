@@ -26,6 +26,7 @@ async function Chat({ params }: Props) {
       lang={lang}
       token={token}
       t={m.guest.chat}
+      requestWords={m.book.status}
       listingNames={m.listingNames}
       languageButton={<LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.quietLink} />}
     />

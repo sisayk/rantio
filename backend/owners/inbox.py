@@ -15,7 +15,8 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from . import assistant, messaging
-from .models import Conversation, Language, Message
+from .calendar_views import request_row
+from .models import Conversation, Language, Message, RequestStatus
 from .portal import IsOwner
 
 BODY = serializers.CharField(max_length=4000, trim_whitespace=True)
@@ -54,6 +55,8 @@ def thread(c: Conversation, viewer: str) -> dict:
         "listing_slug": c.listing_slug,
         "messages": [messaging.message_row(m) for m in c.messages.all()],
         "viewer": viewer,
+        # A booking request waiting for the owner: what accepting it would mean.
+        "request": request_row(c) if viewer == "host" and c.request_status == RequestStatus.PENDING else None,
     }
 
 

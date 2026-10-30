@@ -21,6 +21,8 @@ GROUPS = [
     ("Stays", [
         ("Bookings", "event", ("owners", "booking", ""), None),
         ("Booking emails", "mark_email_read", ("owners", "inboundemail", ""), "booking_emails"),
+        ("Site calendars", "sync", ("owners", "calendarfeed", ""), None),
+        ("Closed dates", "event_busy", ("owners", "calendarblock", ""), None),
     ]),
     ("Guests", [
         ("Conversations", "forum", ("owners", "conversation", ""), "team_inbox"),

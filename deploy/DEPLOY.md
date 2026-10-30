@@ -23,7 +23,7 @@ Every command block says where it runs: **On your Mac, in a normal terminal** or
 | `backup.sh` | Nightly database + uploads backup (installed as `stugora-backup`) |
 | `manage.sh` | Run `manage.py` with production settings (installed as `stugora-manage`) |
 | `nginx/` | nginx site (`stugora.conf`), temporary http-only site, stugora.com redirect, snippets |
-| `systemd/` | Services for Django and Next.js; timers for backups, booking emails, invoices |
+| `systemd/` | Services for Django and Next.js; timers for backups, booking emails, invoices, site calendars |
 | `rsync-exclude.txt` | What stays on the Mac when copying code with rsync |
 
 ## 1. Create the server
@@ -211,16 +211,16 @@ tar -xzf /var/backups/stugora/stugora-media-DATE.tar.gz -C /srv/stugora
 systemctl start stugora-django
 ```
 
-## 11. Background jobs (booking emails, monthly invoices)
+## 11. Background jobs (booking emails, monthly invoices, site calendars)
 
-Two timers are ready in `deploy/systemd/`:
+Three timers are ready in `deploy/systemd/`:
 
 | Timer | Runs | Command |
 | --- | --- | --- |
 | `stugora-booking-emails.timer` | every 5 minutes | `manage.py read_booking_emails` |
 | `stugora-invoices.timer` | 1st of each month, 06:00 Finnish time | `manage.py make_monthly_invoices` |
+| `stugora-calendars.timer` | every 15 minutes | `manage.py sync_calendars` |
 
-They rely on those two management commands, which are being written now.
 `deploy.sh` turns each timer on only once its command exists in
 `backend/owners/management/commands/`, so just deploy as usual after they're added.
 Run one by hand: `stugora-manage read_booking_emails`. Logs:

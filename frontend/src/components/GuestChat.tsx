@@ -21,12 +21,15 @@ export default function GuestChat({
   lang,
   token,
   t,
+  requestWords,
   listingNames,
   languageButton,
 }: {
   lang: Lang;
   token: string;
   t: Messages["guest"]["chat"];
+  /** How a booking request made through the owner's link stands. */
+  requestWords: Messages["book"]["status"];
   listingNames: Record<string, string>;
   languageButton: React.ReactNode;
 }) {
@@ -96,6 +99,11 @@ export default function GuestChat({
             {listing ? <a href={paths.cottage(lang, listing.id)}>{t.viewCottage}</a> : null}
           </div>
         </div>
+        {th.request_status ? (
+          <p className={styles.requestDone} data-status={th.request_status} role="status">
+            {requestWords[th.request_status]}
+          </p>
+        ) : null}
         <p className={styles.keepLink}>{t.keepLink}</p>
         <div className={styles.guestThread}>
           <ChatThread

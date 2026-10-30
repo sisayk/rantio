@@ -56,6 +56,25 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     `/<lang>/messages/<token>`. The browser reaches Django through the
     site's own `/api/*` path (`next.config.ts`), so the sign-in cookie is first-party.
 
+## Calendar and booking link
+
+Each cottage has one calendar, the master (Hosting › Calendar, `/<lang>/hosting/calendar`):
+
+- **What fills it:** bookings from every site, dates read from Airbnb, Booking.com and Vrbo
+  through their calendar links (iCal, read every 15 minutes by `manage.py sync_calendars`),
+  Nettimökki bookings from forwarded emails, and dates the owner closes. Overlaps between
+  different sites are shown as double bookings.
+- **What the sites read back:** `/api/calendar/<token>.ics?site=airbnb` (one link per site,
+  leaving out that site's own bookings). It says only "Not available", never guest names.
+- **Booking link:** `/book/<token>`, for the owner's own guests. A guest picks free dates and
+  sends a request; it lands in the owner's calendar and inbox. Accepting it books the stay as
+  the owner's own booking (never charged) and closes the dates everywhere. The owner takes
+  the payment as before; Stugora handles no money. The owner can stop requests or make a new
+  link if the old one spread too far.
+
+Code: `backend/owners/calendar.py`, `booking_requests.py`, `calendar_views.py`;
+`frontend/src/components/owner/OwnerCalendar.tsx`, `components/BookingRequest.tsx`.
+
 ## Languages
 
 All the words are in `frontend/src/i18n/messages/<lang>.ts`; English (`en.ts`) is the

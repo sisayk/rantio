@@ -1,0 +1,19 @@
+# Reads the booking sites' calendar links (iCal) that owners added in Hosting › Calendar,
+# so a stay booked on Airbnb, Booking.com or Vrbo closes the dates everywhere.
+[Unit]
+Description=Stugora: read the booking sites' calendars
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py sync_calendars
+TimeoutStartSec=10min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

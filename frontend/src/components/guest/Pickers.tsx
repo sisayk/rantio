@@ -13,9 +13,10 @@ import styles from "./guest.module.css";
 export type Guests = { adults: number; children: number };
 
 // Month and weekday names for the calendar; weeks start on Monday everywhere we work.
-const CALENDAR_LOCALES = { en: enIE, fi, sv, nb, nn, da, is, et, lv, lt } as const;
+export const CALENDAR_LOCALES = { en: enIE, fi, sv, nb, nn, da, is, et, lv, lt } as const;
 
-function Stepper({
+/** A number with − and + buttons, as in the guest picker. */
+export function Stepper({
   label,
   value,
   min,

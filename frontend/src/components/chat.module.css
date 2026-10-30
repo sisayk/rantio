@@ -626,3 +626,20 @@
 }
 
 .composer textarea[data-suggested="true"] { border-color: #d9b867; }
+
+/* A booking request above the conversation (owner side) and its outcome. */
+.requestSlot { padding: 12px 16px 0; }
+
+.requestDone {
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #dbe9e2;
+  color: #143a2d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.requestDone[data-status="declined"] { background: #f1f3f2; color: #5d6a6e; }
+.requestDone[data-status="pending"] { background: #fdf1de; color: #7a4a06; }
+.guestMain > .requestDone { margin: 16px 0 0; }

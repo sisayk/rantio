@@ -9,7 +9,7 @@ import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import { Logo } from "../guest/icons";
 import styles from "./owner.module.css";
 
-/** Top of every hosting page: brand, the Overview / Messages tabs, the switch to the guest
+/** Top of every hosting page: brand, the Overview / Calendar / Messages tabs, the switch to the guest
  *  side (as on Airbnb), language and sign-out. */
 export default function HostingHeader({
   lang,
@@ -22,7 +22,7 @@ export default function HostingHeader({
   lang: Lang;
   t: Messages["dashboard"];
   languageButton: React.ReactNode;
-  active: "overview" | "messages";
+  active: "overview" | "calendar" | "messages";
   ownerName?: string;
   unread?: number;
 }) {
@@ -42,6 +42,9 @@ export default function HostingHeader({
         <nav className={styles.tabs} aria-label={t.area}>
           <a href={paths.hosting(lang)} aria-current={active === "overview" ? "page" : undefined}>
             {t.nav.overview}
+          </a>
+          <a href={paths.hostingCalendar(lang)} aria-current={active === "calendar" ? "page" : undefined}>
+            {t.nav.calendar}
           </a>
           <a href={paths.hostingMessages(lang)} aria-current={active === "messages" ? "page" : undefined}>
             {t.nav.messages}

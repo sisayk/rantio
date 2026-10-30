@@ -16,7 +16,8 @@ from django.contrib import messages
 
 from . import booking_emails, invoicing, stripe_api
 from .models import (
-    Booking, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode, Message, Owner, OwnerSignup,
+    Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
+    Message, Owner, OwnerSignup,
 )
 
 
@@ -114,8 +115,8 @@ class MessageInline(TabularInline):
 class ConversationAdmin(ModelAdmin):
     """Enquiries about example cottages with no owner yet land here for the team to answer."""
 
-    list_display = ["guest_name", "cottage", "listing_slug", "channel", "last_message_at", "archived"]
-    list_filter = ["channel", "archived", "guest_language"]
+    list_display = ["guest_name", "cottage", "listing_slug", "channel", "request_status", "last_message_at", "archived"]
+    list_filter = ["channel", "request_status", "archived", "guest_language"]
     search_fields = ["guest_name", "guest_email", "listing_slug", "cottage__name"]
     readonly_fields = ["token", "created_at", "last_message_at", "owner_read_at", "guest_read_at"]
     inlines = [MessageInline]
@@ -320,3 +321,23 @@ class InvoiceAdmin(ModelAdmin):
     def mark_paid(self, request, queryset):
         n = queryset.filter(status=Invoice.Status.SENT).update(status=Invoice.Status.PAID)
         self.message_user(request, f"Marked {n} invoice(s) paid.")
+
+
+@admin.register(CalendarFeed)
+class CalendarFeedAdmin(ModelAdmin):
+    """Booking sites' calendar links (iCal) that owners added; read every 15 minutes."""
+
+    list_display = ["cottage", "channel", "last_synced_at", "last_error"]
+    list_filter = ["channel"]
+    search_fields = ["cottage__name", "cottage__owner__name"]
+    readonly_fields = ["last_synced_at", "last_error", "created_at"]
+
+
+@admin.register(CalendarBlock)
+class CalendarBlockAdmin(ModelAdmin):
+    """Closed dates: by the owner (no site) or read from a booking site's calendar."""
+
+    list_display = ["cottage", "start", "end", "feed", "note"]
+    list_filter = ["feed__channel"]
+    search_fields = ["cottage__name", "note"]
+    date_hierarchy = "start"
