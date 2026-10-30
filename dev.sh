@@ -49,7 +49,8 @@ fi
 cd ..
 
 trap 'kill 0' EXIT
-CORS_ALLOWED_ORIGINS=http://localhost:3100 backend/.venv/bin/python backend/manage.py runserver 8100 &
+# 0.0.0.0: the phone app on the same Wi-Fi reaches the API too (mobile/README.md).
+CORS_ALLOWED_ORIGINS=http://localhost:3100 backend/.venv/bin/python backend/manage.py runserver 0.0.0.0:8100 &
 (cd frontend && npx next dev -p 3100) &
 sleep 6
 echo

@@ -1,5 +1,7 @@
 // Calls to Stugora's Django API. Owners send their app sign-in key as a Bearer header;
 // guests need no account (a conversation's private token is the key).
+import Constants from "expo-constants";
+
 import type {
   BookingLinkInfo,
   BookingRequestForm,
@@ -28,9 +30,15 @@ export type {
   Thread,
 } from "@/lib/ownerApi";
 
-/** The site the app talks to. For a local backend, put EXPO_PUBLIC_API_URL in mobile/.env. */
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL || "https://stugora.fi").replace(/\/$/, "");
-export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || API_URL).replace(/\/$/, "");
+/**
+ * While developing, the app talks to the backend on the Mac that serves the app's code
+ * (the same address Metro uses, port 8100), so it works on the simulator and on a phone
+ * on the same Wi-Fi alike. Release builds talk to stugora.fi. EXPO_PUBLIC_API_URL in
+ * mobile/.env overrides both.
+ */
+const devHost = __DEV__ ? (Constants.expoConfig?.hostUri ?? "").split(":")[0] : "";
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (devHost ? `http://${devHost}:8100` : "https://stugora.fi")).replace(/\/$/, "");
+export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || (devHost ? `http://${devHost}:3100` : API_URL)).replace(/\/$/, "");
 
 export class SignedOut extends Error {}
 export class ApiError extends Error {
