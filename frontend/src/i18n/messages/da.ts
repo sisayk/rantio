@@ -841,6 +841,8 @@ export const da: Translation = {
     },
     explore: {
       whereYoullBe: "Her skal du bo",
+      viewRows: "Rækker efter område",
+      viewList: "Én ad gangen, store billeder",
       search: "Land, region eller by",
       all: "Alle",
       clear: "Ryd",

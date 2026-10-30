@@ -841,6 +841,8 @@ export const sv: Translation = {
     },
     explore: {
       whereYoullBe: "Här bor du",
+      viewRows: "Rader per område",
+      viewList: "En i taget, stora bilder",
       search: "Land, region eller ort",
       all: "Alla",
       clear: "Rensa",

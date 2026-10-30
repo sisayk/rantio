@@ -841,6 +841,8 @@ export const lv: Translation = {
     },
     explore: {
       whereYoullBe: "Kur jūs būsiet",
+      viewRows: "Rindās pa reģioniem",
+      viewList: "Pa vienam, lieli attēli",
       search: "Valsts, reģions vai pilsēta",
       all: "Visi",
       clear: "Notīrīt",

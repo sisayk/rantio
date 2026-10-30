@@ -841,6 +841,8 @@ export const nn: Translation = {
     },
     explore: {
       whereYoullBe: "Her skal du bu",
+      viewRows: "Rader etter område",
+      viewList: "Éin om gongen, store bilete",
       search: "Land, region eller stad",
       all: "Alle",
       clear: "Tøm",

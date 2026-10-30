@@ -1,5 +1,6 @@
 // What the app remembers on this phone: language, currency, travelling or hosting,
-// saved cottages and the guest's own conversations (their private tokens).
+// saved cottages, the guest's own conversations (their private tokens) and how
+// the Explore page shows cottages.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
@@ -7,6 +8,8 @@ import type { Lang } from "@/i18n/locales";
 import { type Currency, FALLBACK_RATES, isCurrency, LANG_CURRENCY, type Rates } from "@/lib/currency";
 
 export type Mode = "travelling" | "hosting";
+/** Explore's home: rows of cottages by area (the default) or one large card after another. */
+export type HomeView = "rows" | "list";
 
 /** A conversation the guest started from this phone. */
 export type GuestChat = { token: string; listing: string; at: string; kind: "enquiry" | "request" };
@@ -17,6 +20,7 @@ type Stored = {
   mode: Mode;
   saved: string[];
   chats: GuestChat[];
+  homeView?: HomeView;
   rates?: { at: number; rates: Rates };
 };
 
@@ -29,6 +33,8 @@ type Prefs = {
   chats: GuestChat[];
   rates: Rates;
   ratesAt: number;
+  homeView: HomeView;
+  setHomeView: (v: HomeView) => void;
   setLang: (l: Lang) => void;
   setCurrency: (c: Currency) => void;
   setMode: (m: Mode) => void;
@@ -79,6 +85,8 @@ export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; chil
       chats: s.chats,
       rates: { ...FALLBACK_RATES, ...(s.rates?.rates ?? {}) },
       ratesAt: s.rates?.at ?? 0,
+      homeView: s.homeView === "list" ? "list" : "rows",
+      setHomeView: (v) => update(() => ({ homeView: v })),
       setLang: (l) => update(() => ({ lang: l })),
       setCurrency: (c) => update(() => ({ currency: c })),
       setMode: (m) => update(() => ({ mode: m })),

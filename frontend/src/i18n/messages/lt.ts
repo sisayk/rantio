@@ -846,6 +846,8 @@ export const lt: Translation = {
     },
     explore: {
       whereYoullBe: "Kur būsite",
+      viewRows: "Eilutėmis pagal regioną",
+      viewList: "Po vieną, didelės nuotraukos",
       search: "Šalis, regionas ar miestas",
       all: "Visi",
       clear: "Išvalyti",

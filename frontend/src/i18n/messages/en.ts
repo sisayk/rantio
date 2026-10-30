@@ -854,6 +854,8 @@ export const en = {
     },
     explore: {
       whereYoullBe: "Where you'll be",
+      viewRows: "Rows by area",
+      viewList: "One by one, large photos",
       search: "Country, region or town",
       all: "All",
       clear: "Clear",

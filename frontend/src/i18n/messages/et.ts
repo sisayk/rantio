@@ -841,6 +841,8 @@ export const et: Translation = {
     },
     explore: {
       whereYoullBe: "Kus sa ööbid",
+      viewRows: "Ridades piirkonniti",
+      viewList: "Ükshaaval, suured pildid",
       search: "Riik, piirkond või linn",
       all: "Kõik",
       clear: "Tühjenda",

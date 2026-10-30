@@ -49,7 +49,7 @@ function sections(t: T): Section[] {
 export default function Explore() {
   const t = useT();
   const { m, p, lang } = t;
-  const { rates } = usePrefs();
+  const { rates, homeView, setHomeView } = usePrefs();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const [f, setF] = useState<Filters>(NO_FILTERS);
@@ -58,8 +58,11 @@ export default function Explore() {
   const [panel, setPanel] = useState(false);
   const results = useMemo(() => search(f, m.listingNames, rates), [f, m.listingNames, rates]);
   const rows = useMemo(() => sections(t), [t]);
+  // The large-photo view shows every cottage, in the same order as the rows.
+  const everything = useMemo(() => rows.flatMap((s) => s.listings), [rows]);
   const nights = stay.start && stay.end ? daysBetween(stay.start, stay.end) : 0;
   const browsing = !f.query && f.category === "all" && !activeFilters(f) && !nights;
+  const asRows = browsing && homeView === "rows";
   const columns = width >= 700 ? 2 : 1;
   const cardWidth = (width - space.xl * 2 - (columns - 1) * space.lg) / columns;
   const compactWidth = Math.min(220, Math.round((width - space.xl) * 0.44));
@@ -138,22 +141,68 @@ export default function Explore() {
         })}
       </ScrollView>
 
-      {!browsing ? (
-        <View style={styles.resultsHead}>
-          <Text v="h3">{p(m.guest.units.cottages, results.length)}</Text>
+      <View style={styles.resultsHead}>
+        <Text v="h3">{p(m.guest.units.cottages, browsing ? LISTINGS.length : results.length)}</Text>
+        {browsing ? (
+          <View style={styles.viewSwitch} accessibilityRole="radiogroup">
+            {(
+              [
+                ["rows", "grid-outline", m.app.explore.viewRows],
+                ["list", "image-outline", m.app.explore.viewList],
+              ] as const
+            ).map(([v, icon, label]) => {
+              const on = homeView === v;
+              return (
+                <Pressable
+                  key={v}
+                  onPress={() => {
+                    tap();
+                    setHomeView(v);
+                  }}
+                  style={[styles.viewButton, on && styles.viewButtonOn]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: on }}
+                  accessibilityLabel={label}
+                  hitSlop={4}
+                >
+                  <Icon name={icon} size={20} color={on ? "#fff" : colors.soft} />
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : (
           <Button small kind="ghost" label={m.guest.filterPanel.clearAll} onPress={clear} />
-        </View>
-      ) : null}
+        )}
+      </View>
     </View>
+  );
+
+  const hostBand = (
+    <>
+      <Card style={styles.hostBand}>
+        <Logo size={36} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text v="h3">{m.guest.hostBand.title}</Text>
+          <Text v="small">{m.guest.hostBand.body}</Text>
+        </View>
+      </Card>
+      <View style={{ flexDirection: "row", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
+        <Button small label={m.guest.hostBand.cta} onPress={() => openSite(`/${lang}/hosts`)} />
+        <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
+      </View>
+      <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl, marginTop: space.xl }}>
+        {m.guest.examples}
+      </Text>
+    </>
   );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      {browsing ? (
+      {asRows ? (
         <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl * 2 }}>
           {header}
-          {rows.map((s) => (
-            <View key={s.key} style={{ marginTop: space.xl }}>
+          {rows.map((s, i) => (
+            <View key={s.key} style={{ marginTop: i ? space.xl : space.sm }}>
               <View style={styles.sectionHead}>
                 <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
                   {s.title}
@@ -172,26 +221,12 @@ export default function Explore() {
               />
             </View>
           ))}
-
-          <Card style={styles.hostBand}>
-            <Logo size={36} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text v="h3">{m.guest.hostBand.title}</Text>
-              <Text v="small">{m.guest.hostBand.body}</Text>
-            </View>
-          </Card>
-          <View style={{ flexDirection: "row", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
-            <Button small label={m.guest.hostBand.cta} onPress={() => openSite(`/${lang}/hosts`)} />
-            <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
-          </View>
-          <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl, marginTop: space.xl }}>
-            {m.guest.examples}
-          </Text>
+          {hostBand}
         </ScrollView>
       ) : (
         <FlatList
           key={columns}
-          data={results}
+          data={browsing ? everything : results}
           numColumns={columns}
           keyExtractor={(l) => l.id}
           ListHeaderComponent={header}
@@ -203,6 +238,7 @@ export default function Explore() {
               <ListingCard listing={item} width={cardWidth} nights={nights} />
             </View>
           )}
+          ListFooterComponent={browsing ? hostBand : undefined}
           ListEmptyComponent={<Empty icon="search-outline" title={m.guest.empty.title} action={<Button kind="secondary" label={m.guest.empty.action} onPress={clear} />} />}
           keyboardDismissMode="on-drag"
         />
@@ -508,6 +544,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line,
     marginBottom: space.md,
   },
+  viewSwitch: { flexDirection: "row", gap: 2, padding: 3, borderRadius: radius.pill, backgroundColor: colors.ground },
+  viewButton: { width: 40, height: 32, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
+  viewButtonOn: { backgroundColor: colors.ink },
   sectionHead: { flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.xl, marginBottom: space.md },
   hostBand: { flexDirection: "row", gap: space.lg, alignItems: "center", marginHorizontal: space.xl, marginTop: space.xxl },
   sheetCard: { backgroundColor: "#fff", borderRadius: 28, padding: space.xl, gap: space.md },

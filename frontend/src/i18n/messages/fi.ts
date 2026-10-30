@@ -838,6 +838,8 @@ export const fi: Translation = {
     },
     explore: {
       whereYoullBe: "Missä yövyt",
+      viewRows: "Riveittäin alueittain",
+      viewList: "Yksi kerrallaan, isot kuvat",
       search: "Maa, alue tai paikkakunta",
       all: "Kaikki",
       clear: "Tyhjennä",

@@ -841,6 +841,8 @@ export const is: Translation = {
     },
     explore: {
       whereYoullBe: "Hér gistir þú",
+      viewRows: "Raðir eftir svæðum",
+      viewList: "Eitt í einu, stórar myndir",
       search: "Land, svæði eða bær",
       all: "Allt",
       clear: "Hreinsa",
