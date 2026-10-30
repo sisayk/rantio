@@ -22,7 +22,7 @@ import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
 import { RangeCalendar } from "@/ui/range-calendar";
-import { SheetBar } from "@/ui/screen";
+import { ModalFoot, SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
 const SEASON_TONE = { summer: "green", winter: "neutral", autumn: "berry", darkSeason: "neutral", allYear: "green" } as const;
@@ -383,10 +383,10 @@ export default function Cottage() {
           <ScrollView contentContainerStyle={{ padding: space.lg }}>
             <RangeCalendar lang={lang} start={dates[0]} end={dates[1]} onChange={(a, b) => setDates([a, b])} months={12} />
           </ScrollView>
-          <SafeAreaView edges={["bottom"]} style={styles.pickFoot}>
+          <ModalFoot style={styles.pickFoot}>
             <Button kind="ghost" label={m.guest.datePicker.clear} onPress={() => setDates([null, null])} />
             <Button label={m.guest.datePicker.done} onPress={() => setPicking(false)} />
-          </SafeAreaView>
+          </ModalFoot>
         </View>
       </Modal>
     </View>

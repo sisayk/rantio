@@ -142,3 +142,10 @@ export function SwitchPill({ label, onPress }: { label: string; onPress: () => v
     </View>
   );
 }
+
+/** The button row at the bottom of a modal sheet, kept clear of the home indicator.
+ *  (SafeAreaView doesn't pad inside a modal, so the screen's insets are used.) */
+export function ModalFoot({ children, style }: { children: ReactNode; style?: ViewStyle }) {
+  const insets = useSafeAreaInsets();
+  return <View style={[style, { paddingBottom: Math.max(insets.bottom, space.md) }]}>{children}</View>;
+}

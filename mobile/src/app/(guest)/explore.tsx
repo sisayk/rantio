@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
@@ -15,7 +15,7 @@ import { Chip, Stepper } from "@/ui/controls";
 import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
 import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
-import { SheetBar } from "@/ui/screen";
+import { ModalFoot, SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
 type Stay = { start: string | null; end: string | null; adults: number; children: number };
@@ -238,6 +238,7 @@ function SearchSheet({
   const t = useT();
   const { m, p, lang, country } = t;
   const e = m.app.explore;
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState<"where" | "when" | "who">("where");
   const [query, setQuery] = useState(value.query);
   const [stay, setStay] = useState<Stay>(value.stay);
@@ -273,7 +274,7 @@ function SearchSheet({
       }}
       onRequestClose={onClose}
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.ground }}>
+      <View style={{ flex: 1, backgroundColor: colors.ground, paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View style={{ flexDirection: "row", justifyContent: "flex-end", paddingHorizontal: space.lg, paddingTop: space.sm }}>
           <IconButton name="close" label={m.guest.contact.close} onPress={onClose} />
         </View>
@@ -369,7 +370,7 @@ function SearchSheet({
           />
           <Button icon="search" label={m.guest.search.button} onPress={() => onSearch(query.trim(), stay)} />
         </View>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }
@@ -441,7 +442,7 @@ function FilterPanel({ visible, value, onClose, onChange }: { visible: boolean; 
             </View>
           </View>
         </ScrollView>
-        <SafeAreaView edges={["bottom"]} style={styles.panelFoot}>
+        <ModalFoot style={styles.panelFoot}>
           <Button kind="ghost" label={m.guest.filterPanel.clearAll} onPress={() => setF({ ...NO_FILTERS, query: f.query, category: f.category })} />
           <Button
             label={m.guest.filterPanel.show.replace("{cottages}", p(m.guest.units.cottages, shown))}
@@ -450,7 +451,7 @@ function FilterPanel({ visible, value, onClose, onChange }: { visible: boolean; 
               onClose();
             }}
           />
-        </SafeAreaView>
+        </ModalFoot>
       </View>
     </Modal>
   );

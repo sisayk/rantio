@@ -3,7 +3,7 @@
 import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { type ListingPhoto, type PhotoKind, unsplash, unsplashWhole } from "@/lib/listings";
 import { useT } from "@/text/i18n";
@@ -28,15 +28,17 @@ export function PhotoTour({
   const { m, f } = useT();
   const { width } = useWindowDimensions();
   const [viewing, setViewing] = useState<number | null>(null);
+  const insets = useSafeAreaInsets();
   const full = width - space.lg * 2;
   const half = (full - space.sm) / 2;
   const groups = ORDER.map((kind) => ({ kind, items: photos.map((p, i) => ({ p, i })).filter(({ p }) => p.kind === kind) })).filter((g) => g.items.length);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.page }}>
+      {/* A full-screen modal sits under the status bar, so it is padded by the screen's own insets. */}
+      <View style={{ flex: 1, backgroundColor: colors.page, paddingTop: insets.top }}>
         <View style={styles.bar}>
-          <IconButton name="chevron-back" filled={false} label={m.app.detail.close} onPress={onClose} />
+          <IconButton name="chevron-back" label={m.app.detail.close} onPress={onClose} />
           <Text v="h3" numberOfLines={1} style={{ flex: 1, textAlign: "center" }}>
             {f(m.guest.photos.gallery, { name })}
           </Text>
@@ -67,7 +69,7 @@ export function PhotoTour({
         <View style={styles.bookWrap} pointerEvents="box-none">
           <Button label={m.app.explore.book} onPress={onBook} style={styles.book} />
         </View>
-      </SafeAreaView>
+      </View>
       <PhotoViewer photos={photos} start={viewing} onClose={() => setViewing(null)} />
     </Modal>
   );
@@ -122,7 +124,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: ListingPhoto[]
 
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.md, paddingVertical: space.sm, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-  bookWrap: { position: "absolute", left: 0, right: 0, bottom: space.xxl, alignItems: "center" },
+  bookWrap: { position: "absolute", left: 0, right: 0, bottom: space.xxl + 8, alignItems: "center" },
   book: { borderRadius: 999, paddingHorizontal: space.xxl * 1.5 },
   viewerBar: { position: "absolute", left: space.lg, right: space.lg, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   kind: { position: "absolute", left: 0, right: 0, textAlign: "center" },

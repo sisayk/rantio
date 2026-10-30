@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { getListing, listingName } from "@/lib/listings";
@@ -13,7 +12,7 @@ import { Stepper } from "@/ui/controls";
 import { Field } from "@/ui/form";
 import { Button, Icon, Problem, Text } from "@/ui/kit";
 import { RangeCalendar } from "@/ui/range-calendar";
-import { SheetBar } from "@/ui/screen";
+import { ModalFoot, SheetBar } from "@/ui/screen";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -120,10 +119,10 @@ export default function Contact() {
           <ScrollView contentContainerStyle={{ padding: space.lg }}>
             <RangeCalendar lang={lang} start={dates[0]} end={dates[1]} onChange={(a, b) => setDates([a, b])} months={12} />
           </ScrollView>
-          <SafeAreaView edges={["bottom"]} style={styles.foot}>
+          <ModalFoot style={styles.foot}>
             <Button kind="ghost" label={m.guest.datePicker.clear} onPress={() => setDates([null, null])} />
             <Button label={m.guest.datePicker.done} onPress={() => setPicking(false)} />
-          </SafeAreaView>
+          </ModalFoot>
         </View>
       </Modal>
     </View>
