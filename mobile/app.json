@@ -55,6 +55,7 @@
         }
       ],
       "expo-secure-store",
+      "react-native-maps",
       "expo-localization"
     ],
     "experiments": {

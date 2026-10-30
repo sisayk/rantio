@@ -13,6 +13,10 @@ export default function GuestTabs() {
         <NativeTabs.Trigger.Label>{t.explore}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="map">
+        <NativeTabs.Trigger.Label>{t.map}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "map", selected: "map.fill" }} md="map" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="saved">
         <NativeTabs.Trigger.Label>{t.saved}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: "heart", selected: "heart.fill" }} md={{ default: "favorite_border", selected: "favorite" }} />

@@ -819,6 +819,7 @@ export const da: Translation = {
   // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
+      map: "Kort",
       explore: "Udforsk",
       saved: "Gemte",
       messages: "Beskeder",
@@ -830,6 +831,7 @@ export const da: Translation = {
       menu: "Menu",
     },
     explore: {
+      whereYoullBe: "Her skal du bo",
       search: "Land, region eller by",
       all: "Alle",
       clear: "Ryd",

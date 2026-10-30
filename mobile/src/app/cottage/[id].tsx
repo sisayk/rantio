@@ -17,6 +17,7 @@ import { colors, radius, shadowFloat, space } from "@/theme";
 import { ChannelStack, ChannelTile } from "@/ui/channels";
 import { Button, Empty, Icon, IconButton, Pill, Problem, Text } from "@/ui/kit";
 import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
+import { PinMap } from "@/ui/maps";
 import { SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
@@ -196,6 +197,24 @@ export default function Cottage() {
           ))}
 
           <Divider />
+          <Text v="h2">{m.app.explore.whereYoullBe}</Text>
+          <Text v="small" style={{ marginBottom: space.md }}>
+            {[l.city, region ? regionLabel(region, l.country, lang) : null, country(l.country)].filter(Boolean).join(", ")}
+          </Text>
+          <Pressable
+            onPress={() =>
+              Linking.openURL(
+                Platform.OS === "ios" ? `maps:?q=${encodeURIComponent(name)}&ll=${l.lat},${l.lng}` : `geo:${l.lat},${l.lng}?q=${l.lat},${l.lng}(${encodeURIComponent(name)})`,
+              )
+            }
+            accessibilityRole="button"
+            accessibilityLabel={m.guest.detail.map}
+            style={styles.mapFrame}
+          >
+            <PinMap lat={l.lat} lng={l.lng} style={{ flex: 1 }} />
+          </Pressable>
+
+          <Divider />
           <Text v="h2">{m.guest.detail.nearbyTitle}</Text>
           <Text v="small" style={{ marginBottom: space.md }}>
             {m.guest.detail.nearbyLead}
@@ -342,6 +361,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.line,
   },
+  mapFrame: { height: 220, borderRadius: radius.lg, overflow: "hidden", backgroundColor: colors.greenTint },
   siteRow: { flexDirection: "row", alignItems: "center", gap: space.lg, paddingVertical: space.md },
   siteLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   footer: {
