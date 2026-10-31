@@ -33,10 +33,10 @@ npx expo run:ios        # builds and opens the iPhone simulator (needs Xcode)
 npx expo run:android    # builds and opens the Android emulator (needs Android Studio)
 ```
 
-While developing, the app talks to the backend on the Mac it was started from (port 8100,
-the same address Metro serves the app from), on the simulator and on a phone on the same
-Wi-Fi. Start it first with `./dev.sh` in `~/stugora`; it listens on the Wi-Fi too. If macOS
-asks whether Python may accept incoming connections, allow it. Sign in as
+While developing, the app talks to the Mac it was started from (the same address Metro
+serves the app from) through the website on port 3100, which passes `/api/` and `/media/`
+on to Django. That works on the simulator and on a phone on the same Wi-Fi, without opening
+Django's own port to the network. Start both first with `./dev.sh` in `~/stugora`. Sign in as
 `demo@stugora.fi`; in development the code shows on the sign-in screen. Release builds
 talk to https://stugora.fi; `EXPO_PUBLIC_API_URL` in `mobile/.env` overrides both
 (see `.env.example`).

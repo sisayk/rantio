@@ -32,13 +32,14 @@ export type {
 } from "@/lib/ownerApi";
 
 /**
- * While developing, the app talks to the backend on the Mac that serves the app's code
- * (the same address Metro uses, port 8100), so it works on the simulator and on a phone
- * on the same Wi-Fi alike. Release builds talk to stugora.fi. EXPO_PUBLIC_API_URL in
- * mobile/.env overrides both.
+ * While developing, the app talks to the Mac that serves the app's code (the address Metro
+ * uses), through the website on port 3100: it passes /api/ and /media/ on to Django, as
+ * stugora.fi does. That works on the simulator and on a phone on the same Wi-Fi alike, even
+ * when Django itself only listens on the Mac or macOS blocks Python's incoming connections.
+ * Release builds talk to stugora.fi. EXPO_PUBLIC_API_URL in mobile/.env overrides both.
  */
 const devHost = __DEV__ ? (Constants.expoConfig?.hostUri ?? "").split(":")[0] : "";
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (devHost ? `http://${devHost}:8100` : "https://stugora.fi")).replace(/\/$/, "");
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (devHost ? `http://${devHost}:3100` : "https://stugora.fi")).replace(/\/$/, "");
 export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || (devHost ? `http://${devHost}:3100` : API_URL)).replace(/\/$/, "");
 
 export class SignedOut extends Error {}
