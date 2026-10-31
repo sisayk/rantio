@@ -2,3 +2,7 @@
 *.jpg
 *.mp4
 *.blend1
+assets/
+frames/
+*.txt
+aurora-cabin-real.blend
