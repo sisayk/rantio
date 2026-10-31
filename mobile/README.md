@@ -33,10 +33,11 @@ npx expo run:ios        # builds and opens the iPhone simulator (needs Xcode)
 npx expo run:android    # builds and opens the Android emulator (needs Android Studio)
 ```
 
-While developing, the app talks to the Mac it was started from (the same address Metro
-serves the app from) through the website on port 3100, which passes `/api/` and `/media/`
-on to Django. That works on the simulator and on a phone on the same Wi-Fi, without opening
-Django's own port to the network. Start both first with `./dev.sh` in `~/stugora`. Sign in as
+While developing, the app calls the API on the same address it loads its code from:
+Metro (`metro.config.js`) passes `/api/` and `/media/` on to Django on this Mac. Anything
+that can load the app (simulator, emulator, a phone on the Wi-Fi, a tunnel) can then sign
+in, without opening Django's own port to the network. Start Django first with `./dev.sh` in
+`~/stugora`; after changing `metro.config.js`, restart Metro. Sign in as
 `demo@stugora.fi`; in development the code shows on the sign-in screen. Release builds
 talk to https://stugora.fi; `EXPO_PUBLIC_API_URL` in `mobile/.env` overrides both
 (see `.env.example`).

@@ -11,7 +11,7 @@ import { Button, Card, Empty, Icon, type IconName, Loading, Pill, Problem, Secti
 import { Figure, StayRow } from "@/ui/host";
 import { TabScreen } from "@/ui/screen";
 
-const STATUS_TONE = { intake: "berry", listing: "berry", live: "green", paused: "neutral" } as const;
+const STATUS_TONE = { intake: "berry", listing: "berry", live: "green", paused: "neutral", archived: "neutral" } as const;
 
 export default function Today() {
   const { m, lang, f, p, country } = useT();
