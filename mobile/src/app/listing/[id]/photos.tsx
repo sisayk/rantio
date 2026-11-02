@@ -1,6 +1,5 @@
 import { Image } from "expo-image";
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-import * as ImagePicker from "expo-image-picker";
+import type { ImagePickerOptions } from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
@@ -36,6 +35,16 @@ export default function ListingPhotos() {
 
   const add = async (from: "library" | "camera") => {
     setProblem(null);
+    // Loaded only when needed, so an app build made before these modules still opens.
+    let ImagePicker: typeof import("expo-image-picker");
+    let Manipulator: typeof import("expo-image-manipulator");
+    try {
+      ImagePicker = await import("expo-image-picker");
+      Manipulator = await import("expo-image-manipulator");
+    } catch {
+      return setProblem(f(t.errors.failed, { name: "" }).trim());
+    }
+    const { ImageManipulator, SaveFormat } = Manipulator;
     const perm = from === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
       Alert.alert(m.app.listing.permission, undefined, [
@@ -46,7 +55,7 @@ export default function ListingPhotos() {
     }
     const room = Math.max(0, MAX - photos.length);
     if (!room) return setProblem(t.errors.too_many);
-    const options: ImagePicker.ImagePickerOptions = {
+    const options: ImagePickerOptions = {
       mediaTypes: ["images"],
       quality: 1,
       exif: false,
