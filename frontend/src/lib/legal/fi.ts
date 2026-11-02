@@ -190,7 +190,7 @@ export const fi: LegalTexts = {
         heading: "Omistajien tilit",
         paragraphs: [
           "Mökkien omistajat voivat ilmoittautua mukaan lomakkeella; lomakkeen lähettäminen ei sido sinua mihinkään. Omistajat kirjautuvat sisään sähköpostiin lähetettävällä kertakäyttöisellä koodilla, joten pidä sähköpostitilisi turvassa äläkä jaa koodeja.",
-          "Palvelustamme omistajille, kuten 99 euron vuosimaksusta mökkiä kohden, 12 prosentin provisiosta Rantion lisäämien kanavien varauksista (molempiin lisätään arvonlisävero) ja laskutuksesta Stripen kautta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
+          "Palvelustamme omistajille, kuten vuosimaksusta mökkiä kohden (99 euroa, tai Ruotsissa, Norjassa, Tanskassa tai Islannissa olevasta mökistä 1 080 SEK, 1 030 NOK, 740 DKK tai 13 500 ISK), 12 prosentin provisiosta Rantion lisäämien kanavien varauksista (molempiin lisätään arvonlisävero) ja laskutuksesta Stripen kautta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
         ],
       },
       {

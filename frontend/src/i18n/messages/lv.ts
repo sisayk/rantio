@@ -384,7 +384,7 @@ export const lv: Translation = {
     meta: {
       title: "Rantio – jūsu brīvdienu māja Airbnb, Booking.com un Vrbo",
       description:
-        "Rantio piesaista viesus no ārvalstīm jūsu brīvdienu mājai jebkur Ziemeļvalstīs vai Baltijā un saskaņo kalendārus ar vietnēm, kuras jau izmantojat. 99 € gadā un 12% no mūsu piesaistītajām rezervācijām.",
+        "Rantio piesaista viesus no ārvalstīm jūsu brīvdienu mājai jebkur Ziemeļvalstīs vai Baltijā un saskaņo kalendārus ar vietnēm, kuras jau izmantojat. {fee} gadā un 12% no mūsu piesaistītajām rezervācijām.",
     },
     nav: { cta: "Pieteikt savu māju", login: "Pieteikties" },
     hero: {
@@ -392,9 +392,9 @@ export const lv: Translation = {
       nightsLabel: "Papildu naktis gadā",
       nights: { zero: "{n} papildu nakšu", one: "{n} papildu nakts", other: "{n} papildu naktis" },
       priceLabel: "Cena par nakti",
-      perNight: "€ / naktī",
+      perNight: "{currency} / naktī",
       finePrint:
-        "Aprēķinā atskaitītas platformu komisijas (ap 15%), Rantio gada maksa 99 €, 12% komisija un PVN.",
+        "Aprēķinā atskaitītas platformu komisijas (ap 15%), Rantio gada maksa {fee}, 12% komisija un PVN.",
       lead: "Rantio ievieto jūsu brīvdienu māju Airbnb, Booking.com un Vrbo un saskaņo visus kalendārus ar vietējām vietnēm, kuras jau izmantojat, piemēram, Nettimökki Somijā.",
       cta: "Pieteikt savu māju",
       photoAlt: "Brīvdienu māja ezera krastā mākoņainā vasaras dienā",
@@ -439,14 +439,14 @@ export const lv: Translation = {
       ],
     },
     price: {
-      title: "99 € gadā un 12% no mūsu piesaistītajām rezervācijām",
+      title: "{fee} gadā un 12% no mūsu piesaistītajām rezervācijām",
       lead: "Bez uzstādīšanas maksas un bez ikmēneša maksas. Gada maksa sedz sludinājumu izveidi un uzturēšanu. Kad viesis rezervē caur kanālu, ko atvēra Rantio, jūs maksājat 12% no summas, ko jums izmaksā platforma. Abām maksām pieskaita PVN. Par rezervācijām no vietnēm, kuras izmantojāt jau iepriekš, piemēram, Nettimökki, mēs nekad neiekasējam maksu.",
-      exampleTitle: "Piemērs: 20 papildu naktis par 150 € naktī",
+      exampleTitle: "Piemērs: 20 papildu naktis par {price} naktī",
       rows: {
         guests: "Viesi maksā",
         platform: "Platformu komisijas, ap 15%",
         commission: "Rantio 12% plus PVN",
-        yearly: "Gada maksa 99 € plus PVN",
+        yearly: "Gada maksa {fee} plus PVN",
       },
       total: "Jums paliek",
       about: "ap {amount}",
@@ -881,7 +881,7 @@ export const lv: Translation = {
       plusVat: "+ PVN {vat}",
       empty: "Šogad gada maksu nav.",
     },
-    howItWorks: "Komisija ir daļa no summas, ko vietne jums izmaksā par uzturēšanos (bez uzkopšanas maksas). Par Nettimökki un jūsu pašu rezervācijām komisija netiek ņemta. Gada maksa ir 99 € + PVN par katru māju; pilotprojekta īpašniekiem pirmais gads ir bez maksas. PVN ir 25,5 %.",
+    howItWorks: "Komisija ir daļa no summas, ko vietne jums izmaksā par uzturēšanos (bez uzkopšanas maksas). Par Nettimökki un jūsu pašu rezervācijām komisija netiek ņemta. Gada maksa ir {fee} + PVN par katru māju; pilotprojekta īpašniekiem pirmais gads ir bez maksas. PVN ir 25,5 %.",
     ownBooking: "Pašu rezervācija",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

@@ -50,6 +50,24 @@ class InvoiceTests(TestCase):
         line = invoicing.build(self.owner, NOV, RATES).lines[1]
         self.assertEqual((line["amount"], line["original"]), ("60.00", "660.00 SEK"))
 
+    def test_swedish_owner_is_invoiced_in_kronor(self):
+        erik = Owner.objects.create(name="Erik", email="erik@example.se", language="sv")
+        stuga = Cottage.objects.create(owner=erik, name="Röda stugan", country="SE", max_guests=4, price_per_night=1500,
+                                       listing_started_on=date(2026, 11, 10))
+        with alerts.muted():
+            Booking.objects.create(cottage=stuga, channel="booking", check_in=date(2026, 11, 5), check_out=date(2026, 11, 8),
+                                   owner_payout=Decimal("5500.00"))
+        inv = invoicing.build(erik, NOV, RATES)
+        self.assertEqual(inv.currency, "SEK")
+        self.assertEqual([(x["kind"], x["amount"], x["original"]) for x in inv.lines],
+                         [("commission", "660.00", ""), ("yearly_fee", "1080.00", "")])
+        self.assertEqual((inv.subtotal, inv.rates_date), (Decimal("1740.00"), ""))
+
+    def test_icelandic_krona_goes_to_stripe_in_whole_kronur(self):
+        self.assertEqual(stripe_api.cents(Decimal("13500.00"), "ISK"), 1350000)
+        self.assertEqual(stripe_api.cents(Decimal("3442.43"), "ISK"), 344200)
+        self.assertEqual(stripe_api.cents(Decimal("12.34"), "EUR"), 1234)
+
     def test_nothing_due_makes_no_invoice(self):
         self.assertIsNone(invoicing.build(self.owner, date(2027, 1, 1), RATES))
 

@@ -318,16 +318,16 @@ class InboundEmailAdmin(ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdmin(ModelAdmin):
-    list_display = ["number", "owner", "month", "subtotal", "vat", "total", "status", "sent_at"]
-    list_filter = ["status", "month"]
+    list_display = ["number", "owner", "month", "subtotal", "vat", "total", "currency", "status", "sent_at"]
+    list_filter = ["status", "month", "currency"]
     search_fields = ["number", "owner__name", "owner__email"]
-    readonly_fields = ["number", "owner", "month", "line_table", "subtotal", "vat", "total", "rates_date",
+    readonly_fields = ["number", "owner", "month", "currency", "line_table", "subtotal", "vat", "total", "rates_date",
                        "stripe_invoice_id", "stripe_link", "created_at", "sent_at"]
     exclude = ["lines", "stripe_url"]
     actions = ["rebuild", "send_with_stripe", "mark_paid"]
     fieldsets = [
-        ("Invoice", {"fields": ["number", "owner", "month", "status"], "classes": ["st-grid-2"]}),
-        ("Lines, in euros before VAT", {"fields": ["line_table", "subtotal", "vat", "total", "rates_date"],
+        ("Invoice", {"fields": ["number", "owner", "month", "currency", "status"], "classes": ["st-grid-2"]}),
+        ("Lines, before VAT", {"fields": ["line_table", "subtotal", "vat", "total", "rates_date"],
                                         "classes": ["st-grid-2"]}),
         ("Stripe", {"fields": ["stripe_invoice_id", "stripe_link", "created_at", "sent_at"], "classes": ["st-grid-2"]}),
     ]
@@ -338,8 +338,8 @@ class InvoiceAdmin(ModelAdmin):
     @display(description="Lines")
     def line_table(self, obj):
         rows = "".join(
-            format_html("<tr><td style='padding:2px 12px 2px 0'>{}</td><td style='text-align:right'>{} €</td><td style='padding-left:8px;color:#888'>{}</td></tr>",
-                        x["description"], x["amount"], x.get("original", ""))
+            format_html("<tr><td style='padding:2px 12px 2px 0'>{}</td><td style='text-align:right'>{} {}</td><td style='padding-left:8px;color:#888'>{}</td></tr>",
+                        x["description"], x["amount"], obj.currency, x.get("original", ""))
             for x in obj.lines
         )
         return format_html("<table>{}</table>", format_html(rows)) if rows else "—"

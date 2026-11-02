@@ -384,7 +384,7 @@ export const et: Translation = {
     meta: {
       title: "Rantio – sinu puhkemaja Airbnb-s, Booking.com-is ja Vrbo-s",
       description:
-        "Rantio toob sinu puhkemajja külalisi välismaalt, kõikjal Põhjamaades ja Baltikumis, ning hoiab kalendrid kooskõlas saitidega, mida juba kasutad. 99 € aastas ja 12% meie toodud broneeringutest.",
+        "Rantio toob sinu puhkemajja külalisi välismaalt, kõikjal Põhjamaades ja Baltikumis, ning hoiab kalendrid kooskõlas saitidega, mida juba kasutad. {fee} aastas ja 12% meie toodud broneeringutest.",
     },
     nav: { cta: "Lisa oma puhkemaja", login: "Logi sisse" },
     hero: {
@@ -392,9 +392,9 @@ export const et: Translation = {
       nightsLabel: "Lisaööd aastas",
       nights: { one: "{n} lisaöö", other: "{n} lisaööd" },
       priceLabel: "Öö hind",
-      perNight: "€ / öö",
+      perNight: "{currency} / öö",
       finePrint:
-        "Hinnangust on maha arvatud platvormide tasud (umbes 15%), Rantio 99 € aastatasu, 12% vahendustasu ja käibemaks.",
+        "Hinnangust on maha arvatud platvormide tasud (umbes 15%), Rantio {fee} aastatasu, 12% vahendustasu ja käibemaks.",
       lead: "Rantio paneb sinu puhkemaja üles Airbnb-sse, Booking.com-i ja Vrbo-sse ning hoiab kõik kalendrid kooskõlas kohalike saitidega, mida juba kasutad, näiteks Soomes Nettimökkiga.",
       cta: "Lisa oma puhkemaja",
       photoAlt: "Puhkemaja järve kaldal pilvisel suvepäeval",
@@ -439,14 +439,14 @@ export const et: Translation = {
       ],
     },
     price: {
-      title: "99 € aastas ja 12% meie toodud broneeringutest",
+      title: "{fee} aastas ja 12% meie toodud broneeringutest",
       lead: "Ei liitumistasu ega kuutasu. Aastatasu katab kuulutuste loomise ja haldamise. Kui külaline broneerib Rantio avatud kanali kaudu, maksad 12% summast, mille platvorm sulle maksab. Mõlemale lisandub käibemaks. Me ei võta kunagi tasu broneeringutelt saitidelt, mida kasutasid juba varem, näiteks Nettimökkist.",
-      exampleTitle: "Näide: 20 lisaööd hinnaga 150 € öö",
+      exampleTitle: "Näide: 20 lisaööd hinnaga {price} öö",
       rows: {
         guests: "Külalised maksavad",
         platform: "Platvormide tasud, umbes 15%",
         commission: "Rantio 12% + käibemaks",
-        yearly: "Aastatasu 99 € + käibemaks",
+        yearly: "Aastatasu {fee} + käibemaks",
       },
       total: "Sulle jääb",
       about: "umbes {amount}",
@@ -881,7 +881,7 @@ export const et: Translation = {
       plusVat: "+ km {vat}",
       empty: "Sel aastal aastatasusid pole.",
     },
-    howItWorks: "Vahendustasu on osa summast, mille kanal sulle majutuse eest maksab (koristustasu arvestamata). Nettimökki ja sinu enda broneeringute eest tasu ei võeta. Aastatasu on 99 € + käibemaks maja kohta; pilootomanikel on esimene aasta tasuta. Käibemaks on 25,5 %.",
+    howItWorks: "Vahendustasu on osa summast, mille kanal sulle majutuse eest maksab (koristustasu arvestamata). Nettimökki ja sinu enda broneeringute eest tasu ei võeta. Aastatasu on {fee} + käibemaks maja kohta; pilootomanikel on esimene aasta tasuta. Käibemaks on 25,5 %.",
     ownBooking: "Oma broneering",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

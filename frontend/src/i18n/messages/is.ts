@@ -384,7 +384,7 @@ export const is: Translation = {
     meta: {
       title: "Rantio – sumarbústaðurinn þinn á Airbnb, Booking.com og Vrbo",
       description:
-        "Rantio færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. 99 € á ári og 12% af bókunum sem við útvegum.",
+        "Rantio færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. {fee} á ári og 12% af bókunum sem við útvegum.",
     },
     nav: { cta: "Skráðu bústaðinn þinn", login: "Innskráning" },
     hero: {
@@ -392,9 +392,9 @@ export const is: Translation = {
       nightsLabel: "Viðbótarnætur á ári",
       nights: { one: "{n} viðbótarnótt", other: "{n} viðbótarnætur" },
       priceLabel: "Verð á nótt",
-      perNight: "€ / nótt",
+      perNight: "{currency} / nótt",
       finePrint:
-        "Í matinu hafa þóknanir bókunarsíðna (um 15%), 99 € árgjald Rantio, 12% þóknun og virðisaukaskattur verið dregin frá.",
+        "Í matinu hafa þóknanir bókunarsíðna (um 15%), {fee} árgjald Rantio, 12% þóknun og virðisaukaskattur verið dregin frá.",
       lead: "Rantio setur bústaðinn þinn á Airbnb, Booking.com og Vrbo og heldur öllum dagatölum í takt við innlendu síðurnar sem þú notar nú þegar, eins og Nettimökki í Finnlandi.",
       cta: "Skráðu bústaðinn þinn",
       photoAlt: "Sumarbústaður á vatnsbakka á skýjuðum sumardegi",
@@ -439,14 +439,14 @@ export const is: Translation = {
       ],
     },
     price: {
-      title: "99 € á ári og 12% af bókunum sem við útvegum",
+      title: "{fee} á ári og 12% af bókunum sem við útvegum",
       lead: "Ekkert stofngjald og ekkert mánaðargjald. Árgjaldið nær yfir gerð og umsjón skráninganna. Þegar gestur bókar í gegnum rás sem Rantio opnaði greiðir þú 12% af því sem bókunarsíðan greiðir þér. Virðisaukaskattur bætist við hvort tveggja. Við tökum aldrei gjald fyrir bókanir af síðum sem þú notaðir áður, eins og Nettimökki.",
-      exampleTitle: "Dæmi: 20 viðbótarnætur á 150 € nóttin",
+      exampleTitle: "Dæmi: 20 viðbótarnætur á {price} nóttin",
       rows: {
         guests: "Gestir greiða",
         platform: "Þóknanir bókunarsíðna, um 15%",
         commission: "Rantio 12% auk VSK",
-        yearly: "Árgjald 99 € auk VSK",
+        yearly: "Árgjald {fee} auk VSK",
       },
       total: "Þú heldur eftir",
       about: "um {amount}",
@@ -881,7 +881,7 @@ export const is: Translation = {
       plusVat: "+ VSK {vat}",
       empty: "Engin árgjöld í ár.",
     },
-    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er 99 € + VSK á hvern bústað; fyrir tilraunaeigendur er fyrsta árið ókeypis. Virðisaukaskattur er 25,5 %.",
+    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er {fee} + VSK á hvern bústað; fyrir tilraunaeigendur er fyrsta árið ókeypis. Virðisaukaskattur er 25,5 %.",
     ownBooking: "Eigin bókun",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

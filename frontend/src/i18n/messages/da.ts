@@ -384,7 +384,7 @@ export const da: Translation = {
     meta: {
       title: "Rantio – dit sommerhus på Airbnb, Booking.com og Vrbo",
       description:
-        "Rantio skaffer gæster fra udlandet til dit sommerhus overalt i Norden og Baltikum og holder kalenderne i takt med de sider, du allerede bruger. 99 € om året og 12 % af de bookinger, vi skaffer.",
+        "Rantio skaffer gæster fra udlandet til dit sommerhus overalt i Norden og Baltikum og holder kalenderne i takt med de sider, du allerede bruger. {fee} om året og 12 % af de bookinger, vi skaffer.",
     },
     nav: { cta: "Udlej dit sommerhus", login: "Log ind" },
     hero: {
@@ -392,9 +392,9 @@ export const da: Translation = {
       nightsLabel: "Ekstra nætter om året",
       nights: { one: "{n} ekstra nat", other: "{n} ekstra nætter" },
       priceLabel: "Pris pr. nat",
-      perNight: "€ / nat",
+      perNight: "{currency} / nat",
       finePrint:
-        "Estimatet er efter platformsgebyrer (ca. 15 %), Rantios årsgebyr på 99 €, provisionen på 12 % og moms.",
+        "Estimatet er efter platformsgebyrer (ca. 15 %), Rantios årsgebyr på {fee}, provisionen på 12 % og moms.",
       lead: "Rantio lægger dit sommerhus på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sider, du allerede bruger, som fx Nettimökki i Finland.",
       cta: "Udlej dit sommerhus",
       photoAlt: "Et sommerhus ved en sø en overskyet sommerdag",
@@ -439,14 +439,14 @@ export const da: Translation = {
       ],
     },
     price: {
-      title: "99 € om året og 12 % af de bookinger, vi skaffer",
+      title: "{fee} om året og 12 % af de bookinger, vi skaffer",
       lead: "Intet oprettelsesgebyr og intet månedligt gebyr. Årsgebyret dækker, at vi laver og vedligeholder dine annoncer. Når en gæst booker via en kanal, Rantio har åbnet, betaler du 12 % af det beløb, platformen udbetaler til dig. Moms lægges oven i begge dele. Vi tager aldrig betaling for bookinger fra de sider, du allerede brugte før, som fx Nettimökki.",
-      exampleTitle: "Eksempel: 20 ekstra nætter à 150 € pr. nat",
+      exampleTitle: "Eksempel: 20 ekstra nætter à {price} pr. nat",
       rows: {
         guests: "Gæsterne betaler",
         platform: "Platformsgebyrer, ca. 15 %",
         commission: "Rantio 12 % plus moms",
-        yearly: "Årsgebyr 99 € plus moms",
+        yearly: "Årsgebyr {fee} plus moms",
       },
       total: "Du beholder",
       about: "ca. {amount}",
@@ -881,7 +881,7 @@ export const da: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Ingen årsgebyrer i år.",
     },
-    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er 99 € + moms pr. sommerhus; for pilotejere er det første år gratis. Momsen er 25,5 %.",
+    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er {fee} + moms pr. sommerhus; for pilotejere er det første år gratis. Momsen er 25,5 %.",
     ownBooking: "Egen booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

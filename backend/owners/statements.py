@@ -4,8 +4,9 @@ A stay counts in the year (and month) of its check-in day. Yearly fees count in 
 year their listing year starts.
 
 Money is shown in the owner's currency: the one their cottages are in (a Swedish
-owner sees kronor). Rantio's yearly fee is set in euros; it is listed in euros and
-counted in the totals at the day's ECB rate.
+owner sees kronor). Rantio's yearly fee is a set amount in each cottage's currency
+(1 080 kr for a Swedish cottage), so it needs no conversion unless an owner has
+cottages in more than one currency.
 """
 
 from collections import Counter, defaultdict
@@ -113,9 +114,9 @@ def summary(owner: Owner, year: int, today: date) -> dict:
     fee_rows = []
     for cottage in cottages:
         for f in fees_for(cottage, year):
-            fee_rows.append({"cottage": cottage.name, **f})
-            totals["fees"] += mine(f["fee"], "EUR")
-            totals["fees_vat"] += mine(f["vat"], "EUR")
+            fee_rows.append({"cottage": cottage.name, "currency": cottage.currency, **f})
+            totals["fees"] += mine(f["fee"], cottage.currency)
+            totals["fees_vat"] += mine(f["vat"], cottage.currency)
     stugora_total = totals["commission"] + totals["commission_vat"] + totals["fees"] + totals["fees_vat"]
 
     cottage_rows = []
@@ -162,7 +163,6 @@ def summary(owner: Owner, year: int, today: date) -> dict:
             "commission_rate": f"{owner.commission_rate:.2f}",
         },
         "currency": currency,
-        "fee_currency": "EUR",
         "rate": {"per_eur": f"{rates[currency]}", "date": rate_date} if currency != "EUR" else None,
         "year": year,
         "years": years,
@@ -184,6 +184,6 @@ def summary(owner: Owner, year: int, today: date) -> dict:
         ),
         "cottages": cottage_rows,
         "fees": [{**f, "starts_on": f["starts_on"].isoformat(), "fee": money(f["fee"]), "vat": money(f["vat"]),
-                  "fee_local": money(mine(f["fee"] + f["vat"], "EUR"))} for f in fee_rows],
+                  "fee_local": money(mine(f["fee"] + f["vat"], f["currency"]))} for f in fee_rows],
         "upcoming": [booking_row(b, today) for b in upcoming],
     }

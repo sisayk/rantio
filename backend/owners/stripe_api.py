@@ -62,7 +62,11 @@ def _post(path: str, data: dict | None = None, idempotency_key: str | None = Non
         raise StripeError(f"Stripe {path}: {e.code} {message}") from e
 
 
-def cents(amount: Decimal) -> int:
+def cents(amount: Decimal, currency: str = "EUR") -> int:
+    """Stripe's smallest unit. Icelandic krónur have no öre: Stripe still wants two decimals,
+    but in whole krónur (a multiple of 100)."""
+    if currency.upper() == "ISK":
+        return int(amount.quantize(Decimal("1"))) * 100
     return int((amount * 100).quantize(Decimal("1")))
 
 
@@ -85,7 +89,7 @@ def send(invoice: Invoice) -> Invoice:
     customer = ensure_customer(invoice.owner)
     key = f"invoice-{invoice.number}-{invoice.subtotal}"
     inv = _post("/invoices", {
-        "customer": customer, "collection_method": "send_invoice", "currency": "eur",
+        "customer": customer, "collection_method": "send_invoice", "currency": invoice.currency.lower(),
         "days_until_due": settings.INVOICE_DAYS_UNTIL_DUE, "pending_invoice_items_behavior": "exclude",
         "auto_advance": False, "description": f"Rantio {invoice.month:%m/%Y} · {invoice.number}",
         "metadata": {"stugora_invoice": invoice.number},
@@ -93,13 +97,13 @@ def send(invoice: Invoice) -> Invoice:
     tax = [settings.STRIPE_TAX_RATE_ID] if settings.STRIPE_TAX_RATE_ID else None
     for i, line in enumerate(invoice.lines):
         _post("/invoiceitems", {
-            "customer": customer, "invoice": inv["id"], "currency": "eur",
-            "amount": cents(Decimal(line["amount"])), "description": line["description"], "tax_rates": tax,
+            "customer": customer, "invoice": inv["id"], "currency": invoice.currency.lower(),
+            "amount": cents(Decimal(line["amount"]), invoice.currency), "description": line["description"], "tax_rates": tax,
         }, idempotency_key=f"{key}-item-{i}")
     if not tax:  # no tax rate set up in Stripe: VAT as its own line
         _post("/invoiceitems", {
-            "customer": customer, "invoice": inv["id"], "currency": "eur",
-            "amount": cents(invoice.vat), "description": f"ALV / VAT {pct(VAT_RATE)} %",
+            "customer": customer, "invoice": inv["id"], "currency": invoice.currency.lower(),
+            "amount": cents(invoice.vat, invoice.currency), "description": f"ALV / VAT {pct(VAT_RATE)} %",
         }, idempotency_key=f"{key}-vat")
     _post(f"/invoices/{inv['id']}/finalize", {}, idempotency_key=f"{key}-finalize")
     sent = _post(f"/invoices/{inv['id']}/send", {}, idempotency_key=f"{key}-send")

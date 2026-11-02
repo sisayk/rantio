@@ -381,7 +381,7 @@ export const fi: Translation = {
     meta: {
       title: "Rantio – mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon",
       description:
-        "Rantio tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. 99 € vuodessa ja 12 % tuomistamme varauksista.",
+        "Rantio tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. {fee} vuodessa ja 12 % tuomistamme varauksista.",
     },
     nav: { cta: "Ilmoita mökkisi", login: "Kirjaudu" },
     hero: {
@@ -389,9 +389,9 @@ export const fi: Translation = {
       nightsLabel: "Lisäyöt vuodessa",
       nights: { one: "{n} lisäyö", other: "{n} lisäyötä" },
       priceLabel: "Hinta yöltä",
-      perNight: "€ / yö",
+      perNight: "{currency} / yö",
       finePrint:
-        "Arviosta on vähennetty alustojen palkkiot (noin 15 %), Rantion 99 € vuosimaksu, 12 % palkkio ja arvonlisävero.",
+        "Arviosta on vähennetty alustojen palkkiot (noin 15 %), Rantion {fee} vuosimaksu, 12 % palkkio ja arvonlisävero.",
       lead: "Rantio vie mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon ja pitää kalenterit samassa tahdissa Nettimökin kanssa.",
       cta: "Ilmoita mökkisi",
       photoAlt: "Mökki järven rannalla pilvisenä kesäpäivänä",
@@ -436,14 +436,14 @@ export const fi: Translation = {
       ],
     },
     price: {
-      title: "99 € vuodessa ja 12 % tuomistamme varauksista",
+      title: "{fee} vuodessa ja 12 % tuomistamme varauksista",
       lead: "Ei aloitus- eikä kuukausimaksua. Vuosimaksu kattaa ilmoitusten tekemisen ja ylläpidon. Kun vieras varaa Rantion avaaman kanavan kautta, maksat 12 % summasta, jonka alusta tilittää sinulle. Hintoihin lisätään alv 25,5 %. Nettimökin varauksista emme veloita koskaan.",
-      exampleTitle: "Esimerkki: 20 lisäyötä, 150 € yöltä",
+      exampleTitle: "Esimerkki: 20 lisäyötä, {price} yöltä",
       rows: {
         guests: "Vieraiden maksut",
         platform: "Alustojen palkkiot, noin 15 %",
         commission: "Rantion palkkio 12 % ja alv",
-        yearly: "Vuosimaksu 99 € ja alv",
+        yearly: "Vuosimaksu {fee} ja alv",
       },
       total: "Jää sinulle",
       about: "noin {amount}",
@@ -878,7 +878,7 @@ export const fi: Translation = {
       plusVat: "+ ALV {vat}",
       empty: "Ei vuosimaksuja tänä vuonna.",
     },
-    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on 99 € + ALV mökkiä kohden; pilottiomistajilla ensimmäinen vuosi on maksuton. Arvonlisävero on 25,5 %.",
+    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on {fee} + ALV mökkiä kohden; pilottiomistajilla ensimmäinen vuosi on maksuton. Arvonlisävero on 25,5 %.",
     ownBooking: "Oma varaus",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

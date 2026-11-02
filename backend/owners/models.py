@@ -11,14 +11,24 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
-# - €99 yearly fee per cottage, invoiced when each listing year starts;
-#   pilot owners' first year is free.
+# - €99 yearly fee per cottage (or the set amount in the cottage's own currency,
+#   YEARLY_FEES), invoiced when each listing year starts; pilot owners' first year is free.
 # - Commission is a share of the owner's payout for the stay (after platform
 #   fees, cleaning fees excluded); Nettimökki bookings are never charged.
 # - Both carry Finnish VAT.
 STANDARD_COMMISSION_RATE = Decimal("12.00")
 PILOT_COMMISSION_RATE = Decimal("10.00")
 YEARLY_FEE = Decimal("99.00")
+# The yearly fee in each currency, so an owner pays a set amount in their own money: about
+# €99 at the ECB rate of 2 Nov 2026, rounded like Rantio's prices (tens of kronor, hundreds
+# of krónur). Change them here; frontend/src/lib/content.ts YEARLY_FEES must say the same.
+YEARLY_FEES = {
+    "EUR": YEARLY_FEE,
+    "SEK": Decimal("1080.00"),
+    "NOK": Decimal("1030.00"),
+    "DKK": Decimal("740.00"),
+    "ISK": Decimal("13500.00"),
+}
 VAT_RATE = Decimal("25.50")
 LISTING_TERM_MONTHS = 12
 
@@ -352,9 +362,10 @@ class Cottage(models.Model):
         return add_months(self.listing_started_on, LISTING_TERM_MONTHS * (year - 1))
 
     def yearly_fee(self, year: int) -> Decimal:
+        """In the cottage's currency (a Swedish cottage's in kronor)."""
         if year == 1 and self.owner.is_pilot:
             return Decimal("0.00")
-        return YEARLY_FEE
+        return YEARLY_FEES.get(self.currency, YEARLY_FEE)
 
     def yearly_fee_vat(self, year: int) -> Decimal:
         return vat_on(self.yearly_fee(year))
@@ -768,7 +779,8 @@ class InboundEmail(models.Model):
 
 
 class Invoice(models.Model):
-    """One owner's monthly bill: commission on stays from Rantio's channels and yearly fees, in euros with VAT."""
+    """One owner's monthly bill: commission on stays from Rantio's channels and yearly fees, with VAT,
+    in the owner's currency (the one most of their cottages are in)."""
 
     class Status(models.TextChoices):
         DRAFT = "draft", "Draft"
@@ -780,6 +792,7 @@ class Invoice(models.Model):
     month = models.DateField(help_text="First day of the month the invoice covers (stays by check-in day).")
     number = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=5, choices=Status.choices, default=Status.DRAFT, db_index=True)
+    currency = models.CharField(max_length=3, default="EUR")
     lines = models.JSONField(default=list)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     vat = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))

@@ -2,19 +2,24 @@
 
 import { useId, useState } from "react";
 import type { Messages } from "@/i18n";
-import { money, plural } from "@/i18n/format";
+import { fill as fillIn, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
-import { ownerNetGain } from "@/lib/content";
+import { NIGHT_PRICES, ownerNetGain, YEARLY_FEES } from "@/lib/content";
+import { currencySign, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import styles from "./landing.module.css";
 
 export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"]["hero"] }) {
+  // In the page's currency: kronor on a Swedish page, with the Swedish yearly fee.
+  const currency = LANG_CURRENCY[lang];
+  const range = NIGHT_PRICES[currency];
   const [nights, setNights] = useState(20);
-  const [price, setPrice] = useState(150);
+  const [price, setPrice] = useState(range.typical);
   const sliderId = useId();
   const priceId = useId();
 
-  const gain = Math.round(ownerNetGain(nights, price) / 10) * 10;
-  const euros = money(lang, gain);
+  const gain = roundNicely(ownerNetGain(nights, price, currency), currency);
+  const amount = formatPrice(lang, gain, currency);
+  const perNight = fillIn(lang, t.perNight, { currency: currencySign(lang, currency) });
   // "Your cottage could earn {amount} more a year": the amount sits wherever the language puts it.
   const [before, after = ""] = t.title.split("{amount}");
   const fill = ((nights - 5) / (60 - 5)) * 100;
@@ -23,12 +28,12 @@ export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"
     <div className={styles.estimator}>
       <h1 className={styles.heroTitle}>
         {before}
-        <span className={styles.heroAmount}>{euros}</span>
+        <span className={styles.heroAmount}>{amount}</span>
         {after}
       </h1>
 
       <p className={styles.heroMeta} aria-live="polite">
-        {plural(lang, t.nights, nights)}, {price} {t.perNight}
+        {plural(lang, t.nights, nights)}, {formatPrice(lang, price, currency)} / {perNight.split(" / ")[1] ?? ""}
       </p>
 
       <label htmlFor={sliderId} className={styles.visuallyHidden}>
@@ -53,20 +58,20 @@ export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"
             id={priceId}
             type="number"
             inputMode="numeric"
-            min={40}
-            max={1000}
-            step={10}
+            min={range.min}
+            max={range.max}
+            step={range.step}
             value={price}
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (Number.isFinite(value)) setPrice(Math.min(1000, Math.max(0, value)));
+              if (Number.isFinite(value)) setPrice(Math.min(range.max, Math.max(0, value)));
             }}
           />
-          <span aria-hidden="true">{t.perNight}</span>
+          <span aria-hidden="true">{perNight}</span>
         </span>
       </div>
 
-      <p className={styles.finePrint}>{t.finePrint}</p>
+      <p className={styles.finePrint}>{fillIn(lang, t.finePrint, { fee: formatPrice(lang, YEARLY_FEES[currency], currency) })}</p>
     </div>
   );
 }

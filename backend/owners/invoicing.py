@@ -1,13 +1,15 @@
 """Monthly commission invoices.
 
-Each month, one invoice per owner, in euros with Finnish VAT:
+Each month, one invoice per owner, with Finnish VAT, in the owner's currency (the one most
+of their cottages are in: kronor for a Swedish owner):
 - commission on stays from the channels Rantio added, by check-in day (as on the
   owner's dashboard). Nettimökki and the owner's own bookings are never charged.
   Airbnb stays are left off when Airbnb pays Rantio directly as co-host.
-- yearly fees whose listing year starts that month (pilot owners' first year is free).
+- yearly fees whose listing year starts that month (pilot owners' first year is free),
+  the set amount in the cottage's currency (models.YEARLY_FEES).
 
-Stays in other currencies (Swedish kronor…) are converted at the ECB rate of the day
-the invoice is made. Invoices start as drafts; stripe_api.send() sends them.
+Anything in another currency than the invoice's (an owner with cottages in two
+countries) is converted at the ECB rate of the day the invoice is made. Invoices start as drafts; stripe_api.send() sends them.
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from django.db import transaction
 
 from . import rates as fx
 from .models import Booking, Invoice, Owner, add_months, vat_on
+from .statements import owner_currency
 
 ZERO = Decimal("0.00")
 
@@ -35,7 +38,7 @@ def previous_month(today: date) -> date:
     return add_months(month_start(today), -1)
 
 
-def lines_for(owner: Owner, month: date, rates: dict) -> list[dict]:
+def lines_for(owner: Owner, month: date, rates: dict, currency: str = "EUR") -> list[dict]:
     start, end = month_start(month), add_months(month_start(month), 1)
     bookings = (
         Booking.objects.filter(cottage__owner=owner, check_in__gte=start, check_in__lt=end, cancelled=False)
@@ -49,14 +52,14 @@ def lines_for(owner: Owner, month: date, rates: dict) -> list[dict]:
     for b in bookings:
         if b.commission <= 0:
             continue
-        amount = fx.convert(b.commission, b.currency, "EUR", rates)
+        amount = fx.convert(b.commission, b.currency, currency, rates)
         lines.append({
             "kind": "commission",
             "booking": b.pk,
             "description": f"{pct(owner.commission_rate)} % commission · {b.cottage.name} · "
                            f"{b.get_channel_display()} · {b.check_in:%-d.%-m.}–{b.check_out:%-d.%-m.%Y}",
             "amount": str(amount),
-            "original": f"{b.commission} {b.currency}" if b.currency != "EUR" else "",
+            "original": f"{b.commission} {b.currency}" if b.currency != currency else "",
         })
     for cottage in owner.cottages.exclude(listing_started_on=None):
         n = 1
@@ -67,8 +70,8 @@ def lines_for(owner: Owner, month: date, rates: dict) -> list[dict]:
                     "kind": "yearly_fee",
                     "cottage": cottage.pk,
                     "description": f"Yearly fee · {cottage.name} · listing year {n} from {starts:%-d.%-m.%Y}",
-                    "amount": str(fee),
-                    "original": "",
+                    "amount": str(fx.convert(fee, cottage.currency, currency, rates)),
+                    "original": f"{fee} {cottage.currency}" if cottage.currency != currency else "",
                 })
             n += 1
     return lines
@@ -88,7 +91,8 @@ def build(owner: Owner, month: date, rates: tuple[dict, str | None] | None = Non
     invoice = Invoice.objects.select_for_update().filter(owner=owner, month=month).first()
     if invoice and invoice.status != Invoice.Status.DRAFT:
         return invoice
-    lines = lines_for(owner, month, table)
+    currency = owner_currency(list(owner.cottages.all()))
+    lines = lines_for(owner, month, table, currency)
     if not lines:
         if invoice:
             invoice.delete()
@@ -96,6 +100,7 @@ def build(owner: Owner, month: date, rates: tuple[dict, str | None] | None = Non
     subtotal = sum((Decimal(x["amount"]) for x in lines), ZERO)
     if invoice is None:
         invoice = Invoice(owner=owner, month=month, number=_next_number(month.year))
+    invoice.currency = currency
     invoice.lines = lines
     invoice.subtotal = subtotal
     invoice.vat = vat_on(subtotal)

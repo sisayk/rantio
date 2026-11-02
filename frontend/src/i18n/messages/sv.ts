@@ -384,7 +384,7 @@ export const sv: Translation = {
     meta: {
       title: "Rantio – din stuga på Airbnb, Booking.com och Vrbo",
       description:
-        "Rantio ger din stuga gäster från utlandet, var som helst i Norden eller Baltikum, och håller kalendrarna i takt med de sajter du redan använder. 99 € om året och 12 % av bokningarna vi förmedlar.",
+        "Rantio ger din stuga gäster från utlandet, var som helst i Norden eller Baltikum, och håller kalendrarna i takt med de sajter du redan använder. {fee} om året och 12 % av bokningarna vi förmedlar.",
     },
     nav: { cta: "Lägg ut din stuga", login: "Logga in" },
     hero: {
@@ -392,9 +392,9 @@ export const sv: Translation = {
       nightsLabel: "Extra nätter per år",
       nights: { one: "{n} extra natt", other: "{n} extra nätter" },
       priceLabel: "Pris per natt",
-      perNight: "€ / natt",
+      perNight: "{currency} / natt",
       finePrint:
-        "I uppskattningen har vi dragit av plattformarnas avgifter (cirka 15 %), Rantios årsavgift på 99 €, provisionen på 12 % och moms.",
+        "I uppskattningen har vi dragit av plattformarnas avgifter (cirka 15 %), Rantios årsavgift på {fee}, provisionen på 12 % och moms.",
       lead: "Rantio lägger ut din stuga på Airbnb, Booking.com och Vrbo och håller alla kalendrar i takt med de lokala sajter du redan använder, till exempel Nettimökki i Finland.",
       cta: "Lägg ut din stuga",
       photoAlt: "En stuga på en sjöstrand en molnig sommardag",
@@ -439,14 +439,14 @@ export const sv: Translation = {
       ],
     },
     price: {
-      title: "99 € om året och 12 % av bokningarna vi förmedlar",
+      title: "{fee} om året och 12 % av bokningarna vi förmedlar",
       lead: "Ingen startavgift och ingen månadsavgift. Årsavgiften täcker arbetet med att skapa och sköta dina annonser. När en gäst bokar via en kanal som Rantio har öppnat betalar du 12 % av det som plattformen betalar ut till dig. Moms tillkommer på båda. Vi tar aldrig betalt för bokningar från de sajter du använde redan tidigare, till exempel Nettimökki.",
-      exampleTitle: "Exempel: 20 extra nätter à 150 € per natt",
+      exampleTitle: "Exempel: 20 extra nätter à {price} per natt",
       rows: {
         guests: "Gästerna betalar",
         platform: "Plattformsavgifter, cirka 15 %",
         commission: "Rantio 12 % plus moms",
-        yearly: "Årsavgift 99 € plus moms",
+        yearly: "Årsavgift {fee} plus moms",
       },
       total: "Du behåller",
       about: "cirka {amount}",
@@ -881,7 +881,7 @@ export const sv: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Inga årsavgifter i år.",
     },
-    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är 99 € + moms per stuga; för pilotägare är första året gratis. Momsen är 25,5 %.",
+    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är {fee} + moms per stuga; för pilotägare är första året gratis. Momsen är 25,5 %.",
     ownBooking: "Egen bokning",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

@@ -19,8 +19,10 @@ cottage site) is the example of "a local site you already use".
   the polite "jūs/Jūs"; pick what local booking sites use and stay consistent).
 - Keep these exactly: Rantio, Airbnb, Booking.com, Vrbo, Nettimökki, Wikipedia,
   Unsplash, Elda-Auto Tmi, CC BY-SA, every `{placeholder}`.
-- Write prices, percentages and dates the local way: "99 €" or "€99", "12 %" or
-  "12%", "12.–15. juli", whatever the language uses.
+- Write percentages and dates the local way: "12 %" or "12%", "12.–15. juli",
+  whatever the language uses. Money is never written into the text: keep {fee} and
+  {price} as they are; the page fills them in its own currency (99 € on a Finnish page,
+  1 080 kr on a Swedish one).
 - Lists (nav, steps, faq items, cards) keep the same number of items, same order.
 - Plural objects need every form the language's plural rules use (CLDR):
   sv, nb, nn, da, is, et: `one`, `other`. lv: `zero`, `one`, `other`

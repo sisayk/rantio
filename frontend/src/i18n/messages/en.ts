@@ -397,7 +397,7 @@ export const en = {
     meta: {
       title: "Rantio – your cottage on Airbnb, Booking.com and Vrbo",
       description:
-        "Rantio brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. €99 a year and 12% of the bookings we bring.",
+        "Rantio brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. {fee} a year and 12% of the bookings we bring.",
     },
     nav: { cta: "List your cottage", login: "Sign in" },
     hero: {
@@ -405,9 +405,9 @@ export const en = {
       nightsLabel: "Extra nights a year",
       nights: p({ one: "{n} extra night", other: "{n} extra nights" }),
       priceLabel: "Price per night",
-      perNight: "€ / night",
+      perNight: "{currency} / night",
       finePrint:
-        "The estimate takes off platform fees (about 15%), Rantio's €99 yearly fee, the 12% commission and VAT.",
+        "The estimate takes off platform fees (about 15%), Rantio's {fee} yearly fee, the 12% commission and VAT.",
       lead: "Rantio puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with the local sites you already use, such as Nettimökki in Finland.",
       cta: "List your cottage",
       photoAlt: "A cottage on a lake shore on a cloudy summer day",
@@ -452,14 +452,14 @@ export const en = {
       ],
     },
     price: {
-      title: "€99 a year and 12% of the bookings we bring",
+      title: "{fee} a year and 12% of the bookings we bring",
       lead: "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Rantio opened, you pay 12% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
-      exampleTitle: "Example: 20 extra nights at €150 a night",
+      exampleTitle: "Example: 20 extra nights at {price} a night",
       rows: {
         guests: "Guests pay",
         platform: "Platform fees, about 15%",
         commission: "Rantio 12% plus VAT",
-        yearly: "Yearly fee €99 plus VAT",
+        yearly: "Yearly fee {fee} plus VAT",
       },
       total: "You keep",
       about: "about {amount}",
@@ -894,7 +894,7 @@ export const en = {
       plusVat: "+ VAT {vat}",
       empty: "No yearly fees this year.",
     },
-    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is €99 + VAT per cottage; pilot owners' first year is free. VAT is 25.5%.",
+    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is {fee} + VAT per cottage; pilot owners' first year is free. VAT is 25.5%.",
     ownBooking: "Own booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

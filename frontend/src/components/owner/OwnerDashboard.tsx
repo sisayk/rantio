@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Messages } from "@/i18n";
 import { fill, number, plural } from "@/i18n/format";
+import { YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
@@ -43,6 +44,7 @@ export default function OwnerDashboard({
   // Figures come in the owner's currency (a Swedish owner's in kronor); each stay in its cottage's.
   const currency: Currency = load.state === "ready" && isCurrency(load.summary.currency) ? load.summary.currency : "EUR";
   const cur = (b: BookingRow): Currency => (isCurrency(b.currency) ? b.currency : currency);
+  const feeCur = (f: { currency: string }): Currency => (isCurrency(f.currency) ? f.currency : currency);
 
   // The dashboard renders only in the browser, after the figures load, so Intl dates are safe here;
   // numbers and money use the site's own formatting (src/i18n/format.ts, src/lib/currency.ts).
@@ -295,7 +297,7 @@ export default function OwnerDashboard({
                       ) : null}
                       {c.next_fee_on && c.next_fee ? (
                         <span className={styles.muted}>
-                          {fill(lang, t.cottages.nextFee, { date: fmt.date(c.next_fee_on), fee: fmt.cents(c.next_fee, "EUR") })}
+                          {fill(lang, t.cottages.nextFee, { date: fmt.date(c.next_fee_on), fee: fmt.cents(c.next_fee, isCurrency(c.currency) ? c.currency : currency) })}
                         </span>
                       ) : null}
                     </>
@@ -376,8 +378,8 @@ export default function OwnerDashboard({
                   <span className={styles.num}>
                     {Number(f.fee) === 0
                       ? t.fees.free
-                      : `${fmt.cents(f.fee, "EUR")} ${fill(lang, t.fees.plusVat, { vat: fmt.cents(f.vat, "EUR") })}`}
-                    {Number(f.fee) !== 0 && currency !== "EUR" ? (
+                      : `${fmt.cents(f.fee, feeCur(f))} ${fill(lang, t.fees.plusVat, { vat: fmt.cents(f.vat, feeCur(f)) })}`}
+                    {Number(f.fee) !== 0 && feeCur(f) !== currency ? (
                       <small className={styles.muted}> ≈ {fmt.cur(f.fee_local)}</small>
                     ) : null}
                   </span>
@@ -387,7 +389,7 @@ export default function OwnerDashboard({
           ) : (
             <p className={styles.note}>{t.fees.empty}</p>
           )}
-          <p className={styles.howItWorks}>{t.howItWorks}</p>
+          <p className={styles.howItWorks}>{fill(lang, t.howItWorks, { fee: fmt.cur(YEARLY_FEES[currency], currency) })}</p>
         </section>
       </main>
     </div>

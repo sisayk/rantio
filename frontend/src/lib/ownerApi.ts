@@ -23,9 +23,8 @@ export type BookingRow = {
 
 export type Summary = {
   owner: { name: string; first_name: string; email: string; language: string; is_pilot: boolean; commission_rate: string };
-  /** The owner's currency; bookings and totals are in it. Rantio's yearly fee is in EUR. */
+  /** The owner's currency; bookings and totals are in it. Each yearly fee is in its cottage's currency. */
   currency: string;
-  fee_currency: "EUR";
   rate: { per_eur: string; date: string | null } | null;
   year: number;
   years: number[];
@@ -64,7 +63,7 @@ export type Summary = {
     payout: Money;
     occupancy: number | null;
   }[];
-  fees: { cottage: string; listing_year: number; starts_on: string; fee: Money; vat: Money; fee_local: Money }[];
+  fees: { cottage: string; currency: string; listing_year: number; starts_on: string; fee: Money; vat: Money; fee_local: Money }[];
   upcoming: BookingRow[];
   unread_messages: number;
 };

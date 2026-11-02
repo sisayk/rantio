@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element -- static photos in /public, sized by CSS */
 import { getMessages } from "@/i18n";
-import { countryName, languageNamesIn, money } from "@/i18n/format";
+import { countryName, fill, languageNamesIn, money } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { COMMISSION, CONTACT_EMAIL, PLATFORM_FEE, VAT, YEARLY_FEE } from "@/lib/content";
+import { COMMISSION, CONTACT_EMAIL, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
+import { type Currency, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import { COUNTRIES } from "@/lib/listings";
 import { PHOTOS, SHOWCASE_CARDS } from "@/lib/showcase";
 import Estimator from "./Estimator";
@@ -41,18 +42,25 @@ const STEP_ICONS = [
   <svg key="c" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5" /><circle cx="12" cy="12" r="2.6" /><path d="M6.5 9.5v5M17.5 9.5v5" /></svg>,
 ];
 
-// The price example: 20 extra nights at €150, worked out the same way as the estimator.
-const EXAMPLE_GUESTS = 20 * 150;
-const EXAMPLE_PLATFORM = EXAMPLE_GUESTS * PLATFORM_FEE;
-const EXAMPLE_COMMISSION = (EXAMPLE_GUESTS - EXAMPLE_PLATFORM) * COMMISSION * (1 + VAT);
-const EXAMPLE_YEARLY = YEARLY_FEE * (1 + VAT);
-const EXAMPLE_KEEP = EXAMPLE_GUESTS - EXAMPLE_PLATFORM - EXAMPLE_COMMISSION - EXAMPLE_YEARLY;
+// The price example: 20 extra nights at a typical price, worked out the same way as the
+// estimator, in the page's currency (kronor and the Swedish yearly fee on a Swedish page).
+function example(currency: Currency) {
+  const guests = 20 * NIGHT_PRICES[currency].typical;
+  const platform = guests * PLATFORM_FEE;
+  const commission = (guests - platform) * COMMISSION * (1 + VAT);
+  const yearly = YEARLY_FEES[currency] * (1 + VAT);
+  return { guests, platform, commission, yearly, keep: guests - platform - commission - yearly };
+}
 
 export default function Landing({ lang }: { lang: Lang }) {
   const m = getMessages(lang);
   const t = m.owner;
   const intl = LANG_INFO[lang].intl;
   const eur = (n: number) => money(lang, Math.round(n));
+  const currency = LANG_CURRENCY[lang];
+  const cash = (n: number) => formatPrice(lang, n, currency);
+  const ex = example(currency);
+  const fee = cash(YEARLY_FEES[currency]);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   // July 2027 starts on a Thursday; 5–11 July 2027 is a Monday-to-Sunday week.
   const month = new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" }).format(new Date(2027, 6, 1));
@@ -60,10 +68,10 @@ export default function Landing({ lang }: { lang: Lang }) {
     new Intl.DateTimeFormat(intl, { weekday: "short" }).format(new Date(2027, 6, 5 + i)),
   );
   const priceRows = [
-    { label: t.price.rows.guests, value: eur(EXAMPLE_GUESTS) },
-    { label: t.price.rows.platform, value: `−${eur(EXAMPLE_PLATFORM)}` },
-    { label: t.price.rows.commission, value: `−${eur(EXAMPLE_COMMISSION)}` },
-    { label: t.price.rows.yearly, value: `−${eur(EXAMPLE_YEARLY)}` },
+    { label: t.price.rows.guests, value: cash(ex.guests) },
+    { label: t.price.rows.platform, value: `−${cash(ex.platform)}` },
+    { label: t.price.rows.commission, value: `−${cash(ex.commission)}` },
+    { label: fill(lang, t.price.rows.yearly, { fee }), value: `−${cash(ex.yearly)}` },
   ];
   let fillOrder = 0;
 
@@ -213,13 +221,13 @@ export default function Landing({ lang }: { lang: Lang }) {
         <section className={`${styles.wide} ${styles.twoCol}`} aria-labelledby="price-title">
           <div>
             <h2 id="price-title" className={styles.sectionTitle}>
-              {t.price.title}
+              {fill(lang, t.price.title, { fee })}
             </h2>
             <p className={styles.sectionLead}>{t.price.lead}</p>
             <p className={styles.priceTerms}>{t.price.terms}</p>
           </div>
           <div className={styles.priceCard}>
-            <h3 className={styles.priceCardTitle}>{t.price.exampleTitle}</h3>
+            <h3 className={styles.priceCardTitle}>{fill(lang, t.price.exampleTitle, { price: cash(NIGHT_PRICES[currency].typical) })}</h3>
             <dl className={styles.priceRows}>
               {priceRows.map((row) => (
                 <div key={row.label}>
@@ -229,7 +237,7 @@ export default function Landing({ lang }: { lang: Lang }) {
               ))}
               <div className={styles.priceTotal}>
                 <dt>{t.price.total}</dt>
-                <dd>{t.price.about.replace("{amount}", eur(Math.round(EXAMPLE_KEEP / 10) * 10))}</dd>
+                <dd>{t.price.about.replace("{amount}", cash(roundNicely(ex.keep, currency)))}</dd>
               </div>
             </dl>
           </div>

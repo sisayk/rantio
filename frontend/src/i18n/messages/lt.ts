@@ -384,7 +384,7 @@ export const lt: Translation = {
     meta: {
       title: "Rantio – Jūsų namelis Airbnb, Booking.com ir Vrbo",
       description:
-        "Rantio atveda užsienio svečius į Jūsų poilsio namelį bet kurioje Šiaurės ar Baltijos šalyje ir suderina kalendorius su svetainėmis, kuriomis jau naudojatės. 99 € per metus ir 12 % nuo mūsų atvestų užsakymų.",
+        "Rantio atveda užsienio svečius į Jūsų poilsio namelį bet kurioje Šiaurės ar Baltijos šalyje ir suderina kalendorius su svetainėmis, kuriomis jau naudojatės. {fee} per metus ir 12 % nuo mūsų atvestų užsakymų.",
     },
     nav: { cta: "Paskelbkite namelį", login: "Prisijungti" },
     hero: {
@@ -397,9 +397,9 @@ export const lt: Translation = {
         other: "{n} papildomų naktų",
       },
       priceLabel: "Nakvynės kaina",
-      perNight: "€ / naktis",
+      perNight: "{currency} / naktis",
       finePrint:
-        "Skaičiuojant atimami platformų mokesčiai (apie 15 %), Rantio metinis 99 € mokestis, 12 % komisinis mokestis ir PVM.",
+        "Skaičiuojant atimami platformų mokesčiai (apie 15 %), Rantio metinis {fee} mokestis, 12 % komisinis mokestis ir PVM.",
       lead: "Rantio paskelbia Jūsų namelį Airbnb, Booking.com ir Vrbo bei suderina visus kalendorius su vietinėmis svetainėmis, kuriomis jau naudojatės, pavyzdžiui, Nettimökki Suomijoje.",
       cta: "Paskelbkite namelį",
       photoAlt: "Namelis ant ežero kranto debesuotą vasaros dieną",
@@ -444,14 +444,14 @@ export const lt: Translation = {
       ],
     },
     price: {
-      title: "99 € per metus ir 12 % nuo mūsų atvestų užsakymų",
+      title: "{fee} per metus ir 12 % nuo mūsų atvestų užsakymų",
       lead: "Jokio pradinio ar mėnesinio mokesčio. Metinis mokestis padengia skelbimų parengimą ir priežiūrą. Kai svečias užsisako per Rantio atvertą kanalą, mokate 12 % sumos, kurią Jums sumoka platforma. Prie abiejų pridedamas PVM. Niekada neimame mokesčio už užsakymus iš svetainių, kuriomis naudojotės ir anksčiau, pavyzdžiui, Nettimökki.",
-      exampleTitle: "Pavyzdys: 20 papildomų naktų po 150 € už naktį",
+      exampleTitle: "Pavyzdys: 20 papildomų naktų po {price} už naktį",
       rows: {
         guests: "Svečiai sumoka",
         platform: "Platformų mokesčiai, apie 15 %",
         commission: "Rantio 12 % + PVM",
-        yearly: "Metinis mokestis 99 € + PVM",
+        yearly: "Metinis mokestis {fee} + PVM",
       },
       total: "Jums lieka",
       about: "apie {amount}",
@@ -886,7 +886,7 @@ export const lt: Translation = {
       plusVat: "+ PVM {vat}",
       empty: "Šiais metais metinių mokesčių nėra.",
     },
-    howItWorks: "Komisinis mokestis yra dalis sumos, kurią svetainė Jums išmoka už viešnagę (be valymo mokesčio). Už Nettimökki ir Jūsų pačių užsakymus mokestis neimamas. Metinis mokestis – 99 € + PVM už namelį; bandomiesiems savininkams pirmieji metai nemokami. PVM – 25,5 %.",
+    howItWorks: "Komisinis mokestis yra dalis sumos, kurią svetainė Jums išmoka už viešnagę (be valymo mokesčio). Už Nettimökki ir Jūsų pačių užsakymus mokestis neimamas. Metinis mokestis – {fee} + PVM už namelį; bandomiesiems savininkams pirmieji metai nemokami. PVM – 25,5 %.",
     ownBooking: "Savas užsakymas",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

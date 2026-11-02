@@ -190,7 +190,7 @@ export const en: LegalTexts = {
         heading: "Owner accounts",
         paragraphs: [
           "Cottage owners can ask to join through the sign-up form; sending it doesn't commit you to anything. Owners sign in with a one-time code sent to their email, so keep your email account safe and don't share the codes.",
-          "Our service for owners, including the yearly fee of €99 per cottage, the 12% commission on bookings from the channels Rantio adds (VAT is added to both) and invoicing through Stripe, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
+          "Our service for owners, including the yearly fee per cottage (€99, or SEK 1,080, NOK 1,030, DKK 740 or ISK 13,500 for a cottage in Sweden, Norway, Denmark or Iceland), the 12% commission on bookings from the channels Rantio adds (VAT is added to both) and invoicing through Stripe, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
         ],
       },
       {

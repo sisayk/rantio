@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice } from "@/lib/currency";
 import { useHost } from "@/state/host";
 import { formatDate } from "@/text/dates";
@@ -114,8 +115,8 @@ export default function Earnings() {
                   </Text>
                 ) : (
                   <View style={{ alignItems: "flex-end" }}>
-                    <Text v="h3">{cents(fee.fee, "EUR")}</Text>
-                    <Text v="tiny">{f(d.fees.plusVat, { vat: cents(fee.vat, "EUR") })}</Text>
+                    <Text v="h3">{cents(fee.fee, fee.currency as Currency)}</Text>
+                    <Text v="tiny">{f(d.fees.plusVat, { vat: cents(fee.vat, fee.currency as Currency) })}</Text>
                   </View>
                 )}
               </View>
@@ -123,7 +124,7 @@ export default function Earnings() {
           </Card>
         )}
         <Text v="small" style={{ marginTop: space.lg }}>
-          {d.howItWorks}
+          {f(d.howItWorks, { fee: formatPrice(lang, YEARLY_FEES[cur] ?? YEARLY_FEES.EUR, cur) })}
         </Text>
       </Section>
     </TabScreen>

@@ -68,7 +68,7 @@ class RatesTests(TestCase):
 
 
 class SwedishOwnerTests(TestCase):
-    """A Swedish owner sees kronor; Rantio's yearly fee stays in euros."""
+    """A Swedish owner sees kronor, Rantio's yearly fee included (a set 1 080 kr)."""
 
     def setUp(self):
         cache.clear()
@@ -86,8 +86,9 @@ class SwedishOwnerTests(TestCase):
         self.assertEqual(s["currency"], "SEK")
         self.assertEqual(s["totals"]["payout"], "5000.00")
         self.assertEqual(s["totals"]["commission"], "600.00")  # 12 % of the payout, in kronor
-        self.assertEqual(s["totals"]["fees"], "1089.00")  # €99 at 11 kr
-        self.assertEqual(s["fees"][0]["fee"], "99.00")
+        self.assertEqual(s["totals"]["fees"], "1080.00")  # the Swedish yearly fee, not €99 converted
+        self.assertEqual((s["fees"][0]["fee"], s["fees"][0]["currency"]), ("1080.00", "SEK"))
+        self.assertEqual(s["cottages"][0]["next_fee"], "1080.00")
         self.assertEqual(s["cottages"][0]["currency"], "SEK")
         self.assertEqual(s["upcoming"], [])
         self.assertEqual(s["rate"], {"per_eur": "11.0000", "date": "2026-10-28"})
