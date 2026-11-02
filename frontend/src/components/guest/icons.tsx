@@ -107,12 +107,13 @@ export const Logo = ({ className }: P) => {
   );
 };
 
-/** "Rantio" with a pin for the dot of the i; as tall as 1.2 × the surrounding font size. */
+/** "Rantio" with a pin for the dot of the i. Its box is the letters only (as tall as the
+ *  surrounding font size), so it lines up with text beside it; the pin rises above the box. */
 export const Wordmark = ({ className }: P) => (
   <svg
     className={className}
-    viewBox={`0 0 ${WORDMARK.width} ${WORDMARK.height}`}
-    style={{ height: "1.2em", width: "auto", display: "block" }}
+    viewBox={`0 ${WORDMARK.lettersTop} ${WORDMARK.width} ${WORDMARK.height - WORDMARK.lettersTop}`}
+    style={{ height: "1em", width: "auto", display: "block", overflow: "visible" }}
     role="img"
     aria-label="Rantio"
   >
