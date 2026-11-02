@@ -1,6 +1,7 @@
 // Calls to Rantio's Django API. Owners send their app sign-in key as a Bearer header;
 // guests need no account (a conversation's private token is the key).
 import Constants from "expo-constants";
+import { NativeModules } from "react-native";
 
 import type {
   BookingLinkInfo,
@@ -31,13 +32,27 @@ export type {
   Thread,
 } from "@/lib/ownerApi";
 
+/** Metro's host:port. Expo's tools pass it as hostUri; an app started from Xcode or Android
+ *  Studio doesn't get that, so the address its code was loaded from is used instead. */
+function devServer(): string {
+  const fromExpo = Constants.expoConfig?.hostUri;
+  if (fromExpo) return fromExpo;
+  try {
+    const source = NativeModules.SourceCode as { getConstants?: () => { scriptURL?: string }; scriptURL?: string } | undefined;
+    const url = source?.getConstants?.().scriptURL ?? source?.scriptURL ?? "";
+    return url.match(/^https?:\/\/([^/?#]+)/)?.[1] ?? "";
+  } catch {
+    return "";
+  }
+}
+
 /**
  * While developing, the app calls the API on the same address it loads its code from
  * (Metro), and metro.config.js passes /api/ and /media/ on to Django on the Mac. Whatever
  * reaches Metro (simulator, emulator, a phone on the Wi-Fi, a tunnel) can then sign in.
  * Release builds talk to rantio.fi. EXPO_PUBLIC_API_URL in mobile/.env overrides both.
  */
-const hostUri = __DEV__ ? (Constants.expoConfig?.hostUri ?? "") : "";
+const hostUri = __DEV__ ? devServer() : "";
 const devHost = hostUri.split(":")[0];
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (hostUri ? `http://${hostUri}` : "https://rantio.fi")).replace(/\/$/, "");
 export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || (devHost ? `http://${devHost}:3100` : API_URL)).replace(/\/$/, "");
