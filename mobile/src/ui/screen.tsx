@@ -115,6 +115,7 @@ export const styles = StyleSheet.create({
     borderBottomColor: colors.line,
   },
   sheetBar: {
+    backgroundColor: colors.page, // also a sticky header in the language and currency sheets
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: space.md,
