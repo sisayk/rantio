@@ -452,6 +452,60 @@ export const et: Translation = {
       about: "umbes {amount}",
       terms: "Kuulutused kehtivad korraga 12 kuud ja pikenevad koos aastatasuga.",
     },
+    monitor: {
+      badge: "Peagi tulekul",
+      title: "Mökki monitor: tea, et suvilas on kõik korras",
+      lead: "Väike seade suvila seinale, mis saadab su telefoni hoiatuse, kui midagi on valesti. Sellel on oma 4G-ühendus, nii et see töötab ilma wifita, ja aku hoiab seda elektrikatkestuse ajal töös.",
+      features: [
+        {
+          key: "frost",
+          title: "Külm",
+          body: "Hoiatab enne, kui torud jõuavad külmuda.",
+        },
+        {
+          key: "power",
+          title: "Elektrikatkestus",
+          body: "Annab teada, kui elekter kaob ja kui see tagasi tuleb.",
+        },
+        {
+          key: "leak",
+          title: "Veeleke",
+          body: "Põrandale pandav andur märkab leket varakult.",
+        },
+        {
+          key: "door",
+          title: "Uksed",
+          body: "Broneeringu ajal tähendab avatud uks, et külalised on saabunud. Muul ajal tuleb hoiatus.",
+        },
+        {
+          key: "probes",
+          title: "Toru ja saun",
+          body: "Andurid veetorul ja saunas näitavad temperatuure rakenduses.",
+        },
+      ],
+      app: "Hoiatused tulevad Rantio rakendusse, broneeringute ja sõnumite kõrvale. Sobib igale suvilale, olenemata sellest, kas annad seda üürile või mitte.",
+      photoAlt: "Mökki monitor suvila seinal koos temperatuuriandurite, lekkeanduri ja ukseanduriga",
+      caption: "Prototüübi disain",
+      chipTitle: "Külmumisoht: Järvihuvila",
+      chipBody: "Toas 4 °C ja langeb. Küte võib olla välja lülitatud.",
+      formTitle: "Anna teada, kui see valmis on",
+      email: "E-post",
+      rents: "Kas annad suvilat üürile?",
+      rentsOptions: {
+        yes: "Jah",
+        not_yet: "Veel mitte",
+        no: "Ei, see on meie jaoks",
+      },
+      consent: "Rantio võib mulle Mökki monitori kohta e-kirju saata.",
+      submit: "Anna teada, kui see valmis on",
+      sending: "Saadan…",
+      done: "Aitäh! Anname e-kirjaga teada, kui Mökki monitor on valmis.",
+      errors: {
+        email: "Kontrolli e-posti aadressi.",
+        consent: "Vajame luba sulle e-kirju saata.",
+        network: "Saatmine ebaõnnestus. Proovi hetke pärast uuesti.",
+      },
+    },
     faq: {
       title: "Küsimused",
       items: [

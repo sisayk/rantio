@@ -6,7 +6,7 @@ from django.urls import path
 
 from config.admin_assets_view import admin_css
 from owners import calendar_views, inbound, inbox, listings, portal
-from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
+from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Rantio admin"
 admin.site.site_title = "Rantio"
@@ -15,6 +15,7 @@ urlpatterns = [
     path("admin/_assets/stugora-admin.css", admin_css, name="admin_css"),
     path("admin/", admin.site.urls),
     path("api/signups/", OwnerSignupCreateView.as_view(), name="owner-signup"),
+    path("api/monitor-waitlist/", MonitorInterestCreateView.as_view(), name="monitor-waitlist"),
     path("api/auth/request-code/", portal.RequestCodeView.as_view(), name="login-request-code"),
     path("api/auth/verify-code/", portal.VerifyCodeView.as_view(), name="login-verify-code"),
     path("api/auth/logout/", portal.LogoutView.as_view(), name="logout"),

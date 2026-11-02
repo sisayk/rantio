@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 
 from rest_framework import serializers
 
-from .models import OwnerSignup
+from .models import MonitorInterest, OwnerSignup
 
 
 class OwnerSignupSerializer(serializers.ModelSerializer):
@@ -42,3 +42,28 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
         attrs["email"] = attrs["email"].strip().lower()
         attrs["name"] = attrs["name"].strip()
         return attrs
+
+
+class MonitorInterestSerializer(serializers.ModelSerializer):
+    website = serializers.CharField(required=False, allow_blank=True, write_only=True)  # honeypot
+    # The same address may join twice; the second time just updates the answers.
+    email = serializers.EmailField()
+
+    class Meta:
+        model = MonitorInterest
+        fields = ["email", "language", "country", "rents", "privacy_consent", "source", "website"]
+
+    def validate_privacy_consent(self, value: bool) -> bool:
+        if not value:
+            raise serializers.ValidationError("Consent to the privacy policy is required.")
+        return value
+
+    def validate(self, attrs):
+        if attrs.pop("website", ""):
+            raise serializers.ValidationError("Invalid submission.")
+        attrs["email"] = attrs["email"].strip().lower()
+        return attrs
+
+    def create(self, validated):
+        entry, _ = MonitorInterest.objects.update_or_create(email=validated.pop("email"), defaults=validated)
+        return entry

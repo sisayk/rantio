@@ -452,6 +452,60 @@ export const is: Translation = {
       about: "um {amount}",
       terms: "Skráningar gilda í 12 mánuði í senn og endurnýjast með árgjaldinu.",
     },
+    monitor: {
+      badge: "Væntanlegt",
+      title: "Mökki monitor: vittu að allt er í lagi í bústaðnum",
+      lead: "Lítið tæki á vegg bústaðarins sem sendir viðvörun í símann þinn þegar eitthvað er að. Það er með eigin 4G-tengingu, svo það virkar án Wi-Fi, og rafhlaða heldur því gangandi í rafmagnsleysi.",
+      features: [
+        {
+          key: "frost",
+          title: "Frost",
+          body: "Varar þig við áður en lagnirnar geta frosið.",
+        },
+        {
+          key: "power",
+          title: "Rafmagnsleysi",
+          body: "Lætur vita þegar rafmagnið fer og þegar það kemur aftur.",
+        },
+        {
+          key: "leak",
+          title: "Vatnsleki",
+          body: "Nemi á gólfinu greinir leka snemma.",
+        },
+        {
+          key: "door",
+          title: "Hurðir",
+          body: "Meðan á bókun stendur þýðir opnuð hurð að gestirnir eru komnir. Annars kemur viðvörun.",
+        },
+        {
+          key: "probes",
+          title: "Lagnir og gufubað",
+          body: "Nemar á vatnslögninni og í gufubaðinu sýna hitastigið í appinu.",
+        },
+      ],
+      app: "Viðvaranirnar birtast í Rantio-appinu, við hliðina á bókunum og skilaboðum. Hentar öllum bústöðum, hvort sem þú leigir út eða ekki.",
+      photoAlt: "Mökki monitor á vegg í bústað, með hitanemum, lekanema og hurðarnema",
+      caption: "Hönnun frumgerðar",
+      chipTitle: "Frosthætta í Järvihuvila",
+      chipBody: "4 °C inni og lækkar. Hitinn gæti verið slökktur.",
+      formTitle: "Láttu mig vita þegar það er tilbúið",
+      email: "Netfang",
+      rents: "Leigir þú bústaðinn út?",
+      rentsOptions: {
+        yes: "Já",
+        not_yet: "Ekki enn",
+        no: "Nei, hann er fyrir okkur",
+      },
+      consent: "Rantio má senda mér tölvupóst um Mökki monitor.",
+      submit: "Láttu mig vita þegar það er tilbúið",
+      sending: "Sendir…",
+      done: "Takk! Við sendum þér tölvupóst þegar Mökki monitor er tilbúinn.",
+      errors: {
+        email: "Athugaðu netfangið.",
+        consent: "Við þurfum leyfi þitt til að senda þér tölvupóst.",
+        network: "Ekki tókst að senda. Reyndu aftur eftir smástund.",
+      },
+    },
     faq: {
       title: "Spurningar",
       items: [

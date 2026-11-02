@@ -465,6 +465,60 @@ export const en = {
       about: "about {amount}",
       terms: "Listings run for 12 months at a time and renew with the yearly fee.",
     },
+    monitor: {
+      badge: "Coming soon",
+      title: "Mökki monitor: know your cottage is all right",
+      lead: "A small box for the cottage wall that sends an alert to your phone when something is wrong. It has its own 4G connection, so it works without Wi‑Fi, and a battery keeps it going through a power cut.",
+      features: [
+        {
+          key: "frost",
+          title: "Frost",
+          body: "Warns you before the pipes can freeze.",
+        },
+        {
+          key: "power",
+          title: "Power cut",
+          body: "Tells you when the electricity goes, and when it comes back.",
+        },
+        {
+          key: "leak",
+          title: "Water leak",
+          body: "A sensor on the floor catches a leak early.",
+        },
+        {
+          key: "door",
+          title: "Doors",
+          body: "During a booking, a door opening means your guests have arrived. Otherwise it's an alert.",
+        },
+        {
+          key: "probes",
+          title: "Pipe and sauna",
+          body: "Probes on the water pipe and in the sauna show their temperatures in the app.",
+        },
+      ],
+      app: "Alerts arrive in the Rantio app, next to your bookings and messages. It suits any cottage, whether you rent it out or not.",
+      photoAlt: "The Mökki monitor on a cottage wall, with its temperature probes, leak sensor and door sensor",
+      caption: "Prototype design",
+      chipTitle: "Frost risk at Järvihuvila",
+      chipBody: "4 °C indoors and falling. The heating may be off.",
+      formTitle: "Tell me when it's ready",
+      email: "Email",
+      rents: "Do you rent the cottage out?",
+      rentsOptions: {
+        yes: "Yes",
+        not_yet: "Not yet",
+        no: "No, it's for us",
+      },
+      consent: "Rantio may email me about the Mökki monitor.",
+      submit: "Tell me when it's ready",
+      sending: "Sending…",
+      done: "Thanks! We'll email you when the Mökki monitor is ready.",
+      errors: {
+        email: "Check the email address.",
+        consent: "We need your permission to email you.",
+        network: "Sending failed. Try again in a moment.",
+      },
+    },
     faq: {
       title: "Questions",
       items: [

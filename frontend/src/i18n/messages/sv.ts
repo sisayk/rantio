@@ -452,6 +452,60 @@ export const sv: Translation = {
       about: "cirka {amount}",
       terms: "Annonserna gäller 12 månader i taget och förnyas med årsavgiften.",
     },
+    monitor: {
+      badge: "Kommer snart",
+      title: "Mökki monitor: vet att stugan mår bra",
+      lead: "En liten box på stugans vägg som larmar till din telefon när något är fel. Den har egen 4G-uppkoppling, så den fungerar utan wifi, och ett batteri håller den igång vid strömavbrott.",
+      features: [
+        {
+          key: "frost",
+          title: "Frost",
+          body: "Varnar innan rören hinner frysa.",
+        },
+        {
+          key: "power",
+          title: "Strömavbrott",
+          body: "Säger till när strömmen går och när den kommer tillbaka.",
+        },
+        {
+          key: "leak",
+          title: "Vattenläcka",
+          body: "En givare på golvet upptäcker läckor tidigt.",
+        },
+        {
+          key: "door",
+          title: "Dörrar",
+          body: "Under en bokning betyder en öppnad dörr att gästerna har kommit. Annars blir det ett larm.",
+        },
+        {
+          key: "probes",
+          title: "Rör och bastu",
+          body: "Givare på vattenröret och i bastun visar temperaturerna i appen.",
+        },
+      ],
+      app: "Larmen kommer i Rantio-appen, bredvid dina bokningar och meddelanden. Passar alla stugor, oavsett om du hyr ut eller inte.",
+      photoAlt: "Mökki monitor på en stugvägg, med temperaturgivare, läckgivare och dörrgivare",
+      caption: "Prototypens design",
+      chipTitle: "Frostrisk i Järvihuvila",
+      chipBody: "4 °C inne och sjunker. Värmen kan vara avstängd.",
+      formTitle: "Säg till när den är klar",
+      email: "E-post",
+      rents: "Hyr du ut stugan?",
+      rentsOptions: {
+        yes: "Ja",
+        not_yet: "Inte än",
+        no: "Nej, den är för oss",
+      },
+      consent: "Rantio får mejla mig om Mökki monitor.",
+      submit: "Säg till när den är klar",
+      sending: "Skickar…",
+      done: "Tack! Vi mejlar dig när Mökki monitor är klar.",
+      errors: {
+        email: "Kontrollera e-postadressen.",
+        consent: "Vi behöver ditt tillstånd att mejla dig.",
+        network: "Det gick inte att skicka. Försök igen om en stund.",
+      },
+    },
     faq: {
       title: "Frågor",
       items: [

@@ -452,6 +452,60 @@ export const lv: Translation = {
       about: "ap {amount}",
       terms: "Sludinājumi darbojas 12 mēnešus un tiek pagarināti, samaksājot gada maksu.",
     },
+    monitor: {
+      badge: "Drīzumā",
+      title: "Mökki monitor: zini, ka brīvdienu mājā viss ir kārtībā",
+      lead: "Neliela ierīce mājas sienai, kas sūta brīdinājumu uz tavu tālruni, kad kaut kas nav kārtībā. Tai ir savs 4G savienojums, tāpēc tā darbojas bez Wi-Fi, un akumulators to uztur darbībā elektrības pārtraukuma laikā.",
+      features: [
+        {
+          key: "frost",
+          title: "Sals",
+          body: "Brīdina, pirms caurules var aizsalt.",
+        },
+        {
+          key: "power",
+          title: "Elektrības pārtraukums",
+          body: "Paziņo, kad elektrība pazūd un kad tā atgriežas.",
+        },
+        {
+          key: "leak",
+          title: "Ūdens noplūde",
+          body: "Sensors uz grīdas laikus pamana noplūdi.",
+        },
+        {
+          key: "door",
+          title: "Durvis",
+          body: "Rezervācijas laikā atvērtas durvis nozīmē, ka viesi ir ieradušies. Citādi tas ir brīdinājums.",
+        },
+        {
+          key: "probes",
+          title: "Caurule un pirts",
+          body: "Sensori uz ūdens caurules un pirtī rāda temperatūru lietotnē.",
+        },
+      ],
+      app: "Brīdinājumi parādās Rantio lietotnē blakus tavām rezervācijām un ziņām. Der jebkurai brīvdienu mājai, neatkarīgi no tā, vai tu to izīrē.",
+      photoAlt: "Mökki monitor uz mājas sienas ar temperatūras sensoriem, noplūdes sensoru un durvju sensoru",
+      caption: "Prototipa dizains",
+      chipTitle: "Aizsalšanas risks: Järvihuvila",
+      chipBody: "Iekšā 4 °C, un temperatūra krītas. Iespējams, apkure ir izslēgta.",
+      formTitle: "Paziņojiet, kad tā būs gatava",
+      email: "E-pasts",
+      rents: "Vai tu izīrē māju?",
+      rentsOptions: {
+        yes: "Jā",
+        not_yet: "Vēl ne",
+        no: "Nē, tā ir mums pašiem",
+      },
+      consent: "Rantio drīkst man sūtīt e-pastus par Mökki monitor.",
+      submit: "Paziņojiet, kad tā būs gatava",
+      sending: "Sūta…",
+      done: "Paldies! Mēs tev paziņosim pa e-pastu, kad Mökki monitor būs gatava.",
+      errors: {
+        email: "Pārbaudi e-pasta adresi.",
+        consent: "Mums vajag tavu atļauju sūtīt tev e-pastus.",
+        network: "Neizdevās nosūtīt. Mēģini vēlreiz pēc brīža.",
+      },
+    },
     faq: {
       title: "Jautājumi",
       items: [

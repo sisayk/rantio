@@ -126,6 +126,31 @@ class OwnerSignup(models.Model):
         return self.get_country_display()
 
 
+class MonitorInterest(models.Model):
+    """Someone who asked to hear when the Mökki monitor (the cottage alert box) is ready."""
+
+    class Rents(models.TextChoices):
+        YES = "yes", "Rents it out"
+        NOT_YET = "not_yet", "Not yet"
+        NO = "no", "Only for own use"
+
+    email = models.EmailField(unique=True)
+    language = models.CharField(max_length=2, choices=Language.choices, default=Language.FINNISH)
+    country = models.CharField(max_length=2, choices=Country.choices, default=Country.FINLAND)
+    rents = models.CharField(max_length=8, choices=Rents.choices, blank=True)
+    privacy_consent = models.BooleanField(default=False)
+    source = models.CharField(max_length=80, blank=True, help_text="utm_source or referral")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Mökki monitor waitlist entry"
+        verbose_name_plural = "Mökki monitor waitlist"
+
+    def __str__(self) -> str:
+        return self.email
+
+
 class Owner(models.Model):
     """A cottage owner who has signed the service agreement."""
 

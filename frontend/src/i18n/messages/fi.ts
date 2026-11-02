@@ -449,6 +449,60 @@ export const fi: Translation = {
       about: "noin {amount}",
       terms: "Ilmoitukset ovat voimassa 12 kuukautta kerrallaan ja jatkuvat vuosimaksulla.",
     },
+    monitor: {
+      badge: "Tulossa",
+      title: "Mökki monitor: tiedät, että mökillä on kaikki hyvin",
+      lead: "Pieni laite mökin seinälle. Se hälyttää puhelimeesi, kun jokin on vialla. Siinä on oma 4G-yhteys, joten se toimii ilman wifiä, ja akku pitää sen käynnissä sähkökatkon aikana.",
+      features: [
+        {
+          key: "frost",
+          title: "Pakkanen",
+          body: "Varoittaa ennen kuin putket ehtivät jäätyä.",
+        },
+        {
+          key: "power",
+          title: "Sähkökatko",
+          body: "Kertoo, kun sähköt katkeavat ja kun ne palaavat.",
+        },
+        {
+          key: "leak",
+          title: "Vesivuoto",
+          body: "Lattialle asetettava anturi huomaa vuodon ajoissa.",
+        },
+        {
+          key: "door",
+          title: "Ovet",
+          body: "Varauksen aikana oven avaus tarkoittaa, että vieraat ovat saapuneet. Muulloin siitä tulee hälytys.",
+        },
+        {
+          key: "probes",
+          title: "Putki ja sauna",
+          body: "Anturit vesiputkessa ja saunassa näyttävät lämpötilat sovelluksessa.",
+        },
+      ],
+      app: "Hälytykset tulevat Rantio-sovellukseen varausten ja viestien rinnalle. Sopii mille tahansa mökille, vuokraatpa sitä tai et.",
+      photoAlt: "Mökki monitor mökin seinällä, lämpötila-anturit, vuotoanturi ja ovianturi",
+      caption: "Prototyypin muotoilu",
+      chipTitle: "Jäätymisvaara: Järvihuvila",
+      chipBody: "Sisällä 4 °C ja laskee. Lämmitys saattaa olla pois päältä.",
+      formTitle: "Kerro, kun se on valmis",
+      email: "Sähköposti",
+      rents: "Vuokraatko mökkiä?",
+      rentsOptions: {
+        yes: "Kyllä",
+        not_yet: "En vielä",
+        no: "En, se on omassa käytössä",
+      },
+      consent: "Rantio saa lähettää minulle sähköpostia Mökki monitorista.",
+      submit: "Kerro, kun se on valmis",
+      sending: "Lähetetään…",
+      done: "Kiitos! Kerromme sähköpostilla, kun Mökki monitor on valmis.",
+      errors: {
+        email: "Tarkista sähköpostiosoite.",
+        consent: "Tarvitsemme luvan lähettää sinulle sähköpostia.",
+        network: "Lähetys epäonnistui. Yritä hetken kuluttua uudelleen.",
+      },
+    },
     faq: {
       title: "Kysyttyä",
       items: [

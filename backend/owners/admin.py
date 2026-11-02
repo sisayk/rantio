@@ -17,7 +17,7 @@ from django.contrib import messages
 from . import booking_emails, invoicing, stripe_api
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
-    Message, Owner, OwnerSignup,
+    Message, MonitorInterest, Owner, OwnerSignup,
 )
 
 
@@ -35,6 +35,14 @@ class OwnerSignupAdmin(ModelAdmin):
         ("Follow-up", {"fields": ["status", "internal_notes"]}),
         ("From the form", {"fields": ["privacy_consent", "source", "created_at"], "classes": ["st-grid-3"]}),
     ]
+
+
+@admin.register(MonitorInterest)
+class MonitorInterestAdmin(ModelAdmin):
+    list_display = ["email", "country", "rents", "language", "created_at"]
+    list_filter = ["rents", "country", "language"]
+    search_fields = ["email"]
+    readonly_fields = ["created_at", "privacy_consent", "source"]
 
 
 class CottageInline(TabularInline):

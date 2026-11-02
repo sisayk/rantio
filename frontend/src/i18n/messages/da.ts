@@ -452,6 +452,60 @@ export const da: Translation = {
       about: "ca. {amount}",
       terms: "Annoncerne løber 12 måneder ad gangen og fornyes med årsgebyret.",
     },
+    monitor: {
+      badge: "Kommer snart",
+      title: "Mökki monitor: vid, at sommerhuset har det godt",
+      lead: "En lille boks på sommerhusets væg, der giver din telefon besked, når noget er galt. Den har sin egen 4G-forbindelse, så den virker uden wifi, og et batteri holder den kørende under strømsvigt.",
+      features: [
+        {
+          key: "frost",
+          title: "Frost",
+          body: "Advarer, før rørene kan fryse.",
+        },
+        {
+          key: "power",
+          title: "Strømsvigt",
+          body: "Siger til, når strømmen går, og når den kommer igen.",
+        },
+        {
+          key: "leak",
+          title: "Vandlæk",
+          body: "En sensor på gulvet opdager læk i tide.",
+        },
+        {
+          key: "door",
+          title: "Døre",
+          body: "Under en booking betyder en åbnet dør, at gæsterne er ankommet. Ellers giver den en alarm.",
+        },
+        {
+          key: "probes",
+          title: "Rør og sauna",
+          body: "Følere på vandrøret og i saunaen viser temperaturerne i appen.",
+        },
+      ],
+      app: "Alarmerne kommer i Rantio-appen, ved siden af dine bookinger og beskeder. Passer til ethvert sommerhus, uanset om du lejer det ud eller ej.",
+      photoAlt: "Mökki monitor på en sommerhusvæg med temperaturfølere, lækagesensor og dørsensor",
+      caption: "Prototypens design",
+      chipTitle: "Frostfare i Järvihuvila",
+      chipBody: "4 °C indenfor og faldende. Varmen er måske slukket.",
+      formTitle: "Giv mig besked, når den er klar",
+      email: "E-mail",
+      rents: "Lejer du sommerhuset ud?",
+      rentsOptions: {
+        yes: "Ja",
+        not_yet: "Ikke endnu",
+        no: "Nej, det er til os selv",
+      },
+      consent: "Rantio må sende mig e-mails om Mökki monitor.",
+      submit: "Giv mig besked, når den er klar",
+      sending: "Sender…",
+      done: "Tak! Vi sender dig en e-mail, når Mökki monitor er klar.",
+      errors: {
+        email: "Tjek e-mailadressen.",
+        consent: "Vi skal have din tilladelse til at sende dig e-mails.",
+        network: "Afsendelsen mislykkedes. Prøv igen om lidt.",
+      },
+    },
     faq: {
       title: "Spørgsmål",
       items: [

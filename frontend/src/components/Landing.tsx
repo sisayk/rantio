@@ -14,6 +14,8 @@ import { Wordmark } from "./guest/icons";
 import g from "./guest/guest.module.css";
 import styles from "./landing.module.css";
 import AppBadges from "./AppBadges";
+import MonitorWaitlist from "./MonitorWaitlist";
+import monitorPhoto from "@/assets/mokki-monitor.jpg";
 
 // July 2027 at an example Saimaa cottage: Nettimökki weeks stay, gaps fill from abroad.
 const JULY_OFFSET = 3; // 1 July 2027 is a Thursday
@@ -23,6 +25,15 @@ const ADDED: Record<number, string> = {
   17: "Booking.com", 18: "Booking.com", 19: "Booking.com", 20: "Booking.com", 21: "Booking.com",
 };
 const RUN_STARTS = new Set([11, 17]);
+
+// Mökki monitor features, in the order of messages owner.monitor.features.
+const MONITOR_ICONS: Record<string, React.ReactNode> = {
+  frost: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5" /></svg>,
+  power: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2.5 5.5 13.5H12l-1 8 7.5-11H12z" /></svg>,
+  leak: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11Z" /><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5" /></svg>,
+  door: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21M3 21h18M16 6h2.5V21" /><circle cx="12.5" cy="12.5" r="0.9" /></svg>,
+  probes: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13.5V5a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0Z" /><path d="M12 9v6.5" /></svg>,
+};
 
 const STEP_ICONS = [
   <svg key="a" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5" /><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4" /></svg>,
@@ -222,6 +233,41 @@ export default function Landing({ lang }: { lang: Lang }) {
               </div>
             </dl>
           </div>
+        </section>
+
+        {/* Mökki monitor: the cottage alert box, coming soon */}
+        <section className={`${styles.wide} ${styles.monitor}`} aria-labelledby="monitor-title">
+          <div className={styles.monitorTop}>
+            <figure className={styles.monitorPhoto}>
+              <img src={monitorPhoto.src} alt={t.monitor.photoAlt} width={1200} height={900} loading="lazy" />
+              <div className={styles.chipBooking}>
+                <span className={`${styles.chipDot} ${styles.chipDotCold}`} aria-hidden="true" />
+                <div>
+                  <p className={styles.chipTitle}>{t.monitor.chipTitle}</p>
+                  <p className={styles.chipBody}>{t.monitor.chipBody}</p>
+                </div>
+              </div>
+              <figcaption>{t.monitor.caption}</figcaption>
+            </figure>
+            <div className={styles.monitorBody}>
+              <span className={styles.monitorBadge}>{t.monitor.badge}</span>
+              <h2 id="monitor-title" className={styles.sectionTitle}>
+                {t.monitor.title}
+              </h2>
+              <p className={styles.sectionLead}>{t.monitor.lead}</p>
+              <p className={styles.monitorApp}>{t.monitor.app}</p>
+              <MonitorWaitlist lang={lang} t={t.monitor} privacyLink={t.form.privacyLink} />
+            </div>
+          </div>
+          <ul className={styles.monitorFeatures}>
+            {t.monitor.features.map((feature) => (
+              <li key={feature.key}>
+                <span className={styles.stepIcon}>{MONITOR_ICONS[feature.key]}</span>
+                <h3>{feature.title}</h3>
+                <p>{feature.body}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* FAQ */}

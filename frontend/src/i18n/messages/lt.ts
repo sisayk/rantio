@@ -457,6 +457,60 @@ export const lt: Translation = {
       about: "apie {amount}",
       terms: "Skelbimai galioja 12 mėnesių ir pratęsiami sumokėjus metinį mokestį.",
     },
+    monitor: {
+      badge: "Netrukus",
+      title: "Mökki monitor: žinokite, kad sodyboje viskas gerai",
+      lead: "Nedidelis prietaisas ant sodybos sienos, kuris įspėja jūsų telefoną, kai kas nors negerai. Jis turi savo 4G ryšį, todėl veikia be Wi-Fi, o baterija jį palaiko dingus elektrai.",
+      features: [
+        {
+          key: "frost",
+          title: "Šaltis",
+          body: "Įspėja, kol vamzdžiai dar nespėjo užšalti.",
+        },
+        {
+          key: "power",
+          title: "Dingusi elektra",
+          body: "Praneša, kai dingsta elektra ir kai ji vėl atsiranda.",
+        },
+        {
+          key: "leak",
+          title: "Vandens nuotėkis",
+          body: "Jutiklis ant grindų laiku pastebi nuotėkį.",
+        },
+        {
+          key: "door",
+          title: "Durys",
+          body: "Užsakymo metu atidarytos durys reiškia, kad svečiai atvyko. Kitu metu tai įspėjimas.",
+        },
+        {
+          key: "probes",
+          title: "Vamzdis ir pirtis",
+          body: "Jutikliai ant vandens vamzdžio ir pirtyje rodo temperatūrą programėlėje.",
+        },
+      ],
+      app: "Įspėjimai ateina į Rantio programėlę šalia jūsų užsakymų ir žinučių. Tinka bet kuriai sodybai, nesvarbu, ar ją nuomojate.",
+      photoAlt: "Mökki monitor ant sodybos sienos su temperatūros jutikliais, nuotėkio jutikliu ir durų jutikliu",
+      caption: "Prototipo dizainas",
+      chipTitle: "Užšalimo pavojus: Järvihuvila",
+      chipBody: "Viduje 4 °C ir krenta. Gali būti išjungtas šildymas.",
+      formTitle: "Praneškite, kai bus paruoštas",
+      email: "El. paštas",
+      rents: "Ar nuomojate sodybą?",
+      rentsOptions: {
+        yes: "Taip",
+        not_yet: "Dar ne",
+        no: "Ne, ji mums patiems",
+      },
+      consent: "Rantio gali man siųsti el. laiškus apie Mökki monitor.",
+      submit: "Praneškite, kai bus paruoštas",
+      sending: "Siunčiama…",
+      done: "Ačiū! Parašysime el. paštu, kai Mökki monitor bus paruoštas.",
+      errors: {
+        email: "Patikrinkite el. pašto adresą.",
+        consent: "Mums reikia jūsų leidimo siųsti el. laiškus.",
+        network: "Nepavyko išsiųsti. Bandykite dar kartą po akimirkos.",
+      },
+    },
     faq: {
       title: "Klausimai",
       items: [

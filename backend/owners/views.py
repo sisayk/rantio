@@ -6,8 +6,8 @@ from rest_framework import generics, permissions, views
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
-from .models import OwnerSignup
-from .serializers import OwnerSignupSerializer
+from .models import MonitorInterest, OwnerSignup
+from .serializers import MonitorInterestSerializer, OwnerSignupSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,31 @@ class OwnerSignupCreateView(generics.CreateAPIView):
                 )
             except Exception:  # a mail outage must not lose the sign-up
                 logger.exception("Could not send sign-up notification for %s", signup.pk)
+
+
+class MonitorInterestCreateView(generics.CreateAPIView):
+    """Public endpoint behind "Tell me when it's ready" for the Mökki monitor on the owners' page."""
+
+    queryset = MonitorInterest.objects.all()
+    serializer_class = MonitorInterestSerializer
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "signup"
+
+    def perform_create(self, serializer):
+        entry = serializer.save()
+        if settings.SIGNUP_NOTIFY_EMAILS:
+            try:
+                send_mail(
+                    subject=f"Mökki monitor waitlist: {entry.email}",
+                    message=f"{entry.email} · {entry.get_country_display()} · {entry.get_rents_display() or '-'}"
+                    f" · writes in {entry.get_language_display()}",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=settings.SIGNUP_NOTIFY_EMAILS,
+                )
+            except Exception:
+                logger.exception("Could not send waitlist notification for %s", entry.pk)
 
 
 class RatesView(views.APIView):
