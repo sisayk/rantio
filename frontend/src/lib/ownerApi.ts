@@ -160,6 +160,32 @@ export type BookingRequestRow = {
   created_at: string;
 };
 
+/** Why a night costs what it does (backend owners/pricing.py). */
+export type PriceReason =
+  | "override" | "smart" | "season" | "weekend" | "christmas" | "midsummer" | "easter" | "winter_holiday" | "autumn_holiday"
+  | "summer" | "demand_high" | "demand_up" | "demand_low" | "last_minute" | "gap" | "min" | "max";
+
+/** One night's price: the owner's own for that date (override), smart pricing's, or the usual price. */
+export type NightPriceRow = {
+  date: string;
+  price: Money;
+  /** What smart pricing would ask, shown as a suggestion when it is off. */
+  suggested: Money;
+  override: boolean;
+  reasons: PriceReason[];
+  base?: Money;
+  free?: boolean;
+};
+
+export type CottagePrices = {
+  currency: string;
+  price_per_night?: Money;
+  smart_pricing: boolean;
+  smart_min_price?: Money;
+  smart_max_price?: Money;
+  nights: NightPriceRow[];
+};
+
 export type CalendarData = {
   today: string;
   from: string;
@@ -169,6 +195,19 @@ export type CalendarData = {
   /** Pairs of "kind-id" keys of entries that overlap: double bookings. */
   conflicts: [string, string][];
   requests: BookingRequestRow[];
+  /** Each night's price, by cottage id. */
+  prices: Record<string, CottagePrices>;
+};
+
+/** A stay's price through the booking link. */
+export type StayQuote = {
+  currency: string;
+  nights: { date: string; price: Money }[];
+  subtotal: Money;
+  discount_percent: number;
+  discount: Money;
+  cleaning_fee: Money;
+  total: Money;
 };
 
 /** What a guest with an owner's booking link sees. */
@@ -316,6 +355,10 @@ export type ListingFields = {
   weekly_discount: number;
   monthly_discount: number;
   security_deposit: Money;
+  /** Smart pricing: nightly prices follow demand between these limits (empty: 75 % and 200 % of the price). */
+  smart_pricing: boolean;
+  smart_min_price: Money | null;
+  smart_max_price: Money | null;
   seasonal_prices: Season[];
   taxes_note: string;
   check_in_from: string | null;
@@ -452,6 +495,10 @@ export const ownerApi = {
   setBookingLink: (cottage: number, open: boolean) =>
     call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "PATCH", body: JSON.stringify({ open }) }),
   renewBookingLink: (cottage: number) => call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "POST" }),
+  prices: (cottage: number, from: string, days: number) => call<CottagePrices>(`owner/cottages/${cottage}/prices/?from=${from}&days=${days}`),
+  /** A price for the nights start…end (end = the day after the last night); null: back to automatic. */
+  setPrices: (cottage: number, start: string, end: string, price: string | null) =>
+    call<CottagePrices>(`owner/cottages/${cottage}/prices/`, { method: "POST", body: JSON.stringify({ start, end, price }) }),
   acceptRequest: (id: number, payout: string) =>
     call<ConversationRow>(`owner/conversations/${id}/accept/`, { method: "POST", body: JSON.stringify({ payout }) }),
   declineRequest: (id: number) => call<ConversationRow>(`owner/conversations/${id}/decline/`, { method: "POST" }),
@@ -465,6 +512,8 @@ export const guestApi = {
   send: (token: string, body: string) =>
     call<Thread>(`conversations/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify({ body }) }),
   bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),
+  quote: (token: string, checkIn: string, checkOut: string) =>
+    call<StayQuote>(`book/${encodeURIComponent(token)}/quote/?check_in=${checkIn}&check_out=${checkOut}`),
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify(form) }),
 };

@@ -539,6 +539,7 @@ export const nn: Translation = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Sluttvask",
+      discount: "Rabatt ({pct} %)",
       total: "Totalt",
       note: "Eigaren stadfestar prisen og fortel deg korleis du betaler. Du betaler ingenting på Rantio.",
     },
@@ -904,6 +905,16 @@ export const nn: Translation = {
       notificationsBlocked: "Varsel frå Rantio er slått av i innstillingane på telefonen.",
       openSettings: "Opne innstillingar",
       web: "Rantio på nett",
+    },
+    listing: {
+      library: "Vel frå biblioteket",
+      uploading: "Lastar opp {n} av {total}…",
+      permission: "Gje Rantio tilgang til bileta eller kameraet i innstillingane på telefonen.",
+      descriptionIn: "Skildring ({language})",
+      onWeb: "Meir på rantio.fi",
+      onWebLead: "Stad på kartet og i nærleiken",
+      calendarPrices: "Prisar i kalenderen",
+      photoActions: "Bilete",
     },
     detail: {
       showAmenities: "Vis alle {n} fasilitetane",

@@ -94,7 +94,11 @@
 
 .day {
   position: relative;
-  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
   border: 0;
   background: transparent;
   color: var(--o-ink);
@@ -434,4 +438,20 @@
   .requests { grid-template-columns: 1fr; }
   .copyField { flex-wrap: wrap; }
   .copyField input { flex-basis: 100%; }
+}
+
+/* Each free night's price under its date: green from smart pricing, berry when the owner set it. */
+.price { font-size: 10.5px; font-weight: 500; line-height: 1.2; color: var(--o-soft); }
+.price[data-source="smart"],
+.priceKey [data-source="smart"] { color: var(--o-green); }
+.price[data-source="custom"],
+.priceKey [data-source="custom"] { color: #a3245a; }
+.day[data-picked] .price { color: inherit; }
+.priceKey { margin: 10px 0 0; color: var(--o-soft); font-size: 13px; }
+.priceBox {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--o-line);
+  border-bottom: 1px solid var(--o-line);
 }

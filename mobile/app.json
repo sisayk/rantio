@@ -78,6 +78,14 @@
           "ios": { "deploymentTarget": "17.0" }
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Rantio uses your photos so you can add pictures of your cottage to its listing.",
+          "cameraPermission": "Rantio uses the camera so you can take pictures of your cottage for its listing.",
+          "microphonePermission": false
+        }
+      ],
       "react-native-maps",
       "expo-localization"
     ],

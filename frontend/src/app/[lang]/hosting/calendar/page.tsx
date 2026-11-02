@@ -25,6 +25,7 @@ export default async function Page({ params }: Props) {
     <OwnerCalendar
       lang={lang}
       t={m.dashboard}
+      np={m.listings.nightPrices}
       languageButton={
         <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.quietLink} />
       }

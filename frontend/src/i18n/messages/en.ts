@@ -552,6 +552,7 @@ export const en = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Cleaning",
+      discount: "Discount ({pct}%)",
       total: "Total",
       note: "The owner confirms the price and tells you how to pay. Nothing is paid on Rantio.",
     },
@@ -917,6 +918,16 @@ export const en = {
       notificationsBlocked: "Notifications for Rantio are off in your phone's settings.",
       openSettings: "Open settings",
       web: "Rantio on the web",
+    },
+    listing: {
+      library: "Choose from library",
+      uploading: "Uploading {n} of {total}…",
+      permission: "Allow Rantio to use your photos or camera in your phone's settings.",
+      descriptionIn: "Description ({language})",
+      onWeb: "More on rantio.fi",
+      onWebLead: "Location on the map and nearby places",
+      calendarPrices: "Prices on the calendar",
+      photoActions: "Photo",
     },
     detail: {
       showAmenities: "Show all {n} amenities",

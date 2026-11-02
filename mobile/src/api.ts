@@ -11,8 +11,16 @@ import type {
   CalendarData,
   CalendarFeed,
   ConversationRow,
+  CottagePrices,
   Enquiry,
   EnquiryDraft,
+  ListingDetail,
+  ListingFields,
+  ListingPhoto,
+  ListingSummary,
+  PhotoKind,
+  StatusAction,
+  StayQuote,
   Summary,
   Thread,
 } from "@/lib/ownerApi";
@@ -28,6 +36,17 @@ export type {
   CalendarFeed,
   ChatMessage,
   ConversationRow,
+  CottagePrices,
+  ListingDetail,
+  ListingFields,
+  ListingPhoto,
+  ListingStatus,
+  ListingSummary,
+  NightPriceRow,
+  PhotoKind,
+  PriceReason,
+  StatusAction,
+  StayQuote,
   Summary,
   Thread,
 } from "@/lib/ownerApi";
@@ -101,6 +120,25 @@ async function call<T>(path: string, init: RequestInit & { owner?: boolean } = {
   return body as T;
 }
 
+/** A multipart upload with the owner's key (the photo picker's files). */
+async function upload<T>(path: string, form: FormData): Promise<T> {
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (key) headers.Authorization = `Bearer ${key}`;
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/api/${path}`, { method: "POST", body: form, headers });
+  } catch {
+    throw new Offline("offline");
+  }
+  if (res.status === 401 || res.status === 403) {
+    onSignedOut?.();
+    throw new SignedOut();
+  }
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) throw new ApiError(String(body.detail ?? `HTTP ${res.status}`), res.status, body);
+  return body as T;
+}
+
 const json = (method: string, data?: unknown): RequestInit => ({
   method,
   body: data === undefined ? undefined : JSON.stringify(data),
@@ -141,6 +179,35 @@ export const ownerApi = {
   acceptRequest: (id: number, payout: string) =>
     call<ConversationRow>(`owner/conversations/${id}/accept/`, { ...json("POST", { payout }), owner: true }),
   declineRequest: (id: number) => call<ConversationRow>(`owner/conversations/${id}/decline/`, { ...json("POST"), owner: true }),
+
+  // ---------- listings: the same editor as Hosting → My listings on the website ----------
+  listings: () => call<{ cottages: ListingSummary[] }>("owner/cottages/", { owner: true }),
+  listing: (id: number) => call<ListingDetail>(`owner/cottages/${id}/`, { owner: true }),
+  createListing: (name: string) => call<ListingDetail>("owner/cottages/", { ...json("POST", { name }), owner: true }),
+  saveListing: (id: number, fields: Partial<ListingFields>) =>
+    call<ListingDetail>(`owner/cottages/${id}/`, { ...json("PATCH", fields), owner: true }),
+  setListingStatus: (id: number, action: StatusAction) =>
+    call<ListingDetail>(`owner/cottages/${id}/status/`, { ...json("POST", { action }), owner: true }),
+  /** A photo from the phone: `uri` is a local file (already resized). */
+  addPhoto: (cottage: number, uri: string, kind?: PhotoKind) => {
+    const form = new FormData();
+    form.append("file", { uri, name: "photo.jpg", type: "image/jpeg" } as unknown as Blob);
+    if (kind) form.append("kind", kind);
+    return upload<ListingPhoto>(`owner/cottages/${cottage}/photos/`, form);
+  },
+  updatePhoto: (cottage: number, photo: number, fields: { kind?: PhotoKind; caption?: string }) =>
+    call<ListingPhoto>(`owner/cottages/${cottage}/photos/${photo}/`, { ...json("PATCH", fields), owner: true }),
+  deletePhoto: (cottage: number, photo: number) =>
+    call<Record<string, never>>(`owner/cottages/${cottage}/photos/${photo}/`, { ...json("DELETE"), owner: true }),
+  orderPhotos: (cottage: number, ids: number[]) =>
+    call<{ photos: ListingPhoto[] }>(`owner/cottages/${cottage}/photos/order/`, { ...json("POST", { ids }), owner: true }),
+
+  // ---------- nightly prices and smart pricing ----------
+  prices: (cottage: number, from: string, days: number) =>
+    call<CottagePrices>(`owner/cottages/${cottage}/prices/?from=${from}&days=${days}`, { owner: true }),
+  /** One price for the nights start…end (end: the morning after the last night); null: back to automatic. */
+  setPrices: (cottage: number, start: string, end: string, price: string | null) =>
+    call<CottagePrices>(`owner/cottages/${cottage}/prices/`, { ...json("POST", { start, end, price }), owner: true }),
 };
 
 export const guestApi = {
@@ -149,6 +216,8 @@ export const guestApi = {
   thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
   send: (token: string, body: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`, json("POST", { body })),
   bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),
+  quote: (token: string, checkIn: string, checkOut: string) =>
+    call<StayQuote>(`book/${encodeURIComponent(token)}/quote/?check_in=${checkIn}&check_out=${checkOut}`),
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, json("POST", form)),
   rates: () => call<{ rates: Record<string, number>; date?: string }>("rates/"),

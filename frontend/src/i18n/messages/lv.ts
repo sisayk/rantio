@@ -539,6 +539,7 @@ export const lv: Translation = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Uzkopšana",
+      discount: "Atlaide ({pct}%)",
       total: "Kopā",
       note: "Īpašnieks apstiprinās cenu un pateiks, kā maksāt. Vietnē Rantio nekas netiek maksāts.",
     },
@@ -904,6 +905,16 @@ export const lv: Translation = {
       notificationsBlocked: "Rantio paziņojumi ir izslēgti tālruņa iestatījumos.",
       openSettings: "Atvērt iestatījumus",
       web: "Rantio tīmeklī",
+    },
+    listing: {
+      library: "Izvēlēties no galerijas",
+      uploading: "Augšupielādē {n} no {total}…",
+      permission: "Ļaujiet Rantio izmantot jūsu attēlus vai kameru tālruņa iestatījumos.",
+      descriptionIn: "Apraksts ({language})",
+      onWeb: "Vairāk vietnē rantio.fi",
+      onWebLead: "Atrašanās vieta kartē un tuvumā",
+      calendarPrices: "Cenas kalendārā",
+      photoActions: "Attēls",
     },
     detail: {
       showAmenities: "Rādīt visas {n} ērtības",

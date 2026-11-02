@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from "react-native";
 
-import { ApiError, type BookingLinkInfo, guestApi, Offline } from "@/api";
+import { ApiError, type BookingLinkInfo, guestApi, Offline, type StayQuote } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { usePrefs } from "@/state/prefs";
 import { daysBetween, formatRange } from "@/text/dates";
@@ -47,6 +47,23 @@ export default function BookingRequest() {
   }, [token]);
   useEffect(load, [load]);
 
+  // The stay's price from the server: each night's own price (seasons, weekends, smart pricing), discounts and cleaning.
+  const [quote, setQuote] = useState<{ key: string; q: StayQuote } | null>(null);
+  useEffect(() => {
+    const [a, z] = dates;
+    if (!a || !z) return;
+    let live = true;
+    guestApi.quote(token, a, z).then(
+      (q) => {
+        if (live) setQuote({ key: `${a}|${z}`, q });
+      },
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [token, dates]);
+
   const taken = useMemo(() => {
     const busyRanges = info?.busy ?? [];
     return (day: string) => busyRanges.some(([a, z]) => a <= day && day < z);
@@ -60,6 +77,13 @@ export default function BookingRequest() {
   const [start, end] = dates;
   const nights = start && end ? daysBetween(start, end) : 0;
   const price = (v: number) => formatPrice(lang, v, currency);
+  const q = quote && quote.key === `${start}|${end}` ? quote.q : null;
+  const each = q ? q.nights.map((n) => Number(n.price)) : [];
+  const even = !q || each.every((x) => x === each[0]);
+  const stay = q ? Number(q.subtotal) : Number(info.price_per_night) * nights;
+  const cleaning = q ? Number(q.cleaning_fee) : Number(info.cleaning_fee);
+  const total = q ? Number(q.total) : stay + cleaning;
+  const nightsLabel = even ? f(b.price.nights, { price: price(q ? each[0] : Number(info.price_per_night)), nights: p(b.nights, nights) }) : p(b.nights, nights);
   const errors = {
     name: !name.trim() ? b.errors.required : null,
     email: !email.trim() ? b.errors.required : !EMAIL.test(email.trim()) ? b.errors.email : null,
@@ -143,18 +167,26 @@ export default function BookingRequest() {
           {nights ? (
             <Card style={{ marginTop: space.xl, gap: space.sm }}>
               <View style={styles.priceRow}>
-                <Text v="body">{f(b.price.nights, { price: price(Number(info.price_per_night)), nights: p(b.nights, nights) })}</Text>
-                <Text v="body">{price(Number(info.price_per_night) * nights)}</Text>
+                <Text v="body">{nightsLabel}</Text>
+                <Text v="body">{price(stay)}</Text>
               </View>
-              {Number(info.cleaning_fee) ? (
+              {q && Number(q.discount) ? (
+                <View style={styles.priceRow}>
+                  <Text v="body">{f(b.price.discount, { pct: q.discount_percent })}</Text>
+                  <Text v="body" color={colors.green}>
+                    −{price(Number(q.discount))}
+                  </Text>
+                </View>
+              ) : null}
+              {cleaning ? (
                 <View style={styles.priceRow}>
                   <Text v="body">{b.price.cleaning}</Text>
-                  <Text v="body">{price(Number(info.cleaning_fee))}</Text>
+                  <Text v="body">{price(cleaning)}</Text>
                 </View>
               ) : null}
               <View style={[styles.priceRow, styles.total]}>
                 <Text v="h3">{b.price.total}</Text>
-                <Text v="h3">{price(Number(info.price_per_night) * nights + Number(info.cleaning_fee))}</Text>
+                <Text v="h3">{price(total)}</Text>
               </View>
               <Text v="tiny">{b.price.note}</Text>
             </Card>

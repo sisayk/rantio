@@ -47,13 +47,14 @@ export default function Menu() {
         </Card>
 
         <Section title={m.app.profile.hosting}>
+          <Row icon="grid-outline" label={m.listings.title} detail={m.listings.add} onPress={() => router.push("/listings")} />
           {summary?.cottages.map((c) => (
             <Row
               key={c.id}
               icon="home-outline"
               label={c.name}
-              detail={m.app.menu.settings}
-              onPress={() => router.push(`/cottage-settings/${c.id}`)}
+              detail={`${m.listings.nav.photos} · ${m.listings.nav.pricing}`}
+              onPress={() => router.push(`/listing/${c.id}`)}
             />
           ))}
           <Row icon="list-outline" label={m.app.menu.bookings} onPress={() => router.push("/bookings")} />

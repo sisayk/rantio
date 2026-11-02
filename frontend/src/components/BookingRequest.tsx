@@ -8,7 +8,7 @@ import { countryName, fill, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { formatPrice, isCurrency } from "@/lib/currency";
-import { type BookingLinkInfo, guestApi } from "@/lib/ownerApi";
+import { type BookingLinkInfo, guestApi, type StayQuote } from "@/lib/ownerApi";
 import { CALENDAR_LOCALES } from "./guest/Pickers";
 import { Wordmark } from "./guest/icons";
 import chat from "./chat.module.css";
@@ -90,6 +90,23 @@ export default function BookingRequest({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
   const [sentToken, setSentToken] = useState<string | null>(null);
+  // The stay's price from the server: each night's own price (seasons, weekends, smart pricing), discounts and cleaning.
+  const [quote, setQuote] = useState<{ key: string; q: StayQuote } | null>(null);
+  const quoteKey = range?.from && range.to ? `${iso(range.from)}|${iso(range.to)}` : null;
+  useEffect(() => {
+    if (!quoteKey) return;
+    const [a, z] = quoteKey.split("|");
+    let live = true;
+    guestApi.quote(token, a, z).then(
+      (q) => {
+        if (live) setQuote({ key: quoteKey, q });
+      },
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [token, quoteKey]);
 
   const fetchInfo = useCallback(async () => {
     try {
@@ -170,8 +187,13 @@ export default function BookingRequest({
   const currency = isCurrency(info.currency) ? info.currency : "EUR";
   const price = (n: number) => formatPrice(lang, n, currency);
   const nights = range?.from && range.to ? nightsBetween(range.from, range.to) : 0;
-  const stay = nights * Number(info.price_per_night);
-  const cleaning = Number(info.cleaning_fee);
+  const q = quote && quote.key === quoteKey ? quote.q : null;
+  const each = q ? q.nights.map((n) => Number(n.price)) : [];
+  const even = !q || each.every((x) => x === each[0]);
+  const stay = q ? Number(q.subtotal) : nights * Number(info.price_per_night);
+  const cleaning = q ? Number(q.cleaning_fee) : Number(info.cleaning_fee);
+  const discount = q ? Number(q.discount) : 0;
+  const total = q ? Number(q.total) : stay + cleaning;
   const tooShort = nights > 0 && nights < info.min_nights;
   const place = [info.municipality, countryName(lang, info.country)].filter(Boolean).join(", ");
   const dayFmt = new Intl.DateTimeFormat(LANG_INFO[lang].intl, { weekday: "short", day: "numeric", month: "short" });
@@ -322,9 +344,19 @@ export default function BookingRequest({
               {nights > 0 ? (
                 <dl className={styles.lines}>
                   <div>
-                    <dt>{fill(lang, t.price.nights, { price: price(Number(info.price_per_night)), nights: plural(lang, t.nights, nights) })}</dt>
+                    <dt>
+                      {even
+                        ? fill(lang, t.price.nights, { price: price(q ? each[0] : Number(info.price_per_night)), nights: plural(lang, t.nights, nights) })
+                        : plural(lang, t.nights, nights)}
+                    </dt>
                     <dd>{price(stay)}</dd>
                   </div>
+                  {discount ? (
+                    <div>
+                      <dt>{fill(lang, t.price.discount, { pct: q?.discount_percent ?? 0 })}</dt>
+                      <dd>−{price(discount)}</dd>
+                    </div>
+                  ) : null}
                   {cleaning ? (
                     <div>
                       <dt>{t.price.cleaning}</dt>
@@ -333,7 +365,7 @@ export default function BookingRequest({
                   ) : null}
                   <div className={styles.total}>
                     <dt>{t.price.total}</dt>
-                    <dd>{price(stay + cleaning)}</dd>
+                    <dd>{price(total)}</dd>
                   </div>
                 </dl>
               ) : null}

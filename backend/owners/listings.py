@@ -13,6 +13,8 @@
   POST   /api/owner/cottages/<id>/photos/<pid>/replace/  a new file for the same place in the gallery
   DELETE /api/owner/cottages/<id>/photos/<pid>/        remove a photo and, once that is committed, its file
   POST   /api/owner/cottages/<id>/photos/order/        {"ids": [...]} new order; the first is the cover
+  GET    /api/owner/cottages/<id>/prices/?from=&days=  each night's price and why (owners/pricing.py)
+  POST   /api/owner/cottages/<id>/prices/              {"start", "end", "price"} set nights' price; price null: back to automatic
 
 Every view looks the cottage up among the signed-in owner's own (404 for anyone else's).
 Changes here are Rantio's own listing. Airbnb, Booking.com, Vrbo and Nettimökki keep their
@@ -31,10 +33,10 @@ from rest_framework import parsers, serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import calendar
+from . import calendar, pricing
 from .calendar import FEED_CHANNELS
 from .media_checks import IMAGE_MAX, image_type
-from .models import Booking, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, Language
+from .models import Booking, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, Language, NightPrice
 from .portal import IsOwner
 
 MAX_PHOTOS = 40
@@ -232,6 +234,9 @@ def cottage_detail(c: Cottage) -> dict:
         "weekly_discount": c.weekly_discount,
         "monthly_discount": c.monthly_discount,
         "security_deposit": money(c.security_deposit),
+        "smart_pricing": c.smart_pricing,
+        "smart_min_price": money(c.smart_min_price),
+        "smart_max_price": money(c.smart_max_price),
         "seasonal_prices": list(c.seasonal_prices or []),
         "taxes_note": c.taxes_note,
         "check_in_from": hhmm(c.check_in_from),
@@ -339,6 +344,8 @@ class CottageSerializer(serializers.ModelSerializer):
     weekly_discount = serializers.IntegerField(min_value=0, max_value=80, required=False)
     monthly_discount = serializers.IntegerField(min_value=0, max_value=80, required=False)
     security_deposit = amount()
+    smart_min_price = amount(allow_null=True)
+    smart_max_price = amount(allow_null=True)
     seasonal_prices = SeasonSerializer(many=True, required=False)
     taxes_note = text(300)
     check_in_from = serializers.TimeField(required=False, allow_null=True)
@@ -362,7 +369,7 @@ class CottageSerializer(serializers.ModelSerializer):
             "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
             "nearby", "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price",
             "cleaning_fee", "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount",
-            "security_deposit", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by",
+            "security_deposit", "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by",
             "self_check_in", "min_age", "pets_allowed", "smoking_allowed", "events_allowed", "quiet_hours", "house_rules",
             "waste_instructions", "sauna_instructions", "fireplace_instructions", "arrival_instructions",
             "departure_instructions", "access_details", "nettimokki_url",
@@ -391,6 +398,10 @@ class CottageSerializer(serializers.ModelSerializer):
         mx = attrs.get("max_nights", self.instance.max_nights if self.instance else None)
         if mx is not None and mx < mn:
             raise serializers.ValidationError({"max_nights": "The longest stay can't be shorter than the shortest."})
+        low = attrs.get("smart_min_price", self.instance.smart_min_price if self.instance else None)
+        high = attrs.get("smart_max_price", self.instance.smart_max_price if self.instance else None)
+        if low is not None and high is not None and high < low:
+            raise serializers.ValidationError({"smart_max_price": "The highest price can't be below the lowest."})
         for season in attrs.get("seasonal_prices", []):
             if season["start"] == season["end"]:
                 raise serializers.ValidationError({"seasonal_prices": "A season needs a different start and end."})
@@ -715,3 +726,67 @@ class OwnerPhotoOrderView(APIView):
             touch(cottage)
             log(cottage, request, "photo_order")
         return Response({"photos": [photo_row(p) for p in CottagePhoto.objects.filter(cottage=cottage)]})
+
+
+# ---------- nightly prices ----------
+
+MAX_PRICE_DAYS = 400
+
+
+class PricesSerializer(serializers.Serializer):
+    start = serializers.DateField()
+    end = serializers.DateField()
+    price = serializers.DecimalField(max_digits=9, decimal_places=2, min_value=Decimal("1"), allow_null=True)
+
+    def validate(self, attrs):
+        if attrs["end"] <= attrs["start"]:
+            raise serializers.ValidationError({"end": "The last night must be after the first."})
+        if (attrs["end"] - attrs["start"]).days > MAX_PRICE_DAYS:
+            raise serializers.ValidationError({"end": "Set at most a year at a time."})
+        if attrs["start"] < timezone.localdate():
+            raise serializers.ValidationError({"start": "Past nights can't be priced."})
+        return attrs
+
+
+def price_rows(cottage: Cottage, start: date, days: int) -> dict:
+    low, high = pricing.limits(cottage)
+    return {
+        "currency": cottage.currency,
+        "price_per_night": money(cottage.price_per_night),
+        "smart_pricing": cottage.smart_pricing,
+        "smart_min_price": money(pricing.round_price(low, cottage.currency)),
+        "smart_max_price": money(pricing.round_price(high, cottage.currency)),
+        "nights": [n.as_dict() for n in pricing.nights(cottage, start, start + timedelta(days=days))],
+    }
+
+
+class OwnerPricesView(APIView):
+    """Each night's price, and the owner setting a price for some nights (or clearing it)."""
+
+    permission_classes = [IsOwner]
+
+    def get(self, request, pk):
+        cottage = own(request, pk)
+        try:
+            start = date.fromisoformat(request.query_params.get("from", ""))
+        except ValueError:
+            start = timezone.localdate()
+        try:
+            days = min(MAX_PRICE_DAYS, max(1, int(request.query_params.get("days", 60))))
+        except ValueError:
+            days = 60
+        return Response(price_rows(cottage, start, days))
+
+    def post(self, request, pk):
+        cottage = own(request, pk)
+        data = PricesSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        v = data.validated_data
+        nights = [v["start"] + timedelta(days=i) for i in range((v["end"] - v["start"]).days)]
+        with transaction.atomic():
+            NightPrice.objects.filter(cottage=cottage, date__in=nights).delete()
+            if v["price"] is not None:
+                NightPrice.objects.bulk_create([NightPrice(cottage=cottage, date=d, price=v["price"]) for d in nights])
+            log(cottage, request, "edit", ["night_prices"])
+            touch(cottage)
+        return Response(price_rows(cottage, v["start"], len(nights)))

@@ -536,6 +536,7 @@ export const fi: Translation = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Siivous",
+      discount: "Alennus ({pct} %)",
       total: "Yhteensä",
       note: "Omistaja vahvistaa hinnan ja kertoo, miten maksat. Rantiossa ei makseta mitään.",
     },
@@ -901,6 +902,16 @@ export const fi: Translation = {
       notificationsBlocked: "Rantion ilmoitukset ovat pois päältä puhelimesi asetuksissa.",
       openSettings: "Avaa asetukset",
       web: "Rantio verkossa",
+    },
+    listing: {
+      library: "Valitse kirjastosta",
+      uploading: "Ladataan {n}/{total}…",
+      permission: "Salli Rantion käyttää kuviasi tai kameraa puhelimen asetuksissa.",
+      descriptionIn: "Kuvaus ({language})",
+      onWeb: "Lisää rantio.fi:ssä",
+      onWebLead: "Sijainti kartalla ja lähipalvelut",
+      calendarPrices: "Hinnat kalenterissa",
+      photoActions: "Kuva",
     },
     detail: {
       showAmenities: "Näytä kaikki {n} varustetta",

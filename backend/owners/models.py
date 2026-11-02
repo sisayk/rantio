@@ -264,6 +264,14 @@ class Cottage(models.Model):
     monthly_discount = models.PositiveSmallIntegerField(default=0, help_text="Percent off stays of 28 nights or more.")
     security_deposit = models.DecimalField(max_digits=9, decimal_places=2, default=Decimal("0.00"))
     seasonal_prices = models.JSONField(default=list, blank=True, help_text="[{\"name\", \"start\": \"MM-DD\", \"end\": \"MM-DD\", \"price\"}]")
+    # Smart pricing (owners/pricing.py): nightly prices follow demand, between these limits.
+    smart_pricing = models.BooleanField(default=False, help_text="Nightly prices follow demand within the limits below.")
+    smart_min_price = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True, help_text="Smart pricing never goes below this. Empty: 75 % of the price per night."
+    )
+    smart_max_price = models.DecimalField(
+        max_digits=9, decimal_places=2, null=True, blank=True, help_text="Smart pricing never goes above this. Empty: twice the price per night."
+    )
     taxes_note = models.CharField(max_length=300, blank=True)
     # House rules
     check_in_from = models.TimeField(null=True, blank=True)
@@ -477,6 +485,22 @@ class CalendarFeed(models.Model):
 
     def __str__(self) -> str:
         return f"{self.cottage.name}: {self.get_channel_display()} calendar"
+
+
+class NightPrice(models.Model):
+    """A price the owner set for one night; it wins over smart pricing and the usual price."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="night_prices")
+    date = models.DateField()
+    price = models.DecimalField(max_digits=9, decimal_places=2, validators=[MinValueValidator(Decimal("1"))])
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["cottage", "date"], name="one_price_per_night")]
+        ordering = ["cottage", "date"]
+
+    def __str__(self):
+        return f"{self.cottage} {self.date}: {self.price}"
 
 
 class CalendarBlock(models.Model):

@@ -539,6 +539,7 @@ export const et: Translation = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Koristus",
+      discount: "Allahindlus ({pct}%)",
       total: "Kokku",
       note: "Omanik kinnitab hinna ja ütleb, kuidas maksta. Rantios ei maksta midagi.",
     },
@@ -904,6 +905,16 @@ export const et: Translation = {
       notificationsBlocked: "Rantio teavitused on telefoni seadetes välja lülitatud.",
       openSettings: "Ava seaded",
       web: "Rantio veebis",
+    },
+    listing: {
+      library: "Vali galeriist",
+      uploading: "Laadin üles {n}/{total}…",
+      permission: "Luba Rantiol kasutada oma pilte või kaamerat telefoni seadetes.",
+      descriptionIn: "Kirjeldus ({language})",
+      onWeb: "Rohkem saidil rantio.fi",
+      onWebLead: "Asukoht kaardil ja lähedal",
+      calendarPrices: "Hinnad kalendris",
+      photoActions: "Pilt",
     },
     detail: {
       showAmenities: "Näita kõiki {n} mugavust",

@@ -544,6 +544,7 @@ export const lt: Translation = {
     price: {
       nights: "{price} × {nights}",
       cleaning: "Valymas",
+      discount: "Nuolaida ({pct} %)",
       total: "Iš viso",
       note: "Savininkas patvirtins kainą ir nurodys, kaip sumokėti. Per Rantio nieko nemokate.",
     },
@@ -909,6 +910,16 @@ export const lt: Translation = {
       notificationsBlocked: "Rantio pranešimai išjungti telefono nustatymuose.",
       openSettings: "Atidaryti nustatymus",
       web: "Rantio internete",
+    },
+    listing: {
+      library: "Pasirinkti iš galerijos",
+      uploading: "Įkeliama {n} iš {total}…",
+      permission: "Telefono nustatymuose leiskite Rantio naudoti Jūsų nuotraukas arba kamerą.",
+      descriptionIn: "Aprašymas ({language})",
+      onWeb: "Daugiau rantio.fi",
+      onWebLead: "Vieta žemėlapyje ir netoliese",
+      calendarPrices: "Kainos kalendoriuje",
+      photoActions: "Nuotrauka",
     },
     detail: {
       showAmenities: "Rodyti visus {n} patogumus",

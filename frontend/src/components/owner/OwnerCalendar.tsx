@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Messages } from "@/i18n";
 import { fill, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { formatPrice, isCurrency } from "@/lib/currency";
 import { paths } from "@/i18n/paths";
 import {
   type CalendarCottage,
   type CalendarData,
   type CalendarEntry,
   type CalendarFeed,
+  type NightPriceRow,
   ownerApi,
   SignedOut,
 } from "@/lib/ownerApi";
@@ -49,10 +51,13 @@ function monthGrid(first: string): (string | null)[] {
 export default function OwnerCalendar({
   lang,
   t,
+  np,
   languageButton,
 }: {
   lang: Lang;
   t: Messages["dashboard"];
+  /** Prices per night: the words from the listing editor's messages. */
+  np: Messages["listings"]["nightPrices"];
   languageButton: React.ReactNode;
 }) {
   const c = t.calendar;
@@ -67,6 +72,8 @@ export default function OwnerCalendar({
   const [note, setNote] = useState("");
   const [shownDay, setShownDay] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [priceText, setPriceText] = useState("");
+  const [priceNote, setPriceNote] = useState("");
 
   const fail = useCallback(
     (err: unknown) => {
@@ -195,6 +202,25 @@ export default function OwnerCalendar({
     }
   }
 
+  async function savePrice(price: string | null) {
+    if (!cottage || !pick?.end || !month) return;
+    const value = price === null ? null : Number(price.replace(",", "."));
+    if (value !== null && !(value >= 1)) return setPriceNote(np.failed);
+    setWorking(true);
+    setPriceNote("");
+    try {
+      await ownerApi.setPrices(cottage.id, pick.start, addDays(pick.end, 1), value === null ? null : value.toFixed(2));
+      setPick(null);
+      setPriceText("");
+      await load(month);
+    } catch (err) {
+      if (err instanceof SignedOut) fail(err);
+      else setPriceNote(np.failed);
+    } finally {
+      setWorking(false);
+    }
+  }
+
   async function reopen(id: number) {
     if (!month) return;
     setWorking(true);
@@ -271,6 +297,14 @@ export default function OwnerCalendar({
   ];
   const kindLabel = (k: Kind | null) => (k ? Object.fromEntries(legend)[k] : "");
   const shown = shownDay ? dayKind(shownDay).items : [];
+  const prices = cottage ? data?.prices?.[String(cottage.id)] : undefined;
+  const nights = new Map<string, NightPriceRow>((prices?.nights ?? []).map((n) => [n.date, n]));
+  const money = (v: string | number) => (prices && isCurrency(prices.currency) ? formatPrice(lang, Number(v), prices.currency) : `${Number(v)} ${prices?.currency ?? ""}`);
+  const picked: NightPriceRow[] = [];
+  if (pick?.end) for (let d = pick.start; d <= pick.end; d = addDays(d, 1)) if (nights.has(d)) picked.push(nights.get(d)!);
+  const low = Math.min(...picked.map((n) => Number(n.price)));
+  const high = Math.max(...picked.map((n) => Number(n.price)));
+  const reasons = [...new Set(picked.flatMap((n) => n.reasons))].filter((r) => r !== "smart").map((r) => np.reasons[r]);
   const nightsPicked = pick?.end ? Math.round((parse(pick.end).getTime() - parse(pick.start).getTime()) / 86_400_000) + 1 : 0;
 
   return (
@@ -359,6 +393,7 @@ export default function OwnerCalendar({
                         const k = dayKind(day);
                         const past = day < today;
                         const picked = !!pick && (pick.end ? pick.start <= day && day <= pick.end : day === pick.start);
+                        const night = !k.kind && !past ? nights.get(day) : undefined;
                         return (
                           <button
                             key={day}
@@ -373,10 +408,15 @@ export default function OwnerCalendar({
                             data-shown={day === shownDay || undefined}
                             disabled={past && !k.items.length}
                             aria-selected={picked}
-                            aria-label={`${fmt.long(day)}${k.kind ? `: ${kindLabel(k.kind)}` : ""}`}
+                            aria-label={`${fmt.long(day)}${k.kind ? `: ${kindLabel(k.kind)}` : ""}${night ? `, ${money(night.price)}` : ""}`}
                             onClick={() => chooseDay(day)}
                           >
                             {parse(day).getDate()}
+                            {night ? (
+                              <span className={cal.price} data-source={night.override ? "custom" : night.reasons.includes("smart") ? "smart" : undefined} aria-hidden="true">
+                                {Math.round(Number(night.price)).toLocaleString(intl)}
+                              </span>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -394,6 +434,13 @@ export default function OwnerCalendar({
                 ))}
               </ul>
 
+              {prices ? (
+                <p className={cal.priceKey}>
+                  {fill(lang, np.newPrice, { currency: prices.currency })}: <span data-source="smart">{np.smart}</span> ·{" "}
+                  <span data-source="custom">{np.custom}</span> · <span>{np.usual}</span>
+                </p>
+              ) : null}
+
               <div className={cal.panel} aria-live="polite">
                 {pick?.end ? (
                   <div className={cal.panelBox}>
@@ -403,6 +450,36 @@ export default function OwnerCalendar({
                       <span>{c.pick.note}</span>
                       <input value={note} maxLength={200} placeholder={c.pick.notePlaceholder} onChange={(e) => setNote(e.target.value)} />
                     </label>
+                    {prices && pick.start >= today && picked.length ? (
+                      <div className={cal.priceBox}>
+                        <span>
+                          <strong>{low === high ? money(low) : `${money(low)} – ${money(high)}`}</strong>{" "}
+                          <span className={styles.muted}>
+                            {[picked.some((n) => n.override) ? np.custom : prices.smart_pricing ? np.smart : np.usual, ...reasons].join(" · ")}
+                          </span>
+                        </span>
+                        {!prices.smart_pricing && picked.length === 1 && picked[0].suggested !== picked[0].price ? (
+                          <button type="button" className={cal.textLink} onClick={() => setPriceText(String(Number(picked[0].suggested)))}>
+                            {fill(lang, np.suggested, { price: money(picked[0].suggested) })}
+                          </button>
+                        ) : null}
+                        <label className={cal.noteField}>
+                          <span>{fill(lang, np.newPrice, { currency: prices.currency })}</span>
+                          <input type="number" inputMode="decimal" min={1} step="1" value={priceText} onChange={(e) => setPriceText(e.target.value)} />
+                        </label>
+                        <div className={cal.panelActions}>
+                          <button type="button" className={cal.outlineBtn} disabled={working || !priceText.trim()} onClick={() => savePrice(priceText)}>
+                            {np.save}
+                          </button>
+                          {picked.some((n) => n.override) ? (
+                            <button type="button" className={cal.textLink} disabled={working} onClick={() => savePrice(null)}>
+                              {np.automatic}
+                            </button>
+                          ) : null}
+                        </div>
+                        {priceNote ? <p className={cal.clashNote}>{priceNote}</p> : null}
+                      </div>
+                    ) : null}
                     <div className={cal.panelActions}>
                       <button type="button" className={cal.primaryBtn} disabled={working} onClick={closeDates}>
                         {working ? c.pick.closing : c.pick.close}

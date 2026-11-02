@@ -38,7 +38,7 @@ const FIELDS = [
   "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions", "nearby",
   "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price", "cleaning_fee",
   "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount", "security_deposit",
-  "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by", "self_check_in", "min_age",
+  "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by", "self_check_in", "min_age",
   "pets_allowed", "smoking_allowed", "events_allowed", "quiet_hours", "house_rules", "waste_instructions",
   "sauna_instructions", "fireplace_instructions", "arrival_instructions", "departure_instructions", "access_details",
   "nettimokki_url",
@@ -49,6 +49,7 @@ const FIELD_SECTION: Record<string, Section> = {
   min_nights: "pricing", max_nights: "pricing", price_per_night: "pricing", weekend_price: "pricing", cleaning_fee: "pricing",
   extra_guest_fee: "pricing", extra_guest_from: "pricing", pet_fee: "pricing", weekly_discount: "pricing", monthly_discount: "pricing",
   security_deposit: "pricing", seasonal_prices: "pricing", taxes_note: "pricing",
+  smart_pricing: "pricing", smart_min_price: "pricing", smart_max_price: "pricing",
   check_in_from: "rules", check_in_until: "rules", check_out_by: "rules", self_check_in: "rules", min_age: "rules",
   pets_allowed: "rules", smoking_allowed: "rules", events_allowed: "rules", quiet_hours: "rules", house_rules: "rules",
   waste_instructions: "rules", sauna_instructions: "rules", fireplace_instructions: "rules",
@@ -640,6 +641,13 @@ export default function ListingEditor({
     );
   };
 
+  // Smart pricing's limits when left empty: 75 % and 200 % of the nightly price, rounded like its prices.
+  const smartDefault = (share: number) => {
+    const step = { SEK: 10, NOK: 10, DKK: 10, ISK: 100 }[currency as string] ?? 1;
+    const v = Math.max(step, Math.round((Number(f.price_per_night) * share) / step) * step);
+    return isCurrency(currency) ? formatPrice(lang, v, currency) : `${v} ${currency}`;
+  };
+
   const setSeason = (i: number, patch: Partial<ListingFields["seasonal_prices"][number]>) =>
     set("seasonal_prices", f.seasonal_prices.map((x, j) => (j === i ? { ...x, ...patch } : x)));
 
@@ -650,6 +658,30 @@ export default function ListingEditor({
       <div className={s.grid2}>
         {numberField("price_per_night", `${l.pricing.base} (${currency})`, { money: true })}
         {numberField("weekend_price", `${l.pricing.weekend} (${currency})`, { money: true, hint: l.pricing.weekendHint })}
+      </div>
+      <div className={s.group}>
+        <h3>{l.pricing.smart}</h3>
+        <p className={s.hint}>{l.pricing.smartLead}</p>
+        {toggle("smart_pricing", l.pricing.smartOn)}
+        {f.smart_pricing ? (
+          <>
+            <div className={s.grid2}>
+              {numberField("smart_min_price", `${l.pricing.smartMin} (${currency})`, {
+                money: true,
+                hint: Number(f.price_per_night) ? fill(lang, l.pricing.smartDefault, { price: smartDefault(0.75) }) : undefined,
+              })}
+              {numberField("smart_max_price", `${l.pricing.smartMax} (${currency})`, {
+                money: true,
+                hint: Number(f.price_per_night) ? fill(lang, l.pricing.smartDefault, { price: smartDefault(2) }) : undefined,
+              })}
+            </div>
+            <p className={s.info}>{l.pricing.smartSites}</p>
+          </>
+        ) : null}
+        <a className={s.button} href={paths.hostingCalendarFor(lang, id)} style={{ alignSelf: "flex-start", justifySelf: "start", width: "fit-content" }}>
+          {l.nightPrices.title}
+        </a>
+        <span className={s.hint}>{l.nightPrices.lead}</span>
       </div>
       <div className={s.group}>
         <h3>{l.pricing.stay}</h3>

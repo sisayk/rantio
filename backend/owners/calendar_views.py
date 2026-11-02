@@ -3,6 +3,7 @@
 Public (no sign-in, the token in the link is the key):
   GET  /api/calendar/<token>.ics       the cottage's busy dates, for Airbnb, Booking.com, Vrbo
   GET  /api/book/<token>/              what a guest needs to choose dates
+  GET  /api/book/<token>/quote/?check_in=&check_out=   the stay's price, night by night
   POST /api/book/<token>/              send a booking request
 Owner (signed in):
   GET  /api/owner/calendar/            every cottage's calendar, requests and site links
@@ -24,7 +25,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import booking_requests, calendar, messaging
+from . import booking_requests, calendar, messaging, pricing
 from .booking_requests import RequestError
 from .calendar import FEED_CHANNELS, FeedError
 from .models import Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, Language, RequestStatus, new_link_token
@@ -125,6 +126,24 @@ class BookingLinkView(APIView):
         return Response({"token": c.token}, status=status.HTTP_201_CREATED)
 
 
+class BookingQuoteView(APIView):
+    """The price of a stay through the booking link, with each night's own price."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request, token):
+        cottage = get_object_or_404(Cottage, booking_link_token=token)
+        try:
+            check_in = date.fromisoformat(request.query_params.get("check_in", ""))
+            check_out = date.fromisoformat(request.query_params.get("check_out", ""))
+        except ValueError:
+            return Response({"detail": "dates"}, status=status.HTTP_400_BAD_REQUEST)
+        if not 0 < (check_out - check_in).days <= booking_requests.MAX_NIGHTS:
+            return Response({"detail": "dates"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(pricing.quote(cottage, check_in, check_out))
+
+
 # ---------- owner ----------
 
 def own_cottages(request):
@@ -175,7 +194,7 @@ def request_row(c: Conversation) -> dict:
         "adults": c.guests or 1,
         "children": c.children,
         "message": first.body if first else "",
-        "estimate": money(booking_requests.estimate(c.cottage, nights)),
+        "estimate": money(booking_requests.estimate(c.cottage, c.check_in, c.check_out)),
         "currency": c.cottage.currency,
         "free": calendar.is_free(c.cottage, c.check_in, c.check_out),
         "created_at": c.created_at.isoformat(),
@@ -222,6 +241,19 @@ class OwnerCalendarView(APIView):
             "entries": [e.as_dict() for e in items],
             "conflicts": [[f"{a.kind}-{a.id}", f"{b.kind}-{b.id}"] for a, b in clashes],
             "requests": [request_row(c) for c in pending],
+            # Each night's price per cottage, for the calendar (owners/pricing.py).
+            "prices": {
+                str(c.pk): {
+                    "currency": c.currency,
+                    "smart_pricing": c.smart_pricing,
+                    "nights": [
+                        {"date": n.date.isoformat(), "price": f"{n.price:.2f}", "override": n.override,
+                         "suggested": f"{n.suggested:.2f}", "reasons": n.reasons}
+                        for n in pricing.nights(c, start, end)
+                    ],
+                }
+                for c in cottages
+            },
         })
 
 

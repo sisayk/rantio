@@ -99,9 +99,12 @@ def dates_text(c: Conversation, lang: str) -> str:
     return f"{alerts.fmt(c.check_in, lang)}–{alerts.fmt(c.check_out, lang)}"
 
 
-def estimate(cottage: Cottage, nights: int) -> Decimal:
-    """The owner's own price for the stay: nightly price times nights, plus cleaning."""
-    return cottage.price_per_night * nights + cottage.cleaning_fee
+def estimate(cottage: Cottage, check_in: date, check_out: date) -> Decimal:
+    """The owner's own price for the stay: each night's price (owners/pricing.py), less a
+    weekly or monthly discount, plus cleaning."""
+    from . import pricing
+
+    return Decimal(pricing.quote(cottage, check_in, check_out)["total"])
 
 
 def check_dates(cottage: Cottage, check_in: date, check_out: date, guests: int) -> None:
