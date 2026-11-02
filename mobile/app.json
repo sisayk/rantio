@@ -15,10 +15,23 @@
       "appleTeamId": "PQU74K3M7H",
       "buildNumber": "1",
       "supportsTablet": true,
-      "config": { "usesNonExemptEncryption": false },
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
-        "CFBundleLocalizations": ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"]
+        "CFBundleLocalizations": [
+          "en",
+          "fi",
+          "sv",
+          "nb",
+          "nn",
+          "da",
+          "is",
+          "et",
+          "lv",
+          "lt"
+        ]
       }
     },
     "android": {
@@ -31,7 +44,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "blockedPermissions": ["android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW"]
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "output": "single",
@@ -56,6 +72,12 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "ios": { "deploymentTarget": "17.0" }
+        }
+      ],
       "react-native-maps",
       "expo-localization"
     ],
