@@ -20,7 +20,7 @@ export const CHANNELS = {
 } as const;
 export type ChannelId = keyof typeof CHANNELS;
 
-// Sites Stugora lists on in each country, most-used first.
+// Sites Rantio lists on in each country, most-used first.
 const GLOBAL: ChannelId[] = ["airbnb", "booking", "vrbo", "expedia", "google", "holidu", "hometogo"];
 export const CHANNELS_BY_COUNTRY: Record<string, ChannelId[]> = {
   FI: [...GLOBAL, "nettimokki", "lomarengas"],

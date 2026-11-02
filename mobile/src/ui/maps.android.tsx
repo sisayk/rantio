@@ -1,12 +1,13 @@
 // Maps on Android: OpenStreetMap drawn by Leaflet in a web view, as on the website.
 // (react-native-maps on Android needs a Google Maps key and billing account; this needs
-// neither.) Same components and look as maps.tsx: price pins, a green home pin.
+// neither.) Same components and look as maps.tsx: price pins, the Rantio icon for a cottage's spot.
 import { type ComponentType, type Ref, useEffect, useRef, useState } from "react";
 import { Linking, View, type ViewStyle } from "react-native";
 import { WebView as WebViewClass, type WebViewMessageEvent, type WebViewProps } from "react-native-webview";
 
 import { type Listing, listingCurrency } from "@/lib/listings";
 import { useMoney } from "@/state/money";
+import { MARK } from "@/lib/brand";
 import { colors } from "@/theme";
 import { LEAFLET_CSS, LEAFLET_JS } from "@/ui/leaflet.generated";
 
@@ -15,9 +16,9 @@ type WebRef = { injectJavaScript: (script: string) => void };
 const WebView = WebViewClass as unknown as ComponentType<WebViewProps & { ref?: Ref<WebRef> }>;
 
 // Tiles are asked for "from" the website, as OpenStreetMap's tile policy expects a referer.
-const BASE = "https://stugora.fi/";
+const BASE = "https://rantio.fi/";
 
-const MARK = `<svg viewBox="0 0 40 40" width="26" height="26"><path d="M15 4 6 17h4.5L5 25h20l-5.5-8H24L15 4Z" fill="#fff"/><path d="M14 25v4h2v-4" fill="#fff"/><path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`;
+const MARK_SVG = `<svg viewBox="0 0 1024 1024" width="44" height="44"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${MARK.green[0]}"/><stop offset="1" stop-color="${MARK.green[1]}"/></linearGradient></defs><rect width="1024" height="1024" rx="${MARK.radius}" fill="url(#g)"/><g transform="${MARK.transform}"><path d="${MARK.white}" fill="#fff" fill-rule="evenodd"/><path d="${MARK.pin}" fill="${MARK.orange}" fill-rule="evenodd"/></g></svg>`;
 
 function page(script: string, interactive: boolean) {
   const still = interactive ? "" : "dragging:false,touchZoom:false,doubleClickZoom:false,scrollWheelZoom:false,boxZoom:false,keyboard:false,tap:false,";
@@ -30,7 +31,7 @@ html,body,#map{margin:0;padding:0;height:100%;width:100%;background:${colors.gre
 .at{width:0;height:0}
 .pin{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;background:#fff;color:${colors.ink};font:700 14px/1 sans-serif;padding:7px 10px;border-radius:999px;border:0.5px solid rgba(0,0,0,.12);box-shadow:0 2px 5px rgba(0,0,0,.22)}
 .pin.on{background:${colors.ink};color:#fff;transform:translate(-50%,-50%) scale(1.08)}
-.home{position:absolute;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:24px;background:${colors.green};border:3px solid #fff;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 7px rgba(0,0,0,.28)}
+.home{position:absolute;transform:translate(-50%,-50%);display:block;line-height:0;border:3px solid #fff;border-radius:13px;overflow:hidden;background:#fff;box-shadow:0 3px 7px rgba(0,0,0,.28)};border:3px solid #fff;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 7px rgba(0,0,0,.28)}
 </style></head><body><div id="map"></div>
 <script>${LEAFLET_JS}</script>
 <script>
@@ -150,7 +151,7 @@ export function CottagesMap({ listings, selected, onSelect, style, bottomPadding
 export function PinMap({ lat, lng, style }: { lat: number; lng: number; style?: ViewStyle }) {
   const html = page(
     `map.setView([${Number(lat)},${Number(lng)}],11);
-L.marker([${Number(lat)},${Number(lng)}],{icon:L.divIcon({className:"at",iconSize:[0,0],html:'<span class="home">${MARK}</span>'}),keyboard:false,interactive:false}).addTo(map);`,
+L.marker([${Number(lat)},${Number(lng)}],{icon:L.divIcon({className:"at",iconSize:[0,0],html:'<span class="home">${MARK_SVG}</span>'}),keyboard:false,interactive:false}).addTo(map);`,
     false,
   );
   return (

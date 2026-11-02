@@ -13,7 +13,7 @@ export const unsplashWhole = (id: string, w: number) => `https://images.unsplash
 
 export const HERO_PHOTO = unsplash("1698701680003-5272b37f57c0", 2000, 900);
 
-// Nordic and Baltic countries Stugora covers, in the order shown to guests.
+// Nordic and Baltic countries Rantio covers, in the order shown to guests.
 export const COUNTRIES = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT"] as const;
 export type Country = (typeof COUNTRIES)[number];
 

@@ -12,7 +12,7 @@ config.resolver.nodeModulesPaths = [path.resolve(__dirname, "node_modules")];
 // While developing, the app calls Django through Metro itself: /api/ and /media/ on Metro's
 // address go on to Django on this Mac. A phone or emulator that can load the app can then
 // always sign in, whatever the network, firewall or tunnel (see src/api.ts).
-const DJANGO = new URL(process.env.STUGORA_API_TARGET || "http://127.0.0.1:8100");
+const DJANGO = new URL(process.env.RANTIO_API_TARGET || "http://127.0.0.1:8100");
 const PROXIED = /^\/(api|media)\//;
 
 function toDjango(req, res) {
@@ -25,7 +25,7 @@ function toDjango(req, res) {
   );
   upstream.on("error", () => {
     if (!res.headersSent) res.writeHead(502, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ detail: "Stugora's server isn't running on this Mac. Start it with ./dev.sh in ~/stugora." }));
+    res.end(JSON.stringify({ detail: "Rantio's server isn't running on this Mac. Start it with ./dev.sh in ~/stugora." }));
   });
   req.pipe(upstream);
 }

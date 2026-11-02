@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Ko darīt Ziemeļvalstu brīvdienu mājā | Stugora",
+      title: "Ko darīt Ziemeļvalstu brīvdienu mājā | Rantio",
       description: "Pirts, peldēšana, airēšana, makšķerēšana, pārgājieni, slēpošana un ziemeļblāzma: atrodiet brīvdienu māju tam, ko vēlaties darīt.",
     },
     title: "Ko darīt brīvdienu mājā",
     lead: "Pirts pie ezera, airēšana garajā vakara gaismā, slēpošana un ziemeļblāzma. Izvēlieties, ko vēlaties darīt, un skatiet piemērotās mājas.",
-    note: "Stugora nepārdod piedzīvojumus. Saimnieks pastāstīs, kas atrodas tuvumā, un vietējie gidi pieņem rezervācijas, piemēram, braucieniem ar suņu pajūgu un ziemeļblāzmas ekskursijām.",
+    note: "Rantio nepārdod piedzīvojumus. Saimnieks pastāstīs, kas atrodas tuvumā, un vietējie gidi pieņem rezervācijas, piemēram, braucieniem ar suņu pajūgu un ziemeļblāzmas ekskursijām.",
     items: {
       sauna: {
         title: "Pirts un atveldzējoša peldēšanās",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Brīvdienu māju galamērķi Ziemeļvalstīs un Baltijā | Stugora",
+      title: "Brīvdienu māju galamērķi Ziemeļvalstīs un Baltijā | Rantio",
       description: "Somija, Zviedrija, Norvēģija, Dānija, Islande, Igaunija, Latvija un Lietuva: ezeri, fjordi, kāpas un meži un tur esošās brīvdienu mājas.",
     },
     title: "Galamērķi",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Iedvesma brīvdienām lauku mājā | Stugora",
+      title: "Iedvesma brīvdienām lauku mājā | Rantio",
       description: "Īsi ceļveži par pirti, ziemeļblāzmu, ikviena tiesībām, Jāņiem un ziemu Ziemeļvalstu brīvdienu mājā.",
     },
     title: "Iedvesma",

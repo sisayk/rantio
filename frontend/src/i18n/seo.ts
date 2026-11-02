@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { DEFAULT_LANG, LANG_INFO, type Lang, LANGS } from "./locales";
 
 /** Where the site is served; set NEXT_PUBLIC_SITE_URL in production. */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://stugora.fi").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rantio.fi").replace(/\/$/, "");
 
 /** `path` is the page without its language: "" for home, "/hosts", "/cottages/x". */
 export function alternates(lang: Lang, path: string): NonNullable<Metadata["alternates"]> {
@@ -22,7 +22,7 @@ export function pageMetadata(lang: Lang, path: string, title: string, descriptio
     alternates: alternates(lang, path),
     openGraph: {
       type: "website",
-      siteName: "Stugora",
+      siteName: "Rantio",
       title,
       description,
       url: `${SITE_URL}/${lang}${path}`,

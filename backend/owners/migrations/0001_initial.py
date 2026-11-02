@@ -268,7 +268,7 @@ class Migration(migrations.Migration):
                             ("booking", "Booking.com"),
                             ("vrbo", "Vrbo"),
                             ("google", "Google Vacation Rentals"),
-                            ("direct", "Stugora direct"),
+                            ("direct", "Rantio direct"),
                             ("nettimokki", "Nettimökki"),
                         ],
                         max_length=12,

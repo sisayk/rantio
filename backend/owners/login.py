@@ -17,64 +17,64 @@ CODES_PER_HOUR = 5  # per owner, on top of the per-IP throttle
 # Subject and body per site language (frontend/src/i18n/locales.ts); English for anything else.
 MESSAGES = {
     "en": (
-        "Your Stugora sign-in code: {code}",
-        "Hi {name},\n\nyour code for signing in to Stugora is:\n\n    {code}\n\n"
+        "Your Rantio sign-in code: {code}",
+        "Hi {name},\n\nyour code for signing in to Rantio is:\n\n    {code}\n\n"
         "It works for {minutes} minutes. If you didn't try to sign in, you can ignore this email.\n\n"
-        "Best wishes\nStugora",
+        "Best wishes\nRantio",
     ),
     "fi": (
-        "Stugora-kirjautumiskoodisi: {code}",
-        "Hei {name},\n\nkirjautumiskoodisi Stugoraan on:\n\n    {code}\n\n"
+        "Rantio-kirjautumiskoodisi: {code}",
+        "Hei {name},\n\nkirjautumiskoodisi Rantioon on:\n\n    {code}\n\n"
         "Koodi on voimassa {minutes} minuuttia. Jos et yrittänyt kirjautua, voit jättää tämän viestin huomiotta.\n\n"
-        "Terveisin\nStugora",
+        "Terveisin\nRantio",
     ),
     "sv": (
-        "Din inloggningskod till Stugora: {code}",
-        "Hej {name},\n\ndin kod för att logga in på Stugora är:\n\n    {code}\n\n"
+        "Din inloggningskod till Rantio: {code}",
+        "Hej {name},\n\ndin kod för att logga in på Rantio är:\n\n    {code}\n\n"
         "Den gäller i {minutes} minuter. Om du inte försökte logga in kan du bortse från det här mejlet.\n\n"
-        "Hälsningar\nStugora",
+        "Hälsningar\nRantio",
     ),
     "nb": (
-        "Innloggingskoden din til Stugora: {code}",
-        "Hei {name},\n\nkoden din for å logge inn på Stugora er:\n\n    {code}\n\n"
+        "Innloggingskoden din til Rantio: {code}",
+        "Hei {name},\n\nkoden din for å logge inn på Rantio er:\n\n    {code}\n\n"
         "Den gjelder i {minutes} minutter. Hvis du ikke prøvde å logge inn, kan du se bort fra denne e-posten.\n\n"
-        "Hilsen\nStugora",
+        "Hilsen\nRantio",
     ),
     "nn": (
-        "Innloggingskoden din til Stugora: {code}",
-        "Hei {name},\n\nkoden din for å logge inn på Stugora er:\n\n    {code}\n\n"
+        "Innloggingskoden din til Rantio: {code}",
+        "Hei {name},\n\nkoden din for å logge inn på Rantio er:\n\n    {code}\n\n"
         "Han gjeld i {minutes} minutt. Viss du ikkje prøvde å logge inn, kan du sjå bort frå denne e-posten.\n\n"
-        "Helsing\nStugora",
+        "Helsing\nRantio",
     ),
     "da": (
-        "Din login-kode til Stugora: {code}",
-        "Hej {name},\n\ndin kode til at logge ind på Stugora er:\n\n    {code}\n\n"
+        "Din login-kode til Rantio: {code}",
+        "Hej {name},\n\ndin kode til at logge ind på Rantio er:\n\n    {code}\n\n"
         "Den gælder i {minutes} minutter. Hvis du ikke prøvede at logge ind, kan du se bort fra denne e-mail.\n\n"
-        "Venlig hilsen\nStugora",
+        "Venlig hilsen\nRantio",
     ),
     "is": (
-        "Innskráningarkóðinn þinn hjá Stugora: {code}",
-        "Hæ {name},\n\nkóðinn þinn til að skrá þig inn hjá Stugora er:\n\n    {code}\n\n"
+        "Innskráningarkóðinn þinn hjá Rantio: {code}",
+        "Hæ {name},\n\nkóðinn þinn til að skrá þig inn hjá Rantio er:\n\n    {code}\n\n"
         "Hann gildir í {minutes} mínútur. Ef þú reyndir ekki að skrá þig inn geturðu hunsað þennan póst.\n\n"
-        "Kveðja\nStugora",
+        "Kveðja\nRantio",
     ),
     "et": (
-        "Sinu Stugora sisselogimiskood: {code}",
-        "Tere {name},\n\nsinu kood Stugorasse sisselogimiseks on:\n\n    {code}\n\n"
+        "Sinu Rantio sisselogimiskood: {code}",
+        "Tere {name},\n\nsinu kood Rantiosse sisselogimiseks on:\n\n    {code}\n\n"
         "See kehtib {minutes} minutit. Kui sa ei proovinud sisse logida, võid selle kirja tähelepanuta jätta.\n\n"
-        "Parimate soovidega\nStugora",
+        "Parimate soovidega\nRantio",
     ),
     "lv": (
-        "Jūsu Stugora pieteikšanās kods: {code}",
-        "Sveiki, {name}!\n\nJūsu kods pieteikšanās Stugora ir:\n\n    {code}\n\n"
+        "Jūsu Rantio pieteikšanās kods: {code}",
+        "Sveiki, {name}!\n\nJūsu kods pieteikšanās Rantio ir:\n\n    {code}\n\n"
         "Tas ir derīgs {minutes} minūtes. Ja jūs nemēģinājāt pieteikties, šo e-pastu varat neņemt vērā.\n\n"
-        "Ar cieņu\nStugora",
+        "Ar cieņu\nRantio",
     ),
     "lt": (
-        "Jūsų Stugora prisijungimo kodas: {code}",
-        "Sveiki, {name},\n\nJūsų kodas prisijungti prie Stugora:\n\n    {code}\n\n"
+        "Jūsų Rantio prisijungimo kodas: {code}",
+        "Sveiki, {name},\n\nJūsų kodas prisijungti prie Rantio:\n\n    {code}\n\n"
         "Jis galioja {minutes} min. Jei nebandėte prisijungti, šį laišką galite ignoruoti.\n\n"
-        "Pagarbiai\nStugora",
+        "Pagarbiai\nRantio",
     ),
 }
 

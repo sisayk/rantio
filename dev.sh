@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Stugora locally: Django API on :8100, Next.js site on :3100.
+# Start Rantio locally: Django API on :8100, Next.js site on :3100.
 # Ports differ from 8000/3000 so Bona can run at the same time.
 set -e
 cd "$(dirname "$0")"
@@ -14,12 +14,12 @@ for candidate in python3.13 python3.12 python3.11 python3.10 python3 \
   fi
 done
 if [ -z "$PY" ]; then
-  echo "Stugora needs Python 3.10 or newer. Install it with:  brew install python@3.12"
+  echo "Rantio needs Python 3.10 or newer. Install it with:  brew install python@3.12"
   exit 1
 fi
 if ! command -v node >/dev/null 2>&1 ||
    ! node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=9)?0:1)'; then
-  echo "Stugora needs Node.js 20.9 or newer. Install it with:  brew install node"
+  echo "Rantio needs Node.js 20.9 or newer. Install it with:  brew install node"
   exit 1
 fi
 echo "Using $("$PY" --version) and Node $(node --version)"
@@ -54,10 +54,10 @@ CORS_ALLOWED_ORIGINS=http://localhost:3100 backend/.venv/bin/python backend/mana
 (cd frontend && npx next dev -p 3100) &
 sleep 6
 echo
-echo "Stugora is running:"
+echo "Rantio is running:"
 echo "  Guest site:   http://localhost:3100  (opens /en, /fi, /sv ... by your browser's language)"
 echo "  Owner page:   http://localhost:3100/en/hosts  (or /fi/hosts, /sv/hosts ...)"
-echo "  Dashboard:    http://localhost:3100/en/hosting  (or /fi/hosting …; sign in as demo@stugora.fi, the code shows on the page)"
+echo "  Dashboard:    http://localhost:3100/en/hosting  (or /fi/hosting …; sign in as demo@rantio.fi, the code shows on the page)"
 echo "  Admin:        http://localhost:8100/admin  (create a login: backend/.venv/bin/python backend/manage.py createsuperuser)"
 echo "Press Ctrl+C to stop."
 if [ "$(uname)" = "Darwin" ]; then open http://localhost:3100 || true; fi

@@ -1,6 +1,6 @@
 {% extends 'unfold/layouts/unauthenticated.html' %}
-{# Stugora admin login, the same split-screen layout as Bona's admin login:
-   left (hidden under 768px) a forest-green panel with the Stugora mark and a
+{# Rantio admin login, the same split-screen layout as Bona's admin login:
+   left (hidden under 768px) a forest-green panel with the Rantio mark and a
    lake-and-forest line drawing; right a centred card. The auth form, the
    #login-form id and unfold's error notes are unchanged. Honours dark mode. #}
 
@@ -17,7 +17,7 @@
         --bl-espresso-2: #143A2D;
         --bl-cream: #F3F5F2;
         --bl-cream-muted: rgba(243, 245, 242, .76);
-        /* Stugora forest green, as on stugora.fi. Variable names as in Bona's login. */
+        /* Rantio forest green, as on rantio.fi. Variable names as in Bona's login. */
         --bl-on-dark: #A9D4C1;
         --bl-rose: #1D4C3C;
         --bl-rose-dark: #143A2D;
@@ -179,7 +179,7 @@
                     <path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
                     <path d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
-                Stugora
+                Rantio
             </div>
             <svg class="bl-art" viewBox="0 0 600 260" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
                 <path d="M0 150 60 70l20 26 30-46 34 52 22-30 40 58"/>
@@ -199,7 +199,7 @@
                     <span class="accent">Admin</span>
                 </div>
                 <p class="bl-blurb">
-                    Sign in to the Stugora admin to look after owners, cottages, stays and guests.
+                    Sign in to the Rantio admin to look after owners, cottages, stays and guests.
                 </p>
             </div>
 
@@ -292,11 +292,11 @@
                 <div class="bl-or">{% translate 'or' %}</div>
                 <div class="bl-note">
                     <span class="material-symbols-outlined">verified_user</span>
-                    {% translate 'Secure access to the Stugora admin' %}
+                    {% translate 'Secure access to the Rantio admin' %}
                 </div>
             </div>
 
-            <div class="bl-footer">&copy; {% now "Y" %} Stugora · Elda-Auto Tmi</div>
+            <div class="bl-footer">&copy; {% now "Y" %} Rantio · Elda-Auto Tmi</div>
 
             {% include "unfold/helpers/unauthenticated_header.html" %}
         </div>

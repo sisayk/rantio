@@ -6,15 +6,15 @@ const UPDATED = "Last updated: 30 October 2026";
 export const en: LegalTexts = {
   privacy: {
     title: "Privacy policy",
-    description: "How Stugora handles the personal data of guests, cottage owners and website visitors.",
+    description: "How Rantio handles the personal data of guests, cottage owners and website visitors.",
     updated: UPDATED,
     intro:
-      "This policy explains what personal data Stugora collects, why, who sees it and what your rights are. We collect as little as we can and keep it in the EU.",
+      "This policy explains what personal data Rantio collects, why, who sees it and what your rights are. We collect as little as we can and keep it in the EU.",
     sections: [
       {
         heading: "Who we are",
         paragraphs: [
-          "Stugora is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). Elda-Auto Tmi is the controller of the personal data described here.",
+          "Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). Elda-Auto Tmi is the controller of the personal data described here.",
           `Questions about privacy, or a request about your own data: ${CONTACT_EMAIL}. We answer within a month, usually much sooner.`,
         ],
       },
@@ -147,21 +147,21 @@ export const en: LegalTexts = {
 
   terms: {
     title: "Website terms",
-    description: "The terms for using stugora.fi: what the site is, how bookings work and what we're responsible for.",
+    description: "The terms for using rantio.fi: what the site is, how bookings work and what we're responsible for.",
     updated: UPDATED,
-    intro: "These terms apply when you use stugora.fi. We've kept them short and plain. By using the site, you accept them.",
+    intro: "These terms apply when you use rantio.fi. We've kept them short and plain. By using the site, you accept them.",
     sections: [
       {
-        heading: "Who runs Stugora",
+        heading: "Who runs Rantio",
         paragraphs: [
-          `Stugora is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). You can reach us at ${CONTACT_EMAIL}.`,
-          "Stugora lists Nordic and Baltic holiday cottages on Airbnb, Booking.com, Vrbo and other sites on behalf of their owners. On stugora.fi you can browse the cottages, see where each one can be booked and send the owner a question.",
+          `Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). You can reach us at ${CONTACT_EMAIL}.`,
+          "Rantio lists Nordic and Baltic holiday cottages on Airbnb, Booking.com, Vrbo and other sites on behalf of their owners. On rantio.fi you can browse the cottages, see where each one can be booked and send the owner a question.",
         ],
       },
       {
         heading: "Booking and paying",
         paragraphs: [
-          "You don't book or pay on stugora.fi. Bookings and payments happen on the listing sites, such as Airbnb, Booking.com or Vrbo, under that site's own terms, cancellation rules and privacy policy. The rental agreement is between you and the owner, made through that site; Stugora is not a party to it.",
+          "You don't book or pay on rantio.fi. Bookings and payments happen on the listing sites, such as Airbnb, Booking.com or Vrbo, under that site's own terms, cancellation rules and privacy policy. The rental agreement is between you and the owner, made through that site; Rantio is not a party to it.",
           "Questions about a booking, a payment or a refund go to the site you booked on, or to the owner.",
         ],
       },
@@ -169,7 +169,7 @@ export const en: LegalTexts = {
         heading: "Cottage information",
         paragraphs: [
           "Owners give us the descriptions, photos, prices and other details of their cottages. We check them as well as we reasonably can, but we can't promise that every detail is correct or up to date. What the listing site shows when you book is what counts.",
-          "Prices on stugora.fi are a guide. Prices in a currency other than the cottage's own are converted with the European Central Bank's reference rates and are estimates; the listing site shows the exact price.",
+          "Prices on rantio.fi are a guide. Prices in a currency other than the cottage's own are converted with the European Central Bank's reference rates and are estimates; the listing site shows the exact price.",
         ],
       },
       {
@@ -190,19 +190,19 @@ export const en: LegalTexts = {
         heading: "Owner accounts",
         paragraphs: [
           "Cottage owners can ask to join through the sign-up form; sending it doesn't commit you to anything. Owners sign in with a one-time code sent to their email, so keep your email account safe and don't share the codes.",
-          "Our service for owners, including the yearly fee of €99 per cottage, the 12% commission on bookings from the channels Stugora adds (VAT is added to both) and invoicing through Stripe, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
+          "Our service for owners, including the yearly fee of €99 per cottage, the 12% commission on bookings from the channels Rantio adds (VAT is added to both) and invoicing through Stripe, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
         ],
       },
       {
         heading: "Content on the site",
         paragraphs: [
-          "The site's text, design and the Stugora name belong to us; cottage photos and descriptions belong to their owners or photographers. You're welcome to look around and share links, but don't copy listings in bulk, scrape the site or use it in a way that harms it or other people.",
+          "The site's text, design and the Rantio name belong to us; cottage photos and descriptions belong to their owners or photographers. You're welcome to look around and share links, but don't copy listings in bulk, scrape the site or use it in a way that harms it or other people.",
         ],
       },
       {
         heading: "What we're responsible for",
         paragraphs: [
-          "We do our best to keep stugora.fi available and its information right, but we offer the site as it is, and it can sometimes be down or contain mistakes.",
+          "We do our best to keep rantio.fi available and its information right, but we offer the site as it is, and it can sometimes be down or contain mistakes.",
           "We're not responsible for the stay itself, for what owners or listing sites do, or for the content of other websites we link to. We're not liable for indirect losses, such as lost profit, caused by using the site.",
           "Nothing in these terms limits your rights under mandatory consumer protection law, or our liability for harm caused on purpose or through gross negligence.",
         ],

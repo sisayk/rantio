@@ -1,6 +1,6 @@
 # Nightly backup: database dump + media archive into /var/backups/stugora (deploy/backup.sh).
 [Unit]
-Description=Stugora backup (database + media)
+Description=Rantio backup (database + media)
 After=postgresql.service
 
 [Service]

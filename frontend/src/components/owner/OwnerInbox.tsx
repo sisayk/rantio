@@ -17,7 +17,7 @@ import styles from "./owner.module.css";
 type Filter = "all" | "unread" | "archived";
 const POLL_MS = 20_000;
 
-/** Every guest conversation, from stugora.fi and the booking sites, beside the one being read. */
+/** Every guest conversation, from rantio.fi and the booking sites, beside the one being read. */
 export default function OwnerInbox({
   lang,
   t,
@@ -133,7 +133,7 @@ export default function OwnerInbox({
     filter === "archived" ? c.archived : !c.archived && (filter === "all" || c.unread),
   );
   const unread = (rows ?? []).filter((c) => c.unread).length;
-  const siteName = (c: ConversationRow) => (c.channel === "direct" ? "Stugora" : c.channel_label);
+  const siteName = (c: ConversationRow) => (c.channel === "direct" ? "Rantio" : c.channel_label);
   const stayLine = (c: ConversationRow) =>
     [
       c.check_in && c.check_out ? fmt.range(c.check_in, c.check_out) : null,

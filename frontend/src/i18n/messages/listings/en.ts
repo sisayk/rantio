@@ -7,7 +7,7 @@ const p = (forms: Plural) => forms;
 export const listings = {
   meta: { title: "My listings", editTitle: "Edit listing", previewTitle: "Preview" },
   title: "My listings",
-  lead: "Your cottages as guests see them on Stugora. Edit the details, photos, prices and rules here.",
+  lead: "Your cottages as guests see them on Rantio. Edit the details, photos, prices and rules here.",
   add: "Add new property",
   addTitle: "Add a property",
   addName: "What's the property called?",
@@ -69,7 +69,7 @@ export const listings = {
   unsaved: "Unsaved changes",
   allSaved: "All changes saved",
   saveError: "Your changes weren't saved. Check the fields marked in red and try again.",
-  networkError: "Couldn't reach Stugora. Your changes are still here; try saving again.",
+  networkError: "Couldn't reach Rantio. Your changes are still here; try saving again.",
   invalid: "Check this field",
   leave: "You have unsaved changes. Leave without saving?",
   restore: "You have unsaved changes from {date} on this device.",
@@ -77,7 +77,7 @@ export const listings = {
   restoreDrop: "Discard",
   sections: "Listing sections",
   stugoraOnly:
-    "Changes here update your Stugora listing. Airbnb, Booking.com, Vrbo and Nettimökki keep their own listings: our team copies changes there for you until a channel manager is connected.",
+    "Changes here update your Rantio listing. Airbnb, Booking.com, Vrbo and Nettimökki keep their own listings: our team copies changes there for you until a channel manager is connected.",
   nav: {
     overview: "Overview",
     basics: "Basic information",
@@ -152,7 +152,7 @@ export const listings = {
     replace: "Replace",
     remove: "Delete",
     removeTitle: "Delete this photo?",
-    removeBody: "It's removed from your Stugora listing. This can't be undone; photos on the booking sites stay until our team updates them.",
+    removeBody: "It's removed from your Rantio listing. This can't be undone; photos on the booking sites stay until our team updates them.",
     empty: "No photos yet. Start with the outside of the cottage; it becomes the cover.",
     previewGallery: "Preview the gallery",
     count: "{n} of {max}",
@@ -223,7 +223,7 @@ export const listings = {
 
   pricing: {
     title: "Pricing and fees",
-    lead: "These are the prices on your Stugora page and booking link. Airbnb, Booking.com and Vrbo keep their own prices; a calendar link only carries dates, so prices are not synced to them.",
+    lead: "These are the prices on your Rantio page and booking link. Airbnb, Booking.com and Vrbo keep their own prices; a calendar link only carries dates, so prices are not synced to them.",
     base: "Price per night",
     weekend: "Friday and Saturday nights",
     weekendHint: "Leave empty to use the nightly price.",
@@ -333,7 +333,7 @@ export const listings = {
     minStay: "Shortest stay: {n} nights. Change it under Pricing and fees.",
     sites: "Booking sites",
     sitesLead:
-      "This is calendar sync only. Each site reads your Stugora calendar link and Stugora reads theirs every 15 minutes, so a booking made in the last few minutes may not show yet. Photos, texts and prices are not synced.",
+      "This is calendar sync only. Each site reads your Rantio calendar link and Rantio reads theirs every 15 minutes, so a booking made in the last few minutes may not show yet. Photos, texts and prices are not synced.",
     manage: "Connect or change calendar links",
     lastSync: "Last read {time}",
     never: "Not read yet",
@@ -351,16 +351,16 @@ export const listings = {
 
   status: {
     title: "Status",
-    current: "Your Stugora listing is {status}.",
+    current: "Your Rantio listing is {status}.",
     explain: {
       intake: "Draft: only you can see it. Publish it when the needed items are done.",
       listing: "Our team is setting up the listings on the booking sites.",
-      live: "Published on Stugora. Guests can find it and send booking requests.",
-      paused: "Paused: hidden from new guests on Stugora. Existing stays, messages and earnings are untouched.",
+      live: "Published on Rantio. Guests can find it and send booking requests.",
+      paused: "Paused: hidden from new guests on Rantio. Existing stays, messages and earnings are untouched.",
       archived: "Archived: out of your active listings. Its stays, earnings and messages stay in your records.",
     },
     external:
-      "This only changes your Stugora listing. To pause the cottage on Airbnb, Booking.com, Vrbo or Nettimökki, change it on each site or ask us to.",
+      "This only changes your Rantio listing. To pause the cottage on Airbnb, Booking.com, Vrbo or Nettimökki, change it on each site or ask us to.",
     publish: "Publish",
     pause: "Pause listing",
     relist: "Publish again",
@@ -375,7 +375,7 @@ export const listings = {
     restored: "Restored as a draft",
     pauseTitle: "Pause this listing?",
     pauseBody:
-      "New guests won't find it on Stugora and your booking link stops taking requests. Stays already booked are not cancelled, and your earnings and messages stay as they are. Airbnb, Booking.com, Vrbo and Nettimökki are not changed.",
+      "New guests won't find it on Rantio and your booking link stops taking requests. Stays already booked are not cancelled, and your earnings and messages stay as they are. Airbnb, Booking.com, Vrbo and Nettimökki are not changed.",
     archiveTitle: "Archive this property?",
     archiveBody: "It moves out of your active listings. Its past stays, earnings and messages stay in your records, and you can restore it later.",
     futureBookings: p({
@@ -388,7 +388,7 @@ export const listings = {
     deleteConfirm: "Type the property's name to confirm",
     deleteButton: "Delete permanently",
     deleted: "Property deleted",
-    deleteHasBookings: "This property has stays on record, so it can't be deleted: they're part of your earnings and Stugora's invoices. Archive it instead.",
+    deleteHasBookings: "This property has stays on record, so it can't be deleted: they're part of your earnings and Rantio's invoices. Archive it instead.",
     deleteHasMessages: "Guests have written about this property, so it can't be deleted. Archive it instead to keep the messages.",
     deleteName: "The name doesn't match.",
     history: "Change history",

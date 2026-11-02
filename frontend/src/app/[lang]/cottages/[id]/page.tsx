@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMetadata(
     lang,
     `/cottages/${l.id}`,
-    `${name} – ${l.place} | Stugora`,
+    `${name} – ${l.place} | Rantio`,
     `${name}, ${l.place}, ${country}.`,
     unsplash(l.photo, 1200, 630, l.photoCrop),
   );

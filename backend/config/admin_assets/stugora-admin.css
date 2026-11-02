@@ -1,11 +1,11 @@
-/* Stugora admin stylesheet — the same design as Bona's operations admin
-   (django-unfold + this file), in Stugora's green.
+/* Rantio admin stylesheet — the same design as Bona's operations admin
+   (django-unfold + this file), in Rantio's green.
    Served by config/admin_assets_view.py at /admin/_assets/stugora-admin.css, so it
    ships with the code and needs no collectstatic. */
 /* ---------- 0. Theme tokens — light defaults + dark overrides ----------- */
 /* Unfold toggles the `dark` class on <html>; every colour below flips with it. */
 :root {
-  /* Stugora forest green, as on stugora.fi and the owner dashboard. */
+  /* Rantio forest green, as on rantio.fi and the owner dashboard. */
   --st-accent: #1D4C3C;
   --st-accent-hover: #143A2D;
   --st-accent-light: #4F7A6B;
@@ -48,7 +48,7 @@
 
 
 /* =========================================================================
-   Stugora admin — global form design system.
+   Rantio admin — global form design system.
    Applies to every /admin/ add/edit page via UNFOLD["STYLES"].
 
    Goals
@@ -745,7 +745,7 @@
    resets any layout/position leakage. Scoped to #login-form so it never
    affects edit-page save bars (those live under #content, section 10).
 
-   Requirements covered: strong Stugora green bg + white text, full width,
+   Requirements covered: strong Rantio green bg + white text, full width,
    44–48px tall, 10px radius, weight 600, darker hover, visible focus ring,
    and disabled/loading that stays visible (never opacity-0 / white-on-white). */
 
@@ -758,7 +758,7 @@
   width: 100% !important;
   min-height: 46px !important;
   padding: 12px 18px !important;
-  background: var(--st-accent) !important;          /* Stugora green (primary-600) */
+  background: var(--st-accent) !important;          /* Rantio green (primary-600) */
   background-image: none !important;
   color: #ffffff !important;
   border: 1px solid var(--st-accent) !important;
@@ -890,7 +890,7 @@ nav a.active {
    scroll sideways. Keep the hidden one 1px. */
 html body select.select2-hidden-accessible.select2-hidden-accessible { width:1px !important; min-width:0 !important; min-height:0 !important; }
 
-/* ---------- 15. Stugora: a lone date field ------------------------------- */
+/* ---------- 15. Rantio: a lone date field ------------------------------- */
 /* Section 6 sizes date and time inputs with flex-basis for a row of inputs;
    where unfold puts the date input in a column, that basis became its height. */
 #content .field-line .flex-col > input.vDateField,

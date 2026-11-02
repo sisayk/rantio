@@ -2,7 +2,7 @@
 # Relies on the management command `make_monthly_invoices` (backend/owners/management/commands/).
 # setup-server.sh / deploy.sh only enable the timer once that command exists.
 [Unit]
-Description=Stugora: make monthly invoices
+Description=Rantio: make monthly invoices
 After=network-online.target postgresql.service
 Wants=network-online.target
 

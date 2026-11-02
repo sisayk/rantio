@@ -1,7 +1,7 @@
 // Building blocks every screen uses: text, buttons, rows, cards, empty and error states.
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Haptics from "expo-haptics";
-import type { ComponentProps, ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useId } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -13,7 +13,9 @@ import {
   View,
   type ViewStyle,
 } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Defs, G, LinearGradient, Path, Rect, Stop } from "react-native-svg";
+
+import { MARK, WORDMARK } from "@/lib/brand";
 
 import { colors, fonts, radius, shadow, space } from "@/theme";
 
@@ -237,20 +239,33 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
   );
 }
 
-/** Stugora's mark: a pine and a cabin over water, as on the website. */
-export function Logo({ size = 32, color = colors.green }: { size?: number; color?: string }) {
+/** Rantio's mark: the app icon (green square, R with a house, orange pin), as on the website. */
+export function Logo({ size = 32 }: { size?: number }) {
+  // Each copy gets its own gradient id: one in a hidden screen would otherwise blank the others.
+  const id = `rantio-green-${useId().replace(/\W/g, "")}`;
   return (
-    <Svg width={size} height={size} viewBox="0 0 40 40" accessibilityElementsHidden importantForAccessibility="no">
-      <Path d="M15 4 6 17h4.5L5 25h20l-5.5-8H24L15 4Z" fill={color} />
-      <Path d="M14 25v4h2v-4" fill={color} />
-      <Path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke={color} strokeWidth={2.2} strokeLinejoin="round" />
-      <Path
-        d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0"
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinecap="round"
-      />
+    <Svg width={size} height={size} viewBox="0 0 1024 1024" accessibilityElementsHidden importantForAccessibility="no">
+      <Defs>
+        <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor={MARK.green[0]} />
+          <Stop offset="1" stopColor={MARK.green[1]} />
+        </LinearGradient>
+      </Defs>
+      <Rect width={1024} height={1024} rx={MARK.radius} fill={`url(#${id})`} />
+      <G transform={MARK.transform}>
+        <Path d={MARK.white} fill="#fff" fillRule="evenodd" />
+        <Path d={MARK.pin} fill={MARK.orange} fillRule="evenodd" />
+      </G>
+    </Svg>
+  );
+}
+
+/** "Rantio" with a pin for the dot of the i. */
+export function Wordmark({ height = 32 }: { height?: number }) {
+  return (
+    <Svg width={(height * WORDMARK.width) / WORDMARK.height} height={height} viewBox={`0 0 ${WORDMARK.width} ${WORDMARK.height}`} accessibilityRole="image" accessibilityLabel="Rantio">
+      <Path d={WORDMARK.word} fill={WORDMARK.green} fillRule="evenodd" />
+      <Path d={WORDMARK.pin} fill={WORDMARK.yellow} fillRule="evenodd" />
     </Svg>
   );
 }

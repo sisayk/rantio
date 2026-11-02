@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nightly Stugora backup, run as root by stugora-backup.timer (03:30 Finnish time).
+# Nightly Rantio backup, run as root by stugora-backup.timer (03:30 Finnish time).
 #   - the PostgreSQL database as a pg_dump custom-format file (restore with pg_restore)
 #   - the uploads folder (MEDIA_ROOT) as a .tar.gz
 # into /var/backups/stugora, keeping 14 days.

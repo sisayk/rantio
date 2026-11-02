@@ -87,7 +87,7 @@ def send(invoice: Invoice) -> Invoice:
     inv = _post("/invoices", {
         "customer": customer, "collection_method": "send_invoice", "currency": "eur",
         "days_until_due": settings.INVOICE_DAYS_UNTIL_DUE, "pending_invoice_items_behavior": "exclude",
-        "auto_advance": False, "description": f"Stugora {invoice.month:%m/%Y} · {invoice.number}",
+        "auto_advance": False, "description": f"Rantio {invoice.month:%m/%Y} · {invoice.number}",
         "metadata": {"stugora_invoice": invoice.number},
     }, idempotency_key=key)
     tax = [settings.STRIPE_TAX_RATE_ID] if settings.STRIPE_TAX_RATE_ID else None

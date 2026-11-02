@@ -1,7 +1,7 @@
 """Reading forwarded Nettimökki booking emails, so their dates are blocked everywhere else.
 
 Nettimökki has no calendar sync. Each cottage has its own forwarding address,
-bookings+<code>@stugora.fi; the owner forwards Nettimökki's booking emails there (a
+bookings+<code>@rantio.fi; the owner forwards Nettimökki's booking emails there (a
 mail-app rule does it automatically). Each email is stored, matched to its cottage,
 and read for the dates:
 

@@ -1,4 +1,4 @@
-// Stugora's look on phones: the website's green, white surfaces and Hanken Grotesk,
+// Rantio's look on phones: the website's green, white surfaces and Hanken Grotesk,
 // laid out the way Airbnb's apps are (large titles, photo cards, a calm tab bar).
 import { Platform } from "react-native";
 

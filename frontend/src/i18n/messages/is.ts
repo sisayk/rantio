@@ -13,13 +13,13 @@ export const is: Translation = {
       current: "Núverandi tungumál",
     },
     footer: {
-      note: "Stugora er aukanafn Elda-Auto Tmi.",
+      note: "Rantio er aukanafn Elda-Auto Tmi.",
       contact: "Hafa samband",
       privacy: "Persónuvernd",
       terms: "Skilmálar",
     },
     apps: {
-      title: "Sæktu Stugora-appið",
+      title: "Sæktu Rantio-appið",
       soon: "Væntanlegt",
       download: "Sækja í",
     },
@@ -81,10 +81,10 @@ export const is: Translation = {
       aiHint: "Skrifaðu nokkur orð (dagsetningar, gæludýr, seina komu) og gervigreindin býr til skilaboð úr þeim.",
     },
     chat: {
-      metaTitle: "Samtalið þitt – Stugora",
+      metaTitle: "Samtalið þitt – Rantio",
       title: "Samtalið þitt um {cottage}",
       withHost: "Eigandi: {name}",
-      withStugora: "Teymi Stugora",
+      withRantio: "Teymi Rantio",
       keepLink: "Geymdu slóð þessarar síðu: hún er einkahlekkurinn þinn á samtalið. Við sendum hana líka í tölvupósti.",
       host: "Eigandinn",
       you: "Þú",
@@ -98,7 +98,7 @@ export const is: Translation = {
       waiting: "Eigandinn svarar yfirleitt innan sólarhrings. Við sendum þér tölvupóst þegar svarið kemur.",
     },
     meta: {
-      title: "Stugora – sumarbústaðir á Norðurlöndum og í Eystrasaltslöndunum",
+      title: "Rantio – sumarbústaðir á Norðurlöndum og í Eystrasaltslöndunum",
       description:
         "Sumarbústaðir við vötn, firði, skóga og strendur frá Íslandi til Litháens. Bókaðu á Airbnb, Booking.com eða Vrbo.",
     },
@@ -382,9 +382,9 @@ export const is: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – sumarbústaðurinn þinn á Airbnb, Booking.com og Vrbo",
+      title: "Rantio – sumarbústaðurinn þinn á Airbnb, Booking.com og Vrbo",
       description:
-        "Stugora færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. 99 € á ári og 12% af bókunum sem við útvegum.",
+        "Rantio færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. 99 € á ári og 12% af bókunum sem við útvegum.",
     },
     nav: { cta: "Skráðu bústaðinn þinn", login: "Innskráning" },
     hero: {
@@ -394,8 +394,8 @@ export const is: Translation = {
       priceLabel: "Verð á nótt",
       perNight: "€ / nótt",
       finePrint:
-        "Í matinu hafa þóknanir bókunarsíðna (um 15%), 99 € árgjald Stugora, 12% þóknun og virðisaukaskattur verið dregin frá.",
-      lead: "Stugora setur bústaðinn þinn á Airbnb, Booking.com og Vrbo og heldur öllum dagatölum í takt við innlendu síðurnar sem þú notar nú þegar, eins og Nettimökki í Finnlandi.",
+        "Í matinu hafa þóknanir bókunarsíðna (um 15%), 99 € árgjald Rantio, 12% þóknun og virðisaukaskattur verið dregin frá.",
+      lead: "Rantio setur bústaðinn þinn á Airbnb, Booking.com og Vrbo og heldur öllum dagatölum í takt við innlendu síðurnar sem þú notar nú þegar, eins og Nettimökki í Finnlandi.",
       cta: "Skráðu bústaðinn þinn",
       photoAlt: "Sumarbústaður á vatnsbakka á skýjuðum sumardegi",
       chipBookingTitle: "Ný bókun frá Airbnb",
@@ -440,12 +440,12 @@ export const is: Translation = {
     },
     price: {
       title: "99 € á ári og 12% af bókunum sem við útvegum",
-      lead: "Ekkert stofngjald og ekkert mánaðargjald. Árgjaldið nær yfir gerð og umsjón skráninganna. Þegar gestur bókar í gegnum rás sem Stugora opnaði greiðir þú 12% af því sem bókunarsíðan greiðir þér. Virðisaukaskattur bætist við hvort tveggja. Við tökum aldrei gjald fyrir bókanir af síðum sem þú notaðir áður, eins og Nettimökki.",
+      lead: "Ekkert stofngjald og ekkert mánaðargjald. Árgjaldið nær yfir gerð og umsjón skráninganna. Þegar gestur bókar í gegnum rás sem Rantio opnaði greiðir þú 12% af því sem bókunarsíðan greiðir þér. Virðisaukaskattur bætist við hvort tveggja. Við tökum aldrei gjald fyrir bókanir af síðum sem þú notaðir áður, eins og Nettimökki.",
       exampleTitle: "Dæmi: 20 viðbótarnætur á 150 € nóttin",
       rows: {
         guests: "Gestir greiða",
         platform: "Þóknanir bókunarsíðna, um 15%",
-        commission: "Stugora 12% auk VSK",
+        commission: "Rantio 12% auk VSK",
         yearly: "Árgjald 99 € auk VSK",
       },
       total: "Þú heldur eftir",
@@ -498,7 +498,7 @@ export const is: Translation = {
       nettimokki: "Hlekkur á skráninguna þína á Nettimökki",
       message: "Eitthvað fleira sem þú vilt segja okkur?",
       optional: "valfrjálst",
-      consent: "Stugora má geyma þessar upplýsingar og hafa samband við mig.",
+      consent: "Rantio má geyma þessar upplýsingar og hafa samband við mig.",
       privacyLink: "Lestu persónuverndarstefnuna okkar",
       submit: "Skráðu bústaðinn þinn",
       sending: "Sendi…",
@@ -519,7 +519,7 @@ export const is: Translation = {
   },
 
   book: {
-    metaTitle: "Bókunarbeiðni – Stugora",
+    metaTitle: "Bókunarbeiðni – Rantio",
     host: "Gestgjafi: {name}",
     perNight: "{price} / nótt",
     dates: "Dagsetningar",
@@ -540,7 +540,7 @@ export const is: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Þrif",
       total: "Samtals",
-      note: "Eigandinn staðfestir verðið og segir þér hvernig þú greiðir. Ekkert er greitt á Stugora.",
+      note: "Eigandinn staðfestir verðið og segir þér hvernig þú greiðir. Ekkert er greitt á Rantio.",
     },
     form: {
       title: "Upplýsingar um þig",
@@ -650,7 +650,7 @@ export const is: Translation = {
       },
       link: {
         title: "Bókunarhlekkurinn þinn",
-        lead: "Deildu honum með þínum eigin gestum: fjölskyldum sem koma aftur, vinum, Facebook-síðunni þinni. Þeir sjá lausu dagana þína og senda beiðni; þú samþykkir eða hafnar. Stugora tekur ekkert fyrir þessar bókanir.",
+        lead: "Deildu honum með þínum eigin gestum: fjölskyldum sem koma aftur, vinum, Facebook-síðunni þinni. Þeir sjá lausu dagana þína og senda beiðni; þú samþykkir eða hafnar. Rantio tekur ekkert fyrir þessar bókanir.",
         copy: "Afrita hlekk",
         copied: "Afritað",
         view: "Opna",
@@ -663,7 +663,7 @@ export const is: Translation = {
       },
       sites: {
         title: "Tengdu bókunarsíðurnar þínar",
-        lead: "Hver síða les dagatal Stugora og Stugora les dagatölin þeirra á 15 mínútna fresti. Gerðu þetta einu sinni fyrir hverja síðu.",
+        lead: "Hver síða les dagatal Rantio og Rantio les dagatölin þeirra á 15 mínútna fresti. Gerðu þetta einu sinni fyrir hverja síðu.",
         ours: "1. Settu þennan hlekk inn á {site}",
         oursHelp: "Veldu að flytja inn dagatal í dagatalsstillingunum á {site} og límdu þennan hlekk inn.",
         theirs: "2. Límdu dagatalshlekkinn frá {site} hér",
@@ -702,14 +702,14 @@ export const is: Translation = {
       emptyFilter: "Ekkert hér.",
       choose: "Veldu samtal til að lesa það.",
       back: "Öll skilaboð",
-      enquiry: "Fyrirspurn af stugora.fi",
+      enquiry: "Fyrirspurn af rantio.fi",
       you: "Þú",
       placeholder: "Skrifaðu svar…",
       send: "Senda",
       sending: "Sendi…",
       failed: "Ekki tókst að senda svarið. Reyndu aftur.",
       siteNote: "Svör til gesta á {site} fara í gegnum {site} þegar rásastjórinn þinn er tengdur. Þangað til eru þau aðeins vistuð hér.",
-      directNote: "Gesturinn fær svarið þitt í tölvupósti og les það á Stugora. Gesturinn sér aldrei netfangið þitt og þú sérð ekki netfang gestsins.",
+      directNote: "Gesturinn fær svarið þitt í tölvupósti og les það á Rantio. Gesturinn sér aldrei netfangið þitt og þú sérð ekki netfang gestsins.",
       archive: "Setja í geymslu",
       unarchive: "Færa aftur í innhólf",
       writesIn: "Skrifar á {language}",
@@ -718,8 +718,8 @@ export const is: Translation = {
       sendHint: "Ctrl + Enter sendir",
     },
     meta: {
-      title: "Bústaðirnir mínir – Stugora",
-      loginTitle: "Innskráning – Stugora",
+      title: "Bústaðirnir mínir – Rantio",
+      loginTitle: "Innskráning – Rantio",
     },
     area: "Bústaðirnir mínir",
     login: {
@@ -728,7 +728,7 @@ export const is: Translation = {
       email: "Netfang",
       send: "Senda kóða",
       sending: "Sendi…",
-      sentTo: "Ef {email} tilheyrir eiganda hjá Stugora höfum við sent kóða þangað. Hann gildir í 15 mínútur.",
+      sentTo: "Ef {email} tilheyrir eiganda hjá Rantio höfum við sent kóða þangað. Hann gildir í 15 mínútur.",
       code: "Kóði",
       verify: "Skrá inn",
       verifying: "Athuga…",
@@ -738,13 +738,13 @@ export const is: Translation = {
       wrongCode: "Kóðinn virkar ekki. Athugaðu hann eða biddu um nýjan.",
       tooMany: "Of margar tilraunir. Bíddu aðeins og reyndu aftur.",
       failed: "Eitthvað fór úrskeiðis. Reyndu aftur eftir smástund.",
-      notOwner: "Ekki enn hjá Stugora?",
+      notOwner: "Ekki enn hjá Rantio?",
       join: "Skráðu bústaðinn þinn",
     },
     logout: "Skrá út",
     switchToTraveling: "Skipta yfir í ferðalög",
     hello: "Hæ, {name}",
-    lead: "Bókanir, tekjur og hlutur Stugora fyrir bústaðina þína.",
+    lead: "Bókanir, tekjur og hlutur Rantio fyrir bústaðina þína.",
     year: "Ár",
     loading: "Hleður…",
     error: "Ekki tókst að sækja tölurnar. Reyndu aftur eftir smástund.",
@@ -760,18 +760,18 @@ export const is: Translation = {
     },
     kpi: {
       payout: "Greitt til þín",
-      payoutSub: "{stugora} frá síðum Stugora, {own} frá þínum eigin",
+      payoutSub: "{stugora} frá síðum Rantio, {own} frá þínum eigin",
       bookings: "Bókanir",
       cancelled: { one: "{n} afbókuð", other: "{n} afbókaðar" },
-      stugora: "Hlutur Stugora",
+      stugora: "Hlutur Rantio",
       stugoraSub: "{rate} % þóknun og árgjöld, með VSK",
       net: "Þú heldur eftir",
-      netSub: "Greiðslur að frádregnum hlut Stugora",
+      netSub: "Greiðslur að frádregnum hlut Rantio",
     },
     chart: {
       title: "Tekjur eftir mánuðum",
       lead: "Greitt til þín, eftir komumánuði gesta.",
-      stugora: "Síður Stugora",
+      stugora: "Síður Rantio",
       own: "Þínar eigin síður",
       ownNote: "Nettimökki og þínar eigin bókanir",
       total: "Samtals",
@@ -829,7 +829,7 @@ export const is: Translation = {
     howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er 99 € + VSK á hvern bústað; fyrir tilraunaeigendur er fyrsta árið ókeypis. Virðisaukaskattur er 25,5 %.",
     ownBooking: "Eigin bókun",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Kort",
@@ -862,7 +862,7 @@ export const is: Translation = {
       listedOn: "Skráður á",
       book: "Bóka",
       chooseSite: "Veldu hvar þú bókar",
-      chooseLead: "Stugora skráir bústaðinn á þessum vefjum. Bókaðu þar sem þú vilt; verðið og eigandinn eru þau sömu.",
+      chooseLead: "Rantio skráir bústaðinn á þessum vefjum. Bókaðu þar sem þú vilt; verðið og eigandinn eru þau sömu.",
       logIn: "Innskráning eigenda",
     },
     saved: {
@@ -901,9 +901,9 @@ export const is: Translation = {
       bookings: "Allar bókanir",
       notifications: "Tilkynningar",
       notificationsLead: "Nýjar bókanir, skilaboð og bókunarbeiðnir í þennan síma.",
-      notificationsBlocked: "Slökkt er á tilkynningum frá Stugora í stillingum símans.",
+      notificationsBlocked: "Slökkt er á tilkynningum frá Rantio í stillingum símans.",
       openSettings: "Opna stillingar",
-      web: "Stugora á vefnum",
+      web: "Rantio á vefnum",
     },
     detail: {
       showAmenities: "Sýna öll {n} þægindi",

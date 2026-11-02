@@ -14,7 +14,7 @@ type Props = { params: Promise<{ lang: string; id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isLang(lang)) return {};
-  return { title: `${getMessages(lang).listings.meta.editTitle} – Stugora`, robots: { index: false, follow: false } };
+  return { title: `${getMessages(lang).listings.meta.editTitle} – Rantio`, robots: { index: false, follow: false } };
 }
 
 async function Editor({ params }: Props) {

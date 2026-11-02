@@ -70,7 +70,7 @@ class SignupApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(OwnerSignup.objects.count(), 0)
 
-    @override_settings(SIGNUP_NOTIFY_EMAILS=["sisay@stugora.fi"])
+    @override_settings(SIGNUP_NOTIFY_EMAILS=["sisay@rantio.fi"])
     def test_notifies_team(self):
         self.client.post(self.url, VALID, format="json")
         self.assertEqual(len(mail.outbox), 1)
@@ -89,7 +89,7 @@ class SignupApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("language", response.data)
 
-    @override_settings(SIGNUP_NOTIFY_EMAILS=["sisay@stugora.fi"])
+    @override_settings(SIGNUP_NOTIFY_EMAILS=["sisay@rantio.fi"])
     def test_team_email_says_which_language_to_answer_in(self):
         self.client.post(self.url, {**VALID, "language": "et"}, format="json")
         self.assertIn("writes in: Eesti", mail.outbox[0].body)

@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Saker att göra vid en nordisk stuga | Stugora",
+      title: "Saker att göra vid en nordisk stuga | Rantio",
       description: "Bastu, bad, paddling, fiske, vandring, skidåkning och norrsken: hitta en stuga för det du vill göra.",
     },
     title: "Saker att göra vid stugan",
     lead: "Bastu vid sjön, paddling i det långa kvällsljuset, skidåkning och norrsken. Välj vad du vill göra och se stugorna som passar.",
-    note: "Stugora säljer inga aktiviteter. Ägaren kan berätta vad som finns i närheten, och lokala guider tar bokningar för till exempel hundspann och norrskensturer.",
+    note: "Rantio säljer inga aktiviteter. Ägaren kan berätta vad som finns i närheten, och lokala guider tar bokningar för till exempel hundspann och norrskensturer.",
     items: {
       sauna: {
         title: "Bastu och ett svalkande dopp",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Stugdestinationer i Norden och Baltikum | Stugora",
+      title: "Stugdestinationer i Norden och Baltikum | Rantio",
       description: "Finland, Sverige, Norge, Danmark, Island, Estland, Lettland och Litauen: sjöar, fjordar, dyner och skogar, och stugorna där.",
     },
     title: "Destinationer",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Inspiration för stugsemestern | Stugora",
+      title: "Inspiration för stugsemestern | Rantio",
       description: "Korta guider om bastun, norrskenet, allemansrätten, midsommar och vinter i en nordisk stuga.",
     },
     title: "Inspiration",

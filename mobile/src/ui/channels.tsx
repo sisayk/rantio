@@ -1,5 +1,5 @@
 // Where a cottage is listed: the booking sites' own icons, as on the website.
-// Being on Airbnb, Booking.com, Vrbo, Expedia and the rest is what Stugora does for owners,
+// Being on Airbnb, Booking.com, Vrbo, Expedia and the rest is what Rantio does for owners,
 // so every cottage card shows it.
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";

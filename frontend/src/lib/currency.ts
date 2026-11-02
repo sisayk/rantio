@@ -10,7 +10,7 @@ export type Currency = (typeof CURRENCIES)[number];
 
 export const isCurrency = (v: unknown): v is Currency => typeof v === "string" && (CURRENCIES as readonly string[]).includes(v);
 
-/** The currency each country Stugora covers uses. */
+/** The currency each country Rantio covers uses. */
 export const COUNTRY_CURRENCY: Record<string, Currency> = {
   FI: "EUR",
   EE: "EUR",

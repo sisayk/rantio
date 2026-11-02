@@ -1,4 +1,4 @@
-"""The Stugora admin dashboard (UNFOLD["DASHBOARD_CALLBACK"]), laid out like Bona's.
+"""The Rantio admin dashboard (UNFOLD["DASHBOARD_CALLBACK"]), laid out like Bona's.
 
 Read-only counts and sums for /admin/: what needs someone today, the main numbers,
 three small charts and recent activity. Money is in euros; bookings in kronor are
@@ -117,7 +117,7 @@ def dashboard_callback(request, context):
     alerts = []
     if signups_new:
         alerts.append({"tone": "warn", "title": f"{signups_new} new owner sign-up{'s' if signups_new > 1 else ''} to contact",
-                       "body": "Owners who filled in the stugora.fi form and have not heard from us yet.",
+                       "body": "Owners who filled in the rantio.fi form and have not heard from us yet.",
                        "link": _url("ownersignup", BADGE_LINKS["signups"]), "cta": "Open sign-ups"})
     if team_waiting:
         alerts.append({"tone": "danger", "title": f"{team_waiting} guest{'s' if team_waiting > 1 else ''} waiting for an answer",
@@ -193,7 +193,7 @@ def dashboard_callback(request, context):
     for m in Message.objects.select_related("conversation", "conversation__cottage").filter(sender="guest").order_by("-created_at")[:6]:
         c = m.conversation
         activity.append((m.created_at, {"icon": "forum", "tone": "blue", "title": f"{c.guest_name} wrote",
-                                        "sub": c.cottage.name if c.cottage else (c.listing_slug or "Stugora"),
+                                        "sub": c.cottage.name if c.cottage else (c.listing_slug or "Rantio"),
                                         "link": reverse("admin:owners_conversation_change", args=[c.pk])}))
     for b in Booking.objects.select_related("cottage").order_by("-created_at")[:5]:
         activity.append((b.created_at, {"icon": "event", "tone": "orange", "title": f"Stay booked on {b.get_channel_display()}",

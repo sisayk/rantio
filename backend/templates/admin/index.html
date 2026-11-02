@@ -1,6 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
-{# Stugora admin dashboard, laid out like Bona's operations dashboard.        #}
+{# Rantio admin dashboard, laid out like Bona's operations dashboard.        #}
 {# Numbers: config/admin_dashboard.py (UNFOLD["DASHBOARD_CALLBACK"]).          #}
 
 {% block bodyclass %}{{ block.super }} st-dash{% endblock %}
@@ -146,7 +146,7 @@
   <div class="db-top">
     <div class="hello">
       <div class="h">Good {% if st_now.hour < 12 %}morning{% elif st_now.hour < 18 %}afternoon{% else %}evening{% endif %}{% if request.user.first_name %}, {{ request.user.first_name }}{% endif %}</div>
-      <p>Here's what's happening with Stugora today.</p>
+      <p>Here's what's happening with Rantio today.</p>
     </div>
     <div class="db-chip">
       <span class="ic"><span class="material-symbols-outlined">calendar_month</span></span>

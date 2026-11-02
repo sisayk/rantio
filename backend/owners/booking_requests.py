@@ -4,7 +4,7 @@ The owner shares the link with their own guests: returning families, friends, th
 Facebook page. A request is a conversation with dates; nothing is booked or paid
 until the owner accepts. Accepting creates the stay as the owner's own booking
 (never charged) and closes the dates everywhere. The owner takes the payment the
-way they do today; Stugora handles no money here.
+way they do today; Rantio handles no money here.
 """
 
 from __future__ import annotations
@@ -38,52 +38,52 @@ class RequestError(Exception):
 
 # (subject, body) per language. {name} {cottage} {dates} {guests} {text} {link} are filled in.
 OWNER_REQUESTED = {
-    "en": ("Booking request: {name}, {dates}", "{name} would like to book {cottage}.\n\nDates: {dates}\nGuests: {guests}\n\n“{text}”\n\nAccept or decline in Stugora. The dates stay open until you accept:\n{link}"),
-    "fi": ("Varauspyyntö: {name}, {dates}", "{name} haluaisi varata kohteen {cottage}.\n\nPäivät: {dates}\nVieraita: {guests}\n\n”{text}”\n\nHyväksy tai hylkää Stugorassa. Päivät pysyvät vapaina, kunnes hyväksyt:\n{link}"),
-    "sv": ("Bokningsförfrågan: {name}, {dates}", "{name} vill boka {cottage}.\n\nDatum: {dates}\nGäster: {guests}\n\n”{text}”\n\nGodkänn eller avböj i Stugora. Datumen är lediga tills du godkänner:\n{link}"),
-    "nb": ("Bookingforespørsel: {name}, {dates}", "{name} vil gjerne booke {cottage}.\n\nDatoer: {dates}\nGjester: {guests}\n\n«{text}»\n\nGodta eller avslå i Stugora. Datoene er ledige til du godtar:\n{link}"),
-    "nn": ("Bookingførespurnad: {name}, {dates}", "{name} vil gjerne booke {cottage}.\n\nDatoar: {dates}\nGjester: {guests}\n\n«{text}»\n\nGodta eller avslå i Stugora. Datoane er ledige til du godtek:\n{link}"),
-    "da": ("Bookingforespørgsel: {name}, {dates}", "{name} vil gerne booke {cottage}.\n\nDatoer: {dates}\nGæster: {guests}\n\n»{text}«\n\nAccepter eller afvis i Stugora. Datoerne er ledige, indtil du accepterer:\n{link}"),
-    "is": ("Bókunarbeiðni: {name}, {dates}", "{name} vill bóka {cottage}.\n\nDagsetningar: {dates}\nGestir: {guests}\n\n„{text}“\n\nSamþykktu eða hafnaðu í Stugora. Dagarnir eru lausir þar til þú samþykkir:\n{link}"),
-    "et": ("Broneerimissoov: {name}, {dates}", "{name} soovib broneerida: {cottage}.\n\nKuupäevad: {dates}\nKülalisi: {guests}\n\n„{text}“\n\nKinnita või keeldu Stugoras. Kuupäevad on vabad, kuni sa kinnitad:\n{link}"),
-    "lv": ("Rezervācijas pieprasījums: {name}, {dates}", "{name} vēlas rezervēt {cottage}.\n\nDatumi: {dates}\nViesi: {guests}\n\n“{text}”\n\nApstipriniet vai noraidiet Stugora. Datumi paliek brīvi, līdz jūs apstiprināt:\n{link}"),
-    "lt": ("Rezervacijos užklausa: {name}, {dates}", "{name} nori rezervuoti {cottage}.\n\nDatos: {dates}\nSvečiai: {guests}\n\n„{text}“\n\nPatvirtinkite arba atmeskite Stugora. Datos lieka laisvos, kol patvirtinsite:\n{link}"),
+    "en": ("Booking request: {name}, {dates}", "{name} would like to book {cottage}.\n\nDates: {dates}\nGuests: {guests}\n\n“{text}”\n\nAccept or decline in Rantio. The dates stay open until you accept:\n{link}"),
+    "fi": ("Varauspyyntö: {name}, {dates}", "{name} haluaisi varata kohteen {cottage}.\n\nPäivät: {dates}\nVieraita: {guests}\n\n”{text}”\n\nHyväksy tai hylkää Rantiossa. Päivät pysyvät vapaina, kunnes hyväksyt:\n{link}"),
+    "sv": ("Bokningsförfrågan: {name}, {dates}", "{name} vill boka {cottage}.\n\nDatum: {dates}\nGäster: {guests}\n\n”{text}”\n\nGodkänn eller avböj i Rantio. Datumen är lediga tills du godkänner:\n{link}"),
+    "nb": ("Bookingforespørsel: {name}, {dates}", "{name} vil gjerne booke {cottage}.\n\nDatoer: {dates}\nGjester: {guests}\n\n«{text}»\n\nGodta eller avslå i Rantio. Datoene er ledige til du godtar:\n{link}"),
+    "nn": ("Bookingførespurnad: {name}, {dates}", "{name} vil gjerne booke {cottage}.\n\nDatoar: {dates}\nGjester: {guests}\n\n«{text}»\n\nGodta eller avslå i Rantio. Datoane er ledige til du godtek:\n{link}"),
+    "da": ("Bookingforespørgsel: {name}, {dates}", "{name} vil gerne booke {cottage}.\n\nDatoer: {dates}\nGæster: {guests}\n\n»{text}«\n\nAccepter eller afvis i Rantio. Datoerne er ledige, indtil du accepterer:\n{link}"),
+    "is": ("Bókunarbeiðni: {name}, {dates}", "{name} vill bóka {cottage}.\n\nDagsetningar: {dates}\nGestir: {guests}\n\n„{text}“\n\nSamþykktu eða hafnaðu í Rantio. Dagarnir eru lausir þar til þú samþykkir:\n{link}"),
+    "et": ("Broneerimissoov: {name}, {dates}", "{name} soovib broneerida: {cottage}.\n\nKuupäevad: {dates}\nKülalisi: {guests}\n\n„{text}“\n\nKinnita või keeldu Rantios. Kuupäevad on vabad, kuni sa kinnitad:\n{link}"),
+    "lv": ("Rezervācijas pieprasījums: {name}, {dates}", "{name} vēlas rezervēt {cottage}.\n\nDatumi: {dates}\nViesi: {guests}\n\n“{text}”\n\nApstipriniet vai noraidiet Rantio. Datumi paliek brīvi, līdz jūs apstiprināt:\n{link}"),
+    "lt": ("Rezervacijos užklausa: {name}, {dates}", "{name} nori rezervuoti {cottage}.\n\nDatos: {dates}\nSvečiai: {guests}\n\n„{text}“\n\nPatvirtinkite arba atmeskite Rantio. Datos lieka laisvos, kol patvirtinsite:\n{link}"),
 }
 GUEST_REQUESTED = {
-    "en": ("Your booking request: {cottage}", "Hi {name},\n\nwe've sent your request for {cottage}, {dates}, to the owner. Nothing is booked or paid yet: the owner confirms and tells you how to pay.\n\nYour request and the owner's answer:\n{link}\n\nStugora"),
-    "fi": ("Varauspyyntösi: {cottage}", "Hei {name},\n\nlähetimme pyyntösi kohteeseen {cottage}, {dates}, omistajalle. Mitään ei ole vielä varattu tai maksettu: omistaja vahvistaa varauksen ja kertoo, miten maksat.\n\nPyyntösi ja omistajan vastaus:\n{link}\n\nStugora"),
-    "sv": ("Din bokningsförfrågan: {cottage}", "Hej {name},\n\nvi har skickat din förfrågan om {cottage}, {dates}, till ägaren. Inget är bokat eller betalt ännu: ägaren bekräftar och berättar hur du betalar.\n\nDin förfrågan och ägarens svar:\n{link}\n\nStugora"),
-    "nb": ("Bookingforespørselen din: {cottage}", "Hei {name},\n\nvi har sendt forespørselen din om {cottage}, {dates}, til eieren. Ingenting er booket eller betalt ennå: eieren bekrefter og forteller hvordan du betaler.\n\nForespørselen din og eierens svar:\n{link}\n\nStugora"),
-    "nn": ("Bookingførespurnaden din: {cottage}", "Hei {name},\n\nvi har sendt førespurnaden din om {cottage}, {dates}, til eigaren. Ingenting er booka eller betalt enno: eigaren stadfestar og fortel korleis du betaler.\n\nFørespurnaden din og svaret frå eigaren:\n{link}\n\nStugora"),
-    "da": ("Din bookingforespørgsel: {cottage}", "Hej {name},\n\nvi har sendt din forespørgsel om {cottage}, {dates}, til ejeren. Intet er booket eller betalt endnu: ejeren bekræfter og fortæller, hvordan du betaler.\n\nDin forespørgsel og ejerens svar:\n{link}\n\nStugora"),
-    "is": ("Bókunarbeiðnin þín: {cottage}", "Hæ {name},\n\nvið höfum sent beiðni þína um {cottage}, {dates}, til eigandans. Ekkert er bókað eða greitt enn: eigandinn staðfestir og segir þér hvernig þú greiðir.\n\nBeiðnin þín og svar eigandans:\n{link}\n\nStugora"),
-    "et": ("Sinu broneerimissoov: {cottage}", "Tere {name},\n\nsaatsime sinu soovi ({cottage}, {dates}) omanikule. Midagi pole veel broneeritud ega makstud: omanik kinnitab ja ütleb, kuidas maksta.\n\nSinu soov ja omaniku vastus:\n{link}\n\nStugora"),
-    "lv": ("Jūsu rezervācijas pieprasījums: {cottage}", "Sveiki, {name}!\n\nMēs nosūtījām jūsu pieprasījumu par {cottage}, {dates}, īpašniekam. Nekas vēl nav rezervēts vai samaksāts: īpašnieks apstiprinās un pateiks, kā maksāt.\n\nJūsu pieprasījums un īpašnieka atbilde:\n{link}\n\nStugora"),
-    "lt": ("Jūsų rezervacijos užklausa: {cottage}", "Sveiki, {name},\n\nJūsų užklausą dėl {cottage}, {dates}, išsiuntėme savininkui. Kol kas niekas nerezervuota ir nesumokėta: savininkas patvirtins ir praneš, kaip sumokėti.\n\nJūsų užklausa ir savininko atsakymas:\n{link}\n\nStugora"),
+    "en": ("Your booking request: {cottage}", "Hi {name},\n\nwe've sent your request for {cottage}, {dates}, to the owner. Nothing is booked or paid yet: the owner confirms and tells you how to pay.\n\nYour request and the owner's answer:\n{link}\n\nRantio"),
+    "fi": ("Varauspyyntösi: {cottage}", "Hei {name},\n\nlähetimme pyyntösi kohteeseen {cottage}, {dates}, omistajalle. Mitään ei ole vielä varattu tai maksettu: omistaja vahvistaa varauksen ja kertoo, miten maksat.\n\nPyyntösi ja omistajan vastaus:\n{link}\n\nRantio"),
+    "sv": ("Din bokningsförfrågan: {cottage}", "Hej {name},\n\nvi har skickat din förfrågan om {cottage}, {dates}, till ägaren. Inget är bokat eller betalt ännu: ägaren bekräftar och berättar hur du betalar.\n\nDin förfrågan och ägarens svar:\n{link}\n\nRantio"),
+    "nb": ("Bookingforespørselen din: {cottage}", "Hei {name},\n\nvi har sendt forespørselen din om {cottage}, {dates}, til eieren. Ingenting er booket eller betalt ennå: eieren bekrefter og forteller hvordan du betaler.\n\nForespørselen din og eierens svar:\n{link}\n\nRantio"),
+    "nn": ("Bookingførespurnaden din: {cottage}", "Hei {name},\n\nvi har sendt førespurnaden din om {cottage}, {dates}, til eigaren. Ingenting er booka eller betalt enno: eigaren stadfestar og fortel korleis du betaler.\n\nFørespurnaden din og svaret frå eigaren:\n{link}\n\nRantio"),
+    "da": ("Din bookingforespørgsel: {cottage}", "Hej {name},\n\nvi har sendt din forespørgsel om {cottage}, {dates}, til ejeren. Intet er booket eller betalt endnu: ejeren bekræfter og fortæller, hvordan du betaler.\n\nDin forespørgsel og ejerens svar:\n{link}\n\nRantio"),
+    "is": ("Bókunarbeiðnin þín: {cottage}", "Hæ {name},\n\nvið höfum sent beiðni þína um {cottage}, {dates}, til eigandans. Ekkert er bókað eða greitt enn: eigandinn staðfestir og segir þér hvernig þú greiðir.\n\nBeiðnin þín og svar eigandans:\n{link}\n\nRantio"),
+    "et": ("Sinu broneerimissoov: {cottage}", "Tere {name},\n\nsaatsime sinu soovi ({cottage}, {dates}) omanikule. Midagi pole veel broneeritud ega makstud: omanik kinnitab ja ütleb, kuidas maksta.\n\nSinu soov ja omaniku vastus:\n{link}\n\nRantio"),
+    "lv": ("Jūsu rezervācijas pieprasījums: {cottage}", "Sveiki, {name}!\n\nMēs nosūtījām jūsu pieprasījumu par {cottage}, {dates}, īpašniekam. Nekas vēl nav rezervēts vai samaksāts: īpašnieks apstiprinās un pateiks, kā maksāt.\n\nJūsu pieprasījums un īpašnieka atbilde:\n{link}\n\nRantio"),
+    "lt": ("Jūsų rezervacijos užklausa: {cottage}", "Sveiki, {name},\n\nJūsų užklausą dėl {cottage}, {dates}, išsiuntėme savininkui. Kol kas niekas nerezervuota ir nesumokėta: savininkas patvirtins ir praneš, kaip sumokėti.\n\nJūsų užklausa ir savininko atsakymas:\n{link}\n\nRantio"),
 }
 GUEST_ACCEPTED = {
-    "en": ("Confirmed: {cottage}, {dates}", "Hi {name},\n\ngood news: the owner of {cottage} has accepted your request for {dates}. The dates are yours. The owner will tell you how to pay; you can write to them here:\n{link}\n\nStugora"),
-    "fi": ("Vahvistettu: {cottage}, {dates}", "Hei {name},\n\nhyviä uutisia: kohteen {cottage} omistaja hyväksyi pyyntösi ajalle {dates}. Päivät ovat sinun. Omistaja kertoo, miten maksat; voit kirjoittaa hänelle täällä:\n{link}\n\nStugora"),
-    "sv": ("Bekräftat: {cottage}, {dates}", "Hej {name},\n\ngoda nyheter: ägaren till {cottage} har godkänt din förfrågan för {dates}. Datumen är dina. Ägaren berättar hur du betalar; du kan skriva till hen här:\n{link}\n\nStugora"),
-    "nb": ("Bekreftet: {cottage}, {dates}", "Hei {name},\n\ngode nyheter: eieren av {cottage} har godtatt forespørselen din for {dates}. Datoene er dine. Eieren forteller hvordan du betaler; du kan skrive til eieren her:\n{link}\n\nStugora"),
-    "nn": ("Stadfesta: {cottage}, {dates}", "Hei {name},\n\ngode nyheiter: eigaren av {cottage} har godteke førespurnaden din for {dates}. Datoane er dine. Eigaren fortel korleis du betaler; du kan skrive til eigaren her:\n{link}\n\nStugora"),
-    "da": ("Bekræftet: {cottage}, {dates}", "Hej {name},\n\ngode nyheder: ejeren af {cottage} har accepteret din forespørgsel for {dates}. Datoerne er dine. Ejeren fortæller, hvordan du betaler; du kan skrive til ejeren her:\n{link}\n\nStugora"),
-    "is": ("Staðfest: {cottage}, {dates}", "Hæ {name},\n\ngóðar fréttir: eigandi {cottage} hefur samþykkt beiðni þína fyrir {dates}. Dagarnir eru þínir. Eigandinn segir þér hvernig þú greiðir; þú getur skrifað honum hér:\n{link}\n\nStugora"),
-    "et": ("Kinnitatud: {cottage}, {dates}", "Tere {name},\n\nhead uudised: {cottage} omanik kinnitas sinu soovi ({dates}). Kuupäevad on sinu omad. Omanik ütleb, kuidas maksta; talle saad kirjutada siin:\n{link}\n\nStugora"),
-    "lv": ("Apstiprināts: {cottage}, {dates}", "Sveiki, {name}!\n\nLabas ziņas: {cottage} īpašnieks apstiprināja jūsu pieprasījumu par {dates}. Datumi ir jūsu. Īpašnieks pateiks, kā maksāt; viņam varat rakstīt šeit:\n{link}\n\nStugora"),
-    "lt": ("Patvirtinta: {cottage}, {dates}", "Sveiki, {name},\n\ngeros žinios: {cottage} savininkas patvirtino Jūsų užklausą {dates}. Datos Jūsų. Savininkas praneš, kaip sumokėti; jam galite parašyti čia:\n{link}\n\nStugora"),
+    "en": ("Confirmed: {cottage}, {dates}", "Hi {name},\n\ngood news: the owner of {cottage} has accepted your request for {dates}. The dates are yours. The owner will tell you how to pay; you can write to them here:\n{link}\n\nRantio"),
+    "fi": ("Vahvistettu: {cottage}, {dates}", "Hei {name},\n\nhyviä uutisia: kohteen {cottage} omistaja hyväksyi pyyntösi ajalle {dates}. Päivät ovat sinun. Omistaja kertoo, miten maksat; voit kirjoittaa hänelle täällä:\n{link}\n\nRantio"),
+    "sv": ("Bekräftat: {cottage}, {dates}", "Hej {name},\n\ngoda nyheter: ägaren till {cottage} har godkänt din förfrågan för {dates}. Datumen är dina. Ägaren berättar hur du betalar; du kan skriva till hen här:\n{link}\n\nRantio"),
+    "nb": ("Bekreftet: {cottage}, {dates}", "Hei {name},\n\ngode nyheter: eieren av {cottage} har godtatt forespørselen din for {dates}. Datoene er dine. Eieren forteller hvordan du betaler; du kan skrive til eieren her:\n{link}\n\nRantio"),
+    "nn": ("Stadfesta: {cottage}, {dates}", "Hei {name},\n\ngode nyheiter: eigaren av {cottage} har godteke førespurnaden din for {dates}. Datoane er dine. Eigaren fortel korleis du betaler; du kan skrive til eigaren her:\n{link}\n\nRantio"),
+    "da": ("Bekræftet: {cottage}, {dates}", "Hej {name},\n\ngode nyheder: ejeren af {cottage} har accepteret din forespørgsel for {dates}. Datoerne er dine. Ejeren fortæller, hvordan du betaler; du kan skrive til ejeren her:\n{link}\n\nRantio"),
+    "is": ("Staðfest: {cottage}, {dates}", "Hæ {name},\n\ngóðar fréttir: eigandi {cottage} hefur samþykkt beiðni þína fyrir {dates}. Dagarnir eru þínir. Eigandinn segir þér hvernig þú greiðir; þú getur skrifað honum hér:\n{link}\n\nRantio"),
+    "et": ("Kinnitatud: {cottage}, {dates}", "Tere {name},\n\nhead uudised: {cottage} omanik kinnitas sinu soovi ({dates}). Kuupäevad on sinu omad. Omanik ütleb, kuidas maksta; talle saad kirjutada siin:\n{link}\n\nRantio"),
+    "lv": ("Apstiprināts: {cottage}, {dates}", "Sveiki, {name}!\n\nLabas ziņas: {cottage} īpašnieks apstiprināja jūsu pieprasījumu par {dates}. Datumi ir jūsu. Īpašnieks pateiks, kā maksāt; viņam varat rakstīt šeit:\n{link}\n\nRantio"),
+    "lt": ("Patvirtinta: {cottage}, {dates}", "Sveiki, {name},\n\ngeros žinios: {cottage} savininkas patvirtino Jūsų užklausą {dates}. Datos Jūsų. Savininkas praneš, kaip sumokėti; jam galite parašyti čia:\n{link}\n\nRantio"),
 }
 GUEST_DECLINED = {
-    "en": ("{cottage}: dates not available", "Hi {name},\n\nunfortunately the owner of {cottage} can't take your request for {dates}. You can write to them here to ask about other dates:\n{link}\n\nStugora"),
-    "fi": ("{cottage}: päivät eivät käy", "Hei {name},\n\nvalitettavasti kohteen {cottage} omistaja ei voi ottaa vastaan pyyntöäsi ajalle {dates}. Voit kysyä muita päiviä täällä:\n{link}\n\nStugora"),
-    "sv": ("{cottage}: datumen är inte lediga", "Hej {name},\n\ntyvärr kan ägaren till {cottage} inte ta emot din förfrågan för {dates}. Du kan fråga om andra datum här:\n{link}\n\nStugora"),
-    "nb": ("{cottage}: datoene er ikke ledige", "Hei {name},\n\ndessverre kan ikke eieren av {cottage} ta imot forespørselen din for {dates}. Du kan spørre om andre datoer her:\n{link}\n\nStugora"),
-    "nn": ("{cottage}: datoane er ikkje ledige", "Hei {name},\n\ndessverre kan ikkje eigaren av {cottage} ta imot førespurnaden din for {dates}. Du kan spørje om andre datoar her:\n{link}\n\nStugora"),
-    "da": ("{cottage}: datoerne er ikke ledige", "Hej {name},\n\ndesværre kan ejeren af {cottage} ikke tage imod din forespørgsel for {dates}. Du kan spørge om andre datoer her:\n{link}\n\nStugora"),
-    "is": ("{cottage}: dagarnir eru ekki lausir", "Hæ {name},\n\nþví miður getur eigandi {cottage} ekki tekið við beiðni þinni fyrir {dates}. Þú getur spurt um aðra daga hér:\n{link}\n\nStugora"),
-    "et": ("{cottage}: kuupäevad pole vabad", "Tere {name},\n\nkahjuks ei saa {cottage} omanik sinu soovi ({dates}) vastu võtta. Teiste kuupäevade kohta saad küsida siin:\n{link}\n\nStugora"),
-    "lv": ("{cottage}: datumi nav pieejami", "Sveiki, {name}!\n\nDiemžēl {cottage} īpašnieks nevar pieņemt jūsu pieprasījumu par {dates}. Par citiem datumiem varat jautāt šeit:\n{link}\n\nStugora"),
-    "lt": ("{cottage}: datos neprieinamos", "Sveiki, {name},\n\ndeja, {cottage} savininkas negali priimti Jūsų užklausos {dates}. Apie kitas datas galite paklausti čia:\n{link}\n\nStugora"),
+    "en": ("{cottage}: dates not available", "Hi {name},\n\nunfortunately the owner of {cottage} can't take your request for {dates}. You can write to them here to ask about other dates:\n{link}\n\nRantio"),
+    "fi": ("{cottage}: päivät eivät käy", "Hei {name},\n\nvalitettavasti kohteen {cottage} omistaja ei voi ottaa vastaan pyyntöäsi ajalle {dates}. Voit kysyä muita päiviä täällä:\n{link}\n\nRantio"),
+    "sv": ("{cottage}: datumen är inte lediga", "Hej {name},\n\ntyvärr kan ägaren till {cottage} inte ta emot din förfrågan för {dates}. Du kan fråga om andra datum här:\n{link}\n\nRantio"),
+    "nb": ("{cottage}: datoene er ikke ledige", "Hei {name},\n\ndessverre kan ikke eieren av {cottage} ta imot forespørselen din for {dates}. Du kan spørre om andre datoer her:\n{link}\n\nRantio"),
+    "nn": ("{cottage}: datoane er ikkje ledige", "Hei {name},\n\ndessverre kan ikkje eigaren av {cottage} ta imot førespurnaden din for {dates}. Du kan spørje om andre datoar her:\n{link}\n\nRantio"),
+    "da": ("{cottage}: datoerne er ikke ledige", "Hej {name},\n\ndesværre kan ejeren af {cottage} ikke tage imod din forespørgsel for {dates}. Du kan spørge om andre datoer her:\n{link}\n\nRantio"),
+    "is": ("{cottage}: dagarnir eru ekki lausir", "Hæ {name},\n\nþví miður getur eigandi {cottage} ekki tekið við beiðni þinni fyrir {dates}. Þú getur spurt um aðra daga hér:\n{link}\n\nRantio"),
+    "et": ("{cottage}: kuupäevad pole vabad", "Tere {name},\n\nkahjuks ei saa {cottage} omanik sinu soovi ({dates}) vastu võtta. Teiste kuupäevade kohta saad küsida siin:\n{link}\n\nRantio"),
+    "lv": ("{cottage}: datumi nav pieejami", "Sveiki, {name}!\n\nDiemžēl {cottage} īpašnieks nevar pieņemt jūsu pieprasījumu par {dates}. Par citiem datumiem varat jautāt šeit:\n{link}\n\nRantio"),
+    "lt": ("{cottage}: datos neprieinamos", "Sveiki, {name},\n\ndeja, {cottage} savininkas negali priimti Jūsų užklausos {dates}. Apie kitas datas galite paklausti čia:\n{link}\n\nRantio"),
 }
 
 

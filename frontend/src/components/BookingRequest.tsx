@@ -10,7 +10,7 @@ import { paths } from "@/i18n/paths";
 import { formatPrice, isCurrency } from "@/lib/currency";
 import { type BookingLinkInfo, guestApi } from "@/lib/ownerApi";
 import { CALENDAR_LOCALES } from "./guest/Pickers";
-import { Logo } from "./guest/icons";
+import { Wordmark } from "./guest/icons";
 import chat from "./chat.module.css";
 import styles from "./book.module.css";
 
@@ -111,8 +111,7 @@ export default function BookingRequest({
   const header = (
     <header className={chat.guestTop}>
       <a className={chat.brand} href={paths.home(lang)}>
-        <Logo className={chat.logo} />
-        Stugora
+        <Wordmark />
       </a>
       {languageButton}
     </header>
@@ -234,7 +233,7 @@ export default function BookingRequest({
         {sentToken ? (
           <section className={styles.done} role="status">
             <h2>{t.sent.title}</h2>
-            <p>{fill(lang, t.sent.body, { host: info.host || "Stugora" })}</p>
+            <p>{fill(lang, t.sent.body, { host: info.host || "Rantio" })}</p>
             <a className={styles.sendBtn} href={paths.guestChat(lang, sentToken)}>
               {t.sent.open}
             </a>
@@ -242,7 +241,7 @@ export default function BookingRequest({
         ) : !info.open ? (
           <section className={styles.done}>
             <h2>{t.closed.title}</h2>
-            <p>{fill(lang, t.closed.body, { host: info.host || "Stugora" })}</p>
+            <p>{fill(lang, t.closed.body, { host: info.host || "Rantio" })}</p>
           </section>
         ) : (
           <form className={styles.layout} onSubmit={send} noValidate>

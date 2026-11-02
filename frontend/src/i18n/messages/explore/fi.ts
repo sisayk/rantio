@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Tekemistä mökillä Pohjolassa | Stugora",
+      title: "Tekemistä mökillä Pohjolassa | Rantio",
       description: "Saunaa, uintia, melontaa, kalastusta, retkeilyä, laskettelua ja revontulia: löydä mökki sen mukaan, mitä haluat tehdä.",
     },
     title: "Tekemistä mökillä",
     lead: "Saunaa järven rannalla, melontaa pitkässä illan valossa, hiihtoa ja revontulia. Valitse, mitä haluat tehdä, niin näet siihen sopivat mökit.",
-    note: "Stugora ei myy elämyksiä. Omistaja kertoo, mitä lähellä on, ja paikalliset oppaat ottavat varauksia esimerkiksi huskyajeluille ja revontuliretkille.",
+    note: "Rantio ei myy elämyksiä. Omistaja kertoo, mitä lähellä on, ja paikalliset oppaat ottavat varauksia esimerkiksi huskyajeluille ja revontuliretkille.",
     items: {
       sauna: {
         title: "Sauna ja vilvoittava pulahdus",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Mökkikohteet Pohjoismaissa ja Baltiassa | Stugora",
+      title: "Mökkikohteet Pohjoismaissa ja Baltiassa | Rantio",
       description: "Suomi, Ruotsi, Norja, Tanska, Islanti, Viro, Latvia ja Liettua: järviä, vuonoja, dyynejä ja metsiä sekä niiden mökit.",
     },
     title: "Kohteet",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Inspiraatiota mökkilomaan | Stugora",
+      title: "Inspiraatiota mökkilomaan | Rantio",
       description: "Lyhyitä oppaita saunaan, revontuliin, jokamiehenoikeuksiin, juhannukseen ja talvimökkeilyyn Pohjolassa.",
     },
     title: "Inspiraatio",

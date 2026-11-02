@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Mida teha Põhjamaade puhkemajas | Stugora",
+      title: "Mida teha Põhjamaade puhkemajas | Rantio",
       description: "Saun, ujumine, aerutamine, kalapüük, matkamine, suusatamine ja virmalised: leia puhkemaja selle järgi, mida tahad teha.",
     },
     title: "Mida puhkemajas teha",
     lead: "Saun järve ääres, aerutamine pikas õhtuvalguses, suusatamine ja virmalised. Vali, mida tahad teha, ja vaata sinna sobivaid puhkemaju.",
-    note: "Stugora ei müü elamusi. Omanik oskab öelda, mis on lähedal, ja kohalikud giidid võtavad vastu broneeringuid näiteks koerarakendisõitudele ja virmaliste retkedele.",
+    note: "Rantio ei müü elamusi. Omanik oskab öelda, mis on lähedal, ja kohalikud giidid võtavad vastu broneeringuid näiteks koerarakendisõitudele ja virmaliste retkedele.",
     items: {
       sauna: {
         title: "Saun ja jahutav suplus",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Puhkemajade sihtkohad Põhjamaades ja Baltikumis | Stugora",
+      title: "Puhkemajade sihtkohad Põhjamaades ja Baltikumis | Rantio",
       description: "Soome, Rootsi, Norra, Taani, Island, Eesti, Läti ja Leedu: järved, fjordid, luited ja metsad ning sealsed puhkemajad.",
     },
     title: "Sihtkohad",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Inspiratsiooni puhkemaja reisiks | Stugora",
+      title: "Inspiratsiooni puhkemaja reisiks | Rantio",
       description: "Lühikesed juhendid sauna, virmaliste, igaüheõiguse, jaanipäeva ja talvise puhkemaja kohta Põhjamaades.",
     },
     title: "Inspiratsioon",

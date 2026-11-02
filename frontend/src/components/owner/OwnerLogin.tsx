@@ -7,7 +7,7 @@ import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import { ownerApi } from "@/lib/ownerApi";
-import { Logo } from "../guest/icons";
+import { Wordmark } from "../guest/icons";
 import styles from "./owner.module.css";
 
 type Step = { name: "email" } | { name: "code"; devCode?: string };
@@ -63,8 +63,7 @@ export default function OwnerLogin({
     <div className={styles.loginPage}>
       <header className={styles.loginTop}>
         <a className={styles.brand} href={paths.hosts(lang)}>
-          <Logo className={styles.logo} />
-          Stugora
+          <Wordmark />
         </a>
         {languageButton}
       </header>

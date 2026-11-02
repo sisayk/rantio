@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Mani sludinājumi", editTitle: "Rediģēt sludinājumu", previewTitle: "Priekšskatījums" },
   title: "Mani sludinājumi",
-  lead: "Jūsu brīvdienu mājas tā, kā tās redz viesi Stugora. Šeit varat mainīt aprakstu, fotoattēlus, cenas un noteikumus.",
+  lead: "Jūsu brīvdienu mājas tā, kā tās redz viesi Rantio. Šeit varat mainīt aprakstu, fotoattēlus, cenas un noteikumus.",
   add: "Pievienot īpašumu",
   addTitle: "Pievienot īpašumu",
   addName: "Kā sauc jūsu īpašumu?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Nesaglabātas izmaiņas",
   allSaved: "Visas izmaiņas saglabātas",
   saveError: "Izmaiņas netika saglabātas. Pārbaudiet sarkani iezīmētos laukus un mēģiniet vēlreiz.",
-  networkError: "Neizdevās sazināties ar Stugora. Jūsu izmaiņas joprojām ir šeit; mēģiniet saglabāt vēlreiz.",
+  networkError: "Neizdevās sazināties ar Rantio. Jūsu izmaiņas joprojām ir šeit; mēģiniet saglabāt vēlreiz.",
   invalid: "Pārbaudiet šo lauku",
   leave: "Jums ir nesaglabātas izmaiņas. Vai iziet bez saglabāšanas?",
   restore: "Šajā ierīcē ir jūsu nesaglabātās izmaiņas no {date}.",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Atmest",
   sections: "Sludinājuma sadaļas",
   stugoraOnly:
-    "Izmaiņas šeit atjaunina jūsu Stugora sludinājumu. Airbnb, Booking.com, Vrbo un Nettimökki ir savi sludinājumi: mūsu komanda tur pārnes izmaiņas jūsu vietā, līdz tiks pievienots kanālu pārvaldnieks.",
+    "Izmaiņas šeit atjaunina jūsu Rantio sludinājumu. Airbnb, Booking.com, Vrbo un Nettimökki ir savi sludinājumi: mūsu komanda tur pārnes izmaiņas jūsu vietā, līdz tiks pievienots kanālu pārvaldnieks.",
   nav: {
     overview: "Pārskats",
     basics: "Pamatinformācija",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Aizstāt",
     remove: "Dzēst",
     removeTitle: "Dzēst šo fotoattēlu?",
-    removeBody: "Tas tiks noņemts no jūsu Stugora sludinājuma. To nevar atsaukt; fotoattēli rezervēšanas vietnēs paliek, līdz mūsu komanda tos atjaunina.",
+    removeBody: "Tas tiks noņemts no jūsu Rantio sludinājuma. To nevar atsaukt; fotoattēli rezervēšanas vietnēs paliek, līdz mūsu komanda tos atjaunina.",
     empty: "Fotoattēlu vēl nav. Sāciet ar mājas ārpusi; tas kļūs par titulfoto.",
     previewGallery: "Priekšskatīt galeriju",
     count: "{n} no {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Cenas un maksas",
-    lead: "Šīs ir cenas jūsu Stugora lapā un rezervācijas saitē. Airbnb, Booking.com un Vrbo ir savas cenas; kalendāra saite pārnes tikai datumus, tāpēc cenas uz turieni netiek sinhronizētas.",
+    lead: "Šīs ir cenas jūsu Rantio lapā un rezervācijas saitē. Airbnb, Booking.com un Vrbo ir savas cenas; kalendāra saite pārnes tikai datumus, tāpēc cenas uz turieni netiek sinhronizētas.",
     base: "Cena par nakti",
     weekend: "Piektdienas un sestdienas naktis",
     weekendHint: "Atstājiet tukšu, lai izmantotu parasto nakts cenu.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Īsākā uzturēšanās: {n} naktis. To var mainīt sadaļā “Cenas un maksas”.",
     sites: "Rezervēšanas vietnes",
     sitesLead:
-      "Tā ir tikai kalendāru sinhronizācija. Katra vietne nolasa jūsu Stugora kalendāra saiti, un Stugora nolasa vietņu saites ik pēc 15 minūtēm, tāpēc pirms dažām minūtēm veikta rezervācija var vēl nebūt redzama. Fotoattēli, teksti un cenas netiek sinhronizēti.",
+      "Tā ir tikai kalendāru sinhronizācija. Katra vietne nolasa jūsu Rantio kalendāra saiti, un Rantio nolasa vietņu saites ik pēc 15 minūtēm, tāpēc pirms dažām minūtēm veikta rezervācija var vēl nebūt redzama. Fotoattēli, teksti un cenas netiek sinhronizēti.",
     manage: "Pievienot vai mainīt kalendāra saites",
     lastSync: "Pēdējo reizi nolasīts {time}",
     never: "Vēl nav nolasīts",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Statuss",
-    current: "Jūsu Stugora sludinājuma statuss: {status}.",
+    current: "Jūsu Rantio sludinājuma statuss: {status}.",
     explain: {
       intake: "Melnraksts: to redzat tikai jūs. Publicējiet, kad vajadzīgie punkti ir izpildīti.",
       listing: "Mūsu komanda veido sludinājumus rezervēšanas vietnēs.",
-      live: "Publicēts Stugora. Viesi to var atrast un sūtīt rezervācijas pieprasījumus.",
-      paused: "Apturēts: jauniem viesiem Stugora tas nav redzams. Esošās uzturēšanās, ziņas un ienākumi paliek nemainīgi.",
+      live: "Publicēts Rantio. Viesi to var atrast un sūtīt rezervācijas pieprasījumus.",
+      paused: "Apturēts: jauniem viesiem Rantio tas nav redzams. Esošās uzturēšanās, ziņas un ienākumi paliek nemainīgi.",
       archived: "Arhivēts: izņemts no aktīvajiem sludinājumiem. Tā uzturēšanās, ienākumi un ziņas paliek jūsu datos.",
     },
     external:
-      "Tas maina tikai jūsu Stugora sludinājumu. Lai apturētu māju Airbnb, Booking.com, Vrbo vai Nettimökki, mainiet to katrā vietnē vai palūdziet mums.",
+      "Tas maina tikai jūsu Rantio sludinājumu. Lai apturētu māju Airbnb, Booking.com, Vrbo vai Nettimökki, mainiet to katrā vietnē vai palūdziet mums.",
     publish: "Publicēt",
     pause: "Apturēt sludinājumu",
     relist: "Publicēt atkārtoti",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Atjaunots kā melnraksts",
     pauseTitle: "Apturēt šo sludinājumu?",
     pauseBody:
-      "Jauni viesi to neatradīs Stugora, un jūsu rezervācijas saite pārstās pieņemt pieprasījumus. Jau rezervētās uzturēšanās netiek atceltas, un jūsu ienākumi un ziņas paliek nemainīgi. Airbnb, Booking.com, Vrbo un Nettimökki nekas netiek mainīts.",
+      "Jauni viesi to neatradīs Rantio, un jūsu rezervācijas saite pārstās pieņemt pieprasījumus. Jau rezervētās uzturēšanās netiek atceltas, un jūsu ienākumi un ziņas paliek nemainīgi. Airbnb, Booking.com, Vrbo un Nettimökki nekas netiek mainīts.",
     archiveTitle: "Arhivēt šo īpašumu?",
     archiveBody: "Tas tiks izņemts no aktīvajiem sludinājumiem. Iepriekšējās uzturēšanās, ienākumi un ziņas paliek jūsu datos, un vēlāk to varat atjaunot.",
     futureBookings: {
@@ -385,7 +385,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Lai apstiprinātu, ierakstiet īpašuma nosaukumu",
     deleteButton: "Dzēst neatgriezeniski",
     deleted: "Īpašums dzēsts",
-    deleteHasBookings: "Šim īpašumam ir reģistrētas uzturēšanās, tāpēc to nevar dzēst: tās ir daļa no jūsu ienākumiem un Stugora rēķiniem. Tā vietā arhivējiet to.",
+    deleteHasBookings: "Šim īpašumam ir reģistrētas uzturēšanās, tāpēc to nevar dzēst: tās ir daļa no jūsu ienākumiem un Rantio rēķiniem. Tā vietā arhivējiet to.",
     deleteHasMessages: "Viesi ir rakstījuši par šo īpašumu, tāpēc to nevar dzēst. Tā vietā arhivējiet to, lai saglabātu ziņas.",
     deleteName: "Nosaukums nesakrīt.",
     history: "Izmaiņu vēsture",

@@ -14,7 +14,7 @@ import LanguageButton from "../LanguagePicker";
 import DetailGallery from "./DetailGallery";
 import HostSwitchLink from "./HostSwitchLink";
 import ListingPrice from "./ListingPrice";
-import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Logo, People, Star } from "./icons";
+import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Wordmark, People, Star } from "./icons";
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
@@ -41,8 +41,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
     <div className={`${styles.page} ${styles.detailPage}`}>
       <header className={styles.detailTop}>
         <a className={styles.brand} href={home}>
-          <Logo className={styles.logo} />
-          Stugora
+          <Wordmark />
         </a>
         <div className={styles.detailTopLinks}>
           <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langButton} />

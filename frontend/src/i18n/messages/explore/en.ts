@@ -15,12 +15,12 @@ export const explore = {
 
   experiences: {
     meta: {
-      title: "Things to do at a Nordic cottage | Stugora",
+      title: "Things to do at a Nordic cottage | Rantio",
       description: "Sauna, swimming, paddling, fishing, hiking, skiing and the northern lights: find a cottage for what you'd like to do.",
     },
     title: "Things to do at a Nordic cottage",
     lead: "Sauna by the lake, paddling in the long evening light, skiing and the northern lights. Pick what you'd like to do and see the cottages that suit it.",
-    note: "Stugora doesn't sell activities. The owner can tell you what's close by, and local guides take bookings for things like husky rides and aurora tours.",
+    note: "Rantio doesn't sell activities. The owner can tell you what's close by, and local guides take bookings for things like husky rides and aurora tours.",
     items: {
       sauna: {
         title: "Sauna and a cool dip",
@@ -59,7 +59,7 @@ export const explore = {
 
   destinations: {
     meta: {
-      title: "Cottage destinations in the Nordics and the Baltics | Stugora",
+      title: "Cottage destinations in the Nordics and the Baltics | Rantio",
       description: "Finland, Sweden, Norway, Denmark, Iceland, Estonia, Latvia and Lithuania: lakes, fjords, dunes and forests, and the cottages there.",
     },
     title: "Destinations",
@@ -80,7 +80,7 @@ export const explore = {
 
   inspiration: {
     meta: {
-      title: "Inspiration for your cottage stay | Stugora",
+      title: "Inspiration for your cottage stay | Rantio",
       description: "Short guides to the sauna, the northern lights, everyman's right, Midsummer and winter at a Nordic cottage.",
     },
     title: "Inspiration",

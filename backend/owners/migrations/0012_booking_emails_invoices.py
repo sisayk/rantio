@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='owner',
             name='airbnb_cohost_payout',
-            field=models.BooleanField(default=True, help_text="Stugora is co-host on the owner's Airbnb listings and Airbnb pays the commission to Stugora directly, so Airbnb stays are left off the monthly invoice."),
+            field=models.BooleanField(default=True, help_text="Rantio is co-host on the owner's Airbnb listings and Airbnb pays the commission to Rantio directly, so Airbnb stays are left off the monthly invoice."),
         ),
         migrations.AddField(
             model_name='owner',

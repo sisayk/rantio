@@ -1,7 +1,7 @@
 # Reads the booking sites' calendar links (iCal) that owners added in Hosting › Calendar,
 # so a stay booked on Airbnb, Booking.com or Vrbo closes the dates everywhere.
 [Unit]
-Description=Stugora: read the booking sites' calendars
+Description=Rantio: read the booking sites' calendars
 After=network-online.target postgresql.service
 Wants=network-online.target
 

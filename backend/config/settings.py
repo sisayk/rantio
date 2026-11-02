@@ -1,4 +1,4 @@
-"""Stugora backend settings.
+"""Rantio backend settings.
 
 Everything environment-specific comes from environment variables, so the same
 file runs locally (SQLite by default) and on the Hetzner server (PostgreSQL).
@@ -171,7 +171,7 @@ ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Stugora <hello@stugora.fi>")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <hello@rantio.fi>")
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
@@ -185,7 +185,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
     # ...except the health check, so `curl http://127.0.0.1:8000/api/health/` works on the server.
     SECURE_REDIRECT_EXEMPT = [r"^api/health/$"]
-    # Only turn these on once every *.stugora.fi subdomain serves HTTPS.
+    # Only turn these on once every *.rantio.fi subdomain serves HTTPS.
     SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_HSTS_INCLUDE_SUBDOMAINS", False)
     SECURE_HSTS_PRELOAD = env_bool("DJANGO_HSTS_PRELOAD", False)
     # Behind nginx every request comes from 127.0.0.1; take the visitor's address from
@@ -251,7 +251,7 @@ if SENTRY_DSN:
     )
 
 
-# Admin look: django-unfold, set up like Bona's operations admin, in Stugora's green.
+# Admin look: django-unfold, set up like Bona's operations admin, in Rantio's green.
 # The sidebar (config/admin_nav.py) and the dashboard (config/admin_dashboard.py) are
 # built per request; the stylesheet is served from config/admin_assets/ by Django
 # itself, so it needs no collectstatic.
@@ -262,9 +262,9 @@ def _admin_css(request):
 
 
 UNFOLD = {
-    "SITE_TITLE": "Stugora admin",
-    "SITE_HEADER": "Stugora",
-    "SITE_SUBHEADER": "Internal admin · stugora.fi",
+    "SITE_TITLE": "Rantio admin",
+    "SITE_HEADER": "Rantio",
+    "SITE_SUBHEADER": "Internal admin · rantio.fi",
     "SITE_URL": SITE_URL + "/",
     "SITE_SYMBOL": "cottage",
     "DASHBOARD_CALLBACK": "config.admin_dashboard.dashboard_callback",
@@ -273,7 +273,7 @@ UNFOLD = {
     "SHOW_VIEW_ON_SITE": True,
     "THEME": None,  # follows the system; switch in the user menu
     "COLORS": {
-        # Stugora forest green (#1d4c3c at 600), the colour of the site and the owner dashboard.
+        # Rantio forest green (#1d4c3c at 600), the colour of the site and the owner dashboard.
         "primary": {
             "50": "241 244 243",
             "100": "223 230 228",
@@ -297,10 +297,10 @@ UNFOLD = {
 
 
 # ---------- booking emails and invoices ----------
-# Owners forward Nettimökki booking emails to bookings+<cottage code>@stugora.fi.
+# Owners forward Nettimökki booking emails to bookings+<cottage code>@rantio.fi.
 # They are read from that mailbox over IMAP (manage.py read_booking_emails) or posted
 # by an inbound-email service to /api/inbound/booking-email/ with INBOUND_EMAIL_SECRET.
-BOOKING_FORWARD_ADDRESS = os.environ.get("BOOKING_FORWARD_ADDRESS", "bookings@stugora.fi")
+BOOKING_FORWARD_ADDRESS = os.environ.get("BOOKING_FORWARD_ADDRESS", "bookings@rantio.fi")
 BOOKING_EMAIL_IMAP_HOST = os.environ.get("BOOKING_EMAIL_IMAP_HOST", "")
 BOOKING_EMAIL_IMAP_USER = os.environ.get("BOOKING_EMAIL_IMAP_USER", "")
 BOOKING_EMAIL_IMAP_PASSWORD = os.environ.get("BOOKING_EMAIL_IMAP_PASSWORD", "")

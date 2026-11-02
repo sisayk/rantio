@@ -4,7 +4,7 @@ export type { Lang } from "@/i18n/locales";
 export const REGIONS = ["saimaa", "lakeland", "lapland", "helsinki", "coast", "other"] as const;
 export type Region = (typeof REGIONS)[number];
 
-export const CONTACT_EMAIL = "hello@stugora.fi";
+export const CONTACT_EMAIL = "hello@rantio.fi";
 
 // Same assumptions as the business plan (28 Oct 2026).
 export const PLATFORM_FEE = 0.15;

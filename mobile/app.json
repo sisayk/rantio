@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Stugora",
-    "slug": "stugora",
+    "name": "Rantio",
+    "slug": "rantio",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "stugora",
+    "scheme": "rantio",
     "userInterfaceStyle": "light",
     "backgroundColor": "#ffffff",
     "primaryColor": "#1d4c3c",
     "description": "Cottages across the Nordics and the Baltics, and the owner's one calendar for every booking site.",
     "ios": {
-      "bundleIdentifier": "fi.stugora.app",
+      "bundleIdentifier": "fi.rantio.app",
       "buildNumber": "1",
       "supportsTablet": true,
       "config": { "usesNonExemptEncryption": false },
@@ -21,10 +21,10 @@
       }
     },
     "android": {
-      "package": "fi.stugora.app",
+      "package": "fi.rantio.app",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#1d4c3c",
+        "backgroundColor": "#02503d",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"

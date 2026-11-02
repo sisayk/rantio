@@ -158,7 +158,7 @@ def export_ics(cottage: Cottage, for_channel: str = "") -> str:
     today = timezone.localdate()
     stamp = timezone.now().astimezone(dt_timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     lines = [
-        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Stugora//Calendar//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Rantio//Calendar//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
         f"X-WR-CALNAME:{_ics_text(cottage.name)}",
     ]
     for e in entries([cottage], today - timedelta(days=1), today + timedelta(days=HORIZON_DAYS), requests=False):
@@ -166,7 +166,7 @@ def export_ics(cottage: Cottage, for_channel: str = "") -> str:
             continue  # the site already has its own bookings
         lines += [
             "BEGIN:VEVENT",
-            f"UID:stugora-{e.kind}-{e.id}@stugora.fi",
+            f"UID:stugora-{e.kind}-{e.id}@rantio.fi",
             f"DTSTAMP:{stamp}",
             f"DTSTART;VALUE=DATE:{e.start:%Y%m%d}",
             f"DTEND;VALUE=DATE:{e.end:%Y%m%d}",
@@ -236,7 +236,7 @@ class FeedError(Exception):
 def fetch(url: str) -> str:
     if not url.lower().startswith("https://"):
         raise FeedError("The link must start with https://")
-    req = urllib.request.Request(url, headers={"User-Agent": "Stugora calendar sync (+https://stugora.fi)"})
+    req = urllib.request.Request(url, headers={"User-Agent": "Rantio calendar sync (+https://rantio.fi)"})
     try:
         with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT) as res:  # noqa: S310 (https checked above)
             body = res.read(MAX_FEED_BYTES + 1)

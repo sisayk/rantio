@@ -1,9 +1,9 @@
 """Monthly commission invoices.
 
 Each month, one invoice per owner, in euros with Finnish VAT:
-- commission on stays from the channels Stugora added, by check-in day (as on the
+- commission on stays from the channels Rantio added, by check-in day (as on the
   owner's dashboard). Nettimökki and the owner's own bookings are never charged.
-  Airbnb stays are left off when Airbnb pays Stugora directly as co-host.
+  Airbnb stays are left off when Airbnb pays Rantio directly as co-host.
 - yearly fees whose listing year starts that month (pilot owners' first year is free).
 
 Stays in other currencies (Swedish kronor…) are converted at the ECB rate of the day

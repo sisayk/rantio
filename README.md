@@ -1,16 +1,16 @@
-# Stugora
+# Rantio
 
 Lists cottages across the Nordics and the Baltics (Finland, Sweden, Norway,
 Denmark, Iceland, Estonia, Latvia, Lithuania) on Airbnb, Booking.com and Vrbo
 for their owners.
 Pricing (plan of 28 Oct 2026): €99 a year per cottage plus 12% of the owner's
-payout on bookings from Stugora's channels, both plus 25.5% VAT. Nettimökki
+payout on bookings from Rantio's channels, both plus 25.5% VAT. Nettimökki
 bookings are never charged. Pilot owners pay 10% and their first year is free.
 
 ## What is here
 
 - `backend/` — Django 5.2 + Django REST Framework
-  - `owners` app: `OwnerSignup` (the stugora.fi form), `Owner`, `Cottage` (intake),
+  - `owners` app: `OwnerSignup` (the rantio.fi form), `Owner`, `Cottage` (intake),
     `Booking` (commission and VAT per stay, yearly fee per listing year)
   - `POST /api/signups/` — public, throttled (10/hour per IP), honeypot field, emails the team
   - owner dashboard API, signed in with a six-digit code emailed to the owner
@@ -24,7 +24,7 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     `/api/owner/conversations/<id>/` (read, reply, archive). Owner and guest are emailed in
     their own language when a message arrives. Threads from Airbnb, Booking.com and the
     other sites will come in through the channel manager; until then they are demo data and
-    replies to them stay in Stugora. Enquiries about example cottages with no owner go to
+    replies to them stay in Rantio. Enquiries about example cottages with no owner go to
     `SIGNUP_NOTIFY_EMAILS` and are answered in the admin
   - AI reply suggestions: `POST /api/owner/conversations/<id>/draft/` sends the conversation, the
     cottage's facts (amenities, house rules, booked dates) and the owner's optional notes or own
@@ -38,13 +38,13 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     1 km unless the owner shows it exactly), photos `…/photos/`, `…/photos/<pid>/`, `…/photos/<pid>/replace/`,
     `…/photos/order/`. Every view looks the cottage up among the signed-in owner's own (404 otherwise).
     Delete only works for a cottage with no stays and no guest messages; archive waits until no stays are
-    coming. Each change is logged in `CottageChange` (shown in the admin). These change Stugora's own
+    coming. Each change is logged in `CottageChange` (shown in the admin). These change Rantio's own
     listing only: Airbnb, Booking.com, Vrbo and Nettimökki keep theirs, and a calendar link (iCal)
     carries dates, never texts, photos or prices
-  - `python manage.py seed_demo` — a demo owner (demo@stugora.fi) with three cottages and a
+  - `python manage.py seed_demo` — a demo owner (demo@rantio.fi) with three cottages and a
     year of bookings; `./dev.sh` creates it on a fresh database
   - `/admin/` — work the sign-ups, owners, cottages and bookings
-- `frontend/` — Next.js 16 site for stugora.fi, in ten languages
+- `frontend/` — Next.js 16 site for rantio.fi, in ten languages
   - every page lives under its language: `/en`, `/fi`, `/sv`, `/nb`, `/nn`, `/da`, `/is`,
     `/et`, `/lv`, `/lt`, e.g. `/sv/hosts` and `/et/cottages/lakeside-villa`; `/` and any
     address without a language redirect to the visitor's saved or browser language
@@ -63,7 +63,7 @@ bookings are never charged. Pilot owners pay 10% and their first year is free.
     resized in the browser to at most 2560 px before upload (`src/lib/imagePrep.ts`); unsaved edits are
     kept in the browser until saved. Amenity keys: `src/lib/amenities.ts` (keep in step with the backend)
   - owner dashboard `/<lang>/hosting` (sign in at `/<lang>/hosting/login`; `/hallinta`
-    redirects to `/fi/hosting`): stays now and coming up, earnings, Stugora's share, earnings
+    redirects to `/fi/hosting`): stays now and coming up, earnings, Rantio's share, earnings
     by month, sites, cottages, the year's bookings with CSV download, yearly fees; words in
     the `dashboard` part of the messages files. Messages at `/<lang>/hosting/messages`;
     guests write from the cottage page ("Message the owner") and continue at
@@ -90,7 +90,7 @@ Each cottage has one calendar, the master (Hosting › Calendar, `/<lang>/hostin
 - **Booking link:** `/book/<token>`, for the owner's own guests. A guest picks free dates and
   sends a request; it lands in the owner's calendar and inbox. Accepting it books the stay as
   the owner's own booking (never charged) and closes the dates everywhere. The owner takes
-  the payment as before; Stugora handles no money. The owner can stop requests or make a new
+  the payment as before; Rantio handles no money. The owner can stop requests or make a new
   link if the old one spread too far.
 
 Code: `backend/owners/calendar.py`, `booking_requests.py`, `calendar_views.py`;
@@ -134,7 +134,7 @@ packages, which takes a few minutes. It then opens http://localhost:3100.
 | --- | --- |
 | Guest site | http://localhost:3100 (redirects to /en, /fi, /sv …) |
 | Owner sign-up page | http://localhost:3100/en/hosts, /fi/hosts … |
-| Owner dashboard (sign in as demo@stugora.fi; the code shows on the page) | http://localhost:3100/fi/hosting, /en/hosting … |
+| Owner dashboard (sign in as demo@rantio.fi; the code shows on the page) | http://localhost:3100/fi/hosting, /en/hosting … |
 | Admin (sign-ups, owners, bookings) | http://localhost:8100/admin |
 
 Ports 3100 and 8100 leave 3000 and 8000 free for Bona. Press Ctrl+C to stop.
@@ -156,19 +156,19 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 | --- | --- |
 | `DJANGO_DEBUG` | `false` |
 | `DJANGO_SECRET_KEY` | a long random string |
-| `DJANGO_ALLOWED_HOSTS` | `stugora.fi,www.stugora.fi` |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` (the dashboard posts through the site) |
+| `DJANGO_ALLOWED_HOSTS` | `rantio.fi,www.rantio.fi` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://rantio.fi,https://www.rantio.fi` (the dashboard posts through the site) |
 | `DATABASE_URL` | `postgres://stugora:…@localhost:5432/stugora` (install `requirements-prod.txt`) |
 | `ANTHROPIC_API_KEY` | key for AI reply suggestions (optional; the button says it's off without it) |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` (default) |
-| `SITE_URL` | `https://stugora.fi` (links in emails) |
-| `ADMIN_URL` | `https://stugora.fi/admin` |
-| `CORS_ALLOWED_ORIGINS` | `https://stugora.fi,https://www.stugora.fi` |
+| `SITE_URL` | `https://rantio.fi` (links in emails) |
+| `ADMIN_URL` | `https://rantio.fi/admin` |
+| `CORS_ALLOWED_ORIGINS` | `https://rantio.fi,https://www.rantio.fi` |
 | `SIGNUP_NOTIFY_EMAILS` | `sisay@…,juha@…` |
 | `EMAIL_BACKEND` | your transactional email backend |
-| `NEXT_PUBLIC_API_URL` (frontend) | `https://stugora.fi` |
-| `NEXT_PUBLIC_SITE_URL` (frontend) | `https://stugora.fi` (canonical URLs, hreflang, sitemaps) |
-| Owner dashboard (sign in as demo@stugora.fi; the code shows on the page) | http://localhost:3100/fi/hosting, /en/hosting … |
+| `NEXT_PUBLIC_API_URL` (frontend) | `https://rantio.fi` |
+| `NEXT_PUBLIC_SITE_URL` (frontend) | `https://rantio.fi` (canonical URLs, hreflang, sitemaps) |
+| Owner dashboard (sign in as demo@rantio.fi; the code shows on the page) | http://localhost:3100/fi/hosting, /en/hosting … |
 
 ## Before the page goes public
 
@@ -177,7 +177,7 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 - Move the "Nearby" lookups (frontend/src/lib/nearby.ts) behind a small Django
   endpoint that caches Wikipedia's answer per cottage for a week, so each page
   view doesn't call Wikipedia from the guest's browser
-- Buy stugora.fi and set up hello@stugora.fi (used on the page)
+- Buy rantio.fi and set up hello@rantio.fi (used on the page)
 - Privacy policy page (GDPR), naming Anthropic as processor for AI reply suggestions, and a link to it next to the consent box
 - Finnish copy checked by a native speaker
-- Confirm with the accountant that Elda-Auto Tmi charges VAT on Stugora fees
+- Confirm with the accountant that Elda-Auto Tmi charges VAT on Rantio fees

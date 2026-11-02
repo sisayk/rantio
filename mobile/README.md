@@ -1,6 +1,6 @@
-# Stugora app (iPhone and Android)
+# Rantio app (iPhone and Android)
 
-One app for both sides of Stugora, switched the way Airbnb's app does it:
+One app for both sides of Rantio, switched the way Airbnb's app does it:
 
 - **Travelling** — Explore cottages (search, categories, filters), Saved, Messages with
   owners, Profile. A cottage page has photos, facts, things to do, amenities, places
@@ -38,9 +38,17 @@ Metro (`metro.config.js`) passes `/api/` and `/media/` on to Django on this Mac.
 that can load the app (simulator, emulator, a phone on the Wi-Fi, a tunnel) can then sign
 in, without opening Django's own port to the network. Start Django first with `./dev.sh` in
 `~/stugora`; after changing `metro.config.js`, restart Metro. Sign in as
-`demo@stugora.fi`; in development the code shows on the sign-in screen. Release builds
-talk to https://stugora.fi; `EXPO_PUBLIC_API_URL` in `mobile/.env` overrides both
+`demo@rantio.fi`; in development the code shows on the sign-in screen. Release builds
+talk to https://rantio.fi; `EXPO_PUBLIC_API_URL` in `mobile/.env` overrides both
 (see `.env.example`).
+
+After a change to the app's name, icon, bundle id or native packages (`app.json`,
+`package.json`), rebuild the native projects before running, in a normal terminal:
+
+```bash
+cd ~/stugora/mobile
+npx expo prebuild --clean
+```
 
 ### Android
 
@@ -82,8 +90,8 @@ npx eas-cli@latest submit --platform ios
 npx eas-cli@latest submit --platform android
 ```
 
-Bundle id / package: `fi.stugora.app`. Icons and splash come from
-`scripts/build-icons.py` (Stugora's mark from the website).
+Bundle id / package: `fi.rantio.app`. Icons and splash come from
+`scripts/build-icons.py` (Rantio's mark from the website).
 
 Push notifications need, once: `eas init` (project id), an Apple push key (EAS asks for it
 on the first iOS build) and, for Android, an FCM v1 key uploaded with

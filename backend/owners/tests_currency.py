@@ -68,7 +68,7 @@ class RatesTests(TestCase):
 
 
 class SwedishOwnerTests(TestCase):
-    """A Swedish owner sees kronor; Stugora's yearly fee stays in euros."""
+    """A Swedish owner sees kronor; Rantio's yearly fee stays in euros."""
 
     def setUp(self):
         cache.clear()

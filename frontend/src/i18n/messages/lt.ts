@@ -13,13 +13,13 @@ export const lt: Translation = {
       current: "Dabartinė kalba",
     },
     footer: {
-      note: "Stugora yra Elda-Auto Tmi prekinis pavadinimas.",
+      note: "Rantio yra Elda-Auto Tmi prekinis pavadinimas.",
       contact: "Kontaktai",
       privacy: "Privatumas",
       terms: "Sąlygos",
     },
     apps: {
-      title: "Atsisiųskite Stugora programėlę",
+      title: "Atsisiųskite Rantio programėlę",
       soon: "Jau netrukus",
       download: "Atsisiųsti iš",
     },
@@ -81,10 +81,10 @@ export const lt: Translation = {
       aiHint: "Parašykite kelis žodžius (datas, augintinius, vėlyvą atvykimą), o DI pavers juos žinute.",
     },
     chat: {
-      metaTitle: "Jūsų pokalbis – Stugora",
+      metaTitle: "Jūsų pokalbis – Rantio",
       title: "Jūsų pokalbis apie {cottage}",
       withHost: "Savininkas: {name}",
-      withStugora: "Stugora komanda",
+      withRantio: "Rantio komanda",
       keepLink: "Išsaugokite šio puslapio adresą: tai Jūsų privati nuoroda į pokalbį. Ją taip pat išsiuntėme Jums el. paštu.",
       host: "Savininkas",
       you: "Jūs",
@@ -98,7 +98,7 @@ export const lt: Translation = {
       waiting: "Savininkas paprastai atsako per parą. Pranešime el. paštu, kai gausite atsakymą.",
     },
     meta: {
-      title: "Stugora – poilsio nameliai Šiaurės ir Baltijos šalyse",
+      title: "Rantio – poilsio nameliai Šiaurės ir Baltijos šalyse",
       description:
         "Poilsio nameliai prie ežerų, fjordų, miškuose ir pajūryje – nuo Islandijos iki Lietuvos. Užsisakykite per Airbnb, Booking.com arba Vrbo.",
     },
@@ -382,9 +382,9 @@ export const lt: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – Jūsų namelis Airbnb, Booking.com ir Vrbo",
+      title: "Rantio – Jūsų namelis Airbnb, Booking.com ir Vrbo",
       description:
-        "Stugora atveda užsienio svečius į Jūsų poilsio namelį bet kurioje Šiaurės ar Baltijos šalyje ir suderina kalendorius su svetainėmis, kuriomis jau naudojatės. 99 € per metus ir 12 % nuo mūsų atvestų užsakymų.",
+        "Rantio atveda užsienio svečius į Jūsų poilsio namelį bet kurioje Šiaurės ar Baltijos šalyje ir suderina kalendorius su svetainėmis, kuriomis jau naudojatės. 99 € per metus ir 12 % nuo mūsų atvestų užsakymų.",
     },
     nav: { cta: "Paskelbkite namelį", login: "Prisijungti" },
     hero: {
@@ -399,8 +399,8 @@ export const lt: Translation = {
       priceLabel: "Nakvynės kaina",
       perNight: "€ / naktis",
       finePrint:
-        "Skaičiuojant atimami platformų mokesčiai (apie 15 %), Stugora metinis 99 € mokestis, 12 % komisinis mokestis ir PVM.",
-      lead: "Stugora paskelbia Jūsų namelį Airbnb, Booking.com ir Vrbo bei suderina visus kalendorius su vietinėmis svetainėmis, kuriomis jau naudojatės, pavyzdžiui, Nettimökki Suomijoje.",
+        "Skaičiuojant atimami platformų mokesčiai (apie 15 %), Rantio metinis 99 € mokestis, 12 % komisinis mokestis ir PVM.",
+      lead: "Rantio paskelbia Jūsų namelį Airbnb, Booking.com ir Vrbo bei suderina visus kalendorius su vietinėmis svetainėmis, kuriomis jau naudojatės, pavyzdžiui, Nettimökki Suomijoje.",
       cta: "Paskelbkite namelį",
       photoAlt: "Namelis ant ežero kranto debesuotą vasaros dieną",
       chipBookingTitle: "Naujas užsakymas per Airbnb",
@@ -445,12 +445,12 @@ export const lt: Translation = {
     },
     price: {
       title: "99 € per metus ir 12 % nuo mūsų atvestų užsakymų",
-      lead: "Jokio pradinio ar mėnesinio mokesčio. Metinis mokestis padengia skelbimų parengimą ir priežiūrą. Kai svečias užsisako per Stugora atvertą kanalą, mokate 12 % sumos, kurią Jums sumoka platforma. Prie abiejų pridedamas PVM. Niekada neimame mokesčio už užsakymus iš svetainių, kuriomis naudojotės ir anksčiau, pavyzdžiui, Nettimökki.",
+      lead: "Jokio pradinio ar mėnesinio mokesčio. Metinis mokestis padengia skelbimų parengimą ir priežiūrą. Kai svečias užsisako per Rantio atvertą kanalą, mokate 12 % sumos, kurią Jums sumoka platforma. Prie abiejų pridedamas PVM. Niekada neimame mokesčio už užsakymus iš svetainių, kuriomis naudojotės ir anksčiau, pavyzdžiui, Nettimökki.",
       exampleTitle: "Pavyzdys: 20 papildomų naktų po 150 € už naktį",
       rows: {
         guests: "Svečiai sumoka",
         platform: "Platformų mokesčiai, apie 15 %",
-        commission: "Stugora 12 % + PVM",
+        commission: "Rantio 12 % + PVM",
         yearly: "Metinis mokestis 99 € + PVM",
       },
       total: "Jums lieka",
@@ -503,7 +503,7 @@ export const lt: Translation = {
       nettimokki: "Nuoroda į Jūsų Nettimökki skelbimą",
       message: "Ar norėtumėte dar ką nors mums pasakyti?",
       optional: "neprivaloma",
-      consent: "Stugora gali saugoti šiuos duomenis ir susisiekti su manimi.",
+      consent: "Rantio gali saugoti šiuos duomenis ir susisiekti su manimi.",
       privacyLink: "Perskaitykite mūsų privatumo politiką",
       submit: "Paskelbkite namelį",
       sending: "Siunčiama…",
@@ -524,7 +524,7 @@ export const lt: Translation = {
   },
 
   book: {
-    metaTitle: "Užsakymo užklausa – Stugora",
+    metaTitle: "Užsakymo užklausa – Rantio",
     host: "Savininkas: {name}",
     perNight: "{price} / naktis",
     dates: "Datos",
@@ -545,7 +545,7 @@ export const lt: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Valymas",
       total: "Iš viso",
-      note: "Savininkas patvirtins kainą ir nurodys, kaip sumokėti. Per Stugora nieko nemokate.",
+      note: "Savininkas patvirtins kainą ir nurodys, kaip sumokėti. Per Rantio nieko nemokate.",
     },
     form: {
       title: "Jūsų duomenys",
@@ -655,7 +655,7 @@ export const lt: Translation = {
       },
       link: {
         title: "Jūsų užsakymo nuoroda",
-        lead: "Pasidalykite ja su savo svečiais: grįžtančiomis šeimomis, draugais, savo Facebook puslapyje. Jie mato laisvas Jūsų datas ir siunčia užklausą, o Jūs ją priimate arba atmetate. Stugora už šiuos užsakymus nieko neima.",
+        lead: "Pasidalykite ja su savo svečiais: grįžtančiomis šeimomis, draugais, savo Facebook puslapyje. Jie mato laisvas Jūsų datas ir siunčia užklausą, o Jūs ją priimate arba atmetate. Rantio už šiuos užsakymus nieko neima.",
         copy: "Kopijuoti nuorodą",
         copied: "Nukopijuota",
         view: "Atidaryti",
@@ -668,7 +668,7 @@ export const lt: Translation = {
       },
       sites: {
         title: "Prijunkite savo užsakymų svetaines",
-        lead: "Kiekviena svetainė skaito Stugora kalendorių, o Stugora jų kalendorius nuskaito kas 15 minučių. Tai reikia padaryti vieną kartą kiekvienai svetainei.",
+        lead: "Kiekviena svetainė skaito Rantio kalendorių, o Rantio jų kalendorius nuskaito kas 15 minučių. Tai reikia padaryti vieną kartą kiekvienai svetainei.",
         ours: "1. Įklijuokite šią nuorodą į {site}",
         oursHelp: "{site} kalendoriaus nustatymuose pasirinkite kalendoriaus importavimą ir įklijuokite šią nuorodą.",
         theirs: "2. Įklijuokite {site} kalendoriaus nuorodą čia",
@@ -707,14 +707,14 @@ export const lt: Translation = {
       emptyFilter: "Čia nieko nėra.",
       choose: "Pasirinkite pokalbį, kad jį perskaitytumėte.",
       back: "Visos žinutės",
-      enquiry: "Užklausa iš stugora.fi",
+      enquiry: "Užklausa iš rantio.fi",
       you: "Jūs",
       placeholder: "Parašykite atsakymą…",
       send: "Siųsti",
       sending: "Siunčiama…",
       failed: "Atsakymo išsiųsti nepavyko. Bandykite dar kartą.",
       siteNote: "Atsakymai {site} svečiams bus siunčiami per {site}, kai bus prijungta kanalų valdymo sistema. Iki tol jie saugomi tik čia.",
-      directNote: "Svečias gaus Jūsų atsakymą el. paštu ir perskaitys jį Stugora. Svečias niekada nemato Jūsų el. pašto adreso, o Jūs – jo.",
+      directNote: "Svečias gaus Jūsų atsakymą el. paštu ir perskaitys jį Rantio. Svečias niekada nemato Jūsų el. pašto adreso, o Jūs – jo.",
       archive: "Archyvuoti",
       unarchive: "Grąžinti į gautuosius",
       writesIn: "Rašo kalba: {language}",
@@ -723,8 +723,8 @@ export const lt: Translation = {
       sendHint: "Ctrl + Enter siunčia",
     },
     meta: {
-      title: "Mano nameliai – Stugora",
-      loginTitle: "Prisijungimas – Stugora",
+      title: "Mano nameliai – Rantio",
+      loginTitle: "Prisijungimas – Rantio",
     },
     area: "Mano nameliai",
     login: {
@@ -733,7 +733,7 @@ export const lt: Translation = {
       email: "El. paštas",
       send: "Siųsti kodą",
       sending: "Siunčiama…",
-      sentTo: "Jei {email} priklauso Stugora savininkui, išsiuntėme į jį kodą. Jis galioja 15 minučių.",
+      sentTo: "Jei {email} priklauso Rantio savininkui, išsiuntėme į jį kodą. Jis galioja 15 minučių.",
       code: "Kodas",
       verify: "Prisijungti",
       verifying: "Tikrinama…",
@@ -743,13 +743,13 @@ export const lt: Translation = {
       wrongCode: "Šis kodas netinka. Patikrinkite jį arba paprašykite naujo.",
       tooMany: "Per daug bandymų. Palaukite ir bandykite dar kartą.",
       failed: "Kažkas nepavyko. Bandykite dar kartą po akimirkos.",
-      notOwner: "Dar ne su Stugora?",
+      notOwner: "Dar ne su Rantio?",
       join: "Paskelbkite namelį",
     },
     logout: "Atsijungti",
     switchToTraveling: "Perjungti į keliavimą",
     hello: "Sveiki, {name}",
-    lead: "Jūsų namelių užsakymai, pajamos ir Stugora dalis.",
+    lead: "Jūsų namelių užsakymai, pajamos ir Rantio dalis.",
     year: "Metai",
     loading: "Įkeliama…",
     error: "Duomenų įkelti nepavyko. Bandykite dar kartą po akimirkos.",
@@ -765,18 +765,18 @@ export const lt: Translation = {
     },
     kpi: {
       payout: "Išmokėta Jums",
-      payoutSub: "{stugora} iš Stugora svetainių, {own} iš Jūsų pačių",
+      payoutSub: "{stugora} iš Rantio svetainių, {own} iš Jūsų pačių",
       bookings: "Užsakymai",
       cancelled: { one: "{n} atšauktas", few: "{n} atšaukti", many: "{n} atšaukto", other: "{n} atšauktų" },
-      stugora: "Stugora dalis",
+      stugora: "Rantio dalis",
       stugoraSub: "{rate} % komisinis mokestis ir metiniai mokesčiai su PVM",
       net: "Jums lieka",
-      netSub: "Išmokos atėmus Stugora dalį",
+      netSub: "Išmokos atėmus Rantio dalį",
     },
     chart: {
       title: "Pajamos pagal mėnesius",
       lead: "Išmokėta Jums, pagal svečių atvykimo mėnesį.",
-      stugora: "Stugora svetainės",
+      stugora: "Rantio svetainės",
       own: "Jūsų pačių svetainės",
       ownNote: "Nettimökki ir Jūsų pačių užsakymai",
       total: "Iš viso",
@@ -834,7 +834,7 @@ export const lt: Translation = {
     howItWorks: "Komisinis mokestis yra dalis sumos, kurią svetainė Jums išmoka už viešnagę (be valymo mokesčio). Už Nettimökki ir Jūsų pačių užsakymus mokestis neimamas. Metinis mokestis – 99 € + PVM už namelį; bandomiesiems savininkams pirmieji metai nemokami. PVM – 25,5 %.",
     ownBooking: "Savas užsakymas",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Žemėlapis",
@@ -867,7 +867,7 @@ export const lt: Translation = {
       listedOn: "Skelbiama",
       book: "Rezervuoti",
       chooseSite: "Pasirinkite, kur rezervuoti",
-      chooseLead: "Stugora skelbia šį namelį šiose svetainėse. Rezervuokite, kur norite; kaina ir savininkas tie patys.",
+      chooseLead: "Rantio skelbia šį namelį šiose svetainėse. Rezervuokite, kur norite; kaina ir savininkas tie patys.",
       logIn: "Savininko prisijungimas",
     },
     saved: {
@@ -906,9 +906,9 @@ export const lt: Translation = {
       bookings: "Visos rezervacijos",
       notifications: "Pranešimai",
       notificationsLead: "Naujos rezervacijos, žinutės ir rezervacijų užklausos šiame telefone.",
-      notificationsBlocked: "Stugora pranešimai išjungti telefono nustatymuose.",
+      notificationsBlocked: "Rantio pranešimai išjungti telefono nustatymuose.",
       openSettings: "Atidaryti nustatymus",
-      web: "Stugora internete",
+      web: "Rantio internete",
     },
     detail: {
       showAmenities: "Rodyti visus {n} patogumus",

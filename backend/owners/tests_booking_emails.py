@@ -29,7 +29,7 @@ FINNISH = (
 )
 
 
-@override_settings(SIGNUP_NOTIFY_EMAILS=["team@stugora.fi"], SITE_URL="https://stugora.fi")
+@override_settings(SIGNUP_NOTIFY_EMAILS=["team@rantio.fi"], SITE_URL="https://rantio.fi")
 class BookingEmailTests(TestCase):
     def setUp(self):
         self.owner = Owner.objects.create(name="Maija", email="maija@example.fi", language="fi")
@@ -67,11 +67,11 @@ class BookingEmailTests(TestCase):
 
     def test_owner_forwarding_by_hand_is_recognised(self):
         body = "---------- Forwarded message ---------\n" + FINNISH.format(ci=d(IN), co=d(OUT))
-        email = ingest(raw("bookings@stugora.fi", "Fwd: Uusi varaus", body, frm="maija@example.fi", mid="<x@gmail.com>"))
+        email = ingest(raw("bookings@rantio.fi", "Fwd: Uusi varaus", body, frm="maija@example.fi", mid="<x@gmail.com>"))
         self.assertEqual((email.status, email.cottage), (InboundEmail.Status.BOOKED, self.cottage))
 
     def test_unknown_sender_needs_a_look(self):
-        email = ingest(raw("bookings@stugora.fi", "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT)), frm="x@y.fi"))
+        email = ingest(raw("bookings@rantio.fi", "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT)), frm="x@y.fi"))
         self.assertEqual(email.status, InboundEmail.Status.REVIEW)
         self.assertFalse(Booking.objects.exists())
 
@@ -90,7 +90,7 @@ class BookingEmailTests(TestCase):
             email = ingest(raw(self.cottage.forwarding_address, "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT))))
         self.assertEqual(email.status, InboundEmail.Status.CONFLICT)
         self.assertIn("Huomio", mail.outbox[0].body)
-        self.assertEqual(mail.outbox[1].to, ["team@stugora.fi"])
+        self.assertEqual(mail.outbox[1].to, ["team@rantio.fi"])
 
     def test_airbnb_booking_reminds_owner_about_nettimokki(self):
         with self.captureOnCommitCallbacks(execute=True):
@@ -108,7 +108,7 @@ class BookingEmailTests(TestCase):
         url = reverse("inbound-booking-email")
         r = raw(self.cottage.forwarding_address, "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT)))
         self.assertEqual(self.client.post(url, r, content_type="message/rfc822").status_code, 403)
-        res = self.client.post(url, r, content_type="message/rfc822", HTTP_X_STUGORA_SECRET="s3cret")
+        res = self.client.post(url, r, content_type="message/rfc822", HTTP_X_RANTIO_SECRET="s3cret")
         self.assertEqual(res.json()["status"], "booked")
         res = self.client.post(url + "?secret=s3cret", {"body-mime": r.replace("a1@", "a2@")})
         self.assertEqual(res.json()["status"], "duplicate")  # same stay, second email

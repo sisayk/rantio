@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Afþreying í norrænum bústað | Stugora",
+      title: "Afþreying í norrænum bústað | Rantio",
       description: "Gufubað, sund, kajakróður, veiði, gönguferðir, skíði og norðurljós: finndu bústað fyrir það sem þig langar að gera.",
     },
     title: "Afþreying í bústaðnum",
     lead: "Gufubað við vatnið, róður í löngu kvöldbirtunni, skíði og norðurljós. Veldu hvað þig langar að gera og skoðaðu bústaðina sem henta.",
-    note: "Stugora selur ekki afþreyingu. Eigandinn getur sagt þér hvað er í nágrenninu og leiðsögumenn á staðnum taka við bókunum, til dæmis í hundasleðaferðir og norðurljósaferðir.",
+    note: "Rantio selur ekki afþreyingu. Eigandinn getur sagt þér hvað er í nágrenninu og leiðsögumenn á staðnum taka við bókunum, til dæmis í hundasleðaferðir og norðurljósaferðir.",
     items: {
       sauna: {
         title: "Gufubað og svalandi sundsprettur",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Áfangastaðir með bústöðum á Norðurlöndum og í Eystrasaltslöndum | Stugora",
+      title: "Áfangastaðir með bústöðum á Norðurlöndum og í Eystrasaltslöndum | Rantio",
       description: "Finnland, Svíþjóð, Noregur, Danmörk, Ísland, Eistland, Lettland og Litháen: vötn, firðir, sandöldur og skógar, og bústaðirnir þar.",
     },
     title: "Áfangastaðir",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Innblástur fyrir bústaðaferðina | Stugora",
+      title: "Innblástur fyrir bústaðaferðina | Rantio",
       description: "Stuttar leiðbeiningar um gufubað, norðurljós, almannarétt, Jónsmessu og vetur í norrænum bústað.",
     },
     title: "Innblástur",

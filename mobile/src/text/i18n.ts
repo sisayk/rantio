@@ -11,7 +11,7 @@ import { NAMES } from "@/text/names";
 
 export { LANG_INFO, LANGS, type Lang, type Messages };
 
-/** The phone's own language if Stugora speaks it (Norwegian "no" counts as bokmål). */
+/** The phone's own language if Rantio speaks it (Norwegian "no" counts as bokmål). */
 export function deviceLang(): Lang {
   for (const loc of getLocales()) {
     const code = (loc.languageCode ?? "").toLowerCase();

@@ -1,6 +1,6 @@
 {
   "name": "stugora-scripts",
   "private": true,
-  "description": "One-off data scripts for Stugora",
+  "description": "One-off data scripts for Rantio",
   "dependencies": { "all-the-cities": "^3.1.0" }
 }

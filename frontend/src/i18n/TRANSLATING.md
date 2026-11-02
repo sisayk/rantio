@@ -1,10 +1,10 @@
-# Translating Stugora
+# Translating Rantio
 
 English (`messages/en.ts`) is the source and the fallback. Each language has one
 file, `messages/<code>.ts`, exporting a `Translation` with the same shape. Anything a
 language leaves out shows in English, and `npm run i18n:check <code>` lists it.
 
-Stugora lists Nordic and Baltic cottages on Airbnb, Booking.com, Vrbo and other
+Rantio lists Nordic and Baltic cottages on Airbnb, Booking.com, Vrbo and other
 sites for their owners. Guests browse example cottages here and book on those sites.
 The owner pages (`owner`) speak to cottage owners anywhere in the Nordics and the
 Baltics; the first pilot cottages are in Finland, so Nettimökki (Finland's own
@@ -17,7 +17,7 @@ cottage site) is the example of "a local site you already use".
   (Finnish "sinä", Swedish/Norwegian/Danish "du", Icelandic "þú", Estonian "sina",
   Latvian "tu"/plural as sites usually do — Latvian and Lithuanian sites often use
   the polite "jūs/Jūs"; pick what local booking sites use and stay consistent).
-- Keep these exactly: Stugora, Airbnb, Booking.com, Vrbo, Nettimökki, Wikipedia,
+- Keep these exactly: Rantio, Airbnb, Booking.com, Vrbo, Nettimökki, Wikipedia,
   Unsplash, Elda-Auto Tmi, CC BY-SA, every `{placeholder}`.
 - Write prices, percentages and dates the local way: "99 €" or "€99", "12 %" or
   "12%", "12.–15. juli", whatever the language uses.

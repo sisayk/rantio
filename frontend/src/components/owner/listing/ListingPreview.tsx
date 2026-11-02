@@ -10,7 +10,7 @@ import { paths } from "@/i18n/paths";
 import { amenityName } from "@/lib/amenities";
 import { formatPrice, isCurrency } from "@/lib/currency";
 import { type ListingPreview as Data, ownerApi, SignedOut } from "@/lib/ownerApi";
-import { Logo } from "../../guest/icons";
+import { Wordmark } from "../../guest/icons";
 import o from "../owner.module.css";
 import { Dialog } from "./ui";
 import s from "./editor.module.css";
@@ -109,8 +109,7 @@ export default function ListingPreview({
       <div className={s.preview}>
         <p style={{ margin: "0 0 16px" }}>
           <span className={o.brand} style={{ fontSize: 22 }}>
-            <Logo className={o.logo} />
-            Stugora
+            <Wordmark />
           </span>
         </p>
         <div className={s.previewTitle}>

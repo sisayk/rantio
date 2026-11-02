@@ -9,7 +9,7 @@ import { paths } from "@/i18n/paths";
 import { getListing, listingName, unsplash } from "@/lib/listings";
 import { guestApi, type Thread } from "@/lib/ownerApi";
 import ChatThread from "./ChatThread";
-import { Logo } from "./guest/icons";
+import { Wordmark } from "./guest/icons";
 import styles from "./chat.module.css";
 
 const POLL_MS = 20_000;
@@ -62,8 +62,7 @@ export default function GuestChat({
   const header = (
     <header className={styles.guestTop}>
       <a className={styles.brand} href={paths.home(lang)}>
-        <Logo className={styles.logo} />
-        Stugora
+        <Wordmark />
       </a>
       {languageButton}
     </header>
@@ -95,7 +94,7 @@ export default function GuestChat({
           {listing ? <img src={unsplash(listing.photo, 240, 240, listing.photoCrop)} alt="" width={72} height={72} /> : null}
           <div>
             <h1>{fill(lang, t.title, { cottage })}</h1>
-            <p>{th.host_name ? fill(lang, t.withHost, { name: th.host_name }) : t.withStugora}</p>
+            <p>{th.host_name ? fill(lang, t.withHost, { name: th.host_name }) : t.withRantio}</p>
             {listing ? <a href={paths.cottage(lang, listing.id)}>{t.viewCottage}</a> : null}
           </div>
         </div>

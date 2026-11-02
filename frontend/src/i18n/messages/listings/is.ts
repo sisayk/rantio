@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Mínar skráningar", editTitle: "Breyta skráningu", previewTitle: "Forskoðun" },
   title: "Mínar skráningar",
-  lead: "Bústaðirnir þínir eins og gestir sjá þá á Stugora. Hér breytir þú lýsingu, myndum, verðum og reglum.",
+  lead: "Bústaðirnir þínir eins og gestir sjá þá á Rantio. Hér breytir þú lýsingu, myndum, verðum og reglum.",
   add: "Bæta við eign",
   addTitle: "Bæta við eign",
   addName: "Hvað heitir eignin?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Óvistaðar breytingar",
   allSaved: "Allar breytingar vistaðar",
   saveError: "Breytingarnar voru ekki vistaðar. Athugaðu rauðmerktu reitina og reyndu aftur.",
-  networkError: "Ekki náðist samband við Stugora. Breytingarnar þínar eru enn hér; reyndu að vista aftur.",
+  networkError: "Ekki náðist samband við Rantio. Breytingarnar þínar eru enn hér; reyndu að vista aftur.",
   invalid: "Athugaðu þennan reit",
   leave: "Þú ert með óvistaðar breytingar. Fara án þess að vista?",
   restore: "Þú átt óvistaðar breytingar frá {date} í þessu tæki.",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Henda",
   sections: "Hlutar skráningarinnar",
   stugoraOnly:
-    "Breytingar hér uppfæra skráninguna þína á Stugora. Airbnb, Booking.com, Vrbo og Nettimökki halda sínum eigin skráningum: teymið okkar færir breytingarnar þangað fyrir þig þar til rásastjóri hefur verið tengdur.",
+    "Breytingar hér uppfæra skráninguna þína á Rantio. Airbnb, Booking.com, Vrbo og Nettimökki halda sínum eigin skráningum: teymið okkar færir breytingarnar þangað fyrir þig þar til rásastjóri hefur verið tengdur.",
   nav: {
     overview: "Yfirlit",
     basics: "Grunnupplýsingar",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Skipta út",
     remove: "Eyða",
     removeTitle: "Eyða þessari mynd?",
-    removeBody: "Hún er fjarlægð af skráningunni þinni á Stugora. Ekki er hægt að afturkalla þetta; myndir á bókunarsíðunum haldast þar til teymið okkar uppfærir þær.",
+    removeBody: "Hún er fjarlægð af skráningunni þinni á Rantio. Ekki er hægt að afturkalla þetta; myndir á bókunarsíðunum haldast þar til teymið okkar uppfærir þær.",
     empty: "Engar myndir enn. Byrjaðu á bústaðnum að utan; sú mynd verður forsíðumyndin.",
     previewGallery: "Forskoða myndasafnið",
     count: "{n} af {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Verð og gjöld",
-    lead: "Þetta eru verðin á Stugora-síðunni þinni og bókunarhlekknum. Airbnb, Booking.com og Vrbo halda sínum eigin verðum; dagatalshlekkur flytur aðeins dagsetningar, svo verðin samstillast ekki þangað.",
+    lead: "Þetta eru verðin á Rantio-síðunni þinni og bókunarhlekknum. Airbnb, Booking.com og Vrbo halda sínum eigin verðum; dagatalshlekkur flytur aðeins dagsetningar, svo verðin samstillast ekki þangað.",
     base: "Verð á nótt",
     weekend: "Föstudags- og laugardagsnætur",
     weekendHint: "Hafðu autt til að nota venjulega næturverðið.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Stysta dvöl: {n} nætur. Breyttu því undir Verð og gjöld.",
     sites: "Bókunarsíður",
     sitesLead:
-      "Þetta er aðeins samstilling dagatala. Hver síða les dagatalshlekk Stugora og Stugora les þeirra á 15 mínútna fresti, svo bókun sem var gerð fyrir örfáum mínútum sést kannski ekki enn. Myndir, textar og verð samstillast ekki.",
+      "Þetta er aðeins samstilling dagatala. Hver síða les dagatalshlekk Rantio og Rantio les þeirra á 15 mínútna fresti, svo bókun sem var gerð fyrir örfáum mínútum sést kannski ekki enn. Myndir, textar og verð samstillast ekki.",
     manage: "Tengja eða breyta dagatalshlekkjum",
     lastSync: "Síðast lesið {time}",
     never: "Ekki lesið enn",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Staða",
-    current: "Staða skráningarinnar þinnar á Stugora: {status}.",
+    current: "Staða skráningarinnar þinnar á Rantio: {status}.",
     explain: {
       intake: "Drög: aðeins þú sérð hana. Birtu hana þegar nauðsynlegu atriðin eru klár.",
       listing: "Teymið okkar er að setja upp skráningarnar á bókunarsíðunum.",
-      live: "Birt á Stugora. Gestir geta fundið hana og sent bókunarbeiðnir.",
-      paused: "Í hléi: falin nýjum gestum á Stugora. Bókaðar dvalir, skilaboð og tekjur haldast óbreytt.",
+      live: "Birt á Rantio. Gestir geta fundið hana og sent bókunarbeiðnir.",
+      paused: "Í hléi: falin nýjum gestum á Rantio. Bókaðar dvalir, skilaboð og tekjur haldast óbreytt.",
       archived: "Í geymslu: utan virkra skráninga. Dvalir, tekjur og skilaboð haldast í gögnunum þínum.",
     },
     external:
-      "Þetta breytir aðeins skráningunni þinni á Stugora. Til að gera hlé á bústaðnum á Airbnb, Booking.com, Vrbo eða Nettimökki breytir þú því á hverri síðu eða biður okkur um það.",
+      "Þetta breytir aðeins skráningunni þinni á Rantio. Til að gera hlé á bústaðnum á Airbnb, Booking.com, Vrbo eða Nettimökki breytir þú því á hverri síðu eða biður okkur um það.",
     publish: "Birta",
     pause: "Gera hlé á skráningu",
     relist: "Birta aftur",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Endurheimt sem drög",
     pauseTitle: "Gera hlé á þessari skráningu?",
     pauseBody:
-      "Nýir gestir finna hana ekki á Stugora og bókunarhlekkurinn þinn hættir að taka við beiðnum. Dvalir sem þegar eru bókaðar eru ekki afbókaðar og tekjur og skilaboð haldast óbreytt. Engu er breytt á Airbnb, Booking.com, Vrbo og Nettimökki.",
+      "Nýir gestir finna hana ekki á Rantio og bókunarhlekkurinn þinn hættir að taka við beiðnum. Dvalir sem þegar eru bókaðar eru ekki afbókaðar og tekjur og skilaboð haldast óbreytt. Engu er breytt á Airbnb, Booking.com, Vrbo og Nettimökki.",
     archiveTitle: "Setja þessa eign í geymslu?",
     archiveBody: "Hún fer úr virkum skráningum. Fyrri dvalir, tekjur og skilaboð haldast í gögnunum þínum og þú getur endurheimt hana síðar.",
     futureBookings: {
@@ -384,7 +384,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Sláðu inn heiti eignarinnar til staðfestingar",
     deleteButton: "Eyða varanlega",
     deleted: "Eign eytt",
-    deleteHasBookings: "Dvalir eru skráðar á þessa eign, svo ekki er hægt að eyða henni: þær eru hluti af tekjum þínum og reikningum Stugora. Settu hana frekar í geymslu.",
+    deleteHasBookings: "Dvalir eru skráðar á þessa eign, svo ekki er hægt að eyða henni: þær eru hluti af tekjum þínum og reikningum Rantio. Settu hana frekar í geymslu.",
     deleteHasMessages: "Gestir hafa skrifað um þessa eign, svo ekki er hægt að eyða henni. Settu hana frekar í geymslu til að halda skilaboðunum.",
     deleteName: "Heitið passar ekki.",
     history: "Breytingasaga",

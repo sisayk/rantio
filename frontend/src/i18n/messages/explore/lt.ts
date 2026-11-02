@@ -16,12 +16,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Ką veikti Šiaurės šalių poilsio namelyje | Stugora",
+      title: "Ką veikti Šiaurės šalių poilsio namelyje | Rantio",
       description: "Pirtis, maudynės, irklavimas, žvejyba, žygiai, slidinėjimas ir šiaurės pašvaistė: raskite namelį tam, ką norite veikti.",
     },
     title: "Ką veikti namelyje",
     lead: "Pirtis prie ežero, irklavimas ilgoje vakaro šviesoje, slidinėjimas ir šiaurės pašvaistė. Pasirinkite, ką norite veikti, ir pažiūrėkite tinkamus namelius.",
-    note: "Stugora nepardavinėja pramogų. Šeimininkas papasakos, kas yra netoliese, o vietiniai gidai priima užsakymus, pavyzdžiui, pasivažinėjimams šunų kinkiniais ir šiaurės pašvaistės išvykoms.",
+    note: "Rantio nepardavinėja pramogų. Šeimininkas papasakos, kas yra netoliese, o vietiniai gidai priima užsakymus, pavyzdžiui, pasivažinėjimams šunų kinkiniais ir šiaurės pašvaistės išvykoms.",
     items: {
       sauna: {
         title: "Pirtis ir gaivus pasinėrimas",
@@ -60,7 +60,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Poilsio namelių kryptys Šiaurės ir Baltijos šalyse | Stugora",
+      title: "Poilsio namelių kryptys Šiaurės ir Baltijos šalyse | Rantio",
       description: "Suomija, Švedija, Norvegija, Danija, Islandija, Estija, Latvija ir Lietuva: ežerai, fjordai, kopos ir miškai bei ten esantys nameliai.",
     },
     title: "Kryptys",
@@ -81,7 +81,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Įkvėpimas atostogoms namelyje | Stugora",
+      title: "Įkvėpimas atostogoms namelyje | Rantio",
       description: "Trumpi gidai apie pirtį, šiaurės pašvaistę, kiekvieno teisę, Jonines ir žiemą Šiaurės šalių namelyje.",
     },
     title: "Įkvėpimas",

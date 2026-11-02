@@ -1,10 +1,10 @@
-"""What an owner sees on their dashboard: earnings, Stugora's share and stays, per calendar year.
+"""What an owner sees on their dashboard: earnings, Rantio's share and stays, per calendar year.
 
 A stay counts in the year (and month) of its check-in day. Yearly fees count in the
 year their listing year starts.
 
 Money is shown in the owner's currency: the one their cottages are in (a Swedish
-owner sees kronor). Stugora's yearly fee is set in euros; it is listed in euros and
+owner sees kronor). Rantio's yearly fee is set in euros; it is listed in euros and
 counted in the totals at the day's ECB rate.
 """
 

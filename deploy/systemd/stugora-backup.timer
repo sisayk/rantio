@@ -1,5 +1,5 @@
 [Unit]
-Description=Run the Stugora backup every night at 03:30 Finnish time
+Description=Run the Rantio backup every night at 03:30 Finnish time
 
 [Timer]
 OnCalendar=*-*-* 03:30:00 Europe/Helsinki

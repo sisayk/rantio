@@ -5,7 +5,7 @@ import { usePrefs } from "@/state/prefs";
 import { useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadowFloat, space } from "@/theme";
-import { Avatar, Button, Icon, Logo, Text } from "@/ui/kit";
+import { Avatar, Button, Icon, Logo, Text, Wordmark } from "@/ui/kit";
 import { SwitchPill, TabScreen } from "@/ui/screen";
 import { AboutRows, openSite, SettingsRows } from "@/ui/settings";
 
@@ -35,10 +35,8 @@ export default function Profile() {
             </>
           ) : (
             <>
-              <View style={styles.logoRing}>
-                <Logo size={56} />
-              </View>
-              <Text v="title">Stugora</Text>
+              <Logo size={64} />
+              <Wordmark height={34} />
               <Text v="small" style={{ textAlign: "center" }}>
                 {m.guest.hero.lead}
               </Text>
@@ -73,7 +71,6 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: colors.page,
   },
-  logoRing: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.greenTint, alignItems: "center", justifyContent: "center", marginBottom: space.sm },
   hostCard: {
     flexDirection: "row",
     alignItems: "center",

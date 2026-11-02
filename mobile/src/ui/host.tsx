@@ -11,7 +11,7 @@ import { Logo, Pill, Text } from "@/ui/kit";
 
 export function siteName(channel: string, label: string, t: T) {
   const known = channel in CHANNELS ? (channel as ChannelId) : null;
-  return known ? CHANNELS[known].name : channel === "owner" ? t.m.dashboard.ownBooking : channel === "direct" ? "Stugora" : label;
+  return known ? CHANNELS[known].name : channel === "owner" ? t.m.dashboard.ownBooking : channel === "direct" ? "Rantio" : label;
 }
 
 export function SiteIcon({ channel, label, showName = true, size = 18 }: { channel: string; label: string; showName?: boolean; size?: number }) {

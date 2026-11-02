@@ -1,4 +1,4 @@
-"""Sidebar for the Stugora admin (UNFOLD["SIDEBAR"]["navigation"]), built like Bona's.
+"""Sidebar for the Rantio admin (UNFOLD["SIDEBAR"]["navigation"]), built like Bona's.
 
 Grouped by the job being done rather than by Django app; each person sees only what
 they may open; the queues that need someone carry a count. Anything registered but

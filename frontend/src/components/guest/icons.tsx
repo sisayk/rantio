@@ -1,4 +1,6 @@
 import type { Category } from "@/lib/listings";
+import { useId } from "react";
+import { MARK, WORDMARK } from "@/lib/brand";
 import type { ActivityId } from "@/lib/activities";
 
 type P = { className?: string };
@@ -85,12 +87,37 @@ export const CategoryIcon = ({ category, className }: P & { category: Category }
   <svg {...base(className)} strokeWidth={1.4}>{categoryPaths[category]}</svg>
 );
 
-export const Logo = ({ className }: P) => (
-  <svg className={className} viewBox="0 0 40 40" aria-hidden="true">
-    <path d="M15 4 6 17h4.5L5 25h20l-5.5-8H24L15 4Z" fill="currentColor" />
-    <path d="M14 25v4h2v-4" fill="currentColor" />
-    <path d="M21 25V17l6.5-5 6.5 5v8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
-    <path d="M3 31c2.5-1.6 5-1.6 7.5 0s5 1.6 7.5 0 5-1.6 7.5 0 5 1.6 7.5 0 3.5-1.6 4 0M7 35.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0 4 1.2 6 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+/** Rantio's mark: the app icon (green square, R with a house, orange pin). */
+export const Logo = ({ className }: P) => {
+  const id = `rantio-green-${useId().replace(/\W/g, "")}`;
+  return (
+    <svg className={className} viewBox="0 0 1024 1024" aria-hidden="true">
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={MARK.green[0]} />
+          <stop offset="1" stopColor={MARK.green[1]} />
+        </linearGradient>
+      </defs>
+      <rect width="1024" height="1024" rx={MARK.radius} fill={`url(#${id})`} />
+      <g transform={MARK.transform}>
+        <path d={MARK.white} fill="#fff" fillRule="evenodd" />
+        <path d={MARK.pin} fill={MARK.orange} fillRule="evenodd" />
+      </g>
+    </svg>
+  );
+};
+
+/** "Rantio" with a pin for the dot of the i; as tall as 1.2 × the surrounding font size. */
+export const Wordmark = ({ className }: P) => (
+  <svg
+    className={className}
+    viewBox={`0 0 ${WORDMARK.width} ${WORDMARK.height}`}
+    style={{ height: "1.2em", width: "auto", display: "block" }}
+    role="img"
+    aria-label="Rantio"
+  >
+    <path d={WORDMARK.word} fill={WORDMARK.green} fillRule="evenodd" />
+    <path d={WORDMARK.pin} fill={WORDMARK.yellow} fillRule="evenodd" />
   </svg>
 );
 

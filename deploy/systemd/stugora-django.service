@@ -1,7 +1,7 @@
 # Django API + admin under gunicorn, on 127.0.0.1:8000 (nginx sends /api/ and /admin/ here).
 # Installed to /etc/systemd/system/ by deploy/setup-server.sh and deploy/deploy.sh.
 [Unit]
-Description=Stugora Django (gunicorn)
+Description=Rantio Django (gunicorn)
 After=network.target postgresql.service
 Wants=postgresql.service
 

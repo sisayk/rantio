@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Oplevelser ved et nordisk sommerhus | Stugora",
+      title: "Oplevelser ved et nordisk sommerhus | Rantio",
       description: "Sauna, badning, kajak og kano, fiskeri, vandring, skiløb og nordlys: find et sommerhus til det, du har lyst til.",
     },
     title: "Oplevelser ved sommerhuset",
     lead: "Sauna ved søen, kano i det lange aftenlys, skiløb og nordlys. Vælg, hvad du har lyst til, og se de sommerhuse, der passer.",
-    note: "Stugora sælger ikke oplevelser. Ejeren kan fortælle, hvad der ligger i nærheden, og lokale guider tager imod bestillinger på for eksempel hundeslædeture og nordlysture.",
+    note: "Rantio sælger ikke oplevelser. Ejeren kan fortælle, hvad der ligger i nærheden, og lokale guider tager imod bestillinger på for eksempel hundeslædeture og nordlysture.",
     items: {
       sauna: {
         title: "Sauna og en kølig dukkert",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Sommerhusrejsemål i Norden og Baltikum | Stugora",
+      title: "Sommerhusrejsemål i Norden og Baltikum | Rantio",
       description: "Finland, Sverige, Norge, Danmark, Island, Estland, Letland og Litauen: søer, fjorde, klitter og skove, og sommerhusene der.",
     },
     title: "Rejsemål",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Inspiration til sommerhusferien | Stugora",
+      title: "Inspiration til sommerhusferien | Rantio",
       description: "Korte guider om sauna, nordlys, allemandsretten, sankthans og vinter i et nordisk sommerhus.",
     },
     title: "Inspiration",

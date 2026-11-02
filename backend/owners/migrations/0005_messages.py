@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name="listing_slug",
             field=models.SlugField(
                 blank=True,
-                help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
+                help_text="The cottage's address on rantio.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
                 max_length=60,
             ),
         ),
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                     "listing_slug",
                     models.SlugField(
                         blank=True,
-                        help_text="Which stugora.fi page the guest wrote from.",
+                        help_text="Which rantio.fi page the guest wrote from.",
                         max_length=60,
                     ),
                 ),
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                             ("google", "Google Vacation Rentals"),
                             ("holidu", "Holidu"),
                             ("hometogo", "HomeToGo"),
-                            ("direct", "Stugora direct"),
+                            ("direct", "Rantio direct"),
                             ("nettimokki", "Nettimökki"),
                             ("owner", "Owner's own booking"),
                         ],

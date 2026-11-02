@@ -6,15 +6,15 @@ const UPDATED = "Päivitetty viimeksi 30.10.2026";
 export const fi: LegalTexts = {
   privacy: {
     title: "Tietosuojaseloste",
-    description: "Miten Stugora käsittelee vieraiden, mökkien omistajien ja sivuston käyttäjien henkilötietoja.",
+    description: "Miten Rantio käsittelee vieraiden, mökkien omistajien ja sivuston käyttäjien henkilötietoja.",
     updated: UPDATED,
     intro:
-      "Tässä selosteessa kerromme, mitä henkilötietoja Stugora kerää, miksi, kuka niitä näkee ja mitä oikeuksia sinulla on. Keräämme niin vähän kuin pystymme ja säilytämme tiedot EU:ssa.",
+      "Tässä selosteessa kerromme, mitä henkilötietoja Rantio kerää, miksi, kuka niitä näkee ja mitä oikeuksia sinulla on. Keräämme niin vähän kuin pystymme ja säilytämme tiedot EU:ssa.",
     sections: [
       {
         heading: "Keitä olemme",
         paragraphs: [
-          "Stugora on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Elda-Auto Tmi on tässä kuvattujen henkilötietojen rekisterinpitäjä.",
+          "Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Elda-Auto Tmi on tässä kuvattujen henkilötietojen rekisterinpitäjä.",
           `Tietosuojaa koskevat kysymykset ja omia tietojasi koskevat pyynnöt: ${CONTACT_EMAIL}. Vastaamme kuukauden kuluessa, yleensä paljon nopeammin.`,
         ],
       },
@@ -147,21 +147,21 @@ export const fi: LegalTexts = {
 
   terms: {
     title: "Käyttöehdot",
-    description: "Stugora.fi-sivuston käyttöehdot: mikä sivusto on, miten varaukset toimivat ja mistä vastaamme.",
+    description: "Rantio.fi-sivuston käyttöehdot: mikä sivusto on, miten varaukset toimivat ja mistä vastaamme.",
     updated: UPDATED,
-    intro: "Nämä ehdot koskevat stugora.fi-sivuston käyttöä. Olemme pitäneet ne lyhyinä ja selkeinä. Käyttämällä sivustoa hyväksyt ne.",
+    intro: "Nämä ehdot koskevat rantio.fi-sivuston käyttöä. Olemme pitäneet ne lyhyinä ja selkeinä. Käyttämällä sivustoa hyväksyt ne.",
     sections: [
       {
-        heading: "Kuka Stugoraa ylläpitää",
+        heading: "Kuka Rantiota ylläpitää",
         paragraphs: [
-          `Stugora on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Tavoitat meidät osoitteesta ${CONTACT_EMAIL}.`,
-          "Stugora ilmoittaa pohjoismaisia ja baltialaisia lomamökkejä omistajiensa puolesta Airbnb:ssä, Booking.comissa, Vrbossa ja muilla sivustoilla. Stugora.fi:ssä voit selata mökkejä, nähdä mistä kunkin voi varata ja lähettää omistajalle kysymyksen.",
+          `Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Tavoitat meidät osoitteesta ${CONTACT_EMAIL}.`,
+          "Rantio ilmoittaa pohjoismaisia ja baltialaisia lomamökkejä omistajiensa puolesta Airbnb:ssä, Booking.comissa, Vrbossa ja muilla sivustoilla. Rantio.fi:ssä voit selata mökkejä, nähdä mistä kunkin voi varata ja lähettää omistajalle kysymyksen.",
         ],
       },
       {
         heading: "Varaaminen ja maksaminen",
         paragraphs: [
-          "Stugora.fi:ssä ei varata eikä makseta. Varaukset ja maksut tehdään varaussivustoilla, kuten Airbnb:ssä, Booking.comissa tai Vrbossa, kyseisen sivuston omien ehtojen, peruutusehtojen ja tietosuojakäytännön mukaan. Vuokrasopimus syntyy sinun ja omistajan välille sivuston kautta; Stugora ei ole sen osapuoli.",
+          "Rantio.fi:ssä ei varata eikä makseta. Varaukset ja maksut tehdään varaussivustoilla, kuten Airbnb:ssä, Booking.comissa tai Vrbossa, kyseisen sivuston omien ehtojen, peruutusehtojen ja tietosuojakäytännön mukaan. Vuokrasopimus syntyy sinun ja omistajan välille sivuston kautta; Rantio ei ole sen osapuoli.",
           "Varausta, maksua tai hyvitystä koskevat kysymykset kannattaa osoittaa sille sivustolle, jolla teit varauksen, tai omistajalle.",
         ],
       },
@@ -169,7 +169,7 @@ export const fi: LegalTexts = {
         heading: "Mökkien tiedot",
         paragraphs: [
           "Omistajat antavat meille mökkiensä kuvaukset, kuvat, hinnat ja muut tiedot. Tarkistamme ne niin hyvin kuin kohtuudella voimme, mutta emme voi luvata, että jokainen tieto on oikein ja ajan tasalla. Ratkaisevaa on se, mitä varaussivusto näyttää varaushetkellä.",
-          "Stugora.fi:n hinnat ovat suuntaa antavia. Muuhun kuin mökin omaan valuuttaan muunnetut hinnat lasketaan Euroopan keskuspankin viitekursseilla ja ovat arvioita; tarkan hinnan näet varaussivustolta.",
+          "Rantio.fi:n hinnat ovat suuntaa antavia. Muuhun kuin mökin omaan valuuttaan muunnetut hinnat lasketaan Euroopan keskuspankin viitekursseilla ja ovat arvioita; tarkan hinnan näet varaussivustolta.",
         ],
       },
       {
@@ -190,19 +190,19 @@ export const fi: LegalTexts = {
         heading: "Omistajien tilit",
         paragraphs: [
           "Mökkien omistajat voivat ilmoittautua mukaan lomakkeella; lomakkeen lähettäminen ei sido sinua mihinkään. Omistajat kirjautuvat sisään sähköpostiin lähetettävällä kertakäyttöisellä koodilla, joten pidä sähköpostitilisi turvassa äläkä jaa koodeja.",
-          "Palvelustamme omistajille, kuten 99 euron vuosimaksusta mökkiä kohden, 12 prosentin provisiosta Stugoran lisäämien kanavien varauksista (molempiin lisätään arvonlisävero) ja laskutuksesta Stripen kautta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
+          "Palvelustamme omistajille, kuten 99 euron vuosimaksusta mökkiä kohden, 12 prosentin provisiosta Rantion lisäämien kanavien varauksista (molempiin lisätään arvonlisävero) ja laskutuksesta Stripen kautta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
         ],
       },
       {
         heading: "Sivuston sisältö",
         paragraphs: [
-          "Sivuston tekstit, ulkoasu ja Stugora-nimi kuuluvat meille; mökkien kuvat ja kuvaukset kuuluvat omistajilleen tai kuvaajilleen. Saat vapaasti katsella sivustoa ja jakaa linkkejä, mutta älä kopioi ilmoituksia massoittain, kaavi sivustoa tai käytä sitä tavalla, joka vahingoittaa sitä tai muita.",
+          "Sivuston tekstit, ulkoasu ja Rantio-nimi kuuluvat meille; mökkien kuvat ja kuvaukset kuuluvat omistajilleen tai kuvaajilleen. Saat vapaasti katsella sivustoa ja jakaa linkkejä, mutta älä kopioi ilmoituksia massoittain, kaavi sivustoa tai käytä sitä tavalla, joka vahingoittaa sitä tai muita.",
         ],
       },
       {
         heading: "Mistä vastaamme",
         paragraphs: [
-          "Teemme parhaamme, jotta stugora.fi on käytettävissä ja sen tiedot oikein, mutta tarjoamme sivuston sellaisenaan, ja se voi joskus olla poissa käytöstä tai sisältää virheitä.",
+          "Teemme parhaamme, jotta rantio.fi on käytettävissä ja sen tiedot oikein, mutta tarjoamme sivuston sellaisenaan, ja se voi joskus olla poissa käytöstä tai sisältää virheitä.",
           "Emme vastaa itse majoituksesta, omistajien tai varaussivustojen toiminnasta emmekä linkittämiemme muiden sivustojen sisällöstä. Emme vastaa sivuston käytöstä aiheutuvista välillisistä vahingoista, kuten saamatta jääneestä voitosta.",
           "Mikään näissä ehdoissa ei rajoita pakottavan kuluttajansuojalainsäädännön mukaisia oikeuksiasi eikä vastuutamme tahallisesti tai törkeällä huolimattomuudella aiheutetusta vahingosta.",
         ],

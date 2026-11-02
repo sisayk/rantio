@@ -13,13 +13,13 @@ export const et: Translation = {
       current: "Praegune keel",
     },
     footer: {
-      note: "Stugora on Elda-Auto Tmi kõrvalärinimi.",
+      note: "Rantio on Elda-Auto Tmi kõrvalärinimi.",
       contact: "Kontakt",
       privacy: "Privaatsus",
       terms: "Tingimused",
     },
     apps: {
-      title: "Laadi alla Stugora äpp",
+      title: "Laadi alla Rantio äpp",
       soon: "Varsti tulemas",
       download: "Laadi alla",
     },
@@ -81,10 +81,10 @@ export const et: Translation = {
       aiHint: "Kirjuta paar sõna (kuupäevad, lemmikloomad, hiline saabumine) ja tehisintellekt teeb neist sõnumi.",
     },
     chat: {
-      metaTitle: "Sinu vestlus – Stugora",
+      metaTitle: "Sinu vestlus – Rantio",
       title: "Sinu vestlus: {cottage}",
       withHost: "Omanik {name}",
-      withStugora: "Stugora meeskond",
+      withRantio: "Rantio meeskond",
       keepLink: "Salvesta selle lehe aadress: see on sinu privaatne link vestlusele. Saatsime selle ka sinu e-postile.",
       host: "Omanik",
       you: "Sina",
@@ -98,7 +98,7 @@ export const et: Translation = {
       waiting: "Omanik vastab tavaliselt ööpäeva jooksul. Anname e-postiga teada, kui vastus tuleb.",
     },
     meta: {
-      title: "Stugora – puhkemajad Põhjamaades ja Baltikumis",
+      title: "Rantio – puhkemajad Põhjamaades ja Baltikumis",
       description:
         "Puhkemajad järvede, fjordide, metsade ja rannikute ääres Islandist Leeduni. Broneeri Airbnb, Booking.com või Vrbo kaudu.",
     },
@@ -382,9 +382,9 @@ export const et: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – sinu puhkemaja Airbnb-s, Booking.com-is ja Vrbo-s",
+      title: "Rantio – sinu puhkemaja Airbnb-s, Booking.com-is ja Vrbo-s",
       description:
-        "Stugora toob sinu puhkemajja külalisi välismaalt, kõikjal Põhjamaades ja Baltikumis, ning hoiab kalendrid kooskõlas saitidega, mida juba kasutad. 99 € aastas ja 12% meie toodud broneeringutest.",
+        "Rantio toob sinu puhkemajja külalisi välismaalt, kõikjal Põhjamaades ja Baltikumis, ning hoiab kalendrid kooskõlas saitidega, mida juba kasutad. 99 € aastas ja 12% meie toodud broneeringutest.",
     },
     nav: { cta: "Lisa oma puhkemaja", login: "Logi sisse" },
     hero: {
@@ -394,8 +394,8 @@ export const et: Translation = {
       priceLabel: "Öö hind",
       perNight: "€ / öö",
       finePrint:
-        "Hinnangust on maha arvatud platvormide tasud (umbes 15%), Stugora 99 € aastatasu, 12% vahendustasu ja käibemaks.",
-      lead: "Stugora paneb sinu puhkemaja üles Airbnb-sse, Booking.com-i ja Vrbo-sse ning hoiab kõik kalendrid kooskõlas kohalike saitidega, mida juba kasutad, näiteks Soomes Nettimökkiga.",
+        "Hinnangust on maha arvatud platvormide tasud (umbes 15%), Rantio 99 € aastatasu, 12% vahendustasu ja käibemaks.",
+      lead: "Rantio paneb sinu puhkemaja üles Airbnb-sse, Booking.com-i ja Vrbo-sse ning hoiab kõik kalendrid kooskõlas kohalike saitidega, mida juba kasutad, näiteks Soomes Nettimökkiga.",
       cta: "Lisa oma puhkemaja",
       photoAlt: "Puhkemaja järve kaldal pilvisel suvepäeval",
       chipBookingTitle: "Uus broneering Airbnb-st",
@@ -440,12 +440,12 @@ export const et: Translation = {
     },
     price: {
       title: "99 € aastas ja 12% meie toodud broneeringutest",
-      lead: "Ei liitumistasu ega kuutasu. Aastatasu katab kuulutuste loomise ja haldamise. Kui külaline broneerib Stugora avatud kanali kaudu, maksad 12% summast, mille platvorm sulle maksab. Mõlemale lisandub käibemaks. Me ei võta kunagi tasu broneeringutelt saitidelt, mida kasutasid juba varem, näiteks Nettimökkist.",
+      lead: "Ei liitumistasu ega kuutasu. Aastatasu katab kuulutuste loomise ja haldamise. Kui külaline broneerib Rantio avatud kanali kaudu, maksad 12% summast, mille platvorm sulle maksab. Mõlemale lisandub käibemaks. Me ei võta kunagi tasu broneeringutelt saitidelt, mida kasutasid juba varem, näiteks Nettimökkist.",
       exampleTitle: "Näide: 20 lisaööd hinnaga 150 € öö",
       rows: {
         guests: "Külalised maksavad",
         platform: "Platvormide tasud, umbes 15%",
-        commission: "Stugora 12% + käibemaks",
+        commission: "Rantio 12% + käibemaks",
         yearly: "Aastatasu 99 € + käibemaks",
       },
       total: "Sulle jääb",
@@ -498,7 +498,7 @@ export const et: Translation = {
       nettimokki: "Link sinu Nettimökki kuulutusele",
       message: "Kas soovid meile veel midagi öelda?",
       optional: "valikuline",
-      consent: "Stugora võib neid andmeid säilitada ja minuga ühendust võtta.",
+      consent: "Rantio võib neid andmeid säilitada ja minuga ühendust võtta.",
       privacyLink: "Loe meie privaatsuspoliitikat",
       submit: "Lisa oma puhkemaja",
       sending: "Saadame…",
@@ -519,7 +519,7 @@ export const et: Translation = {
   },
 
   book: {
-    metaTitle: "Broneerimispäring – Stugora",
+    metaTitle: "Broneerimispäring – Rantio",
     host: "Sinu võõrustaja: {name}",
     perNight: "{price} / öö",
     dates: "Kuupäevad",
@@ -540,7 +540,7 @@ export const et: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Koristus",
       total: "Kokku",
-      note: "Omanik kinnitab hinna ja ütleb, kuidas maksta. Stugoras ei maksta midagi.",
+      note: "Omanik kinnitab hinna ja ütleb, kuidas maksta. Rantios ei maksta midagi.",
     },
     form: {
       title: "Sinu andmed",
@@ -650,7 +650,7 @@ export const et: Translation = {
       },
       link: {
         title: "Sinu broneerimislink",
-        lead: "Jaga seda oma külalistega: tagasi tulevatele peredele, sõpradele, oma Facebooki lehel. Nad näevad sinu vabu kuupäevi ja saadavad päringu; sina võtad selle vastu või lükkad tagasi. Stugora ei võta nende broneeringute eest tasu.",
+        lead: "Jaga seda oma külalistega: tagasi tulevatele peredele, sõpradele, oma Facebooki lehel. Nad näevad sinu vabu kuupäevi ja saadavad päringu; sina võtad selle vastu või lükkad tagasi. Rantio ei võta nende broneeringute eest tasu.",
         copy: "Kopeeri link",
         copied: "Kopeeritud",
         view: "Ava",
@@ -663,7 +663,7 @@ export const et: Translation = {
       },
       sites: {
         title: "Ühenda oma broneerimissaidid",
-        lead: "Iga sait loeb Stugora kalendrit ja Stugora loeb nende kalendreid iga 15 minuti järel. Tee seda iga saidi jaoks üks kord.",
+        lead: "Iga sait loeb Rantio kalendrit ja Rantio loeb nende kalendreid iga 15 minuti järel. Tee seda iga saidi jaoks üks kord.",
         ours: "1. Anna see link saidile {site}",
         oursHelp: "Vali saidi {site} kalendriseadetes kalendri importimine ja kleebi see link.",
         theirs: "2. Kleebi saidi {site} kalendrilink siia",
@@ -702,14 +702,14 @@ export const et: Translation = {
       emptyFilter: "Siin pole midagi.",
       choose: "Vali vestlus, et seda lugeda.",
       back: "Kõik sõnumid",
-      enquiry: "Päring stugora.fi kaudu",
+      enquiry: "Päring rantio.fi kaudu",
       you: "Sina",
       placeholder: "Kirjuta vastus…",
       send: "Saada",
       sending: "Saadan…",
       failed: "Vastust ei õnnestunud saata. Proovi uuesti.",
       siteNote: "Vastused {site} külalistele liiguvad kanali {site} kaudu, kui kanalihaldur on ühendatud. Seni salvestatakse need ainult siia.",
-      directNote: "Külaline saab sinu vastuse e-postiga ja loeb seda Stugoras. Külaline ei näe kunagi sinu e-posti aadressi ega sina tema oma.",
+      directNote: "Külaline saab sinu vastuse e-postiga ja loeb seda Rantios. Külaline ei näe kunagi sinu e-posti aadressi ega sina tema oma.",
       archive: "Arhiveeri",
       unarchive: "Tagasi postkasti",
       writesIn: "Kirjutab keeles: {language}",
@@ -718,8 +718,8 @@ export const et: Translation = {
       sendHint: "Ctrl + Enter saadab",
     },
     meta: {
-      title: "Minu majad – Stugora",
-      loginTitle: "Logi sisse – Stugora",
+      title: "Minu majad – Rantio",
+      loginTitle: "Logi sisse – Rantio",
     },
     area: "Minu majad",
     login: {
@@ -728,7 +728,7 @@ export const et: Translation = {
       email: "E-post",
       send: "Saada kood",
       sending: "Saadan…",
-      sentTo: "Kui {email} kuulub Stugora omanikule, saatsime sinna koodi. See kehtib 15 minutit.",
+      sentTo: "Kui {email} kuulub Rantio omanikule, saatsime sinna koodi. See kehtib 15 minutit.",
       code: "Kood",
       verify: "Logi sisse",
       verifying: "Kontrollin…",
@@ -738,13 +738,13 @@ export const et: Translation = {
       wrongCode: "See kood ei sobi. Kontrolli seda või küsi uus.",
       tooMany: "Liiga palju katseid. Oota veidi ja proovi uuesti.",
       failed: "Midagi läks valesti. Proovi hetke pärast uuesti.",
-      notOwner: "Pole veel Stugoraga liitunud?",
+      notOwner: "Pole veel Rantioga liitunud?",
       join: "Lisa oma puhkemaja",
     },
     logout: "Logi välja",
     switchToTraveling: "Lülitu reisimisele",
     hello: "Tere, {name}",
-    lead: "Sinu majade broneeringud, tulu ja Stugora osa.",
+    lead: "Sinu majade broneeringud, tulu ja Rantio osa.",
     year: "Aasta",
     loading: "Laadin…",
     error: "Andmeid ei õnnestunud laadida. Proovi hetke pärast uuesti.",
@@ -760,18 +760,18 @@ export const et: Translation = {
     },
     kpi: {
       payout: "Sulle makstud",
-      payoutSub: "{stugora} Stugora kanalitest, {own} sinu omadest",
+      payoutSub: "{stugora} Rantio kanalitest, {own} sinu omadest",
       bookings: "Broneeringud",
       cancelled: { one: "{n} tühistatud", other: "{n} tühistatud" },
-      stugora: "Stugora osa",
+      stugora: "Rantio osa",
       stugoraSub: "{rate} % vahendustasu ja aastatasud, koos käibemaksuga",
       net: "Sulle jääb",
-      netSub: "Väljamaksed miinus Stugora osa",
+      netSub: "Väljamaksed miinus Rantio osa",
     },
     chart: {
       title: "Tulu kuude kaupa",
       lead: "Sulle makstud, külaliste saabumiskuu järgi.",
-      stugora: "Stugora kanalid",
+      stugora: "Rantio kanalid",
       own: "Sinu oma kanalid",
       ownNote: "Nettimökki ja sinu oma broneeringud",
       total: "Kokku",
@@ -829,7 +829,7 @@ export const et: Translation = {
     howItWorks: "Vahendustasu on osa summast, mille kanal sulle majutuse eest maksab (koristustasu arvestamata). Nettimökki ja sinu enda broneeringute eest tasu ei võeta. Aastatasu on 99 € + käibemaks maja kohta; pilootomanikel on esimene aasta tasuta. Käibemaks on 25,5 %.",
     ownBooking: "Oma broneering",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Kaart",
@@ -862,7 +862,7 @@ export const et: Translation = {
       listedOn: "Saadaval",
       book: "Broneeri",
       chooseSite: "Vali, kus broneerid",
-      chooseLead: "Stugora pakub seda maja nendel saitidel. Broneeri, kus soovid; hind ja omanik on samad.",
+      chooseLead: "Rantio pakub seda maja nendel saitidel. Broneeri, kus soovid; hind ja omanik on samad.",
       logIn: "Omaniku sisselogimine",
     },
     saved: {
@@ -901,9 +901,9 @@ export const et: Translation = {
       bookings: "Kõik broneeringud",
       notifications: "Teavitused",
       notificationsLead: "Uued broneeringud, sõnumid ja broneerimissoovid sellesse telefoni.",
-      notificationsBlocked: "Stugora teavitused on telefoni seadetes välja lülitatud.",
+      notificationsBlocked: "Rantio teavitused on telefoni seadetes välja lülitatud.",
       openSettings: "Ava seaded",
-      web: "Stugora veebis",
+      web: "Rantio veebis",
     },
     detail: {
       showAmenities: "Näita kõiki {n} mugavust",

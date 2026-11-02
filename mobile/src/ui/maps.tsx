@@ -166,7 +166,7 @@ function PinMapInner({ lat, lng, style }: { lat: number; lng: number; style?: Vi
     >
       <Marker coordinate={{ latitude: lat, longitude: lng }} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
         <View style={styles.home}>
-          <Logo size={26} color="#fff" />
+          <Logo size={44} />
         </View>
       </Marker>
     </MapView>
@@ -190,14 +190,10 @@ const styles = StyleSheet.create({
   pinOn: { backgroundColor: colors.ink, transform: [{ scale: 1.08 }] },
   pinText: { fontFamily: fonts.bold, fontSize: 14, color: colors.ink },
   home: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.green,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 13,
     borderWidth: 3,
     borderColor: "#fff",
+    backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 6,

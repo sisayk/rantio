@@ -1,4 +1,4 @@
-// The languages Stugora speaks. Adding one means adding its code here, its row in
+// The languages Rantio speaks. Adding one means adding its code here, its row in
 // LANG_INFO and a messages file; routes, the picker, sitemaps and hreflang follow.
 // Nothing here depends on the rest of the app, so the proxy can import it too.
 
@@ -36,7 +36,7 @@ export const LANG_INFO: Record<Lang, LangInfo> = {
   lt: { native: "Lietuvių", intl: "lt-LT", wiki: "lt", og: "lt_LT" },
 };
 
-/** Languages people speak in each country Stugora covers, used for local place names. */
+/** Languages people speak in each country Rantio covers, used for local place names. */
 export const COUNTRY_LANGS: Record<string, readonly Lang[]> = {
   FI: ["fi", "sv"],
   SE: ["sv"],

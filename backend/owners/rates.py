@@ -1,4 +1,4 @@
-"""Exchange rates: the European Central Bank's daily reference rates for the kronor Stugora uses.
+"""Exchange rates: the European Central Bank's daily reference rates for the kronor Rantio uses.
 
 The ECB publishes once each working day around 16:00 CET. Stored rates are refreshed
 when they are older than REFRESH_AFTER; if the ECB can't be reached the stored ones

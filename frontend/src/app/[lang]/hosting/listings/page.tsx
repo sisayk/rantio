@@ -13,7 +13,7 @@ type Props = { params: Promise<{ lang: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isLang(lang)) return {};
-  return { title: `${getMessages(lang).listings.meta.title} – Stugora`, robots: { index: false, follow: false } };
+  return { title: `${getMessages(lang).listings.meta.title} – Rantio`, robots: { index: false, follow: false } };
 }
 
 // The owner's properties load in the browser after sign-in; the server only sends the words.

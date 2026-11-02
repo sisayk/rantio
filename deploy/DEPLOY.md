@@ -1,4 +1,4 @@
-# Putting Stugora on a Hetzner server
+# Putting Rantio on a Hetzner server
 
 One small server in Helsinki runs everything: nginx in front, Django (gunicorn) for
 `/api/` and `/admin/`, the Next.js site for everything else, and PostgreSQL. Uploads
@@ -30,7 +30,7 @@ Every command block says where it runs: **On your Mac, in a normal terminal** or
 
 In the Hetzner Cloud console (console.hetzner.cloud):
 
-1. New project "Stugora", then **Add Server**.
+1. New project "Rantio", then **Add Server**.
 2. Location **Helsinki**, image **Ubuntu 24.04**. Pick a server with at least
    **2 vCPU and 4 GB RAM**: a Cost-Optimized (CX) one if Helsinki has it in stock,
    otherwise Regular Performance (CPX). The old CX22 can no longer be ordered, and
@@ -48,23 +48,23 @@ In the Hetzner Cloud console (console.hetzner.cloud):
 
 ## 2. Point the domain at it
 
-At the registrar where stugora.fi is managed (Traficom's list of .fi registrars;
+At the registrar where rantio.fi is managed (Traficom's list of .fi registrars;
 same place as now), set these DNS records:
 
 | Name | Type | Value |
 | --- | --- | --- |
-| `stugora.fi` (`@`) | A | the server's IPv4 |
-| `stugora.fi` (`@`) | AAAA | the server's IPv6 (the `::1` address Hetzner shows) |
+| `rantio.fi` (`@`) | A | the server's IPv4 |
+| `rantio.fi` (`@`) | AAAA | the server's IPv6 (the `::1` address Hetzner shows) |
 | `www` | A | the server's IPv4 |
 | `www` | AAAA | the server's IPv6 |
 
 If you own **stugora.com**, give `stugora.com` and `www.stugora.com` the same A/AAAA
-records; it will redirect to stugora.fi. DNS can take from minutes to a few hours.
+records; it will redirect to rantio.fi. DNS can take from minutes to a few hours.
 
 On your Mac, in a normal terminal (both should print the server's address):
 ```bash
-dig +short stugora.fi
-dig +short www.stugora.fi
+dig +short rantio.fi
+dig +short www.rantio.fi
 ```
 
 ## 3. Log in once
@@ -138,7 +138,7 @@ Only once DNS from step 2 points at the server. Use your own email for expiry no
 On the server (after ssh):
 ```bash
 certbot certonly --webroot -w /var/www/certbot \
-  -d stugora.fi -d www.stugora.fi \
+  -d rantio.fi -d www.rantio.fi \
   --email YOU@EXAMPLE.COM --agree-tos --no-eff-email
 bash /srv/stugora/app/deploy/deploy.sh --skip-pull
 ```
@@ -168,15 +168,15 @@ On the server (after ssh):
 ```bash
 stugora-manage createsuperuser
 ```
-Admin: https://stugora.fi/admin/
+Admin: https://rantio.fi/admin/
 
 ## 9. Check that everything works
 
 On your Mac, in a normal terminal:
 ```bash
-curl -s https://stugora.fi/api/health/          # {"ok": true}
-curl -sI https://www.stugora.fi | head -3       # 301 to https://stugora.fi/
-curl -sI http://stugora.fi | head -3            # 301 to https://stugora.fi/
+curl -s https://rantio.fi/api/health/          # {"ok": true}
+curl -sI https://www.rantio.fi | head -3       # 301 to https://rantio.fi/
+curl -sI http://rantio.fi | head -3            # 301 to https://rantio.fi/
 ```
 Then in the browser: the homepage, `/en/hosts`, sign in to `/en/hosting` (the code
 arrives by email now, so this also tests email), and upload a homepage slide video
@@ -257,6 +257,6 @@ systemctl restart stugora-django stugora-next
 - **Automatic security updates**: `apt-get install -y unattended-upgrades` (on by default
   on Hetzner's Ubuntu image; check with `systemctl status unattended-upgrades`).
 - **Email DNS**: add the SPF and DKIM records your email service gives you for
-  stugora.fi, or sign-in codes will land in spam.
+  rantio.fi, or sign-in codes will land in spam.
 - **Uptime check**: a free monitor (UptimeRobot, Better Stack) on
-  https://stugora.fi/api/health/.
+  https://rantio.fi/api/health/.

@@ -71,7 +71,7 @@ class Country(models.TextChoices):
 
 
 # The currency each country uses. Cottages are priced, and owners paid, in it;
-# Stugora's own yearly fee is set and invoiced in euros.
+# Rantio's own yearly fee is set and invoiced in euros.
 COUNTRY_CURRENCY = {"FI": "EUR", "EE": "EUR", "LV": "EUR", "LT": "EUR", "SE": "SEK", "NO": "NOK", "DK": "DKK", "IS": "ISK"}
 CURRENCIES = ("EUR", "SEK", "NOK", "DKK", "ISK")
 
@@ -88,7 +88,7 @@ class Region(models.TextChoices):
 
 
 class OwnerSignup(models.Model):
-    """An owner who filled in the stugora.fi sign-up form."""
+    """An owner who filled in the rantio.fi sign-up form."""
 
     class Status(models.TextChoices):
         NEW = "new", "New"
@@ -149,7 +149,7 @@ class Owner(models.Model):
     agreement_signed_on = models.DateField(null=True, blank=True)
     airbnb_cohost_payout = models.BooleanField(
         default=True,
-        help_text="Stugora is co-host on the owner's Airbnb listings and Airbnb pays the commission to Stugora "
+        help_text="Rantio is co-host on the owner's Airbnb listings and Airbnb pays the commission to Rantio "
         "directly, so Airbnb stays are left off the monthly invoice.",
     )
     stripe_customer_id = models.CharField(max_length=40, blank=True, editable=False)
@@ -229,7 +229,7 @@ class Cottage(models.Model):
     )
     listing_slug = models.SlugField(
         max_length=60, blank=True, db_index=True,
-        help_text="The cottage's address on stugora.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
+        help_text="The cottage's address on rantio.fi, e.g. lakeside-villa for /fi/cottages/lakeside-villa.",
     )
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.INTAKE)
 
@@ -254,7 +254,7 @@ class Cottage(models.Model):
     amenity_notes = models.JSONField(
         default=dict, blank=True, help_text="{amenity key: {\"note\": \"…\", \"fee\": \"10.00\"}} for amenities with conditions or a price."
     )
-    # Prices Stugora sets on its own pages and booking link. The booking sites keep their own prices.
+    # Prices Rantio sets on its own pages and booking link. The booking sites keep their own prices.
     weekend_price = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True, help_text="Friday and Saturday nights.")
     max_nights = models.PositiveSmallIntegerField(null=True, blank=True)
     extra_guest_fee = models.DecimalField(max_digits=9, decimal_places=2, default=Decimal("0.00"))
@@ -297,7 +297,7 @@ class Cottage(models.Model):
 
     @property
     def forwarding_address(self) -> str:
-        """Where the owner forwards Nettimökki booking emails, e.g. bookings+3f9a1c2e@stugora.fi."""
+        """Where the owner forwards Nettimökki booking emails, e.g. bookings+3f9a1c2e@rantio.fi."""
         local, _, domain = settings.BOOKING_FORWARD_ADDRESS.partition("@")
         return f"{local}+{self.inbound_code}@{domain}"
 
@@ -386,7 +386,7 @@ def _remove_photo_file(sender, instance: CottagePhoto, **kwargs):
 
 
 class Booking(models.Model):
-    """One stay, from any channel. Commission is only charged on Stugora's channels."""
+    """One stay, from any channel. Commission is only charged on Rantio's channels."""
 
     class Channel(models.TextChoices):
         AIRBNB = "airbnb", "Airbnb"
@@ -396,11 +396,11 @@ class Booking(models.Model):
         GOOGLE = "google", "Google Vacation Rentals"
         HOLIDU = "holidu", "Holidu"
         HOMETOGO = "hometogo", "HomeToGo"
-        DIRECT = "direct", "Stugora direct"
+        DIRECT = "direct", "Rantio direct"
         NETTIMOKKI = "nettimokki", "Nettimökki"
         OWNER = "owner", "Owner's own booking"
 
-    # Sites the owner already used before Stugora: we sync their calendar but never charge.
+    # Sites the owner already used before Rantio: we sync their calendar but never charge.
     UNCHARGED_CHANNELS = {Channel.NETTIMOKKI, Channel.OWNER}
 
     cottage = models.ForeignKey(Cottage, on_delete=models.PROTECT, related_name="bookings")
@@ -462,7 +462,7 @@ class Booking(models.Model):
 
 
 class CalendarFeed(models.Model):
-    """A booking site's calendar link (iCal) that Stugora reads, so its bookings close the dates everywhere."""
+    """A booking site's calendar link (iCal) that Rantio reads, so its bookings close the dates everywhere."""
 
     cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="feeds")
     channel = models.CharField(max_length=12, choices=Booking.Channel.choices)
@@ -535,7 +535,7 @@ class RequestStatus(models.TextChoices):
 
 
 class AppDevice(models.Model):
-    """An owner signed in on the Stugora phone app: its sign-in key (stored hashed) and push address."""
+    """An owner signed in on the Rantio phone app: its sign-in key (stored hashed) and push address."""
 
     LIFETIME_DAYS = 180  # unused this long, the phone has to sign in again
 
@@ -557,14 +557,14 @@ class AppDevice(models.Model):
 class Conversation(models.Model):
     """One guest talking with one cottage's owner.
 
-    Enquiries from stugora.fi (channel "direct") are answered here and the guest reads
+    Enquiries from rantio.fi (channel "direct") are answered here and the guest reads
     the answer through a private link. Threads from Airbnb, Booking.com and the other
     sites will arrive through the channel manager; until it is connected they exist
     only as demo data and a reply is kept here, not sent to the site.
     """
 
     cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, null=True, blank=True, related_name="conversations")
-    listing_slug = models.SlugField(max_length=60, blank=True, help_text="Which stugora.fi page the guest wrote from.")
+    listing_slug = models.SlugField(max_length=60, blank=True, help_text="Which rantio.fi page the guest wrote from.")
     booking = models.ForeignKey(Booking, on_delete=models.SET_NULL, null=True, blank=True, related_name="conversations")
     channel = models.CharField(max_length=12, choices=Booking.Channel.choices, default=Booking.Channel.DIRECT)
     guest_name = models.CharField(max_length=120)
@@ -598,7 +598,7 @@ class Conversation(models.Model):
 
     @property
     def replies_here(self) -> bool:
-        """True when the guest reads replies on stugora.fi, not on a booking site."""
+        """True when the guest reads replies on rantio.fi, not on a booking site."""
         return self.channel == Booking.Channel.DIRECT
 
 
@@ -635,7 +635,7 @@ class ExchangeRate(models.Model):
 
 
 class HeroSlide(models.Model):
-    """A photo or a short video at the top of the stugora.fi homepage, in the order set in the admin."""
+    """A photo or a short video at the top of the rantio.fi homepage, in the order set in the admin."""
 
     class Kind(models.TextChoices):
         IMAGE = "image", "Photo"
@@ -689,7 +689,7 @@ class HeroSlide(models.Model):
 
 
 class InboundEmail(models.Model):
-    """A booking email forwarded to Stugora (Nettimökki has no calendar sync), and what was read from it."""
+    """A booking email forwarded to Rantio (Nettimökki has no calendar sync), and what was read from it."""
 
     class Status(models.TextChoices):
         BOOKED = "booked", "Booking added"
@@ -719,7 +719,7 @@ class InboundEmail(models.Model):
 
 
 class Invoice(models.Model):
-    """One owner's monthly bill: commission on stays from Stugora's channels and yearly fees, in euros with VAT."""
+    """One owner's monthly bill: commission on stays from Rantio's channels and yearly fees, in euros with VAT."""
 
     class Status(models.TextChoices):
         DRAFT = "draft", "Draft"

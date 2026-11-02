@@ -11,7 +11,7 @@ import owners.models
 CHANNELS = [
     ("airbnb", "Airbnb"), ("booking", "Booking.com"), ("vrbo", "Vrbo"), ("expedia", "Expedia"),
     ("google", "Google Vacation Rentals"), ("holidu", "Holidu"), ("hometogo", "HomeToGo"),
-    ("direct", "Stugora direct"), ("nettimokki", "Nettimökki"), ("owner", "Owner's own booking"),
+    ("direct", "Rantio direct"), ("nettimokki", "Nettimökki"), ("owner", "Owner's own booking"),
 ]
 
 

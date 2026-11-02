@@ -25,7 +25,7 @@ const projectId = () =>
 async function ensureChannel() {
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
-      name: "Stugora",
+      name: "Rantio",
       importance: AndroidImportance.HIGH,
       lightColor: "#1d4c3c",
     });

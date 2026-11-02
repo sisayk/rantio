@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Minu kuulutused", editTitle: "Muuda kuulutust", previewTitle: "Eelvaade" },
   title: "Minu kuulutused",
-  lead: "Sinu majad nii, nagu külalised neid Stugoras näevad. Siin muudad andmeid, fotosid, hindu ja reegleid.",
+  lead: "Sinu majad nii, nagu külalised neid Rantios näevad. Siin muudad andmeid, fotosid, hindu ja reegleid.",
   add: "Lisa uus majutuskoht",
   addTitle: "Lisa majutuskoht",
   addName: "Mis on majutuskoha nimi?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Salvestamata muudatused",
   allSaved: "Kõik muudatused on salvestatud",
   saveError: "Muudatusi ei salvestatud. Kontrolli punasega märgitud välju ja proovi uuesti.",
-  networkError: "Stugoraga ei õnnestunud ühendust saada. Sinu muudatused on alles; proovi uuesti salvestada.",
+  networkError: "Rantioga ei õnnestunud ühendust saada. Sinu muudatused on alles; proovi uuesti salvestada.",
   invalid: "Kontrolli seda välja",
   leave: "Sul on salvestamata muudatusi. Kas lahkud salvestamata?",
   restore: "Sul on selles seadmes salvestamata muudatusi ({date}).",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Loobu",
   sections: "Kuulutuse osad",
   stugoraOnly:
-    "Siin tehtud muudatused uuendavad sinu Stugora kuulutust. Airbnb, Booking.com, Vrbo ja Nettimökki kuulutused on eraldi: meie meeskond kannab muudatused sinu eest sinna üle, kuni kanalihaldur on ühendatud.",
+    "Siin tehtud muudatused uuendavad sinu Rantio kuulutust. Airbnb, Booking.com, Vrbo ja Nettimökki kuulutused on eraldi: meie meeskond kannab muudatused sinu eest sinna üle, kuni kanalihaldur on ühendatud.",
   nav: {
     overview: "Ülevaade",
     basics: "Põhiandmed",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Asenda",
     remove: "Kustuta",
     removeTitle: "Kas kustutada see foto?",
-    removeBody: "Foto eemaldatakse sinu Stugora kuulutusest. Seda ei saa tagasi võtta; broneerimissaitide fotod jäävad alles, kuni meie meeskond neid uuendab.",
+    removeBody: "Foto eemaldatakse sinu Rantio kuulutusest. Seda ei saa tagasi võtta; broneerimissaitide fotod jäävad alles, kuni meie meeskond neid uuendab.",
     empty: "Fotosid veel pole. Alusta maja välisvaatest; sellest saab kaanefoto.",
     previewGallery: "Galerii eelvaade",
     count: "{n} / {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Hinnad ja tasud",
-    lead: "Need on hinnad sinu Stugora lehel ja broneerimislingis. Airbnb, Booking.com ja Vrbo kasutavad oma hindu; kalendrilink edastab ainult kuupäevi, seega hindu sinna ei sünkroonita.",
+    lead: "Need on hinnad sinu Rantio lehel ja broneerimislingis. Airbnb, Booking.com ja Vrbo kasutavad oma hindu; kalendrilink edastab ainult kuupäevi, seega hindu sinna ei sünkroonita.",
     base: "Öö hind",
     weekend: "Reede ja laupäeva ööd",
     weekendHint: "Jäta tühjaks, et kasutada tavalist öö hinda.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Lühim viibimine: {n} ööd. Muuda seda jaotises Hinnad ja tasud.",
     sites: "Broneerimissaidid",
     sitesLead:
-      "Siin sünkroonitakse ainult kalendrit. Iga sait loeb sinu Stugora kalendrilinki ja Stugora loeb nende oma iga 15 minuti järel, nii et viimastel minutitel tehtud broneering ei pruugi veel näha olla. Fotosid, tekste ja hindu ei sünkroonita.",
+      "Siin sünkroonitakse ainult kalendrit. Iga sait loeb sinu Rantio kalendrilinki ja Rantio loeb nende oma iga 15 minuti järel, nii et viimastel minutitel tehtud broneering ei pruugi veel näha olla. Fotosid, tekste ja hindu ei sünkroonita.",
     manage: "Ühenda või muuda kalendrilinke",
     lastSync: "Viimati loetud {time}",
     never: "Pole veel loetud",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Olek",
-    current: "Sinu Stugora kuulutuse olek: {status}.",
+    current: "Sinu Rantio kuulutuse olek: {status}.",
     explain: {
       intake: "Mustand: seda näed ainult sina. Avalda, kui vajalikud punktid on tehtud.",
       listing: "Meie meeskond seab kuulutusi broneerimissaitidel üles.",
-      live: "Avaldatud Stugoras. Külalised leiavad selle ja saavad saata broneerimispäringuid.",
-      paused: "Peatatud: Stugoras uute külaliste eest peidetud. Olemasolevad broneeringud, sõnumid ja tulu jäävad puutumata.",
+      live: "Avaldatud Rantios. Külalised leiavad selle ja saavad saata broneerimispäringuid.",
+      paused: "Peatatud: Rantios uute külaliste eest peidetud. Olemasolevad broneeringud, sõnumid ja tulu jäävad puutumata.",
       archived: "Arhiveeritud: sinu aktiivsete kuulutuste hulgast väljas. Selle broneeringud, tulu ja sõnumid jäävad sinu andmetesse alles.",
     },
     external:
-      "See muudab ainult sinu Stugora kuulutust. Maja peatamiseks Airbnb-s, Booking.com-is, Vrbos või Nettimökkis muuda seda igal saidil või palu meil seda teha.",
+      "See muudab ainult sinu Rantio kuulutust. Maja peatamiseks Airbnb-s, Booking.com-is, Vrbos või Nettimökkis muuda seda igal saidil või palu meil seda teha.",
     publish: "Avalda",
     pause: "Peata kuulutus",
     relist: "Avalda uuesti",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Taastatud mustandina",
     pauseTitle: "Kas peatada see kuulutus?",
     pauseBody:
-      "Uued külalised ei leia seda Stugorast ja sinu broneerimislink lõpetab päringute vastuvõtmise. Juba tehtud broneeringuid ei tühistata ning sinu tulu ja sõnumid jäävad alles. Airbnb-s, Booking.com-is, Vrbos ja Nettimökkis midagi ei muutu.",
+      "Uued külalised ei leia seda Rantiost ja sinu broneerimislink lõpetab päringute vastuvõtmise. Juba tehtud broneeringuid ei tühistata ning sinu tulu ja sõnumid jäävad alles. Airbnb-s, Booking.com-is, Vrbos ja Nettimökkis midagi ei muutu.",
     archiveTitle: "Kas arhiveerida see majutuskoht?",
     archiveBody: "See liigub sinu aktiivsete kuulutuste hulgast välja. Varasemad broneeringud, tulu ja sõnumid jäävad sinu andmetesse ning saad selle hiljem taastada.",
     futureBookings: {
@@ -384,7 +384,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Kinnitamiseks kirjuta majutuskoha nimi",
     deleteButton: "Kustuta jäädavalt",
     deleted: "Majutuskoht kustutatud",
-    deleteHasBookings: "Sellel majutuskohal on registreeritud broneeringuid, seega seda ei saa kustutada: need on osa sinu tulust ja Stugora arvetest. Arhiveeri see hoopis.",
+    deleteHasBookings: "Sellel majutuskohal on registreeritud broneeringuid, seega seda ei saa kustutada: need on osa sinu tulust ja Rantio arvetest. Arhiveeri see hoopis.",
     deleteHasMessages: "Külalised on selle majutuskoha kohta kirjutanud, seega seda ei saa kustutada. Arhiveeri see, et sõnumid alles jääksid.",
     deleteName: "Nimi ei kattu.",
     history: "Muudatuste ajalugu",

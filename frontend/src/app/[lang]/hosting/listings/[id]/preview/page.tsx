@@ -12,7 +12,7 @@ type Props = { params: Promise<{ lang: string; id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isLang(lang)) return {};
-  return { title: `${getMessages(lang).listings.meta.previewTitle} – Stugora`, robots: { index: false, follow: false } };
+  return { title: `${getMessages(lang).listings.meta.previewTitle} – Rantio`, robots: { index: false, follow: false } };
 }
 
 async function Preview({ params }: Props) {

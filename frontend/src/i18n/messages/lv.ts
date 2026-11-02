@@ -13,13 +13,13 @@ export const lv: Translation = {
       current: "Pašreizējā valoda",
     },
     footer: {
-      note: "Stugora ir uzņēmuma Elda-Auto Tmi papildu nosaukums.",
+      note: "Rantio ir uzņēmuma Elda-Auto Tmi papildu nosaukums.",
       contact: "Kontakti",
       privacy: "Privātums",
       terms: "Noteikumi",
     },
     apps: {
-      title: "Lejupielādējiet Stugora lietotni",
+      title: "Lejupielādējiet Rantio lietotni",
       soon: "Drīzumā",
       download: "Lejupielādēt no",
     },
@@ -81,10 +81,10 @@ export const lv: Translation = {
       aiHint: "Uzrakstiet dažus vārdus (datumus, mājdzīvniekus, vēlu ierašanos), un MI no tiem izveidos ziņu.",
     },
     chat: {
-      metaTitle: "Jūsu saruna – Stugora",
+      metaTitle: "Jūsu saruna – Rantio",
       title: "Jūsu saruna par {cottage}",
       withHost: "Īpašnieks: {name}",
-      withStugora: "Stugora komanda",
+      withRantio: "Rantio komanda",
       keepLink: "Saglabājiet šīs lapas adresi: tā ir jūsu privātā saite uz sarunu. Mēs to nosūtījām arī uz jūsu e-pastu.",
       host: "Īpašnieks",
       you: "Jūs",
@@ -98,7 +98,7 @@ export const lv: Translation = {
       waiting: "Īpašnieks parasti atbild diennakts laikā. Mēs jums paziņosim e-pastā, kad pienāks atbilde.",
     },
     meta: {
-      title: "Stugora – brīvdienu mājas Ziemeļvalstīs un Baltijā",
+      title: "Rantio – brīvdienu mājas Ziemeļvalstīs un Baltijā",
       description:
         "Brīvdienu mājas pie ezeriem, fjordiem, mežos un jūras krastā no Islandes līdz Lietuvai. Rezervējiet Airbnb, Booking.com vai Vrbo.",
     },
@@ -382,9 +382,9 @@ export const lv: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – jūsu brīvdienu māja Airbnb, Booking.com un Vrbo",
+      title: "Rantio – jūsu brīvdienu māja Airbnb, Booking.com un Vrbo",
       description:
-        "Stugora piesaista viesus no ārvalstīm jūsu brīvdienu mājai jebkur Ziemeļvalstīs vai Baltijā un saskaņo kalendārus ar vietnēm, kuras jau izmantojat. 99 € gadā un 12% no mūsu piesaistītajām rezervācijām.",
+        "Rantio piesaista viesus no ārvalstīm jūsu brīvdienu mājai jebkur Ziemeļvalstīs vai Baltijā un saskaņo kalendārus ar vietnēm, kuras jau izmantojat. 99 € gadā un 12% no mūsu piesaistītajām rezervācijām.",
     },
     nav: { cta: "Pieteikt savu māju", login: "Pieteikties" },
     hero: {
@@ -394,8 +394,8 @@ export const lv: Translation = {
       priceLabel: "Cena par nakti",
       perNight: "€ / naktī",
       finePrint:
-        "Aprēķinā atskaitītas platformu komisijas (ap 15%), Stugora gada maksa 99 €, 12% komisija un PVN.",
-      lead: "Stugora ievieto jūsu brīvdienu māju Airbnb, Booking.com un Vrbo un saskaņo visus kalendārus ar vietējām vietnēm, kuras jau izmantojat, piemēram, Nettimökki Somijā.",
+        "Aprēķinā atskaitītas platformu komisijas (ap 15%), Rantio gada maksa 99 €, 12% komisija un PVN.",
+      lead: "Rantio ievieto jūsu brīvdienu māju Airbnb, Booking.com un Vrbo un saskaņo visus kalendārus ar vietējām vietnēm, kuras jau izmantojat, piemēram, Nettimökki Somijā.",
       cta: "Pieteikt savu māju",
       photoAlt: "Brīvdienu māja ezera krastā mākoņainā vasaras dienā",
       chipBookingTitle: "Jauna rezervācija no Airbnb",
@@ -440,12 +440,12 @@ export const lv: Translation = {
     },
     price: {
       title: "99 € gadā un 12% no mūsu piesaistītajām rezervācijām",
-      lead: "Bez uzstādīšanas maksas un bez ikmēneša maksas. Gada maksa sedz sludinājumu izveidi un uzturēšanu. Kad viesis rezervē caur kanālu, ko atvēra Stugora, jūs maksājat 12% no summas, ko jums izmaksā platforma. Abām maksām pieskaita PVN. Par rezervācijām no vietnēm, kuras izmantojāt jau iepriekš, piemēram, Nettimökki, mēs nekad neiekasējam maksu.",
+      lead: "Bez uzstādīšanas maksas un bez ikmēneša maksas. Gada maksa sedz sludinājumu izveidi un uzturēšanu. Kad viesis rezervē caur kanālu, ko atvēra Rantio, jūs maksājat 12% no summas, ko jums izmaksā platforma. Abām maksām pieskaita PVN. Par rezervācijām no vietnēm, kuras izmantojāt jau iepriekš, piemēram, Nettimökki, mēs nekad neiekasējam maksu.",
       exampleTitle: "Piemērs: 20 papildu naktis par 150 € naktī",
       rows: {
         guests: "Viesi maksā",
         platform: "Platformu komisijas, ap 15%",
-        commission: "Stugora 12% plus PVN",
+        commission: "Rantio 12% plus PVN",
         yearly: "Gada maksa 99 € plus PVN",
       },
       total: "Jums paliek",
@@ -498,7 +498,7 @@ export const lv: Translation = {
       nettimokki: "Saite uz jūsu Nettimökki sludinājumu",
       message: "Vai vēlaties vēl ko pastāstīt?",
       optional: "nav obligāti",
-      consent: "Stugora drīkst saglabāt šos datus un sazināties ar mani.",
+      consent: "Rantio drīkst saglabāt šos datus un sazināties ar mani.",
       privacyLink: "Izlasiet mūsu privātuma politiku",
       submit: "Pieteikt savu māju",
       sending: "Sūta…",
@@ -519,7 +519,7 @@ export const lv: Translation = {
   },
 
   book: {
-    metaTitle: "Rezervācijas pieprasījums – Stugora",
+    metaTitle: "Rezervācijas pieprasījums – Rantio",
     host: "Īpašnieks: {name}",
     perNight: "{price} / naktī",
     dates: "Datumi",
@@ -540,7 +540,7 @@ export const lv: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Uzkopšana",
       total: "Kopā",
-      note: "Īpašnieks apstiprinās cenu un pateiks, kā maksāt. Vietnē Stugora nekas netiek maksāts.",
+      note: "Īpašnieks apstiprinās cenu un pateiks, kā maksāt. Vietnē Rantio nekas netiek maksāts.",
     },
     form: {
       title: "Jūsu dati",
@@ -650,7 +650,7 @@ export const lv: Translation = {
       },
       link: {
         title: "Jūsu rezervācijas saite",
-        lead: "Kopīgojiet to ar saviem viesiem: ģimenēm, kas atgriežas, draugiem, savā Facebook lapā. Viņi redz jūsu brīvos datumus un nosūta pieprasījumu; jūs to pieņemat vai noraidāt. Stugora par šīm rezervācijām neko neiekasē.",
+        lead: "Kopīgojiet to ar saviem viesiem: ģimenēm, kas atgriežas, draugiem, savā Facebook lapā. Viņi redz jūsu brīvos datumus un nosūta pieprasījumu; jūs to pieņemat vai noraidāt. Rantio par šīm rezervācijām neko neiekasē.",
         copy: "Kopēt saiti",
         copied: "Nokopēts",
         view: "Atvērt",
@@ -663,7 +663,7 @@ export const lv: Translation = {
       },
       sites: {
         title: "Pievienojiet savas rezervēšanas vietnes",
-        lead: "Katra vietne nolasa Stugora kalendāru, un Stugora ik pēc 15 minūtēm nolasa vietnes kalendāru. Tas jāizdara vienreiz katrai vietnei.",
+        lead: "Katra vietne nolasa Rantio kalendāru, un Rantio ik pēc 15 minūtēm nolasa vietnes kalendāru. Tas jāizdara vienreiz katrai vietnei.",
         ours: "1. Iedodiet šo saiti vietnei {site}",
         oursHelp: "Vietnes {site} kalendāra iestatījumos izvēlieties kalendāra importēšanu un ielīmējiet šo saiti.",
         theirs: "2. Ielīmējiet šeit vietnes {site} kalendāra saiti",
@@ -702,14 +702,14 @@ export const lv: Translation = {
       emptyFilter: "Šeit nekā nav.",
       choose: "Izvēlieties sarunu, lai to izlasītu.",
       back: "Visas ziņas",
-      enquiry: "Pieprasījums no stugora.fi",
+      enquiry: "Pieprasījums no rantio.fi",
       you: "Jūs",
       placeholder: "Rakstiet atbildi…",
       send: "Sūtīt",
       sending: "Sūta…",
       failed: "Atbildi neizdevās nosūtīt. Mēģiniet vēlreiz.",
       siteNote: "Atbildes {site} viesiem tiks sūtītas caur {site}, kad būs pievienots kanālu pārvaldnieks. Līdz tam tās tiek saglabātas tikai šeit.",
-      directNote: "Viesis saņems jūsu atbildi e-pastā un izlasīs to Stugora. Viesis nekad neredz jūsu e-pasta adresi, un jūs neredzat viesa adresi.",
+      directNote: "Viesis saņems jūsu atbildi e-pastā un izlasīs to Rantio. Viesis nekad neredz jūsu e-pasta adresi, un jūs neredzat viesa adresi.",
       archive: "Arhivēt",
       unarchive: "Atgriezt iesūtnē",
       writesIn: "Raksta valodā: {language}",
@@ -718,8 +718,8 @@ export const lv: Translation = {
       sendHint: "Ctrl + Enter nosūta",
     },
     meta: {
-      title: "Manas mājas – Stugora",
-      loginTitle: "Pieteikšanās – Stugora",
+      title: "Manas mājas – Rantio",
+      loginTitle: "Pieteikšanās – Rantio",
     },
     area: "Manas mājas",
     login: {
@@ -728,7 +728,7 @@ export const lv: Translation = {
       email: "E-pasts",
       send: "Sūtīt kodu",
       sending: "Sūta…",
-      sentTo: "Ja {email} pieder Stugora īpašniekam, mēs uz to nosūtījām kodu. Tas ir derīgs 15 minūtes.",
+      sentTo: "Ja {email} pieder Rantio īpašniekam, mēs uz to nosūtījām kodu. Tas ir derīgs 15 minūtes.",
       code: "Kods",
       verify: "Pieteikties",
       verifying: "Pārbauda…",
@@ -738,13 +738,13 @@ export const lv: Translation = {
       wrongCode: "Šis kods neder. Pārbaudiet to vai pieprasiet jaunu.",
       tooMany: "Pārāk daudz mēģinājumu. Uzgaidiet brīdi un mēģiniet vēlreiz.",
       failed: "Kaut kas nogāja greizi. Mēģiniet vēlreiz pēc brīža.",
-      notOwner: "Vēl neesat ar Stugora?",
+      notOwner: "Vēl neesat ar Rantio?",
       join: "Pieteikt savu māju",
     },
     logout: "Iziet",
     switchToTraveling: "Pārslēgties uz ceļošanu",
     hello: "Sveiki, {name}!",
-    lead: "Jūsu māju rezervācijas, ienākumi un Stugora daļa.",
+    lead: "Jūsu māju rezervācijas, ienākumi un Rantio daļa.",
     year: "Gads",
     loading: "Ielādē…",
     error: "Datus neizdevās ielādēt. Mēģiniet vēlreiz pēc brīža.",
@@ -760,18 +760,18 @@ export const lv: Translation = {
     },
     kpi: {
       payout: "Izmaksāts jums",
-      payoutSub: "{stugora} no Stugora vietnēm, {own} no jūsu pašu",
+      payoutSub: "{stugora} no Rantio vietnēm, {own} no jūsu pašu",
       bookings: "Rezervācijas",
       cancelled: { zero: "{n} atceltu", one: "{n} atcelta", other: "{n} atceltas" },
-      stugora: "Stugora daļa",
+      stugora: "Rantio daļa",
       stugoraSub: "{rate} % komisija un gada maksas, ar PVN",
       net: "Jums paliek",
-      netSub: "Izmaksas mīnus Stugora daļa",
+      netSub: "Izmaksas mīnus Rantio daļa",
     },
     chart: {
       title: "Ienākumi pa mēnešiem",
       lead: "Izmaksāts jums, pēc viesu ierašanās mēneša.",
-      stugora: "Stugora vietnes",
+      stugora: "Rantio vietnes",
       own: "Jūsu pašu vietnes",
       ownNote: "Nettimökki un jūsu pašu rezervācijas",
       total: "Kopā",
@@ -829,7 +829,7 @@ export const lv: Translation = {
     howItWorks: "Komisija ir daļa no summas, ko vietne jums izmaksā par uzturēšanos (bez uzkopšanas maksas). Par Nettimökki un jūsu pašu rezervācijām komisija netiek ņemta. Gada maksa ir 99 € + PVN par katru māju; pilotprojekta īpašniekiem pirmais gads ir bez maksas. PVN ir 25,5 %.",
     ownBooking: "Pašu rezervācija",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Karte",
@@ -862,7 +862,7 @@ export const lv: Translation = {
       listedOn: "Pieejama",
       book: "Rezervēt",
       chooseSite: "Izvēlieties, kur rezervēt",
-      chooseLead: "Stugora ievieto šo māju šajās vietnēs. Rezervējiet, kur vēlaties; cena un īpašnieks ir tie paši.",
+      chooseLead: "Rantio ievieto šo māju šajās vietnēs. Rezervējiet, kur vēlaties; cena un īpašnieks ir tie paši.",
       logIn: "Īpašnieka pieteikšanās",
     },
     saved: {
@@ -901,9 +901,9 @@ export const lv: Translation = {
       bookings: "Visas rezervācijas",
       notifications: "Paziņojumi",
       notificationsLead: "Jaunas rezervācijas, ziņas un rezervācijas pieprasījumi šajā tālrunī.",
-      notificationsBlocked: "Stugora paziņojumi ir izslēgti tālruņa iestatījumos.",
+      notificationsBlocked: "Rantio paziņojumi ir izslēgti tālruņa iestatījumos.",
       openSettings: "Atvērt iestatījumus",
-      web: "Stugora tīmeklī",
+      web: "Rantio tīmeklī",
     },
     detail: {
       showAmenities: "Rādīt visas {n} ērtības",

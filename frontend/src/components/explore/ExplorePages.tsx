@@ -24,7 +24,7 @@ import AppBadges from "../AppBadges";
 import CurrencyButton from "../CurrencyButton";
 import LanguageButton from "../LanguagePicker";
 import HostSwitchLink from "../guest/HostSwitchLink";
-import { ActivityIcon, ArrowLeft, Logo } from "../guest/icons";
+import { ActivityIcon, ArrowLeft, Wordmark } from "../guest/icons";
 import MainNav, { type NavPage } from "../guest/MainNav";
 import g from "../guest/guest.module.css";
 import s from "./explore.module.css";
@@ -37,8 +37,7 @@ function Shell({ lang, active, children }: { lang: Lang; active: NavPage; childr
       <header className={s.top}>
         <div className={s.topInner}>
           <a className={g.brand} href={paths.home(lang)}>
-            <Logo className={g.logo} />
-            <span>Stugora</span>
+            <Wordmark />
           </a>
           <MainNav lang={lang} labels={t.nav} active={active} className={s.nav} />
           <div className={`${g.detailTopLinks} ${s.links}`}>

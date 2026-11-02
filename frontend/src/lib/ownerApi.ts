@@ -23,7 +23,7 @@ export type BookingRow = {
 
 export type Summary = {
   owner: { name: string; first_name: string; email: string; language: string; is_pilot: boolean; commission_rate: string };
-  /** The owner's currency; bookings and totals are in it. Stugora's yearly fee is in EUR. */
+  /** The owner's currency; bookings and totals are in it. Rantio's yearly fee is in EUR. */
   currency: string;
   fee_currency: "EUR";
   rate: { per_eur: string; date: string | null } | null;

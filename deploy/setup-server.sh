@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# First-time setup of a fresh Ubuntu 24.04 server for Stugora. Run ON the server as root,
+# First-time setup of a fresh Ubuntu 24.04 server for Rantio. Run ON the server as root,
 # from the copied code:   bash /srv/stugora/app/deploy/setup-server.sh
 #
 # Safe to run again: every step checks what is already there. At the end it runs
@@ -48,7 +48,7 @@ apt-get install -y -q \
 
 PY_OK=$(python3 -c 'import sys; print(int(sys.version_info >= (3, 12)))')
 if [ "$PY_OK" != "1" ]; then
-  echo "Stugora needs Python 3.12+ (django-unfold); this server has $(python3 --version)." >&2
+  echo "Rantio needs Python 3.12+ (django-unfold); this server has $(python3 --version)." >&2
   exit 1
 fi
 
@@ -154,11 +154,11 @@ step "nginx: removing Ubuntu's default site"
 rm -f /etc/nginx/sites-enabled/default
 systemctl enable nginx >/dev/null
 
-step "Building and starting Stugora (deploy.sh)"
+step "Building and starting Rantio (deploy.sh)"
 bash "$SCRIPT_DIR/deploy.sh" --skip-pull
 
 echo
 echo "Setup finished."
-if [ ! -d /etc/letsencrypt/live/stugora.fi ]; then
+if [ ! -d /etc/letsencrypt/live/rantio.fi ]; then
   echo "Next: point DNS at this server, then get the HTTPS certificate (DEPLOY.md, step 7)."
 fi

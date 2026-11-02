@@ -1,7 +1,7 @@
 // English: the source language and the fallback for anything another language lacks.
 // Placeholders in {braces} are filled in by the page; plural forms follow each
 // language's rules (see ../format.ts). Keep product names (Airbnb, Booking.com,
-// Vrbo, Nettimökki, Stugora) as they are in every language.
+// Vrbo, Nettimökki, Rantio) as they are in every language.
 import type { FeatureKey, GroupId } from "@/lib/catalog";
 import type { Region } from "@/lib/content";
 import type { Category } from "@/lib/listings";
@@ -22,13 +22,13 @@ export const en = {
       current: "Current language",
     },
     footer: {
-      note: "Stugora is a trading name of Elda-Auto Tmi.",
+      note: "Rantio is a trading name of Elda-Auto Tmi.",
       contact: "Contact",
       privacy: "Privacy",
       terms: "Terms",
     },
     apps: {
-      title: "Get the Stugora app",
+      title: "Get the Rantio app",
       soon: "Coming soon",
       download: "Download on",
     },
@@ -90,10 +90,10 @@ export const en = {
       aiHint: "Jot down a few words (dates, pets, a late arrival) and AI turns them into a message.",
     },
     chat: {
-      metaTitle: "Your conversation – Stugora",
+      metaTitle: "Your conversation – Rantio",
       title: "Your conversation about {cottage}",
       withHost: "With {name}, the owner",
-      withStugora: "With the Stugora team",
+      withRantio: "With the Rantio team",
       keepLink: "Keep this page's address: it's your private link to the conversation. We've also emailed it to you.",
       host: "Owner",
       you: "You",
@@ -107,7 +107,7 @@ export const en = {
       waiting: "The owner usually answers within a day. We'll email you when they do.",
     },
     meta: {
-      title: "Stugora – cottages across the Nordics and the Baltics",
+      title: "Rantio – cottages across the Nordics and the Baltics",
       description:
         "Cottages by lakes, fjords, forests and coasts from Iceland to Lithuania. Book on Airbnb, Booking.com or Vrbo.",
     },
@@ -395,9 +395,9 @@ export const en = {
 
   owner: {
     meta: {
-      title: "Stugora – your cottage on Airbnb, Booking.com and Vrbo",
+      title: "Rantio – your cottage on Airbnb, Booking.com and Vrbo",
       description:
-        "Stugora brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. €99 a year and 12% of the bookings we bring.",
+        "Rantio brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. €99 a year and 12% of the bookings we bring.",
     },
     nav: { cta: "List your cottage", login: "Sign in" },
     hero: {
@@ -407,8 +407,8 @@ export const en = {
       priceLabel: "Price per night",
       perNight: "€ / night",
       finePrint:
-        "The estimate takes off platform fees (about 15%), Stugora's €99 yearly fee, the 12% commission and VAT.",
-      lead: "Stugora puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with the local sites you already use, such as Nettimökki in Finland.",
+        "The estimate takes off platform fees (about 15%), Rantio's €99 yearly fee, the 12% commission and VAT.",
+      lead: "Rantio puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with the local sites you already use, such as Nettimökki in Finland.",
       cta: "List your cottage",
       photoAlt: "A cottage on a lake shore on a cloudy summer day",
       chipBookingTitle: "New booking from Airbnb",
@@ -453,12 +453,12 @@ export const en = {
     },
     price: {
       title: "€99 a year and 12% of the bookings we bring",
-      lead: "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Stugora opened, you pay 12% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
+      lead: "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Rantio opened, you pay 12% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
       exampleTitle: "Example: 20 extra nights at €150 a night",
       rows: {
         guests: "Guests pay",
         platform: "Platform fees, about 15%",
-        commission: "Stugora 12% plus VAT",
+        commission: "Rantio 12% plus VAT",
         yearly: "Yearly fee €99 plus VAT",
       },
       total: "You keep",
@@ -511,7 +511,7 @@ export const en = {
       nettimokki: "Link to your Nettimökki listing",
       message: "Anything else you'd like to tell us?",
       optional: "optional",
-      consent: "Stugora may store these details and contact me.",
+      consent: "Rantio may store these details and contact me.",
       privacyLink: "Read our privacy policy",
       submit: "List your cottage",
       sending: "Sending…",
@@ -532,7 +532,7 @@ export const en = {
   },
 
   book: {
-    metaTitle: "Booking request – Stugora",
+    metaTitle: "Booking request – Rantio",
     host: "Your host: {name}",
     perNight: "{price} / night",
     dates: "Dates",
@@ -553,7 +553,7 @@ export const en = {
       nights: "{price} × {nights}",
       cleaning: "Cleaning",
       total: "Total",
-      note: "The owner confirms the price and tells you how to pay. Nothing is paid on Stugora.",
+      note: "The owner confirms the price and tells you how to pay. Nothing is paid on Rantio.",
     },
     form: {
       title: "Your details",
@@ -663,7 +663,7 @@ export const en = {
       },
       link: {
         title: "Your booking link",
-        lead: "Share it with your own guests: returning families, friends, your Facebook page. They see your free dates and send a request; you accept or decline. Stugora charges nothing for these bookings.",
+        lead: "Share it with your own guests: returning families, friends, your Facebook page. They see your free dates and send a request; you accept or decline. Rantio charges nothing for these bookings.",
         copy: "Copy link",
         copied: "Copied",
         view: "Open",
@@ -676,7 +676,7 @@ export const en = {
       },
       sites: {
         title: "Connect your booking sites",
-        lead: "Each site reads Stugora's calendar, and Stugora reads theirs every 15 minutes. Do this once for each site.",
+        lead: "Each site reads Rantio's calendar, and Rantio reads theirs every 15 minutes. Do this once for each site.",
         ours: "1. Give this link to {site}",
         oursHelp: "In {site}'s calendar settings, choose to import a calendar and paste this link.",
         theirs: "2. Paste {site}'s calendar link here",
@@ -715,14 +715,14 @@ export const en = {
       emptyFilter: "Nothing here.",
       choose: "Choose a conversation to read it.",
       back: "All messages",
-      enquiry: "Enquiry on stugora.fi",
+      enquiry: "Enquiry on rantio.fi",
       you: "You",
       placeholder: "Write a reply…",
       send: "Send",
       sending: "Sending…",
       failed: "Your reply couldn't be sent. Please try again.",
       siteNote: "Replies to {site} guests will go through {site} once your channel manager is connected. Until then they are saved here only.",
-      directNote: "The guest gets your reply by email and reads it on Stugora. They never see your email address, and you never see theirs.",
+      directNote: "The guest gets your reply by email and reads it on Rantio. They never see your email address, and you never see theirs.",
       archive: "Archive",
       unarchive: "Move back to inbox",
       writesIn: "Writes in {language}",
@@ -731,8 +731,8 @@ export const en = {
       sendHint: "Ctrl + Enter sends",
     },
     meta: {
-      title: "Hosting – Stugora",
-      loginTitle: "Sign in – Stugora",
+      title: "Hosting – Rantio",
+      loginTitle: "Sign in – Rantio",
     },
     area: "Hosting",
     login: {
@@ -741,7 +741,7 @@ export const en = {
       email: "Email",
       send: "Send code",
       sending: "Sending…",
-      sentTo: "If {email} belongs to a Stugora owner, we've sent a code to it. It works for 15 minutes.",
+      sentTo: "If {email} belongs to a Rantio owner, we've sent a code to it. It works for 15 minutes.",
       code: "Code",
       verify: "Sign in",
       verifying: "Checking…",
@@ -751,13 +751,13 @@ export const en = {
       wrongCode: "That code doesn't work. Check it or ask for a new one.",
       tooMany: "Too many tries. Wait a moment and try again.",
       failed: "Something went wrong. Please try again in a moment.",
-      notOwner: "Not with Stugora yet?",
+      notOwner: "Not with Rantio yet?",
       join: "List your cottage",
     },
     logout: "Sign out",
     switchToTraveling: "Switch to traveling",
     hello: "Hi, {name}",
-    lead: "Your cottages' bookings, earnings and Stugora's share.",
+    lead: "Your cottages' bookings, earnings and Rantio's share.",
     year: "Year",
     loading: "Loading…",
     error: "Your figures couldn't be loaded. Please try again in a moment.",
@@ -773,18 +773,18 @@ export const en = {
     },
     kpi: {
       payout: "Paid to you",
-      payoutSub: "{stugora} from Stugora's sites, {own} from your own",
+      payoutSub: "{stugora} from Rantio's sites, {own} from your own",
       bookings: "Bookings",
       cancelled: p({ one: "{n} cancelled", other: "{n} cancelled" }),
-      stugora: "Stugora's share",
+      stugora: "Rantio's share",
       stugoraSub: "{rate}% commission and yearly fees, incl. VAT",
       net: "You keep",
-      netSub: "Payouts minus Stugora's share",
+      netSub: "Payouts minus Rantio's share",
     },
     chart: {
       title: "Earnings by month",
       lead: "Paid to you, by the month guests arrive.",
-      stugora: "Stugora's sites",
+      stugora: "Rantio's sites",
       own: "Your own sites",
       ownNote: "Nettimökki and your own bookings",
       total: "Total",
@@ -842,7 +842,7 @@ export const en = {
     howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is €99 + VAT per cottage; pilot owners' first year is free. VAT is 25.5%.",
     ownBooking: "Own booking",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Map",
@@ -875,7 +875,7 @@ export const en = {
       listedOn: "Listed on",
       book: "Book",
       chooseSite: "Choose where to book",
-      chooseLead: "Stugora lists this cottage on these sites. Book where you like; the price and the owner are the same.",
+      chooseLead: "Rantio lists this cottage on these sites. Book where you like; the price and the owner are the same.",
       logIn: "Owner sign-in",
     },
     saved: {
@@ -914,9 +914,9 @@ export const en = {
       bookings: "All bookings",
       notifications: "Notifications",
       notificationsLead: "New bookings, messages and booking requests on this phone.",
-      notificationsBlocked: "Notifications for Stugora are off in your phone's settings.",
+      notificationsBlocked: "Notifications for Rantio are off in your phone's settings.",
       openSettings: "Open settings",
-      web: "Stugora on the web",
+      web: "Rantio on the web",
     },
     detail: {
       showAmenities: "Show all {n} amenities",

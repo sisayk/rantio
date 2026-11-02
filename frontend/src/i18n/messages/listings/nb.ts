@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Mine annonser", editTitle: "Rediger annonsen", previewTitle: "Forhåndsvisning" },
   title: "Mine annonser",
-  lead: "Hyttene dine slik gjestene ser dem på Stugora. Her endrer du opplysninger, bilder, priser og regler.",
+  lead: "Hyttene dine slik gjestene ser dem på Rantio. Her endrer du opplysninger, bilder, priser og regler.",
   add: "Legg til ny bolig",
   addTitle: "Legg til en bolig",
   addName: "Hva heter boligen?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Ulagrede endringer",
   allSaved: "Alle endringer er lagret",
   saveError: "Endringene ble ikke lagret. Sjekk feltene som er merket med rødt, og prøv igjen.",
-  networkError: "Fikk ikke kontakt med Stugora. Endringene dine er fortsatt her; prøv å lagre igjen.",
+  networkError: "Fikk ikke kontakt med Rantio. Endringene dine er fortsatt her; prøv å lagre igjen.",
   invalid: "Sjekk dette feltet",
   leave: "Du har ulagrede endringer. Vil du gå uten å lagre?",
   restore: "På denne enheten har du ulagrede endringer fra {date}.",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Forkast",
   sections: "Deler av annonsen",
   stugoraOnly:
-    "Endringer her oppdaterer annonsen din på Stugora. Airbnb, Booking.com, Vrbo og Nettimökki har sine egne annonser: teamet vårt fører over endringene dit for deg til en kanalbehandler er koblet til.",
+    "Endringer her oppdaterer annonsen din på Rantio. Airbnb, Booking.com, Vrbo og Nettimökki har sine egne annonser: teamet vårt fører over endringene dit for deg til en kanalbehandler er koblet til.",
   nav: {
     overview: "Oversikt",
     basics: "Grunnleggende opplysninger",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Bytt ut",
     remove: "Slett",
     removeTitle: "Slette dette bildet?",
-    removeBody: "Det fjernes fra annonsen din på Stugora. Dette kan ikke angres; bildene på bookingnettstedene blir liggende til teamet vårt oppdaterer dem.",
+    removeBody: "Det fjernes fra annonsen din på Rantio. Dette kan ikke angres; bildene på bookingnettstedene blir liggende til teamet vårt oppdaterer dem.",
     empty: "Ingen bilder ennå. Start med hytta utenfra; det blir forsidebildet.",
     previewGallery: "Forhåndsvis galleriet",
     count: "{n} av {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Priser og gebyrer",
-    lead: "Dette er prisene på Stugora-siden din og i bookinglenken din. Airbnb, Booking.com og Vrbo har sine egne priser; en kalenderlenke tar bare med datoer, så prisene synkroniseres ikke dit.",
+    lead: "Dette er prisene på Rantio-siden din og i bookinglenken din. Airbnb, Booking.com og Vrbo har sine egne priser; en kalenderlenke tar bare med datoer, så prisene synkroniseres ikke dit.",
     base: "Pris per natt",
     weekend: "Natt til lørdag og søndag",
     weekendHint: "La stå tomt for å bruke vanlig nattpris.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Korteste opphold: {n} netter. Endre det under Priser og gebyrer.",
     sites: "Bookingnettsteder",
     sitesLead:
-      "Dette er bare kalendersynkronisering. Hvert nettsted leser Stugora-kalenderlenken din, og Stugora leser deres hvert 15. minutt, så en booking fra de siste minuttene vises kanskje ikke ennå. Bilder, tekster og priser synkroniseres ikke.",
+      "Dette er bare kalendersynkronisering. Hvert nettsted leser Rantio-kalenderlenken din, og Rantio leser deres hvert 15. minutt, så en booking fra de siste minuttene vises kanskje ikke ennå. Bilder, tekster og priser synkroniseres ikke.",
     manage: "Koble til eller endre kalenderlenker",
     lastSync: "Sist lest {time}",
     never: "Ikke lest ennå",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Status",
-    current: "Stugora-annonsen din er {status}.",
+    current: "Rantio-annonsen din er {status}.",
     explain: {
       intake: "Utkast: bare du ser den. Publiser når de nødvendige punktene er på plass.",
       listing: "Teamet vårt setter opp annonsene på bookingnettstedene.",
-      live: "Publisert på Stugora. Gjestene kan finne den og sende bookingforespørsler.",
-      paused: "På pause: skjult for nye gjester på Stugora. Opphold, meldinger og inntekter du allerede har, påvirkes ikke.",
+      live: "Publisert på Rantio. Gjestene kan finne den og sende bookingforespørsler.",
+      paused: "På pause: skjult for nye gjester på Rantio. Opphold, meldinger og inntekter du allerede har, påvirkes ikke.",
       archived: "Arkivert: ute av de aktive annonsene dine. Opphold, inntekter og meldinger blir liggende i oversikten din.",
     },
     external:
-      "Dette endrer bare Stugora-annonsen din. For å sette hytta på pause på Airbnb, Booking.com, Vrbo eller Nettimökki må du endre det på hvert nettsted, eller be oss om det.",
+      "Dette endrer bare Rantio-annonsen din. For å sette hytta på pause på Airbnb, Booking.com, Vrbo eller Nettimökki må du endre det på hvert nettsted, eller be oss om det.",
     publish: "Publiser",
     pause: "Sett annonsen på pause",
     relist: "Publiser igjen",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Gjenopprettet som utkast",
     pauseTitle: "Sette annonsen på pause?",
     pauseBody:
-      "Nye gjester finner den ikke på Stugora, og bookinglenken din slutter å ta imot forespørsler. Opphold som allerede er booket, avbestilles ikke, og inntektene og meldingene dine er som før. Airbnb, Booking.com, Vrbo og Nettimökki endres ikke.",
+      "Nye gjester finner den ikke på Rantio, og bookinglenken din slutter å ta imot forespørsler. Opphold som allerede er booket, avbestilles ikke, og inntektene og meldingene dine er som før. Airbnb, Booking.com, Vrbo og Nettimökki endres ikke.",
     archiveTitle: "Arkivere denne boligen?",
     archiveBody: "Den flyttes ut av de aktive annonsene dine. Tidligere opphold, inntekter og meldinger blir liggende i oversikten din, og du kan gjenopprette den senere.",
     futureBookings: {
@@ -384,7 +384,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Skriv navnet på boligen for å bekrefte",
     deleteButton: "Slett for godt",
     deleted: "Boligen er slettet",
-    deleteHasBookings: "Denne boligen har registrerte opphold, så den kan ikke slettes: de er en del av inntektene dine og fakturaene fra Stugora. Arkiver den i stedet.",
+    deleteHasBookings: "Denne boligen har registrerte opphold, så den kan ikke slettes: de er en del av inntektene dine og fakturaene fra Rantio. Arkiver den i stedet.",
     deleteHasMessages: "Gjester har skrevet om denne boligen, så den kan ikke slettes. Arkiver den i stedet, så beholder du meldingene.",
     deleteName: "Navnet stemmer ikke.",
     history: "Endringshistorikk",

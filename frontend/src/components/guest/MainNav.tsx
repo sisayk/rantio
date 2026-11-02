@@ -26,7 +26,7 @@ export default function MainNav({
     inspiration: paths.inspiration(lang),
   };
   return (
-    <nav className={className} aria-label="Stugora">
+    <nav className={className} aria-label="Rantio">
       {PAGES.map((page, i) => (
         <a key={page} href={href[page]} aria-current={page === active ? "page" : undefined}>
           {labels[i]}

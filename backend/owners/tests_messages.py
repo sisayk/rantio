@@ -8,7 +8,7 @@ from .login import user_for
 from .models import Conversation, Cottage, Message, Owner
 
 
-@override_settings(SITE_URL="https://stugora.fi", SIGNUP_NOTIFY_EMAILS=["team@stugora.fi"])
+@override_settings(SITE_URL="https://rantio.fi", SIGNUP_NOTIFY_EMAILS=["team@rantio.fi"])
 class MessagingTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -30,7 +30,7 @@ class MessagingTests(TestCase):
         self.assertEqual((c.cottage, c.channel, c.guest_email, c.guest_language), (self.cottage, "direct", "lukas@example.com", "sv"))
         self.assertEqual(c.messages.get().sender, "guest")
         to = {m.to[0]: m for m in mail.outbox}
-        self.assertIn(f"https://stugora.fi/sv/messages/{c.token}", to["lukas@example.com"].body)  # guest's private link
+        self.assertIn(f"https://rantio.fi/sv/messages/{c.token}", to["lukas@example.com"].body)  # guest's private link
         self.assertIn("Lukas Becker", to["maija@example.com"].subject)  # owner, in Finnish
         self.assertIn("kirjoitti", to["maija@example.com"].body)
         self.assertNotIn(c.token, to["maija@example.com"].body)
@@ -40,7 +40,7 @@ class MessagingTests(TestCase):
         res = self.enquire(listing="lofoten-rorbu")
         self.assertEqual(res.status_code, 201)
         self.assertIsNone(Conversation.objects.get().cottage)
-        self.assertIn("team@stugora.fi", [m.to[0] for m in mail.outbox])
+        self.assertIn("team@rantio.fi", [m.to[0] for m in mail.outbox])
 
     def test_enquiry_with_adults_and_children(self):
         c = Conversation.objects.get(token=self.enquire(adults=2, children=1).json()["token"])

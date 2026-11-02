@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                     ("google", "Google Vacation Rentals"),
                     ("holidu", "Holidu"),
                     ("hometogo", "HomeToGo"),
-                    ("direct", "Stugora direct"),
+                    ("direct", "Rantio direct"),
                     ("nettimokki", "Nettimökki"),
                     ("owner", "Owner's own booking"),
                 ],

@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isLang(lang)) return {};
   const t = getMessages(lang).dashboard;
-  return { title: `${t.inbox.title} – Stugora`, robots: { index: false, follow: false } };
+  return { title: `${t.inbox.title} – Rantio`, robots: { index: false, follow: false } };
 }
 
 // Conversations load in the browser after sign-in; the server only sends the words.

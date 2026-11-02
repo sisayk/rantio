@@ -6,7 +6,7 @@ import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { ownerApi } from "@/lib/ownerApi";
 import { forgetOwnerSession } from "@/lib/useOwnerSession";
-import { Logo } from "../guest/icons";
+import { Wordmark } from "../guest/icons";
 import styles from "./owner.module.css";
 
 function TabIcon({ d }: { d: string }) {
@@ -44,8 +44,7 @@ export default function HostingHeader({
     <header className={styles.top}>
       <div className={styles.topInner}>
         <a className={styles.brand} href={paths.home(lang)}>
-          <Logo className={styles.logo} />
-          Stugora
+          <Wordmark />
           <span className={styles.area}>{t.area}</span>
         </a>
         <nav className={styles.tabs} aria-label={t.area}>

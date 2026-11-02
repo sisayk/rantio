@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update Stugora on the server: get the new code, install, build, migrate, restart.
+# Update Rantio on the server: get the new code, install, build, migrate, restart.
 # Run ON the server as root:   bash /srv/stugora/app/deploy/deploy.sh
 #
 #   --skip-pull   don't run git pull (code was copied with rsync, or setup-server.sh calls it)
@@ -113,18 +113,18 @@ systemctl restart stugora-django.service stugora-next.service
 step "nginx"
 install -m 0644 "$DEPLOY_DIR/nginx/stugora-proxy.conf" "$DEPLOY_DIR/nginx/stugora-ssl.conf" \
   "$DEPLOY_DIR/nginx/stugora-security-headers.conf" /etc/nginx/snippets/
-if [ -f /etc/letsencrypt/live/stugora.fi/fullchain.pem ]; then
+if [ -f /etc/letsencrypt/live/rantio.fi/fullchain.pem ]; then
   install -m 0644 "$DEPLOY_DIR/nginx/stugora.conf" /etc/nginx/sites-available/stugora
-  echo "    HTTPS site for stugora.fi installed."
+  echo "    HTTPS site for rantio.fi installed."
 else
   install -m 0644 "$DEPLOY_DIR/nginx/stugora-http-only.conf" /etc/nginx/sites-available/stugora
-  echo "    No certificate for stugora.fi yet: plain-http site installed (DEPLOY.md, step 7)."
+  echo "    No certificate for rantio.fi yet: plain-http site installed (DEPLOY.md, step 7)."
 fi
 ln -sf /etc/nginx/sites-available/stugora /etc/nginx/sites-enabled/stugora
 if [ -f /etc/letsencrypt/live/stugora.com/fullchain.pem ]; then
   install -m 0644 "$DEPLOY_DIR/nginx/stugora-com-redirect.conf" /etc/nginx/sites-available/stugora-com
   ln -sf /etc/nginx/sites-available/stugora-com /etc/nginx/sites-enabled/stugora-com
-  echo "    stugora.com -> stugora.fi redirect installed."
+  echo "    stugora.com -> rantio.fi redirect installed."
 else
   rm -f /etc/nginx/sites-enabled/stugora-com
 fi

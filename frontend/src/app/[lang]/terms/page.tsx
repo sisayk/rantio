@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isLang(lang)) return {};
   const t = getLegal(lang).terms;
-  return pageMetadata(lang, "/terms", `${t.title} | Stugora`, t.description);
+  return pageMetadata(lang, "/terms", `${t.title} | Rantio`, t.description);
 }
 
 export default async function Page({ params }: Props) {

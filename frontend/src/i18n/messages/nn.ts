@@ -13,13 +13,13 @@ export const nn: Translation = {
       current: "Noverande språk",
     },
     footer: {
-      note: "Stugora er eit handelsnamn for Elda-Auto Tmi.",
+      note: "Rantio er eit handelsnamn for Elda-Auto Tmi.",
       contact: "Kontakt",
       privacy: "Personvern",
       terms: "Vilkår",
     },
     apps: {
-      title: "Last ned Stugora-appen",
+      title: "Last ned Rantio-appen",
       soon: "Kjem snart",
       download: "Last ned frå",
     },
@@ -81,10 +81,10 @@ export const nn: Translation = {
       aiHint: "Skriv nokre ord (datoar, kjæledyr, sein ankomst), så gjer KI dei om til ei melding.",
     },
     chat: {
-      metaTitle: "Samtalen din – Stugora",
+      metaTitle: "Samtalen din – Rantio",
       title: "Samtalen din om {cottage}",
       withHost: "Med {name}, eigaren",
-      withStugora: "Med Stugora-teamet",
+      withRantio: "Med Rantio-teamet",
       keepLink: "Ta vare på adressa til denne sida: ho er den private lenkja di til samtalen. Vi har òg sendt henne til deg på e-post.",
       host: "Eigaren",
       you: "Du",
@@ -98,7 +98,7 @@ export const nn: Translation = {
       waiting: "Eigaren svarar vanlegvis innan eit døgn. Vi sender deg ein e-post når svaret kjem.",
     },
     meta: {
-      title: "Stugora – hytter i Norden og Baltikum",
+      title: "Rantio – hytter i Norden og Baltikum",
       description:
         "Hytter ved innsjøar, fjordar, skogar og kystar frå Island til Litauen. Bestill på Airbnb, Booking.com eller Vrbo.",
     },
@@ -382,9 +382,9 @@ export const nn: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – hytta di på Airbnb, Booking.com og Vrbo",
+      title: "Rantio – hytta di på Airbnb, Booking.com og Vrbo",
       description:
-        "Stugora gir hytta di gjester frå utlandet, kvar som helst i Norden eller Baltikum, og held kalendrane i takt med sidene du alt brukar. 99 € i året og 12 % av bestillingane vi skaffar deg.",
+        "Rantio gir hytta di gjester frå utlandet, kvar som helst i Norden eller Baltikum, og held kalendrane i takt med sidene du alt brukar. 99 € i året og 12 % av bestillingane vi skaffar deg.",
     },
     nav: { cta: "Legg ut hytta di", login: "Logg inn" },
     hero: {
@@ -394,8 +394,8 @@ export const nn: Translation = {
       priceLabel: "Pris per natt",
       perNight: "€ / natt",
       finePrint:
-        "Overslaget er etter fråtrekk for plattformgebyr (om lag 15 %), årsavgifta til Stugora på 99 €, provisjonen på 12 % og meirverdiavgift.",
-      lead: "Stugora legg hytta di ut på Airbnb, Booking.com og Vrbo og held alle kalendrane i takt med dei lokale sidene du alt brukar, som Nettimökki i Finland.",
+        "Overslaget er etter fråtrekk for plattformgebyr (om lag 15 %), årsavgifta til Rantio på 99 €, provisjonen på 12 % og meirverdiavgift.",
+      lead: "Rantio legg hytta di ut på Airbnb, Booking.com og Vrbo og held alle kalendrane i takt med dei lokale sidene du alt brukar, som Nettimökki i Finland.",
       cta: "Legg ut hytta di",
       photoAlt: "Ei hytte ved eit vatn ein overskya sommardag",
       chipBookingTitle: "Ny bestilling frå Airbnb",
@@ -440,12 +440,12 @@ export const nn: Translation = {
     },
     price: {
       title: "99 € i året og 12 % av bestillingane vi skaffar deg",
-      lead: "Inga etableringsavgift og inga månadsavgift. Årsavgifta dekkjer arbeidet med å lage og halde ved like annonsane dine. Når ein gjest bestiller gjennom ein kanal Stugora har opna, betaler du 12 % av det plattforma betaler deg. Meirverdiavgift kjem i tillegg på begge. Vi tek aldri betalt for bestillingar frå sidene du brukte før, som Nettimökki.",
+      lead: "Inga etableringsavgift og inga månadsavgift. Årsavgifta dekkjer arbeidet med å lage og halde ved like annonsane dine. Når ein gjest bestiller gjennom ein kanal Rantio har opna, betaler du 12 % av det plattforma betaler deg. Meirverdiavgift kjem i tillegg på begge. Vi tek aldri betalt for bestillingar frå sidene du brukte før, som Nettimökki.",
       exampleTitle: "Eksempel: 20 ekstra netter til 150 € natta",
       rows: {
         guests: "Gjestene betaler",
         platform: "Plattformgebyr, om lag 15 %",
-        commission: "Stugora 12 % pluss mva.",
+        commission: "Rantio 12 % pluss mva.",
         yearly: "Årsavgift 99 € pluss mva.",
       },
       total: "Du sit att med",
@@ -498,7 +498,7 @@ export const nn: Translation = {
       nettimokki: "Lenkje til Nettimökki-annonsen din",
       message: "Er det noko anna du vil fortelje oss?",
       optional: "valfritt",
-      consent: "Stugora kan lagre desse opplysningane og ta kontakt med meg.",
+      consent: "Rantio kan lagre desse opplysningane og ta kontakt med meg.",
       privacyLink: "Les personvernerklæringa vår",
       submit: "Legg ut hytta di",
       sending: "Sender…",
@@ -519,7 +519,7 @@ export const nn: Translation = {
   },
 
   book: {
-    metaTitle: "Bestillingsførespurnad – Stugora",
+    metaTitle: "Bestillingsførespurnad – Rantio",
     host: "Verten din: {name}",
     perNight: "{price} / natt",
     dates: "Datoar",
@@ -540,7 +540,7 @@ export const nn: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Sluttvask",
       total: "Totalt",
-      note: "Eigaren stadfestar prisen og fortel deg korleis du betaler. Du betaler ingenting på Stugora.",
+      note: "Eigaren stadfestar prisen og fortel deg korleis du betaler. Du betaler ingenting på Rantio.",
     },
     form: {
       title: "Opplysningane dine",
@@ -650,7 +650,7 @@ export const nn: Translation = {
       },
       link: {
         title: "Bestillingslenkja di",
-        lead: "Del henne med dine eigne gjester: familiar som kjem att, vener, Facebook-sida di. Dei ser dei ledige datoane dine og sender ein førespurnad; du godtek eller avslår. Stugora tek ingenting for desse bookingane.",
+        lead: "Del henne med dine eigne gjester: familiar som kjem att, vener, Facebook-sida di. Dei ser dei ledige datoane dine og sender ein førespurnad; du godtek eller avslår. Rantio tek ingenting for desse bookingane.",
         copy: "Kopier lenkja",
         copied: "Kopiert",
         view: "Opne",
@@ -663,7 +663,7 @@ export const nn: Translation = {
       },
       sites: {
         title: "Kople til bookingnettstadene dine",
-        lead: "Kvar nettstad les kalenderen til Stugora, og Stugora les kalenderen deira kvart 15. minutt. Dette gjer du éin gong for kvar nettstad.",
+        lead: "Kvar nettstad les kalenderen til Rantio, og Rantio les kalenderen deira kvart 15. minutt. Dette gjer du éin gong for kvar nettstad.",
         ours: "1. Gi denne lenkja til {site}",
         oursHelp: "I kalenderinnstillingane på {site} vel du å importere ein kalender og limer inn denne lenkja.",
         theirs: "2. Lim inn kalenderlenkja frå {site} her",
@@ -702,14 +702,14 @@ export const nn: Translation = {
       emptyFilter: "Ingenting her.",
       choose: "Vel ein samtale for å lese han.",
       back: "Alle meldingar",
-      enquiry: "Førespurnad via stugora.fi",
+      enquiry: "Førespurnad via rantio.fi",
       you: "Du",
       placeholder: "Skriv eit svar…",
       send: "Send",
       sending: "Sender…",
       failed: "Svaret kunne ikkje sendast. Prøv igjen.",
       siteNote: "Svar til gjester på {site} går via {site} når kanalhandsamaren din er kopla til. Fram til då blir dei berre lagra her.",
-      directNote: "Gjesten får svaret ditt på e-post og les det på Stugora. Gjesten ser aldri e-postadressa di, og du ser ikkje gjesten si.",
+      directNote: "Gjesten får svaret ditt på e-post og les det på Rantio. Gjesten ser aldri e-postadressa di, og du ser ikkje gjesten si.",
       archive: "Arkiver",
       unarchive: "Flytt tilbake til innboksen",
       writesIn: "Skriv på {language}",
@@ -718,8 +718,8 @@ export const nn: Translation = {
       sendHint: "Ctrl + Enter sender",
     },
     meta: {
-      title: "Hyttene mine – Stugora",
-      loginTitle: "Logg inn – Stugora",
+      title: "Hyttene mine – Rantio",
+      loginTitle: "Logg inn – Rantio",
     },
     area: "Hyttene mine",
     login: {
@@ -728,7 +728,7 @@ export const nn: Translation = {
       email: "E-post",
       send: "Send kode",
       sending: "Sender…",
-      sentTo: "Viss {email} høyrer til ein hytteeigar hos Stugora, har vi sendt ein kode dit. Han gjeld i 15 minutt.",
+      sentTo: "Viss {email} høyrer til ein hytteeigar hos Rantio, har vi sendt ein kode dit. Han gjeld i 15 minutt.",
       code: "Kode",
       verify: "Logg inn",
       verifying: "Sjekkar…",
@@ -738,13 +738,13 @@ export const nn: Translation = {
       wrongCode: "Koden verkar ikkje. Sjekk han eller be om ein ny.",
       tooMany: "For mange forsøk. Vent litt og prøv igjen.",
       failed: "Noko gjekk gale. Prøv igjen om litt.",
-      notOwner: "Ikkje med i Stugora enno?",
+      notOwner: "Ikkje med i Rantio enno?",
       join: "Legg ut hytta di",
     },
     logout: "Logg ut",
     switchToTraveling: "Byt til reising",
     hello: "Hei, {name}",
-    lead: "Bookingar, inntekter og delen til Stugora for hyttene dine.",
+    lead: "Bookingar, inntekter og delen til Rantio for hyttene dine.",
     year: "År",
     loading: "Lastar…",
     error: "Tala kunne ikkje lastast. Prøv igjen om litt.",
@@ -760,18 +760,18 @@ export const nn: Translation = {
     },
     kpi: {
       payout: "Utbetalt til deg",
-      payoutSub: "{stugora} frå nettstadene til Stugora, {own} frå dine eigne",
+      payoutSub: "{stugora} frå nettstadene til Rantio, {own} frå dine eigne",
       bookings: "Bookingar",
       cancelled: { one: "{n} avbestilt", other: "{n} avbestilte" },
-      stugora: "Delen til Stugora",
+      stugora: "Delen til Rantio",
       stugoraSub: "{rate} % provisjon og årsavgifter, inkl. mva.",
       net: "Du sit att med",
-      netSub: "Utbetalingar minus delen til Stugora",
+      netSub: "Utbetalingar minus delen til Rantio",
     },
     chart: {
       title: "Inntekter per månad",
       lead: "Utbetalt til deg, etter månaden gjestene kjem.",
-      stugora: "Nettstadene til Stugora",
+      stugora: "Nettstadene til Rantio",
       own: "Dine eigne nettstader",
       ownNote: "Nettimökki og eigne bookingar",
       total: "Totalt",
@@ -829,7 +829,7 @@ export const nn: Translation = {
     howItWorks: "Provisjonen er ein del av det nettstaden betaler deg for opphaldet (vaskeavgift ikkje rekna med). Nettimökki og dine eigne bookingar kostar aldri noko. Årsavgifta er 99 € + mva. per hytte; for piloteigarar er det første året gratis. Meirverdiavgifta er 25,5 %.",
     ownBooking: "Eigen booking",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Kart",
@@ -862,7 +862,7 @@ export const nn: Translation = {
       listedOn: "Ligg på",
       book: "Book",
       chooseSite: "Vel kvar du bookar",
-      chooseLead: "Stugora legg ut hytta på desse nettstadene. Book der du vil; prisen og eigaren er dei same.",
+      chooseLead: "Rantio legg ut hytta på desse nettstadene. Book der du vil; prisen og eigaren er dei same.",
       logIn: "Logg inn som eigar",
     },
     saved: {
@@ -901,9 +901,9 @@ export const nn: Translation = {
       bookings: "Alle bookingar",
       notifications: "Varsel",
       notificationsLead: "Nye bookingar, meldingar og bookingførespurnader på denne telefonen.",
-      notificationsBlocked: "Varsel frå Stugora er slått av i innstillingane på telefonen.",
+      notificationsBlocked: "Varsel frå Rantio er slått av i innstillingane på telefonen.",
       openSettings: "Opne innstillingar",
-      web: "Stugora på nett",
+      web: "Rantio på nett",
     },
     detail: {
       showAmenities: "Vis alle {n} fasilitetane",

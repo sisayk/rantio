@@ -10,7 +10,7 @@ import Estimator from "./Estimator";
 import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
 import HostSwitchLink from "./guest/HostSwitchLink";
-import { Logo } from "./guest/icons";
+import { Wordmark } from "./guest/icons";
 import g from "./guest/guest.module.css";
 import styles from "./landing.module.css";
 import AppBadges from "./AppBadges";
@@ -61,8 +61,7 @@ export default function Landing({ lang }: { lang: Lang }) {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <a className={g.brand} href={paths.home(lang)}>
-            <Logo className={g.logo} />
-            <span>Stugora</span>
+            <Wordmark />
           </a>
           <nav className={`${g.detailTopLinks} ${styles.headerNav}`}>
             <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={g.langButton} />

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, slug } = await params;
   if (!isLang(lang) || !isGuide(slug)) return {};
   const guide = getMessages(lang).explore.guides[slug];
-  return pageMetadata(lang, `/inspiration/${slug}`, `${guide.title} | Stugora`, guide.lead, unsplash(GUIDES[slug].photo, 1200, 630));
+  return pageMetadata(lang, `/inspiration/${slug}`, `${guide.title} | Rantio`, guide.lead, unsplash(GUIDES[slug].photo, 1200, 630));
 }
 
 async function Guide({ params }: Props) {

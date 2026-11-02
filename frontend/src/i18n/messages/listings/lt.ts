@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Mano skelbimai", editTitle: "Redaguoti skelbimą", previewTitle: "Peržiūra" },
   title: "Mano skelbimai",
-  lead: "Jūsų nameliai taip, kaip juos mato svečiai Stugora. Čia galite keisti aprašymą, nuotraukas, kainas ir taisykles.",
+  lead: "Jūsų nameliai taip, kaip juos mato svečiai Rantio. Čia galite keisti aprašymą, nuotraukas, kainas ir taisykles.",
   add: "Pridėti objektą",
   addTitle: "Pridėti objektą",
   addName: "Kaip vadinasi Jūsų objektas?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Neišsaugoti pakeitimai",
   allSaved: "Visi pakeitimai išsaugoti",
   saveError: "Pakeitimai neišsaugoti. Patikrinkite raudonai pažymėtus laukus ir bandykite dar kartą.",
-  networkError: "Nepavyko susisiekti su Stugora. Jūsų pakeitimai vis dar čia; bandykite išsaugoti dar kartą.",
+  networkError: "Nepavyko susisiekti su Rantio. Jūsų pakeitimai vis dar čia; bandykite išsaugoti dar kartą.",
   invalid: "Patikrinkite šį lauką",
   leave: "Turite neišsaugotų pakeitimų. Išeiti neišsaugojus?",
   restore: "Šiame įrenginyje yra Jūsų neišsaugotų pakeitimų nuo {date}.",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Atmesti",
   sections: "Skelbimo skiltys",
   stugoraOnly:
-    "Čia atlikti pakeitimai atnaujina Jūsų Stugora skelbimą. Airbnb, Booking.com, Vrbo ir Nettimökki turi savo skelbimus: kol bus prijungta kanalų valdymo sistema, mūsų komanda pakeitimus ten perkels už Jus.",
+    "Čia atlikti pakeitimai atnaujina Jūsų Rantio skelbimą. Airbnb, Booking.com, Vrbo ir Nettimökki turi savo skelbimus: kol bus prijungta kanalų valdymo sistema, mūsų komanda pakeitimus ten perkels už Jus.",
   nav: {
     overview: "Apžvalga",
     basics: "Pagrindinė informacija",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Pakeisti",
     remove: "Ištrinti",
     removeTitle: "Ištrinti šią nuotrauką?",
-    removeBody: "Ji bus pašalinta iš Jūsų Stugora skelbimo. To atšaukti negalima; nuotraukos užsakymų svetainėse liks, kol mūsų komanda jas atnaujins.",
+    removeBody: "Ji bus pašalinta iš Jūsų Rantio skelbimo. To atšaukti negalima; nuotraukos užsakymų svetainėse liks, kol mūsų komanda jas atnaujins.",
     empty: "Nuotraukų dar nėra. Pradėkite nuo namelio iš lauko; ši nuotrauka taps viršeliu.",
     previewGallery: "Peržiūrėti galeriją",
     count: "{n} iš {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Kainos ir mokesčiai",
-    lead: "Tai kainos Jūsų Stugora puslapyje ir užsakymo nuorodoje. Airbnb, Booking.com ir Vrbo turi savo kainas; kalendoriaus nuoroda perduoda tik datas, todėl kainos ten nesinchronizuojamos.",
+    lead: "Tai kainos Jūsų Rantio puslapyje ir užsakymo nuorodoje. Airbnb, Booking.com ir Vrbo turi savo kainas; kalendoriaus nuoroda perduoda tik datas, todėl kainos ten nesinchronizuojamos.",
     base: "Nakties kaina",
     weekend: "Penktadienio ir šeštadienio naktys",
     weekendHint: "Palikite tuščią, kad būtų taikoma įprasta nakties kaina.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Trumpiausia viešnagė: {n} naktys. Ją pakeisite skiltyje „Kainos ir mokesčiai“.",
     sites: "Užsakymų svetainės",
     sitesLead:
-      "Tai tik kalendorių sinchronizavimas. Kiekviena svetainė skaito Jūsų Stugora kalendoriaus nuorodą, o Stugora jų nuorodas nuskaito kas 15 minučių, todėl prieš kelias minutes atliktas užsakymas gali būti dar nematomas. Nuotraukos, tekstai ir kainos nesinchronizuojami.",
+      "Tai tik kalendorių sinchronizavimas. Kiekviena svetainė skaito Jūsų Rantio kalendoriaus nuorodą, o Rantio jų nuorodas nuskaito kas 15 minučių, todėl prieš kelias minutes atliktas užsakymas gali būti dar nematomas. Nuotraukos, tekstai ir kainos nesinchronizuojami.",
     manage: "Prijungti arba keisti kalendoriaus nuorodas",
     lastSync: "Paskutinį kartą nuskaityta {time}",
     never: "Dar nenuskaityta",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Būsena",
-    current: "Jūsų Stugora skelbimo būsena: {status}.",
+    current: "Jūsų Rantio skelbimo būsena: {status}.",
     explain: {
       intake: "Juodraštis: jį matote tik Jūs. Paskelbkite, kai būtini punktai bus atlikti.",
       listing: "Mūsų komanda kuria skelbimus užsakymų svetainėse.",
-      live: "Paskelbta Stugora. Svečiai gali jį rasti ir siųsti užsakymo užklausas.",
-      paused: "Sustabdyta: nauji svečiai Stugora jo nemato. Esamos viešnagės, žinutės ir pajamos lieka nepakitusios.",
+      live: "Paskelbta Rantio. Svečiai gali jį rasti ir siųsti užsakymo užklausas.",
+      paused: "Sustabdyta: nauji svečiai Rantio jo nemato. Esamos viešnagės, žinutės ir pajamos lieka nepakitusios.",
       archived: "Archyvuota: išimta iš aktyvių skelbimų. Viešnagės, pajamos ir žinutės lieka Jūsų įrašuose.",
     },
     external:
-      "Tai keičia tik Jūsų Stugora skelbimą. Norėdami sustabdyti namelį Airbnb, Booking.com, Vrbo ar Nettimökki, pakeiskite tai kiekvienoje svetainėje arba paprašykite mūsų.",
+      "Tai keičia tik Jūsų Rantio skelbimą. Norėdami sustabdyti namelį Airbnb, Booking.com, Vrbo ar Nettimökki, pakeiskite tai kiekvienoje svetainėje arba paprašykite mūsų.",
     publish: "Paskelbti",
     pause: "Sustabdyti skelbimą",
     relist: "Paskelbti iš naujo",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Atkurta kaip juodraštis",
     pauseTitle: "Sustabdyti šį skelbimą?",
     pauseBody:
-      "Nauji svečiai jo neras Stugora, o Jūsų užsakymo nuoroda nebepriims užklausų. Jau užsakytos viešnagės neatšaukiamos, o Jūsų pajamos ir žinutės lieka nepakitusios. Airbnb, Booking.com, Vrbo ir Nettimökki niekas nekeičiama.",
+      "Nauji svečiai jo neras Rantio, o Jūsų užsakymo nuoroda nebepriims užklausų. Jau užsakytos viešnagės neatšaukiamos, o Jūsų pajamos ir žinutės lieka nepakitusios. Airbnb, Booking.com, Vrbo ir Nettimökki niekas nekeičiama.",
     archiveTitle: "Archyvuoti šį objektą?",
     archiveBody: "Jis bus išimtas iš aktyvių skelbimų. Ankstesnės viešnagės, pajamos ir žinutės lieka Jūsų įrašuose, o vėliau jį galėsite atkurti.",
     futureBookings: {
@@ -386,7 +386,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Patvirtinkite įvesdami objekto pavadinimą",
     deleteButton: "Ištrinti visam laikui",
     deleted: "Objektas ištrintas",
-    deleteHasBookings: "Šiam objektui užregistruota viešnagių, todėl jo ištrinti negalima: jos yra Jūsų pajamų ir Stugora sąskaitų dalis. Vietoj to jį archyvuokite.",
+    deleteHasBookings: "Šiam objektui užregistruota viešnagių, todėl jo ištrinti negalima: jos yra Jūsų pajamų ir Rantio sąskaitų dalis. Vietoj to jį archyvuokite.",
     deleteHasMessages: "Svečiai rašė apie šį objektą, todėl jo ištrinti negalima. Archyvuokite jį, kad žinutės išliktų.",
     deleteName: "Pavadinimas nesutampa.",
     history: "Pakeitimų istorija",

@@ -13,13 +13,13 @@ export const fi: Translation = {
       current: "Nykyinen kieli",
     },
     footer: {
-      note: "Stugora on Elda-Auto Tmi:n aputoiminimi.",
+      note: "Rantio on Elda-Auto Tmi:n aputoiminimi.",
       contact: "Yhteys",
       privacy: "Tietosuoja",
       terms: "Käyttöehdot",
     },
     apps: {
-      title: "Lataa Stugora-sovellus",
+      title: "Lataa Rantio-sovellus",
       soon: "Tulossa pian",
       download: "Lataa",
     },
@@ -81,10 +81,10 @@ export const fi: Translation = {
       aiHint: "Kirjoita muutama sana (päivät, lemmikit, myöhäinen saapuminen), niin tekoäly tekee niistä viestin.",
     },
     chat: {
-      metaTitle: "Keskustelusi – Stugora",
+      metaTitle: "Keskustelusi – Rantio",
       title: "Keskustelusi: {cottage}",
       withHost: "Omistaja {name}",
-      withStugora: "Stugoran tiimi",
+      withRantio: "Rantion tiimi",
       keepLink: "Tallenna tämän sivun osoite: se on yksityinen linkkisi keskusteluun. Lähetimme sen myös sähköpostiisi.",
       host: "Omistaja",
       you: "Sinä",
@@ -98,7 +98,7 @@ export const fi: Translation = {
       waiting: "Omistaja vastaa yleensä vuorokauden sisällä. Ilmoitamme sähköpostilla, kun hän vastaa.",
     },
     meta: {
-      title: "Stugora – mökit Pohjoismaissa ja Baltiassa",
+      title: "Rantio – mökit Pohjoismaissa ja Baltiassa",
       description:
         "Mökkejä järvien, vuonojen, metsien ja rannikoiden äärellä Islannista Liettuaan. Varaa Airbnbsta, Booking.comista tai Vrbo:sta.",
     },
@@ -379,9 +379,9 @@ export const fi: Translation = {
 
   owner: {
     meta: {
-      title: "Stugora – mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon",
+      title: "Rantio – mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon",
       description:
-        "Stugora tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. 99 € vuodessa ja 12 % tuomistamme varauksista.",
+        "Rantio tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. 99 € vuodessa ja 12 % tuomistamme varauksista.",
     },
     nav: { cta: "Ilmoita mökkisi", login: "Kirjaudu" },
     hero: {
@@ -391,8 +391,8 @@ export const fi: Translation = {
       priceLabel: "Hinta yöltä",
       perNight: "€ / yö",
       finePrint:
-        "Arviosta on vähennetty alustojen palkkiot (noin 15 %), Stugoran 99 € vuosimaksu, 12 % palkkio ja arvonlisävero.",
-      lead: "Stugora vie mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon ja pitää kalenterit samassa tahdissa Nettimökin kanssa.",
+        "Arviosta on vähennetty alustojen palkkiot (noin 15 %), Rantion 99 € vuosimaksu, 12 % palkkio ja arvonlisävero.",
+      lead: "Rantio vie mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon ja pitää kalenterit samassa tahdissa Nettimökin kanssa.",
       cta: "Ilmoita mökkisi",
       photoAlt: "Mökki järven rannalla pilvisenä kesäpäivänä",
       chipBookingTitle: "Uusi varaus Airbnbsta",
@@ -437,12 +437,12 @@ export const fi: Translation = {
     },
     price: {
       title: "99 € vuodessa ja 12 % tuomistamme varauksista",
-      lead: "Ei aloitus- eikä kuukausimaksua. Vuosimaksu kattaa ilmoitusten tekemisen ja ylläpidon. Kun vieras varaa Stugoran avaaman kanavan kautta, maksat 12 % summasta, jonka alusta tilittää sinulle. Hintoihin lisätään alv 25,5 %. Nettimökin varauksista emme veloita koskaan.",
+      lead: "Ei aloitus- eikä kuukausimaksua. Vuosimaksu kattaa ilmoitusten tekemisen ja ylläpidon. Kun vieras varaa Rantion avaaman kanavan kautta, maksat 12 % summasta, jonka alusta tilittää sinulle. Hintoihin lisätään alv 25,5 %. Nettimökin varauksista emme veloita koskaan.",
       exampleTitle: "Esimerkki: 20 lisäyötä, 150 € yöltä",
       rows: {
         guests: "Vieraiden maksut",
         platform: "Alustojen palkkiot, noin 15 %",
-        commission: "Stugoran palkkio 12 % ja alv",
+        commission: "Rantion palkkio 12 % ja alv",
         yearly: "Vuosimaksu 99 € ja alv",
       },
       total: "Jää sinulle",
@@ -495,7 +495,7 @@ export const fi: Translation = {
       nettimokki: "Linkki Nettimökki-ilmoitukseen",
       message: "Jotain muuta, mitä haluat kertoa?",
       optional: "vapaaehtoinen",
-      consent: "Stugora saa tallentaa nämä tiedot ja ottaa minuun yhteyttä.",
+      consent: "Rantio saa tallentaa nämä tiedot ja ottaa minuun yhteyttä.",
       privacyLink: "Lue tietosuojaseloste",
       submit: "Ilmoita mökkisi",
       sending: "Lähetetään…",
@@ -516,7 +516,7 @@ export const fi: Translation = {
   },
 
   book: {
-    metaTitle: "Varauspyyntö – Stugora",
+    metaTitle: "Varauspyyntö – Rantio",
     host: "Isäntäsi: {name}",
     perNight: "{price} / yö",
     dates: "Päivät",
@@ -537,7 +537,7 @@ export const fi: Translation = {
       nights: "{price} × {nights}",
       cleaning: "Siivous",
       total: "Yhteensä",
-      note: "Omistaja vahvistaa hinnan ja kertoo, miten maksat. Stugorassa ei makseta mitään.",
+      note: "Omistaja vahvistaa hinnan ja kertoo, miten maksat. Rantiossa ei makseta mitään.",
     },
     form: {
       title: "Tietosi",
@@ -647,7 +647,7 @@ export const fi: Translation = {
       },
       link: {
         title: "Varauslinkkisi",
-        lead: "Jaa se omille vieraillesi: palaaville perheille, ystäville, Facebook-sivullesi. He näkevät vapaat päiväsi ja lähettävät pyynnön; sinä hyväksyt tai hylkäät. Stugora ei veloita näistä varauksista mitään.",
+        lead: "Jaa se omille vieraillesi: palaaville perheille, ystäville, Facebook-sivullesi. He näkevät vapaat päiväsi ja lähettävät pyynnön; sinä hyväksyt tai hylkäät. Rantio ei veloita näistä varauksista mitään.",
         copy: "Kopioi linkki",
         copied: "Kopioitu",
         view: "Avaa",
@@ -660,7 +660,7 @@ export const fi: Translation = {
       },
       sites: {
         title: "Yhdistä varaussivustosi",
-        lead: "Jokainen sivusto lukee Stugoran kalenteria, ja Stugora lukee niiden kalenterit 15 minuutin välein. Tee tämä kerran jokaiselle sivustolle.",
+        lead: "Jokainen sivusto lukee Rantion kalenteria, ja Rantio lukee niiden kalenterit 15 minuutin välein. Tee tämä kerran jokaiselle sivustolle.",
         ours: "1. Anna tämä linkki sivustolle {site}",
         oursHelp: "Valitse sivuston {site} kalenteriasetuksista kalenterin tuonti ja liitä tämä linkki.",
         theirs: "2. Liitä sivuston {site} kalenterilinkki tähän",
@@ -699,14 +699,14 @@ export const fi: Translation = {
       emptyFilter: "Täällä ei ole mitään.",
       choose: "Valitse keskustelu luettavaksi.",
       back: "Kaikki viestit",
-      enquiry: "Kysely stugora.fi:stä",
+      enquiry: "Kysely rantio.fi:stä",
       you: "Sinä",
       placeholder: "Kirjoita vastaus…",
       send: "Lähetä",
       sending: "Lähetetään…",
       failed: "Vastausta ei voitu lähettää. Yritä uudelleen.",
       siteNote: "Vastaukset {site}-vieraille kulkevat sivuston {site} kautta, kun kanavanhallinta on kytketty. Siihen asti ne tallentuvat vain tänne.",
-      directNote: "Vieras saa vastauksesi sähköpostilla ja lukee sen Stugorassa. Hän ei näe sähköpostiosoitettasi, etkä sinä hänen.",
+      directNote: "Vieras saa vastauksesi sähköpostilla ja lukee sen Rantiossa. Hän ei näe sähköpostiosoitettasi, etkä sinä hänen.",
       archive: "Arkistoi",
       unarchive: "Palauta saapuneisiin",
       writesIn: "Kirjoittaa kielellä {language}",
@@ -715,8 +715,8 @@ export const fi: Translation = {
       sendHint: "Ctrl + Enter lähettää",
     },
     meta: {
-      title: "Hallinta – Stugora",
-      loginTitle: "Kirjaudu – Stugora",
+      title: "Hallinta – Rantio",
+      loginTitle: "Kirjaudu – Rantio",
     },
     area: "Hallinta",
     login: {
@@ -725,7 +725,7 @@ export const fi: Translation = {
       email: "Sähköposti",
       send: "Lähetä koodi",
       sending: "Lähetetään…",
-      sentTo: "Jos {email} on Stugoran omistajan osoite, lähetimme siihen koodin. Se on voimassa 15 minuuttia.",
+      sentTo: "Jos {email} on Rantion omistajan osoite, lähetimme siihen koodin. Se on voimassa 15 minuuttia.",
       code: "Koodi",
       verify: "Kirjaudu",
       verifying: "Tarkistetaan…",
@@ -741,7 +741,7 @@ export const fi: Translation = {
     logout: "Kirjaudu ulos",
     switchToTraveling: "Vaihda matkustamiseen",
     hello: "Hei, {name}",
-    lead: "Tässä mökkiesi varaukset, tulot ja Stugoran osuus.",
+    lead: "Tässä mökkiesi varaukset, tulot ja Rantion osuus.",
     year: "Vuosi",
     loading: "Ladataan…",
     error: "Tietoja ei saatu ladattua. Yritä hetken päästä uudelleen.",
@@ -757,18 +757,18 @@ export const fi: Translation = {
     },
     kpi: {
       payout: "Maksut sinulle",
-      payoutSub: "{stugora} Stugoran kanavista, {own} omista",
+      payoutSub: "{stugora} Rantion kanavista, {own} omista",
       bookings: "Varaukset",
       cancelled: { one: "{n} peruttu", other: "{n} peruttu" },
-      stugora: "Stugoran osuus",
+      stugora: "Rantion osuus",
       stugoraSub: "Provisio {rate} % ja vuosimaksut, sis. ALV",
       net: "Sinulle jää",
-      netSub: "Maksut miinus Stugoran osuus",
+      netSub: "Maksut miinus Rantion osuus",
     },
     chart: {
       title: "Tulot kuukausittain",
       lead: "Maksut sinulle saapumiskuukauden mukaan.",
-      stugora: "Stugoran kanavat",
+      stugora: "Rantion kanavat",
       own: "Omat kanavat",
       ownNote: "Nettimökki ja omat varauksesi",
       total: "Yhteensä",
@@ -826,7 +826,7 @@ export const fi: Translation = {
     howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on 99 € + ALV mökkiä kohden; pilottiomistajilla ensimmäinen vuosi on maksuton. Arvonlisävero on 25,5 %.",
     ownBooking: "Oma varaus",
   },
-  // The Stugora phone app (mobile/). Everything else the app shows comes from the sections above.
+  // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.
   app: {
     tabs: {
       map: "Kartta",
@@ -859,7 +859,7 @@ export const fi: Translation = {
       listedOn: "Ilmoitettu",
       book: "Varaa",
       chooseSite: "Valitse, missä varaat",
-      chooseLead: "Stugora ilmoittaa tämän mökin näillä sivustoilla. Varaa missä haluat; hinta ja omistaja ovat samat.",
+      chooseLead: "Rantio ilmoittaa tämän mökin näillä sivustoilla. Varaa missä haluat; hinta ja omistaja ovat samat.",
       logIn: "Omistajan kirjautuminen",
     },
     saved: {
@@ -898,9 +898,9 @@ export const fi: Translation = {
       bookings: "Kaikki varaukset",
       notifications: "Ilmoitukset",
       notificationsLead: "Uudet varaukset, viestit ja varauspyynnöt tähän puhelimeen.",
-      notificationsBlocked: "Stugoran ilmoitukset ovat pois päältä puhelimesi asetuksissa.",
+      notificationsBlocked: "Rantion ilmoitukset ovat pois päältä puhelimesi asetuksissa.",
       openSettings: "Avaa asetukset",
-      web: "Stugora verkossa",
+      web: "Rantio verkossa",
     },
     detail: {
       showAmenities: "Näytä kaikki {n} varustetta",

@@ -1,4 +1,4 @@
-"""The Stugora phone app: sign-in keys and push notifications.
+"""The Rantio phone app: sign-in keys and push notifications.
 
 The website signs owners in with a session cookie. A phone app can't use cookies and
 CSRF well, so after the emailed code it gets its own key instead, sent as

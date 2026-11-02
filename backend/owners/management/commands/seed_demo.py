@@ -4,7 +4,7 @@
     python manage.py seed_demo --reset    # delete and create again
     python manage.py seed_demo --only-if-empty   # what dev.sh runs: skip if any owner exists
 
-Sign in at http://localhost:3100/hallinta/kirjaudu with demo@stugora.fi; in development
+Sign in at http://localhost:3100/hallinta/kirjaudu with demo@rantio.fi; in development
 the code is shown on the page (and printed in the terminal).
 """
 
@@ -20,17 +20,17 @@ from django.utils import timezone
 from owners import alerts
 from owners.models import Booking, Conversation, Cottage, Country, Message, Owner, Region
 
-DEMO_EMAIL = "demo@stugora.fi"
+DEMO_EMAIL = "demo@rantio.fi"
 # A Swedish owner, to see the dashboard in kronor.
-DEMO_SE_EMAIL = "demo-se@stugora.fi"
+DEMO_SE_EMAIL = "demo-se@rantio.fi"
 
 COTTAGES = [
-    # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up), stugora.fi page
+    # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up), rantio.fi page
     ("Järvihuvila", "Savonlinna", Region.SAIMAA, 6, 3, 180, 9, "lakeside-villa"),
     ("Rantasauna", "Lohja", Region.HELSINKI, 4, 2, 120, 5, "lohja-lake-cabin"),
     ("Metsämökki", "Kuusamo", Region.OTHER, 5, 2, 140, None, ""),
 ]
-# What the demo cottages have, as on their stugora.fi pages (frontend/src/lib/listings.ts).
+# What the demo cottages have, as on their rantio.fi pages (frontend/src/lib/listings.ts).
 AMENITIES = {
     "lakeside-villa": ["lake", "privateShore", "electricSauna", "woodSauna", "jetty", "boat", "canoe", "hotTub",
                        "dishwasher", "washingMachine", "grillHut", "highChair", "babyBed", "heatPump", "internet", "tv"],
@@ -41,7 +41,7 @@ HOUSE_RULES = {
     "lakeside-villa": "Check-in from 16:00, check-out by 12:00. No smoking indoors. Pets by agreement.",
     "lohja-lake-cabin": "Check-in from 15:00, check-out by 11:00. Water is carried in from the well; outdoor toilet.",
 }
-# Where demo guests book from, roughly like a lake cottage's first Stugora year.
+# Where demo guests book from, roughly like a lake cottage's first Rantio year.
 CHANNELS = [
     (Booking.Channel.AIRBNB, 34), (Booking.Channel.BOOKING, 24), (Booking.Channel.NETTIMOKKI, 22),
     (Booking.Channel.VRBO, 10), (Booking.Channel.EXPEDIA, 5), (Booking.Channel.HOLIDU, 3), (Booking.Channel.OWNER, 2),

@@ -84,7 +84,7 @@ export default function GuestChat() {
             header={
               <Card style={{ gap: 4, marginBottom: space.md }}>
                 <Text v="h3">{f(c.title, { cottage: thread.cottage })}</Text>
-                <Text v="small">{thread.host_name ? f(c.withHost, { name: thread.host_name }) : c.withStugora}</Text>
+                <Text v="small">{thread.host_name ? f(c.withHost, { name: thread.host_name }) : c.withRantio}</Text>
                 {thread.check_in && thread.check_out ? <Text v="small">{formatRange(lang, thread.check_in, thread.check_out)}</Text> : null}
                 {thread.request_status ? (
                   <Pill

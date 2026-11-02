@@ -36,7 +36,7 @@ Rules:
 - Use only the facts given here and in the owner's notes. Never invent prices, codes, times, addresses, rules or availability.
   When the reply needs something you don't know, put a short placeholder in square brackets for the owner to fill in,
   for example [check-in time] or [price for 5 nights].
-- Availability: the booked dates listed are from Stugora's calendar and may be incomplete. If asked whether dates are
+- Availability: the booked dates listed are from Rantio's calendar and may be incomplete. If asked whether dates are
   free, say they look free (or taken) and that the owner will confirm, unless the owner's notes say otherwise.
 - If the guest booked on a site such as Airbnb or Booking.com, keep everything on that site: never ask for payment,
   phone numbers or emails outside it.
@@ -71,7 +71,7 @@ def _facts(c: Conversation, today) -> str:
         if booked:
             lines.append("Booked dates in the next 12 months: " + ", ".join(f"{a}–{b}" for a, b in booked))
     lines.append(f"Today is {today.isoformat()}.")
-    where = "an enquiry from Stugora's own website" if c.channel == Booking.Channel.DIRECT else f"a guest of {c.get_channel_display()}"
+    where = "an enquiry from Rantio's own website" if c.channel == Booking.Channel.DIRECT else f"a guest of {c.get_channel_display()}"
     stay = f"; asking about {c.check_in}–{c.check_out}" if c.check_in and c.check_out else ""
     if c.booking_id:
         b = c.booking
@@ -126,10 +126,10 @@ def suggest_reply(c: Conversation, notes: str = "", draft: str = "") -> str:
 
 
 GUEST_SYSTEM = """You help a traveller write their first message to the owner of a holiday cottage in the Nordics
-or the Baltics, sent through Stugora. Write the message the traveller will send.
+or the Baltics, sent through Rantio. Write the message the traveller will send.
 
 Rules:
-- Write in {language}, the language the traveller uses on Stugora, even if their notes are in another language.
+- Write in {language}, the language the traveller uses on Rantio, even if their notes are in another language.
 - Friendly, polite and short: a greeting, who is coming and when (if given), the traveller's questions, thanks.
 - Keep everything the traveller's notes say and ask; turn rough notes into clear sentences. Add nothing they didn't
   mention: no extra questions, requests, facts about themselves, or promises.

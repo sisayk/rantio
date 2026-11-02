@@ -7,16 +7,16 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_API_URL": "https://stugora.fi" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://rantio.fi" }
     },
     "preview": {
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://stugora.fi" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://rantio.fi" }
     },
     "production": {
       "autoIncrement": true,
-      "env": { "EXPO_PUBLIC_API_URL": "https://stugora.fi" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://rantio.fi" }
     }
   },
   "submit": {

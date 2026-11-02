@@ -6,7 +6,7 @@ import { CONTACT_EMAIL } from "@/lib/content";
 import { getLegal, type LegalKind, legalLang, OTHER_LANGUAGE_NOTE } from "@/lib/legal";
 import AppBadges from "./AppBadges";
 import LanguageButton from "./LanguagePicker";
-import { Logo } from "./guest/icons";
+import { Wordmark } from "./guest/icons";
 import styles from "./legal.module.css";
 
 /** The privacy policy or the website terms: one readable column, in English or Finnish. */
@@ -19,8 +19,7 @@ export default function LegalPage({ lang, kind }: { lang: Lang; kind: LegalKind 
     <div className={styles.page}>
       <header className={styles.header}>
         <a className={styles.brand} href={paths.home(lang)}>
-          <Logo className={styles.logo} />
-          Stugora
+          <Wordmark />
         </a>
         <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={styles.langButton} />
       </header>

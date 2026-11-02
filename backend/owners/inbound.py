@@ -3,7 +3,7 @@
 Accepts the raw email as the request body (message/rfc822 or text/plain), or a
 form field named body-mime (Mailgun "store and notify"/forward) or email (SendGrid
 Inbound Parse with "send raw"). The service must send INBOUND_EMAIL_SECRET in the
-X-Stugora-Secret header or as ?secret=. Without a secret set, the endpoint is off.
+X-Rantio-Secret header or as ?secret=. Without a secret set, the endpoint is off.
 """
 
 import hmac
@@ -24,7 +24,7 @@ def booking_email(request):
     secret = settings.INBOUND_EMAIL_SECRET
     if not secret:
         raise Http404
-    given = request.headers.get("X-Stugora-Secret") or request.GET.get("secret", "")
+    given = request.headers.get("X-Rantio-Secret") or request.GET.get("secret", "")
     if not hmac.compare_digest(given.encode(), secret.encode()):
         return HttpResponse(status=403)
     if len(request.body) > MAX_BYTES:

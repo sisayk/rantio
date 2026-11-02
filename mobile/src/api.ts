@@ -1,4 +1,4 @@
-// Calls to Stugora's Django API. Owners send their app sign-in key as a Bearer header;
+// Calls to Rantio's Django API. Owners send their app sign-in key as a Bearer header;
 // guests need no account (a conversation's private token is the key).
 import Constants from "expo-constants";
 
@@ -35,11 +35,11 @@ export type {
  * While developing, the app calls the API on the same address it loads its code from
  * (Metro), and metro.config.js passes /api/ and /media/ on to Django on the Mac. Whatever
  * reaches Metro (simulator, emulator, a phone on the Wi-Fi, a tunnel) can then sign in.
- * Release builds talk to stugora.fi. EXPO_PUBLIC_API_URL in mobile/.env overrides both.
+ * Release builds talk to rantio.fi. EXPO_PUBLIC_API_URL in mobile/.env overrides both.
  */
 const hostUri = __DEV__ ? (Constants.expoConfig?.hostUri ?? "") : "";
 const devHost = hostUri.split(":")[0];
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (hostUri ? `http://${hostUri}` : "https://stugora.fi")).replace(/\/$/, "");
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (hostUri ? `http://${hostUri}` : "https://rantio.fi")).replace(/\/$/, "");
 export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || (devHost ? `http://${devHost}:3100` : API_URL)).replace(/\/$/, "");
 
 export class SignedOut extends Error {}

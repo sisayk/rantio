@@ -11,12 +11,12 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   experiences: {
     meta: {
-      title: "Ting å gjøre på en nordisk hytte | Stugora",
+      title: "Ting å gjøre på en nordisk hytte | Rantio",
       description: "Badstue, bading, padling, fiske, tur, ski og nordlys: finn en hytte for det du har lyst til å gjøre.",
     },
     title: "Ting å gjøre på hytta",
     lead: "Badstue ved vannet, padling i det lange kveldslyset, skiturer og nordlys. Velg hva du har lyst til å gjøre, og se hyttene som passer.",
-    note: "Stugora selger ikke aktiviteter. Eieren kan fortelle hva som finnes i nærheten, og lokale guider tar imot bestillinger på for eksempel hundekjøring og nordlysturer.",
+    note: "Rantio selger ikke aktiviteter. Eieren kan fortelle hva som finnes i nærheten, og lokale guider tar imot bestillinger på for eksempel hundekjøring og nordlysturer.",
     items: {
       sauna: {
         title: "Badstue og en avkjølende dukkert",
@@ -55,7 +55,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   destinations: {
     meta: {
-      title: "Hyttereisemål i Norden og Baltikum | Stugora",
+      title: "Hyttereisemål i Norden og Baltikum | Rantio",
       description: "Finland, Sverige, Norge, Danmark, Island, Estland, Latvia og Litauen: innsjøer, fjorder, sanddyner og skoger, og hyttene der.",
     },
     title: "Reisemål",
@@ -76,7 +76,7 @@ export const explore: NonNullable<Translation["explore"]> = {
 
   inspiration: {
     meta: {
-      title: "Inspirasjon til hytteferien | Stugora",
+      title: "Inspirasjon til hytteferien | Rantio",
       description: "Korte guider om badstue, nordlys, allemannsretten, sankthans og vinter på en nordisk hytte.",
     },
     title: "Inspirasjon",

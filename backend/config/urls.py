@@ -8,8 +8,8 @@ from config.admin_assets_view import admin_css
 from owners import calendar_views, inbound, inbox, listings, portal
 from owners.views import HeroSlidesView, OwnerSignupCreateView, RatesView
 
-admin.site.site_header = "Stugora admin"
-admin.site.site_title = "Stugora"
+admin.site.site_header = "Rantio admin"
+admin.site.site_title = "Rantio"
 
 urlpatterns = [
     path("admin/_assets/stugora-admin.css", admin_css, name="admin_css"),

@@ -45,5 +45,5 @@ class Command(BaseCommand):
         summary = "\n".join(lines) or "Nothing to invoice."
         self.stdout.write(summary)
         if invoices and settings.SIGNUP_NOTIFY_EMAILS:
-            send_mail(f"Stugora invoices for {first:%m/%Y}", summary + f"\n\n{settings.ADMIN_URL}/owners/invoice/",
+            send_mail(f"Rantio invoices for {first:%m/%Y}", summary + f"\n\n{settings.ADMIN_URL}/owners/invoice/",
                       settings.DEFAULT_FROM_EMAIL, settings.SIGNUP_NOTIFY_EMAILS, fail_silently=True)

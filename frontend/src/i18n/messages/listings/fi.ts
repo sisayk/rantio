@@ -3,7 +3,7 @@ import type { Translation } from "../../translation";
 export const listings: NonNullable<Translation["listings"]> = {
   meta: { title: "Omat kohteet", editTitle: "Muokkaa kohdetta", previewTitle: "Esikatselu" },
   title: "Omat kohteet",
-  lead: "Mökkisi sellaisina kuin vieraat näkevät ne Stugorassa. Muokkaa täällä tietoja, kuvia, hintoja ja sääntöjä.",
+  lead: "Mökkisi sellaisina kuin vieraat näkevät ne Rantiossa. Muokkaa täällä tietoja, kuvia, hintoja ja sääntöjä.",
   add: "Lisää uusi kohde",
   addTitle: "Lisää kohde",
   addName: "Mikä kohteen nimi on?",
@@ -65,7 +65,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   unsaved: "Tallentamattomia muutoksia",
   allSaved: "Kaikki muutokset tallennettu",
   saveError: "Muutoksia ei tallennettu. Tarkista punaisella merkityt kentät ja yritä uudelleen.",
-  networkError: "Stugoraan ei saatu yhteyttä. Muutoksesi ovat yhä tallessa; yritä tallentaa uudelleen.",
+  networkError: "Rantioon ei saatu yhteyttä. Muutoksesi ovat yhä tallessa; yritä tallentaa uudelleen.",
   invalid: "Tarkista tämä kenttä",
   leave: "Sinulla on tallentamattomia muutoksia. Poistutaanko tallentamatta?",
   restore: "Sinulla on tällä laitteella tallentamattomia muutoksia ({date}).",
@@ -73,7 +73,7 @@ export const listings: NonNullable<Translation["listings"]> = {
   restoreDrop: "Hylkää",
   sections: "Ilmoituksen osiot",
   stugoraOnly:
-    "Muutokset päivittävät Stugora-ilmoituksesi. Airbnb:ssä, Booking.comissa, Vrbo:ssa ja Nettimökissä on omat ilmoituksensa: tiimimme kopioi muutokset niihin puolestasi, kunnes kanavanhallinta on kytketty.",
+    "Muutokset päivittävät Rantio-ilmoituksesi. Airbnb:ssä, Booking.comissa, Vrbo:ssa ja Nettimökissä on omat ilmoituksensa: tiimimme kopioi muutokset niihin puolestasi, kunnes kanavanhallinta on kytketty.",
   nav: {
     overview: "Yleiskatsaus",
     basics: "Perustiedot",
@@ -148,7 +148,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     replace: "Vaihda",
     remove: "Poista",
     removeTitle: "Poistetaanko kuva?",
-    removeBody: "Kuva poistuu Stugora-ilmoituksestasi. Tätä ei voi perua; varaussivustojen kuvat pysyvät, kunnes tiimimme päivittää ne.",
+    removeBody: "Kuva poistuu Rantio-ilmoituksestasi. Tätä ei voi perua; varaussivustojen kuvat pysyvät, kunnes tiimimme päivittää ne.",
     empty: "Ei vielä kuvia. Aloita mökin ulkokuvasta, niin siitä tulee kansikuva.",
     previewGallery: "Esikatsele galleriaa",
     count: "{n} / {max}",
@@ -219,7 +219,7 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   pricing: {
     title: "Hinnat ja maksut",
-    lead: "Nämä hinnat näkyvät Stugora-sivullasi ja varauslinkissäsi. Airbnb:ssä, Booking.comissa ja Vrbo:ssa on omat hintansa; kalenterilinkki välittää vain päivät, joten hinnat eivät siirry niihin.",
+    lead: "Nämä hinnat näkyvät Rantio-sivullasi ja varauslinkissäsi. Airbnb:ssä, Booking.comissa ja Vrbo:ssa on omat hintansa; kalenterilinkki välittää vain päivät, joten hinnat eivät siirry niihin.",
     base: "Yöhinta",
     weekend: "Perjantai- ja lauantaiyöt",
     weekendHint: "Jätä tyhjäksi, niin käytetään tavallista yöhintaa.",
@@ -329,7 +329,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     minStay: "Lyhin oleskelu: {n} yötä. Muuta sitä kohdassa Hinnat ja maksut.",
     sites: "Varaussivustot",
     sitesLead:
-      "Tämä synkronoi vain kalenterin. Jokainen sivusto lukee Stugoran kalenterilinkkiä, ja Stugora lukee niiden linkit 15 minuutin välein, joten aivan äsken tehty varaus ei välttämättä näy vielä. Kuvat, tekstit ja hinnat eivät synkronoidu.",
+      "Tämä synkronoi vain kalenterin. Jokainen sivusto lukee Rantion kalenterilinkkiä, ja Rantio lukee niiden linkit 15 minuutin välein, joten aivan äsken tehty varaus ei välttämättä näy vielä. Kuvat, tekstit ja hinnat eivät synkronoidu.",
     manage: "Yhdistä tai muuta kalenterilinkkejä",
     lastSync: "Luettu viimeksi {time}",
     never: "Ei vielä luettu",
@@ -347,16 +347,16 @@ export const listings: NonNullable<Translation["listings"]> = {
 
   status: {
     title: "Tila",
-    current: "Stugora-ilmoituksesi tila: {status}.",
+    current: "Rantio-ilmoituksesi tila: {status}.",
     explain: {
       intake: "Luonnos: vain sinä näet sen. Julkaise, kun tarvittavat kohdat on tehty.",
       listing: "Tiimimme tekee ilmoituksia varaussivustoille.",
-      live: "Julkaistu Stugorassa. Vieraat löytävät sen ja voivat lähettää varauspyyntöjä.",
-      paused: "Tauolla: piilossa uusilta vierailta Stugorassa. Nykyiset varaukset, viestit ja tulot säilyvät ennallaan.",
+      live: "Julkaistu Rantiossa. Vieraat löytävät sen ja voivat lähettää varauspyyntöjä.",
+      paused: "Tauolla: piilossa uusilta vierailta Rantiossa. Nykyiset varaukset, viestit ja tulot säilyvät ennallaan.",
       archived: "Arkistoitu: poissa aktiivisista kohteistasi. Sen varaukset, tulot ja viestit säilyvät tiedoissasi.",
     },
     external:
-      "Tämä muuttaa vain Stugora-ilmoitustasi. Jos haluat tauottaa mökin Airbnb:ssä, Booking.comissa, Vrbo:ssa tai Nettimökissä, muuta asia jokaisella sivustolla tai pyydä meitä tekemään se.",
+      "Tämä muuttaa vain Rantio-ilmoitustasi. Jos haluat tauottaa mökin Airbnb:ssä, Booking.comissa, Vrbo:ssa tai Nettimökissä, muuta asia jokaisella sivustolla tai pyydä meitä tekemään se.",
     publish: "Julkaise",
     pause: "Laita tauolle",
     relist: "Julkaise uudelleen",
@@ -371,7 +371,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     restored: "Palautettu luonnokseksi",
     pauseTitle: "Laitetaanko ilmoitus tauolle?",
     pauseBody:
-      "Uudet vieraat eivät löydä sitä Stugorasta, eikä varauslinkkisi ota vastaan pyyntöjä. Jo tehtyjä varauksia ei peruta, ja tulosi ja viestisi säilyvät ennallaan. Airbnb:hen, Booking.comiin, Vrbo:hon ja Nettimökkiin ei tehdä muutoksia.",
+      "Uudet vieraat eivät löydä sitä Rantiosta, eikä varauslinkkisi ota vastaan pyyntöjä. Jo tehtyjä varauksia ei peruta, ja tulosi ja viestisi säilyvät ennallaan. Airbnb:hen, Booking.comiin, Vrbo:hon ja Nettimökkiin ei tehdä muutoksia.",
     archiveTitle: "Arkistoidaanko kohde?",
     archiveBody: "Kohde siirtyy pois aktiivisista kohteistasi. Sen menneet varaukset, tulot ja viestit säilyvät tiedoissasi, ja voit palauttaa sen myöhemmin.",
     futureBookings: {
@@ -384,7 +384,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleteConfirm: "Vahvista kirjoittamalla kohteen nimi",
     deleteButton: "Poista pysyvästi",
     deleted: "Kohde poistettu",
-    deleteHasBookings: "Kohteella on kirjattuja varauksia, joten sitä ei voi poistaa: ne kuuluvat tuloihisi ja Stugoran laskuihin. Arkistoi se sen sijaan.",
+    deleteHasBookings: "Kohteella on kirjattuja varauksia, joten sitä ei voi poistaa: ne kuuluvat tuloihisi ja Rantion laskuihin. Arkistoi se sen sijaan.",
     deleteHasMessages: "Vieraat ovat kirjoittaneet tästä kohteesta, joten sitä ei voi poistaa. Arkistoi se, niin viestit säilyvät.",
     deleteName: "Nimi ei täsmää.",
     history: "Muutoshistoria",

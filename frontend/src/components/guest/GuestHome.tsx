@@ -44,7 +44,6 @@ import {
   Globe,
   Heart,
   ListIcon,
-  Logo,
   MapIcon,
   People,
   Pin,
@@ -52,6 +51,7 @@ import {
   Sliders,
   Star,
   UserIcon,
+  Wordmark,
 } from "./icons";
 import styles from "./guest.module.css";
 import AppBadges from "../AppBadges";
@@ -553,8 +553,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         <HeroSlides lang={lang} t={t.slides} />
         <header className={styles.topbar}>
           <a className={styles.brand} href={paths.home(lang)}>
-            <Logo className={styles.logo} />
-            <span>Stugora</span>
+            <Wordmark />
           </a>
           <MainNav lang={lang} labels={t.nav} active="stays" staysHref="#majoitus" className={styles.mainNav} />
           <div className={styles.userPill}>

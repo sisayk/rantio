@@ -15,7 +15,7 @@
   POST   /api/owner/cottages/<id>/photos/order/        {"ids": [...]} new order; the first is the cover
 
 Every view looks the cottage up among the signed-in owner's own (404 for anyone else's).
-Changes here are Stugora's own listing. Airbnb, Booking.com, Vrbo and Nettimökki keep their
+Changes here are Rantio's own listing. Airbnb, Booking.com, Vrbo and Nettimökki keep their
 own listings: the team copies changes there until a channel manager is connected, and a
 calendar link (iCal) only carries dates, never texts, photos or prices.
 """
@@ -148,7 +148,7 @@ def channel_rows(c: Cottage, now) -> list[dict]:
         })
     rows.append({
         "channel": Booking.Channel.NETTIMOKKI,
-        # Nettimökki has no calendar link: its booking emails are forwarded to Stugora.
+        # Nettimökki has no calendar link: its booking emails are forwarded to Rantio.
         "state": "email" if c.nettimokki_url else "not_connected",
         "last_synced_at": None, "error": "", "url": c.nettimokki_url, "feed_id": None,
     })
@@ -532,7 +532,7 @@ def future_stays(cottage: Cottage) -> int:
 
 
 class OwnerStatusView(APIView):
-    """Stugora's own listing only. The booking sites keep their own listing status;
+    """Rantio's own listing only. The booking sites keep their own listing status;
     pausing here closes the booking link but never cancels a stay."""
 
     permission_classes = [IsOwner]

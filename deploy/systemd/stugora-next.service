@@ -2,7 +2,7 @@
 # /media/ and /static/ here. The keep-alive timeout is longer than nginx's so a reused
 # connection is never closed under it (which would show as a random 502). Built with `npm run build` by setup-server.sh / deploy.sh.
 [Unit]
-Description=Stugora Next.js site
+Description=Rantio Next.js site
 After=network.target stugora-django.service
 
 [Service]

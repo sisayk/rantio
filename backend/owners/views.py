@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class OwnerSignupCreateView(generics.CreateAPIView):
-    """Public endpoint behind the stugora.fi sign-up form."""
+    """Public endpoint behind the rantio.fi sign-up form."""
 
     queryset = OwnerSignup.objects.all()
     serializer_class = OwnerSignupSerializer
@@ -27,7 +27,7 @@ class OwnerSignupCreateView(generics.CreateAPIView):
         if settings.SIGNUP_NOTIFY_EMAILS:
             try:
                 send_mail(
-                    subject=f"New Stugora owner: {signup.name} ({signup.location_display})",
+                    subject=f"New Rantio owner: {signup.name} ({signup.location_display})",
                     message=(
                         f"{signup.name} <{signup.email}> {signup.phone}\n"
                         f"Where: {signup.location_display} · cottages: {signup.cottage_count}"

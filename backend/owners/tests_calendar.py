@@ -34,7 +34,7 @@ END:VEVENT\r
 BEGIN:VEVENT\r
 DTSTART;VALUE=DATE:{c}\r
 DTEND;VALUE=DATE:{d}\r
-UID:stugora-booking-99@stugora.fi\r
+UID:stugora-booking-99@rantio.fi\r
 SUMMARY:Not available\r
 END:VEVENT\r
 END:VCALENDAR\r
@@ -116,14 +116,14 @@ class IcalTests(TestCase):
         events = calendar.parse_ics(res.content.decode())
         self.assertEqual([(e.start, e.end) for e in events], [(D(5), D(8)), (D(10), D(12)), (D(30), D(31))])
         body = res.content.decode()
-        self.assertNotIn("Family week", body)  # notes and guests never leave Stugora
+        self.assertNotIn("Family week", body)  # notes and guests never leave Rantio
         self.assertNotIn("Reserved", body)
         for_airbnb = calendar.parse_ics(self.client.get(f"/api/calendar/{self.c.calendar_token}.ics?site=airbnb").content.decode())
         self.assertEqual([(e.start, e.end) for e in for_airbnb], [(D(10), D(12)), (D(30), D(31))])
         self.assertEqual(self.client.get("/api/calendar/nope.ics").status_code, 404)
 
 
-@override_settings(SITE_URL="https://stugora.fi")
+@override_settings(SITE_URL="https://rantio.fi")
 class BookingRequestTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -169,7 +169,7 @@ class BookingRequestTests(TestCase):
         self.assertEqual(Conversation.objects.count(), 0)
 
 
-@override_settings(SITE_URL="https://stugora.fi", BOOKING_ALERTS=True)
+@override_settings(SITE_URL="https://rantio.fi", BOOKING_ALERTS=True)
 class OwnerCalendarApiTests(TestCase):
     def setUp(self):
         cache.clear()
@@ -192,8 +192,8 @@ class OwnerCalendarApiTests(TestCase):
         data = self.client.get(f"/api/owner/calendar/?from={D(0).isoformat()}&months=3").json()
         self.assertEqual([c["id"] for c in data["cottages"]], [self.c.pk])
         cottage = data["cottages"][0]
-        self.assertEqual(cottage["booking_link"], f"https://stugora.fi/book/{self.c.booking_link_token}")
-        self.assertEqual(cottage["export"]["airbnb"], f"https://stugora.fi/api/calendar/{self.c.calendar_token}.ics?site=airbnb")
+        self.assertEqual(cottage["booking_link"], f"https://rantio.fi/book/{self.c.booking_link_token}")
+        self.assertEqual(cottage["export"]["airbnb"], f"https://rantio.fi/api/calendar/{self.c.calendar_token}.ics?site=airbnb")
         self.assertEqual({e["kind"] for e in data["entries"]}, {"block", "request"})
         self.assertEqual(data["requests"][0]["id"], conv.pk)
         self.assertEqual(data["requests"][0]["estimate"], "510.00")  # 3 × 150 + 60 cleaning
