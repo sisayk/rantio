@@ -12,6 +12,7 @@
     "description": "Cottages across the Nordics and the Baltics, and the owner's one calendar for every booking site.",
     "ios": {
       "bundleIdentifier": "fi.rantio.app",
+      "appleTeamId": "PQU74K3M7H",
       "buildNumber": "1",
       "supportsTablet": true,
       "config": { "usesNonExemptEncryption": false },
