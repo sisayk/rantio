@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- the owner's own uploads, served by Django */
+import AmenityIcon from "@/components/AmenityIcon";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import type { Messages } from "@/i18n";
@@ -166,6 +167,7 @@ export default function ListingPreview({
                     const note = data.amenity_notes[k];
                     return (
                       <li key={k}>
+                        <AmenityIcon amenity={k} className={s.amenityIcon} />
                         {amenityName(k, features, l.amenities.names)}
                         {note ? (
                           <small>{[note.note, note.fee !== null ? formatPrice(lang, Number(note.fee), currency, true) : ""].filter(Boolean).join(" · ")}</small>

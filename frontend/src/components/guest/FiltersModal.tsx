@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import AmenityIcon from "@/components/AmenityIcon";
 import { BEDROOM_CHOICES, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import type { Messages } from "@/i18n";
 import { fill, type Plural, plural } from "@/i18n/format";
@@ -85,7 +86,7 @@ export default function FiltersModal({ lang, t, catalog, cottages, value, result
           {groups.slice(0, 1).map((g) => (
             <FilterSection key={g.id} title={g.title}>
               {g.options.map(([k, label]) => (
-                <Check key={k} label={label} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
+                <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
               ))}
             </FilterSection>
           ))}
@@ -103,7 +104,7 @@ export default function FiltersModal({ lang, t, catalog, cottages, value, result
           {groups.slice(1).map((g) => (
             <FilterSection key={g.id} title={g.title}>
               {g.options.map(([k, label]) => (
-                <Check key={k} label={label} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
+                <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
               ))}
             </FilterSection>
           ))}
@@ -131,10 +132,11 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+function Check({ label, icon, checked, onChange }: { label: string; icon?: string; checked: boolean; onChange: () => void }) {
   return (
     <label className={styles.checkItem}>
       <input type="checkbox" checked={checked} onChange={onChange} />
+      {icon ? <AmenityIcon amenity={icon} size={20} className={styles.checkIcon} /> : null}
       <span>{label}</span>
     </label>
   );

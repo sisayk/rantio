@@ -1963,7 +1963,7 @@
 }
 
 .amenityGroups > div:has(li:nth-child(9)) li {
-  margin-bottom: 8px;
+  margin-bottom: 14px;
   break-inside: avoid;
 }
 
@@ -1995,6 +1995,25 @@
 
 .amenityGroups svg,
 .bookFlags svg {
+  color: var(--g-green);
+}
+
+.amenityIcon {
+  flex: none;
+}
+
+.amenityGroups ul {
+  gap: 14px;
+}
+
+.amenityGroups li {
+  gap: 14px;
+  line-height: 1.35;
+}
+
+.checkIcon {
+  flex: none;
+  margin-left: -2px;
   color: var(--g-green);
 }
 
@@ -2099,6 +2118,10 @@
   .activityGrid,
   .amenityGroups {
     grid-template-columns: 1fr;
+  }
+
+  .amenityGroups > div:has(li:nth-child(9)) ul {
+    columns: 1;
   }
 
   .detailTopLinks .hostLink {

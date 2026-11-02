@@ -1,5 +1,6 @@
 "use client";
 
+import AmenityIcon from "@/components/AmenityIcon";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Messages } from "@/i18n";
@@ -554,6 +555,7 @@ export default function ListingEditor({
                           checked={on}
                           onChange={(e) => set("amenities", e.target.checked ? [...f.amenities, k] : f.amenities.filter((x) => x !== k))}
                         />
+                        <AmenityIcon amenity={k} size={20} className={s.amenityIcon} />
                         <span>
                           {nameOf(k)}
                           {note?.note || note?.fee ? (

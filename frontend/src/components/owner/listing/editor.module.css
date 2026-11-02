@@ -528,3 +528,10 @@
   .amenityList { grid-template-columns: minmax(0, 1fr); }
   .editorHead h1 { font-size: 24px; }
 }
+
+/* Amenity icons (lib/amenityIcons.ts) beside the checkboxes and in the preview. */
+.amenityIcon { flex: none; color: var(--o-green); }
+.check .amenityIcon { margin-top: 1px; }
+.amenityList li { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: center; column-gap: 12px; }
+.amenityList li small { grid-column: 2; }
+@media (max-width: 600px) { .amenityList { grid-template-columns: 1fr; } }

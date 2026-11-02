@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 import { getMessages } from "@/i18n";
+import AmenityIcon from "@/components/AmenityIcon";
 import { countryName, currencyNames, languageNamesIn, number, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
@@ -14,7 +15,7 @@ import LanguageButton from "../LanguagePicker";
 import DetailGallery from "./DetailGallery";
 import HostSwitchLink from "./HostSwitchLink";
 import ListingPrice from "./ListingPrice";
-import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Check, Wordmark, People, Star } from "./icons";
+import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Wordmark, People, Star } from "./icons";
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
@@ -33,7 +34,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
     .map((g) => ({
       id: g.id,
       title: m.catalog.groups[g.id],
-      items: g.options.filter((k) => (l.features as string[]).includes(k)).map((k) => m.catalog.features[k]),
+      items: g.options.filter((k) => (l.features as string[]).includes(k)),
     }))
     .filter((g) => g.items.length);
 
@@ -135,10 +136,10 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                   <div key={g.id}>
                     <h3>{g.title}</h3>
                     <ul>
-                      {g.items.map((item) => (
-                        <li key={item}>
-                          <Check className={styles.icon16} />
-                          {item}
+                      {g.items.map((k) => (
+                        <li key={k}>
+                          <AmenityIcon amenity={k} className={styles.amenityIcon} />
+                          {m.catalog.features[k]}
                         </li>
                       ))}
                     </ul>
@@ -155,7 +156,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                 .filter((k) => (l.features as string[]).includes(k))
                 .map((k) => (
                   <li key={k}>
-                    <Check className={styles.icon16} />
+                    <AmenityIcon amenity={k} size={20} className={styles.amenityIcon} />
                     {m.catalog.features[k]}
                   </li>
                 ))}

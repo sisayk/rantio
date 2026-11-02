@@ -7,6 +7,7 @@ import { AMENITY_GROUPS, amenityName } from "@/lib/amenities";
 import { useEditor } from "@/state/listing";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
+import { AmenityIcon } from "@/ui/amenity-icon";
 import { EditorShell, Group } from "@/ui/editor";
 import { styles as formStyles } from "@/ui/form";
 import { Icon, tap, Text } from "@/ui/kit";
@@ -67,6 +68,7 @@ export default function ListingAmenities() {
                     accessibilityLabel={name(k)}
                   >
                     <View style={[styles.box, on && styles.boxOn]}>{on ? <Icon name="checkmark" size={16} color="#fff" /> : null}</View>
+                    <AmenityIcon amenity={k} size={22} />
                     <Text v="body" style={{ flex: 1 }}>
                       {name(k)}
                     </Text>
