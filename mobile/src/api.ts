@@ -152,6 +152,9 @@ export const ownerApi = {
   me: () => call<{ name: string; email: string; language: string; is_pilot: boolean }>("owner/me/", { owner: true }),
   setLanguage: (language: string) =>
     call<{ language: string }>("owner/me/", { ...json("PATCH", { language }), owner: true }),
+  /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
+  monitor: () => call<{ joined: boolean }>("owner/monitor/", { owner: true }),
+  joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { ...json("POST"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
   summary: (year?: number) => call<Summary>(`owner/summary/${year ? `?year=${year}` : ""}`, { owner: true }),

@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from . import app
 from . import login as owner_login
 from . import messaging
-from .models import AppDevice, Language
+from .models import AppDevice, Language, MonitorInterest
 from .statements import booking_row, bookings_for, summary
 
 logger = logging.getLogger(__name__)
@@ -103,6 +103,25 @@ class MeView(APIView):
         o.language = lang
         o.save(update_fields=["language"])
         return self.get(request)
+
+
+class MonitorWaitlistView(APIView):
+    """The Mökki monitor waitlist for a signed-in owner: one tap, with the email they sign in with."""
+
+    permission_classes = [IsOwner]
+
+    def get(self, request):
+        return Response({"joined": MonitorInterest.objects.filter(email=request.user.owner.email.lower()).exists()})
+
+    def post(self, request):
+        o = request.user.owner
+        first = o.cottages.order_by("id").first()
+        MonitorInterest.objects.update_or_create(
+            email=o.email.lower(),
+            defaults={"language": o.language, "country": first.country if first else "FI",
+                      "rents": MonitorInterest.Rents.YES, "privacy_consent": True, "source": "hosting"},
+        )
+        return Response({"joined": True})
 
 
 class LogoutView(APIView):

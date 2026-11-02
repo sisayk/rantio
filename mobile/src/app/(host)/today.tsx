@@ -9,6 +9,7 @@ import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
 import { Button, Card, Empty, Icon, type IconName, Loading, Pill, Problem, Section, Text } from "@/ui/kit";
 import { Figure, StayRow } from "@/ui/host";
+import { MonitorCard } from "@/ui/monitor";
 import { TabScreen } from "@/ui/screen";
 
 const STATUS_TONE = { intake: "berry", listing: "berry", live: "green", paused: "neutral", archived: "neutral" } as const;
@@ -96,6 +97,10 @@ export default function Today() {
             )}
           </Card>
         ))}
+      </Section>
+
+      <Section title={m.owner.monitor.badge}>
+        <MonitorCard onMore={() => router.push("/monitor")} />
       </Section>
     </TabScreen>
   );

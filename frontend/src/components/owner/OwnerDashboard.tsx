@@ -11,6 +11,7 @@ import { Bed, CalendarIcon, People } from "../guest/icons";
 import EarningsChart from "./EarningsChart";
 import HostingHeader from "./HostingHeader";
 import ListingsPanel from "./listing/ListingsPanel";
+import MonitorCard from "./MonitorCard";
 import SiteIcon from "./SiteIcon";
 import styles from "./owner.module.css";
 
@@ -26,11 +27,13 @@ export default function OwnerDashboard({
   lang,
   t,
   l,
+  monitor,
   languageButton,
 }: {
   lang: Lang;
   t: T;
   l: Messages["listings"];
+  monitor: Messages["owner"]["monitor"];
   languageButton: React.ReactNode;
 }) {
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -195,6 +198,8 @@ export default function OwnerDashboard({
         </section>
 
         <ListingsPanel lang={lang} l={l} />
+
+        <MonitorCard t={monitor} />
 
         <section className={styles.kpis} aria-label={String(s.year)}>
           <div className={styles.kpi}>

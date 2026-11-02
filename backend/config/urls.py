@@ -21,6 +21,7 @@ urlpatterns = [
     path("api/auth/logout/", portal.LogoutView.as_view(), name="logout"),
     path("api/owner/device/", portal.DeviceView.as_view(), name="owner-device"),
     path("api/owner/me/", portal.MeView.as_view(), name="owner-me"),
+    path("api/owner/monitor/", portal.MonitorWaitlistView.as_view(), name="owner-monitor"),
     path("api/owner/summary/", portal.SummaryView.as_view(), name="owner-summary"),
     path("api/owner/bookings/", portal.BookingsView.as_view(), name="owner-bookings"),
     path("api/enquiries/", inbox.EnquiryView.as_view(), name="enquiry"),

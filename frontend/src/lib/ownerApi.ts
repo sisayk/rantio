@@ -473,6 +473,9 @@ export const ownerApi = {
   verifyCode: (email: string, code: string) =>
     call<{ ok: boolean }>("auth/verify-code/", { method: "POST", body: JSON.stringify({ email, code }) }),
   me: () => call<{ name: string; email: string }>("owner/me/"),
+  /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
+  monitor: () => call<{ joined: boolean }>("owner/monitor/"),
+  joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { method: "POST" }),
   summary: (year?: number) => call<Summary>(`owner/summary/${year ? `?year=${year}` : ""}`),
   bookings: (year: number) => call<{ results: BookingRow[] }>(`owner/bookings/?year=${year}`),
   logout: () => call<{ ok: boolean }>("auth/logout/", { method: "POST" }),

@@ -927,3 +927,62 @@
 .cottageLink { color: inherit; text-decoration: none; }
 .cottageLink:hover { text-decoration: underline; }
 .status[data-status="archived"] { background: #ececec; color: #555; }
+
+/* ---------- Overview: Mökki monitor, coming soon ---------- */
+.monitorCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.monitorPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--o-ground);
+}
+
+.monitorBody h2 { margin: 10px 0 6px; }
+
+.monitorBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #dbe9e2;
+  color: var(--o-green-deep);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.monitorFeatures {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--o-soft);
+}
+
+.monitorFeatures strong { color: var(--o-ink); }
+
+.monitorActions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+.monitorActions + .muted { margin: 10px 0 0; font-size: 13px; }
+
+.monitorDone {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #dbe9e2;
+  color: var(--o-green-deep);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .monitorCard { grid-template-columns: 1fr; }
+}

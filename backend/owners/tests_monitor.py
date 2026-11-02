@@ -33,3 +33,24 @@ class MonitorWaitlistTests(TestCase):
         res = self.client.post(self.url, {"email": "a@b.fi", "privacy_consent": True, "website": "x"}, format="json")
         self.assertEqual(res.status_code, 400)
         self.assertFalse(MonitorInterest.objects.exists())
+
+
+class OwnerMonitorWaitlistTests(TestCase):
+    def setUp(self):
+        from . import login as owner_login
+        from .models import Cottage, Owner
+
+        self.owner = Owner.objects.create(name="Aino", email="Aino@Example.com", language="sv")
+        Cottage.objects.create(owner=self.owner, name="Röda", country="SE", price_per_night="900", max_guests=4, bedrooms=2, beds=4)
+        self.client.force_login(owner_login.user_for(self.owner))
+
+    def test_one_tap_join_with_the_sign_in_email(self):
+        self.assertEqual(self.client.get("/api/owner/monitor/").json(), {"joined": False})
+        self.assertEqual(self.client.post("/api/owner/monitor/").json(), {"joined": True})
+        entry = MonitorInterest.objects.get()
+        self.assertEqual((entry.email, entry.language, entry.country, entry.source), ("aino@example.com", "sv", "SE", "hosting"))
+        self.assertEqual(self.client.get("/api/owner/monitor/").json(), {"joined": True})
+
+    def test_needs_sign_in(self):
+        self.client.logout()
+        self.assertEqual(self.client.get("/api/owner/monitor/").status_code, 403)

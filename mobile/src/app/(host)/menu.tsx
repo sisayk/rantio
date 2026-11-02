@@ -58,6 +58,7 @@ export default function Menu() {
             />
           ))}
           <Row icon="list-outline" label={m.app.menu.bookings} onPress={() => router.push("/bookings")} />
+          <Row icon="hardware-chip-outline" label={m.owner.monitor.title.split(":")[0]} detail={m.owner.monitor.badge} onPress={() => router.push("/monitor")} />
           <Row icon="globe-outline" label={m.app.menu.web} onPress={() => openSite(`/${lang}/hosting`)} last />
         </Section>
 

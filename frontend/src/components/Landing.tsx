@@ -236,7 +236,7 @@ export default function Landing({ lang }: { lang: Lang }) {
         </section>
 
         {/* Mökki monitor: the cottage alert box, coming soon */}
-        <section className={`${styles.wide} ${styles.monitor}`} aria-labelledby="monitor-title">
+        <section id="monitor" className={`${styles.wide} ${styles.monitor}`} aria-labelledby="monitor-title">
           <div className={styles.monitorTop}>
             <figure className={styles.monitorPhoto}>
               <img src={monitorPhoto.src} alt={t.monitor.photoAlt} width={1200} height={900} loading="lazy" />
