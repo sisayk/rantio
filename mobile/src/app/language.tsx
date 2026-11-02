@@ -16,36 +16,32 @@ export default function LanguageSheet() {
   const router = useRouter();
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      {/* The bar is the scroll view's sticky first child: in an iOS form sheet the scroll view is laid
-          out from the sheet's top edge, so a bar above it ended up under the first row. */}
-      <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl }}>
-        <SheetBar title={m.common.language.title} onClose={() => router.back()} />
-        <View style={{ paddingHorizontal: space.xl }}>
-          {LANGS.map((l) => {
-            const on = l === lang;
-            return (
-              <Pressable
-                key={l}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: on }}
-                onPress={() => {
-                  tap();
-                  setLang(l);
-                  // The owner's emails follow the app's language too.
-                  if (signedIn) ownerApi.setLanguage(l).catch(() => undefined);
-                  router.back();
-                }}
-                style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text v="bodyMedium">{LANG_INFO[l].native}</Text>
-                  {l !== lang ? <Text v="small">{language(l)}</Text> : null}
-                </View>
-                {on ? <Icon name="checkmark" color={colors.green} /> : null}
-              </Pressable>
-            );
-          })}
-        </View>
+      <SheetBar title={m.common.language.title} onClose={() => router.back()} />
+      <ScrollView contentContainerStyle={{ paddingHorizontal: space.xl, paddingBottom: space.xxl }}>
+        {LANGS.map((l) => {
+          const on = l === lang;
+          return (
+            <Pressable
+              key={l}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: on }}
+              onPress={() => {
+                tap();
+                setLang(l);
+                // The owner's emails follow the app's language too.
+                if (signedIn) ownerApi.setLanguage(l).catch(() => undefined);
+                router.back();
+              }}
+              style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
+            >
+              <View style={{ flex: 1 }}>
+                <Text v="bodyMedium">{LANG_INFO[l].native}</Text>
+                {l !== lang ? <Text v="small">{language(l)}</Text> : null}
+              </View>
+              {on ? <Icon name="checkmark" color={colors.green} /> : null}
+            </Pressable>
+          );
+        })}
       </ScrollView>
     </View>
   );

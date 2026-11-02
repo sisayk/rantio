@@ -14,39 +14,35 @@ export default function CurrencySheet() {
   const router = useRouter();
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      {/* The bar is the scroll view's sticky first child: in an iOS form sheet the scroll view is laid
-          out from the sheet's top edge, so a bar above it ended up under the first row. */}
-      <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl }}>
-        <SheetBar title={m.guest.currency.title} onClose={() => router.back()} />
-        <View style={{ paddingHorizontal: space.xl }}>
-          {CURRENCIES.map((c) => {
-            const on = c === currency;
-            return (
-              <Pressable
-                key={c}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: on }}
-                onPress={() => {
-                  tap();
-                  setCurrency(c);
-                  router.back();
-                }}
-                style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text v="bodyMedium">{currencyName(c)}</Text>
-                  <Text v="small">
-                    {c} · {currencySign(lang, c)}
-                  </Text>
-                </View>
-                {on ? <Icon name="checkmark" color={colors.green} /> : null}
-              </Pressable>
-            );
-          })}
-          <Text v="small" style={{ marginTop: space.lg }}>
-            {m.guest.currency.note}
-          </Text>
-        </View>
+      <SheetBar title={m.guest.currency.title} onClose={() => router.back()} />
+      <ScrollView contentContainerStyle={{ paddingHorizontal: space.xl, paddingBottom: space.xxl }}>
+        {CURRENCIES.map((c) => {
+          const on = c === currency;
+          return (
+            <Pressable
+              key={c}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: on }}
+              onPress={() => {
+                tap();
+                setCurrency(c);
+                router.back();
+              }}
+              style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
+            >
+              <View style={{ flex: 1 }}>
+                <Text v="bodyMedium">{currencyName(c)}</Text>
+                <Text v="small">
+                  {c} · {currencySign(lang, c)}
+                </Text>
+              </View>
+              {on ? <Icon name="checkmark" color={colors.green} /> : null}
+            </Pressable>
+          );
+        })}
+        <Text v="small" style={{ marginTop: space.lg }}>
+          {m.guest.currency.note}
+        </Text>
       </ScrollView>
     </View>
   );

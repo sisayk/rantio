@@ -66,8 +66,9 @@ function Root() {
         <Stack.Screen name="(host)" options={{ animation: "fade" }} />
         <Stack.Screen name="login" options={{ presentation: "modal" }} />
         <Stack.Screen name="contact/[id]" options={{ presentation: "modal" }} />
-        <Stack.Screen name="language" options={{ presentation: "formSheet", sheetAllowedDetents: [0.6, 1], sheetGrabberVisible: true }} />
-        <Stack.Screen name="currency" options={{ presentation: "formSheet", sheetAllowedDetents: [0.5], sheetGrabberVisible: true }} />
+        {/* Full sheets like the other pickers: in a detented form sheet iOS laid the list out over the title bar. */}
+        <Stack.Screen name="language" options={{ presentation: "modal" }} />
+        <Stack.Screen name="currency" options={{ presentation: "modal" }} />
       </Stack>
     </>
   );
