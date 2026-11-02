@@ -1,7 +1,7 @@
 // Calls to Rantio's Django API. Owners send their app sign-in key as a Bearer header;
 // guests need no account (a conversation's private token is the key).
 import Constants from "expo-constants";
-import { NativeModules } from "react-native";
+import { NativeModules, TurboModuleRegistry } from "react-native";
 
 import type {
   BookingLinkInfo,
@@ -38,12 +38,14 @@ function devServer(): string {
   const fromExpo = Constants.expoConfig?.hostUri;
   if (fromExpo) return fromExpo;
   try {
-    const source = NativeModules.SourceCode as { getConstants?: () => { scriptURL?: string }; scriptURL?: string } | undefined;
-    const url = source?.getConstants?.().scriptURL ?? source?.scriptURL ?? "";
-    return url.match(/^https?:\/\/([^/?#]+)/)?.[1] ?? "";
+    type Source = { getConstants?: () => { scriptURL?: string } } | null | undefined;
+    const source = (TurboModuleRegistry.get("SourceCode") ?? NativeModules.SourceCode) as Source;
+    const found = (source?.getConstants?.().scriptURL ?? "").match(/^https?:\/\/([^/?#]+)/)?.[1];
+    if (found) return found;
   } catch {
-    return "";
+    // fall through
   }
+  return "localhost:8081"; // a development build always loads from Metro; the simulator's is here
 }
 
 /**
