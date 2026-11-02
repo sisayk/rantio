@@ -55,9 +55,20 @@ export function HeartButton({ id, size = 26, onPhoto = true }: { id: string; siz
         tap();
         toggleSaved(id);
       }}
-      style={({ pressed }) => [onPhoto && styles.heartShadow, pressed && { transform: [{ scale: 0.9 }] }]}
+      style={({ pressed }) => [pressed && { transform: [{ scale: 0.9 }] }]}
     >
-      <Icon name={on ? "heart" : "heart-outline"} size={size} color={on ? colors.heart : onPhoto ? "#fff" : colors.ink} />
+      {onPhoto ? (
+        // On a photo: a tinted heart under a white outline, so it reads on any picture without a
+        // view shadow (iOS can't draw a shadow around an icon efficiently and warns about it).
+        <View style={{ width: size, height: size }}>
+          <View style={StyleSheet.absoluteFill}>
+            <Icon name="heart" size={size} color={on ? colors.heart : "rgba(0,0,0,0.35)"} />
+          </View>
+          <Icon name="heart-outline" size={size} color="#fff" />
+        </View>
+      ) : (
+        <Icon name={on ? "heart" : "heart-outline"} size={size} color={on ? colors.heart : colors.ink} />
+      )}
     </Pressable>
   );
 }
@@ -188,5 +199,4 @@ const styles = StyleSheet.create({
   badgeSmall: { top: 10, left: 10, paddingHorizontal: 9, paddingVertical: 4 },
   channels: { position: "absolute", left: 12, bottom: 12 },
   heart: { position: "absolute", top: 12, right: 14 },
-  heartShadow: { shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
 });

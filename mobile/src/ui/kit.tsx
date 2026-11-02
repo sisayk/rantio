@@ -282,7 +282,7 @@ export const styles = StyleSheet.create({
   },
   buttonSmall: { minHeight: 36, paddingHorizontal: space.md, borderRadius: radius.sm },
   iconButton: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  iconButtonFilled: { backgroundColor: "rgba(255,255,255,0.94)", ...shadow },
+  iconButtonFilled: { backgroundColor: "#fff", ...shadow }, // opaque, so iOS can draw the shadow efficiently
   card: { backgroundColor: colors.page, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.line, ...shadow },
   row: { flexDirection: "row", alignItems: "center", gap: space.lg, paddingVertical: space.lg, minHeight: 56 },
   rowLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
