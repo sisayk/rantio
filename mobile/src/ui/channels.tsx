@@ -4,6 +4,7 @@
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 
+import { API_URL } from "@/api";
 import { CHANNELS, type ChannelId, channelIcon } from "@/lib/catalog";
 import { colors } from "@/theme";
 import { Text } from "@/ui/kit";
@@ -20,7 +21,7 @@ export function ChannelStack({ channels, max = 4, size = 22, onPhoto = true }: {
     >
       {shown.map((c, i) => (
         <View key={c} style={[styles.ring, { width: size + 4, height: size + 4, borderRadius: (size + 4) / 2, marginLeft: i ? -size * 0.32 : 0, zIndex: max - i }]}>
-          <Image source={{ uri: channelIcon(c) }} style={{ width: size - 4, height: size - 4, borderRadius: 4 }} recyclingKey={c} />
+          <Image source={{ uri: channelIcon(c, API_URL) }} style={{ width: size - 4, height: size - 4, borderRadius: 4 }} recyclingKey={c} />
         </View>
       ))}
       {rest > 0 ? (
@@ -36,7 +37,7 @@ export function ChannelStack({ channels, max = 4, size = 22, onPhoto = true }: {
 export function ChannelTile({ channel, size = 28 }: { channel: ChannelId; size?: number }) {
   return (
     <View style={styles.tileIcon}>
-      <Image source={{ uri: channelIcon(channel) }} style={{ width: size, height: size, borderRadius: 6 }} />
+      <Image source={{ uri: channelIcon(channel, API_URL) }} style={{ width: size, height: size, borderRadius: 6 }} />
     </View>
   );
 }

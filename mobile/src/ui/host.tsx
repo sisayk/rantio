@@ -2,7 +2,7 @@
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 
-import type { BookingRow } from "@/api";
+import { API_URL, type BookingRow } from "@/api";
 import { CHANNELS, type ChannelId, channelIcon } from "@/lib/catalog";
 import { DAY_WEEKDAY, daysBetween, formatDate } from "@/text/dates";
 import { type T, useT } from "@/text/i18n";
@@ -22,7 +22,7 @@ export function SiteIcon({ channel, label, showName = true, size = 18 }: { chann
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <View style={[styles.icon, { width: size + 6, height: size + 6 }]}>
         {known ? (
-          <Image source={{ uri: channelIcon(known) }} style={{ width: size, height: size, borderRadius: 4 }} />
+          <Image source={{ uri: channelIcon(known, API_URL) }} style={{ width: size, height: size, borderRadius: 4 }} />
         ) : channel === "direct" ? (
           <Logo size={size} />
         ) : (

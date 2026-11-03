@@ -1,6 +1,7 @@
 // What a cottage can have, how guests filter on it, and where it is listed.
 // ---------- listing sites ----------
-// Icons are each site's own favicon, loaded from the site; no logos are stored here.
+// Icons are each site's own favicon, which Rantio's server fetches once and serves
+// (backend/owners/site_icons.py, whose SITES list must match this one); no logos are stored here.
 export const CHANNELS = {
   airbnb: { name: "Airbnb", domain: "airbnb.com" },
   booking: { name: "Booking.com", domain: "booking.com" },
@@ -33,8 +34,8 @@ export const CHANNELS_BY_COUNTRY: Record<string, ChannelId[]> = {
   LT: GLOBAL,
 };
 
-export const channelIcon = (id: ChannelId) =>
-  `https://www.google.com/s2/favicons?domain=${CHANNELS[id].domain}&sz=64`;
+/** The site's icon from Rantio's own server; the app passes its server address as `base`. */
+export const channelIcon = (id: ChannelId, base = "") => `${base}/api/site-icon/${id}/`;
 
 // ---------- filter sections ----------
 // "any": a cottage matches if it has one of the ticked options (water, shore, sauna).
