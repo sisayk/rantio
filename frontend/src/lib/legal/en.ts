@@ -41,7 +41,7 @@ export const en: LegalTexts = {
         ],
         list: [
           "Your name, email address and phone number, if you give it",
-          "Country, region, number of cottages, Nettimökki link and message from the sign-up form",
+          "Country, region, town, number of cottages, Nettimökki link and message from the sign-up form",
           "Your cottages' descriptions, photos, prices and calendars",
           "Bookings, yearly fees, commissions, invoices and whether they're paid (payments go through Stripe; we never see or store card numbers)",
           "Your messages with guests and with us",

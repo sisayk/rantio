@@ -3,9 +3,6 @@ import type { Currency } from "@/lib/currency";
 
 export type { Lang } from "@/i18n/locales";
 
-export const REGIONS = ["saimaa", "lakeland", "lapland", "helsinki", "coast", "other"] as const;
-export type Region = (typeof REGIONS)[number];
-
 export const CONTACT_EMAIL = "info@rantio.fi";
 
 // Same assumptions as the business plan (28 Oct 2026).

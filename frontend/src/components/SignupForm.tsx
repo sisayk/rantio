@@ -4,13 +4,28 @@ import { useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { CONTACT_EMAIL, REGIONS } from "@/lib/content";
-import { COUNTRIES } from "@/lib/listings";
+import { CONTACT_EMAIL } from "@/lib/content";
+import { COUNTRIES, type Country } from "@/lib/listings";
+import { regionLabel } from "@/lib/placeNames";
+import { PLACES } from "@/lib/places";
 import styles from "./landing.module.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
 
-type Field = "name" | "email" | "region" | "nettimokki_url" | "privacy_consent";
+type Field = "name" | "email" | "country" | "region" | "nettimokki_url" | "privacy_consent";
+
+// The country the form starts with, from the page's language (English: none chosen yet).
+const LANG_COUNTRY: Partial<Record<Lang, Country>> = {
+  fi: "FI",
+  sv: "SE",
+  nb: "NO",
+  nn: "NO",
+  da: "DK",
+  is: "IS",
+  et: "EE",
+  lv: "LV",
+  lt: "LT",
+};
 type Errors = Partial<Record<Field | "form", string>>;
 
 type Props = {
@@ -25,9 +40,14 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [errors, setErrors] = useState<Errors>({});
   const [doneName, setDoneName] = useState("");
-  // "FI:saimaa" for a Finnish region, or a country code such as "SE".
-  const [location, setLocation] = useState("");
-  const inFinland = location.startsWith("FI");
+  // Where the cottage is: the country, then one of its official regions, then (optional) the town.
+  const [country, setCountry] = useState<Country | "">(LANG_COUNTRY[lang] ?? "");
+  const [region, setRegion] = useState("");
+  const regions = country
+    ? [...PLACES[country]].sort((a, b) => regionLabel(a, country, lang).localeCompare(regionLabel(b, country, lang), lang))
+    : [];
+  const towns = PLACES[country as Country]?.find((r) => r.id === region)?.cities.map((c) => c.name) ?? [];
+  const inFinland = country === "FI";
 
   function validate(data: FormData): Errors {
     const e: Errors = {};
@@ -37,7 +57,8 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     if (!name) e.name = f.errors.required;
     if (!email) e.email = f.errors.required;
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = f.errors.email;
-    if (!data.get("region")) e.region = f.errors.required;
+    if (!data.get("country")) e.country = f.errors.required;
+    else if (!data.get("region")) e.region = f.errors.required;
     if (link && !/^https?:\/\/([a-z0-9-]+\.)*nettimokki\.com(\/|$)/i.test(link)) e.nettimokki_url = f.errors.nettimokki;
     if (!data.get("privacy_consent")) e.privacy_consent = f.errors.consent;
     return e;
@@ -55,7 +76,6 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     }
 
     const params = new URLSearchParams(window.location.search);
-    const [country, region = ""] = String(data.get("region")).split(":");
     const body = {
       name: String(data.get("name")).trim(),
       email: String(data.get("email")).trim(),
@@ -63,6 +83,9 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       language: lang,
       country,
       region,
+      place: String(data.get("place") ?? "")
+        .trim()
+        .slice(0, 100),
       cottage_count: Number(data.get("cottage_count") ?? 1),
       nettimokki_url: country === "FI" ? String(data.get("nettimokki_url") ?? "").trim() : "",
       message: String(data.get("message") ?? "").trim(),
@@ -90,6 +113,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         const mapped: Errors = {};
         if (detail.email) mapped.email = f.errors.email;
         if (detail.name) mapped.name = f.errors.required;
+        if (detail.country) mapped.country = f.errors.required;
         if (detail.region) mapped.region = f.errors.required;
         if (detail.nettimokki_url) mapped.nettimokki_url = f.errors.nettimokki;
         if (detail.privacy_consent) mapped.privacy_consent = f.errors.consent;
@@ -148,63 +172,96 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       {err("name")}
       {err("email")}
 
-      <div className={styles.fieldRow}>
-        <label className={styles.field} data-invalid={!!errors.region}>
-          <span>{f.region}</span>
-          <select
-            name="region"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            aria-invalid={!!errors.region}
-            aria-describedby={described("region")}
-          >
-            <option value="" disabled>
-              {f.regionPlaceholder}
-            </option>
-            <optgroup label={countries.FI}>
-              {REGIONS.map((r) => (
-                <option key={r} value={`FI:${r}`}>
-                  {f.regions[r]}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label={f.otherCountries}>
-              {COUNTRIES.filter((c) => c !== "FI").map((c) => (
+      <fieldset className={styles.locationSet}>
+        <legend>{f.region}</legend>
+        <div className={styles.fieldRow}>
+          <label className={styles.field} data-invalid={!!errors.country}>
+            <span>{f.country}</span>
+            <select
+              name="country"
+              value={country}
+              autoComplete="country"
+              onChange={(e) => {
+                setCountry(e.target.value as Country | "");
+                setRegion("");
+              }}
+              aria-invalid={!!errors.country}
+              aria-describedby={described("country")}
+            >
+              <option value="" disabled>
+                {f.countryPlaceholder}
+              </option>
+              {COUNTRIES.map((c) => (
                 <option key={c} value={c}>
                   {countries[c]}
                 </option>
               ))}
-            </optgroup>
-          </select>
-          {err("region")}
-        </label>
-        <label className={styles.field}>
-          <span>{f.count}</span>
-          <select name="cottage_count" defaultValue="1">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>
-                {n === 5 ? "5+" : n}
+            </select>
+            {err("country")}
+          </label>
+          <label className={styles.field} data-invalid={!!errors.region}>
+            <span>{f.regionLabel}</span>
+            <select
+              name="region"
+              value={region}
+              disabled={!country}
+              onChange={(e) => setRegion(e.target.value)}
+              aria-invalid={!!errors.region}
+              aria-describedby={described("region")}
+            >
+              <option value="" disabled>
+                {country ? f.regionPlaceholder : f.regionFirst}
               </option>
-            ))}
-          </select>
-        </label>
-      </div>
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {regionLabel(r, country as Country, lang)}
+                </option>
+              ))}
+            </select>
+            {err("region")}
+          </label>
+        </div>
+        <div className={styles.fieldRow}>
+          <label className={styles.field}>
+            <span>
+              {f.place} <em>({f.optional})</em>
+            </span>
+            {/* Any town or municipality; the region's larger towns are offered as you type. */}
+            <input name="place" list="signup-towns" maxLength={100} autoComplete="address-level2" disabled={!region} />
+            <datalist id="signup-towns">
+              {towns.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
+          </label>
+          <label className={styles.field}>
+            <span>{f.count}</span>
+            <select name="cottage_count" defaultValue="1">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>
+                  {n === 5 ? "5+" : n}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </fieldset>
 
       {inFinland ? (
-      <label className={styles.field} data-invalid={!!errors.nettimokki_url}>
-        <span>
-          {f.nettimokki} <em>({f.optional})</em>
-        </span>
-        <input
-          name="nettimokki_url"
-          type="url"
-          inputMode="url"
-          placeholder="https://www.nettimokki.com/…"
-          aria-invalid={!!errors.nettimokki_url}
-          aria-describedby={described("nettimokki_url")}
-        />
-        {err("nettimokki_url")}
-      </label>
+        <label className={styles.field} data-invalid={!!errors.nettimokki_url}>
+          <span>
+            {f.nettimokki} <em>({f.optional})</em>
+          </span>
+          <input
+            name="nettimokki_url"
+            type="url"
+            inputMode="url"
+            placeholder="https://www.nettimokki.com/…"
+            aria-invalid={!!errors.nettimokki_url}
+            aria-describedby={described("nettimokki_url")}
+          />
+          {err("nettimokki_url")}
+        </label>
       ) : null}
 
       <label className={styles.field}>

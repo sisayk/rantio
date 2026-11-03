@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from rest_framework import serializers
 
 from .models import MonitorInterest, OwnerSignup
+from .regions import valid_region
 
 
 class OwnerSignupSerializer(serializers.ModelSerializer):
@@ -12,7 +13,7 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = OwnerSignup
         fields = [
-            "id", "name", "email", "phone", "language", "country", "region", "cottage_count",
+            "id", "name", "email", "phone", "language", "country", "region", "place", "cottage_count",
             "nettimokki_url", "message", "privacy_consent", "source", "website",
         ]
         read_only_fields = ["id"]
@@ -37,8 +38,10 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.pop("website", ""):
             raise serializers.ValidationError("Invalid submission.")
-        if attrs.get("region") and attrs.get("country", "FI") != "FI":
-            raise serializers.ValidationError({"region": "Regions are only used for Finnish cottages."})
+        # The form asks for the country, then one of its official regions.
+        if not valid_region(attrs.get("country", "FI"), attrs.get("region", "")):
+            raise serializers.ValidationError({"region": "Choose one of the country's regions."})
+        attrs["place"] = attrs.get("place", "").strip()
         attrs["email"] = attrs["email"].strip().lower()
         attrs["name"] = attrs["name"].strip()
         return attrs

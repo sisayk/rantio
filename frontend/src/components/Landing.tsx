@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element -- static photos in /public, sized by CSS */
 import { getMessages } from "@/i18n";
 import { countryName, fill, languageNamesIn, money } from "@/i18n/format";
-import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { LANG_INFO, type Lang, LANGS } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
+import { CHANNELS } from "@/lib/catalog";
 import { COMMISSION, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import { COUNTRIES } from "@/lib/listings";
@@ -11,6 +12,7 @@ import Estimator from "./Estimator";
 import LanguageButton from "./LanguagePicker";
 import SignupForm from "./SignupForm";
 import HostSwitchLink from "./guest/HostSwitchLink";
+import MainNav from "./guest/MainNav";
 import { Wordmark } from "./guest/icons";
 import g from "./guest/guest.module.css";
 import styles from "./landing.module.css";
@@ -35,6 +37,14 @@ const MONITOR_ICONS: Record<string, React.ReactNode> = {
   door: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21M3 21h18M16 6h2.5V21" /><circle cx="12.5" cy="12.5" r="0.9" /></svg>,
   probes: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13.5V5a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0Z" /><path d="M12 9v6.5" /></svg>,
 };
+
+// "Why list with Rantio", in the order of owner.why.items: guests abroad, one calendar, control, fees.
+const WHY_ICONS = [
+  <svg key="a" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5s1.2-6.2 3.6-8.5Z" /></svg>,
+  <svg key="b" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" /><path d="M3.5 9.5h17M8 3v4M16 3v4M9 14.5l2 2 4-4" /></svg>,
+  <svg key="c" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>,
+  <svg key="d" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.4 3 8 7 10 4-2 7-5.6 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></svg>,
+];
 
 const STEP_ICONS = [
   <svg key="a" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5" /><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4" /></svg>,
@@ -82,6 +92,7 @@ export default function Landing({ lang }: { lang: Lang }) {
           <a className={g.brand} href={paths.home(lang)}>
             <Wordmark />
           </a>
+          <MainNav lang={lang} labels={m.guest.nav} hostsLabel={m.common.footer.hosts} active="hosts" className={styles.mainNav} />
           <nav className={`${g.detailTopLinks} ${styles.headerNav}`}>
             <LanguageButton lang={lang} t={m.common.language} names={languageNamesIn(lang)} className={g.langButton} />
             <HostSwitchLink
@@ -122,6 +133,39 @@ export default function Landing({ lang }: { lang: Lang }) {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Rantio in numbers: facts only, no made-up statistics */}
+        <section className={styles.factsWrap} aria-label={t.facts.label}>
+          <ul className={styles.facts}>
+            {[
+              [String(Object.keys(CHANNELS).length), t.facts.sites],
+              [String(COUNTRIES.length), t.facts.countries],
+              [String(LANGS.length), t.facts.languages],
+              [cash(0), t.facts.fees],
+            ].map(([value, label]) => (
+              <li key={label}>
+                <strong>{value}</strong>
+                <span>{label}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Why list with Rantio */}
+        <section className={styles.wide} aria-labelledby="why-title">
+          <h2 id="why-title" className={styles.sectionTitle}>
+            {t.why.title}
+          </h2>
+          <ul className={styles.why}>
+            {t.why.items.map((item, i) => (
+              <li key={item.title}>
+                <span className={styles.stepIcon}>{WHY_ICONS[i]}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Example listings */}
@@ -209,7 +253,12 @@ export default function Landing({ lang }: { lang: Lang }) {
           <ol className={styles.steps}>
             {t.how.steps.map((step, i) => (
               <li key={step.title} className={styles.step}>
-                <span className={styles.stepIcon}>{STEP_ICONS[i]}</span>
+                <span className={styles.stepIcon}>
+                  {STEP_ICONS[i]}
+                  <span className={styles.stepNumber} aria-hidden="true">
+                    {i + 1}
+                  </span>
+                </span>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
                 <p className={styles.stepBody}>{step.body}</p>
               </li>

@@ -23,14 +23,14 @@ from .models import (
 
 @admin.register(OwnerSignup)
 class OwnerSignupAdmin(ModelAdmin):
-    list_display = ["name", "email", "country", "region", "cottage_count", "status", "created_at"]
-    list_filter = ["status", "country", "region", "language"]
+    list_display = ["name", "email", "country", "region", "place", "cottage_count", "status", "created_at"]
+    list_filter = ["status", "country", "language"]
     list_editable = ["status"]
     search_fields = ["name", "email", "phone"]
     readonly_fields = ["created_at", "privacy_consent", "source"]
     fieldsets = [
         ("Who", {"fields": ["name", "email", "phone", "language"], "classes": ["st-grid-2"]}),
-        ("Cottages", {"fields": ["country", "region", "cottage_count", "nettimokki_url"], "classes": ["st-grid-2"]}),
+        ("Cottages", {"fields": ["country", "region", "place", "cottage_count", "nettimokki_url"], "classes": ["st-grid-2"]}),
         ("Their message", {"fields": ["message"]}),
         ("Follow-up", {"fields": ["status", "internal_notes"]}),
         ("From the form", {"fields": ["privacy_consent", "source", "created_at"], "classes": ["st-grid-3"]}),

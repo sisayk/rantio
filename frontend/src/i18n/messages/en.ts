@@ -3,7 +3,6 @@
 // language's rules (see ../format.ts). Keep product names (Airbnb, Booking.com,
 // Vrbo, Nettimökki, Rantio) as they are in every language.
 import type { FeatureKey, GroupId } from "@/lib/catalog";
-import type { Region } from "@/lib/content";
 import type { Category } from "@/lib/listings";
 import type { Plural } from "../format";
 import { explore } from "./explore/en";
@@ -467,6 +466,22 @@ export const en = {
       chipBookingBody: "12–15 July, 2 guests from Germany",
       chipSync: "Same dates closed on Nettimökki",
     },
+    facts: {
+      label: "Rantio in numbers",
+      sites: "listing sites",
+      countries: "countries",
+      languages: "site languages",
+      fees: "setup or monthly fees",
+    },
+    why: {
+      title: "Why list with Rantio",
+      items: [
+        { title: "Seen by guests abroad", body: "Your cottage on Airbnb, Booking.com, Vrbo and other big sites, with an English listing we write for you." },
+        { title: "No double bookings", body: "When one site books, the same dates close everywhere, including the sites you already use." },
+        { title: "You stay in charge", body: "You set the prices and the house rules, and keep the weeks you want for yourself." },
+        { title: "Pay when it works", body: "A small yearly fee and 12% of the bookings we bring. Nothing on the guests you already had." },
+      ],
+    },
     listings: {
       title: "How your cottage looks to guests from abroad",
       lead: "We make every cottage an English listing with large photos, clear facts and a price that leaves you at least what you get on the sites you use now.",
@@ -603,16 +618,12 @@ export const en = {
       email: "Email",
       phone: "Phone",
       region: "Where is the cottage?",
-      regionPlaceholder: "Choose a region or country",
-      otherCountries: "Other countries",
-      regions: {
-        saimaa: "Saimaa",
-        lakeland: "Elsewhere in Lakeland",
-        lapland: "Lapland",
-        helsinki: "Helsinki region",
-        coast: "Coast or archipelago",
-        other: "Elsewhere in Finland",
-      } satisfies Record<Region, string> as Record<Region, string>,
+      country: "Country",
+      countryPlaceholder: "Choose a country",
+      regionLabel: "Region",
+      regionPlaceholder: "Choose a region",
+      regionFirst: "Choose the country first",
+      place: "Nearest town or municipality",
       count: "How many cottages?",
       nettimokki: "Link to your Nettimökki listing",
       message: "Anything else you'd like to tell us?",

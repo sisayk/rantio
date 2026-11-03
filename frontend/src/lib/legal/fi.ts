@@ -41,7 +41,7 @@ export const fi: LegalTexts = {
         ],
         list: [
           "Nimesi, sähköpostiosoitteesi ja puhelinnumerosi, jos annat sen",
-          "Ilmoittautumislomakkeen maan, alueen, mökkien määrän, Nettimökki-linkin ja viestin",
+          "Ilmoittautumislomakkeen maan, alueen, paikkakunnan, mökkien määrän, Nettimökki-linkin ja viestin",
           "Mökkiesi kuvaukset, kuvat, hinnat ja kalenterit",
           "Varaukset, vuosimaksut, provisiot, laskut ja niiden maksutilanteen (maksut kulkevat Stripen kautta, emmekä koskaan näe tai tallenna korttinumeroita)",
           "Viestisi vieraiden ja meidän kanssamme",

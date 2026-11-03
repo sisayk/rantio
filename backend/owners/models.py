@@ -10,6 +10,8 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 
+from .regions import REGION_CHOICES, REGIONS
+
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
 # - €99 yearly fee per cottage (or the set amount in the cottage's own currency,
 #   YEARLY_FEES), invoiced when each listing year starts; pilot owners' first year is free.
@@ -86,17 +88,6 @@ COUNTRY_CURRENCY = {"FI": "EUR", "EE": "EUR", "LV": "EUR", "LT": "EUR", "SE": "S
 CURRENCIES = ("EUR", "SEK", "NOK", "DKK", "ISK")
 
 
-class Region(models.TextChoices):
-    """Finnish regions only; other countries leave region blank."""
-
-    SAIMAA = "saimaa", "Saimaa lake region"
-    LAKELAND = "lakeland", "Other Lakeland"
-    LAPLAND = "lapland", "Lapland"
-    HELSINKI = "helsinki", "Helsinki region"
-    COAST = "coast", "Coast and archipelago"
-    OTHER = "other", "Elsewhere in Finland"
-
-
 class OwnerSignup(models.Model):
     """An owner who filled in the rantio.fi sign-up form."""
 
@@ -112,7 +103,8 @@ class OwnerSignup(models.Model):
     phone = models.CharField(max_length=40, blank=True)
     language = models.CharField(max_length=2, choices=Language.choices, default=Language.FINNISH)
     country = models.CharField(max_length=2, choices=Country.choices, default=Country.FINLAND)
-    region = models.CharField(max_length=20, choices=Region.choices, blank=True)
+    region = models.CharField(max_length=40, choices=REGION_CHOICES, blank=True, help_text="The country's official region (regions.py)")
+    place = models.CharField(max_length=100, blank=True, help_text="Nearest town or municipality, as the owner wrote it")
     cottage_count = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1)])
     nettimokki_url = models.URLField(blank=True)
     message = models.TextField(blank=True, max_length=2000)
@@ -131,9 +123,8 @@ class OwnerSignup(models.Model):
 
     @property
     def location_display(self) -> str:
-        if self.region:
-            return f"{self.get_region_display()}, {self.get_country_display()}"
-        return self.get_country_display()
+        region = REGIONS.get(self.country, {}).get(self.region, "")
+        return ", ".join(part for part in (self.place, region, self.get_country_display()) if part)
 
 
 class MonitorInterest(models.Model):
@@ -253,7 +244,7 @@ class Cottage(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name="cottages")
     name = models.CharField(max_length=120)
     country = models.CharField(max_length=2, choices=Country.choices, default=Country.FINLAND)
-    region = models.CharField(max_length=20, choices=Region.choices, blank=True)
+    region = models.CharField(max_length=40, choices=REGION_CHOICES, blank=True)
     municipality = models.CharField(max_length=80, blank=True)
     max_guests = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     bedrooms = models.PositiveSmallIntegerField(default=1)

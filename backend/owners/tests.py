@@ -15,7 +15,8 @@ VALID = {
     "email": "Matti@Example.fi",
     "phone": "+358401234567",
     "language": "fi",
-    "region": "saimaa",
+    "region": "etela-savo",
+    "place": " Savonlinna ",
     "cottage_count": 1,
     "nettimokki_url": "https://www.nettimokki.com/mokki/12345",
     "privacy_consent": True,
@@ -35,21 +36,22 @@ class SignupApiTests(TestCase):
         self.assertEqual(signup.email, "matti@example.fi")
         self.assertEqual(signup.status, OwnerSignup.Status.NEW)
 
-    def test_owner_from_another_country_needs_no_region(self):
-        data = {**VALID, "country": "SE", "region": "", "nettimokki_url": ""}
+    def test_owner_in_another_country_picks_its_region(self):
+        data = {**VALID, "country": "SE", "region": "dalarna", "place": "", "nettimokki_url": ""}
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, 201, response.data)
         signup = OwnerSignup.objects.get()
-        self.assertEqual(signup.location_display, "Sweden")
+        self.assertEqual(signup.location_display, "Dalarna, Sweden")
 
-    def test_finnish_region_only_with_finland(self):
-        response = self.client.post(self.url, {**VALID, "country": "NO"}, format="json")
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("region", response.data)
+    def test_region_must_belong_to_the_country(self):
+        for data in ({**VALID, "country": "NO"}, {**VALID, "region": ""}, {**VALID, "region": "saimaa"}):
+            response = self.client.post(self.url, data, format="json")
+            self.assertEqual(response.status_code, 400, data)
+            self.assertIn("region", response.data)
 
     def test_country_defaults_to_finland(self):
         self.client.post(self.url, VALID, format="json")
-        self.assertEqual(OwnerSignup.objects.get().location_display, "Saimaa lake region, Finland")
+        self.assertEqual(OwnerSignup.objects.get().location_display, "Savonlinna, South Savo, Finland")
 
     def test_requires_privacy_consent(self):
         response = self.client.post(self.url, {**VALID, "privacy_consent": False}, format="json")
@@ -74,7 +76,7 @@ class SignupApiTests(TestCase):
     def test_notifies_team(self):
         self.client.post(self.url, VALID, format="json")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("Saimaa lake region, Finland", mail.outbox[0].subject)
+        self.assertIn("Savonlinna, South Savo, Finland", mail.outbox[0].subject)
 
     def test_accepts_every_site_language(self):
         # The codes in frontend/src/i18n/locales.ts; the form sends the page's language.
@@ -102,7 +104,7 @@ class CommissionTests(TestCase):
     def setUp(self):
         self.owner = Owner.objects.create(name="Liisa", email="liisa@example.fi", agreement_signed_on=date(2026, 10, 31))
         self.cottage = Cottage.objects.create(
-            owner=self.owner, name="Rantasauna", region="saimaa", max_guests=6, price_per_night=Decimal("150")
+            owner=self.owner, name="Rantasauna", region="etela-savo", max_guests=6, price_per_night=Decimal("150")
         )
 
     def book(self, channel, payout="2550.00", **extra):
