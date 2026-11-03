@@ -65,7 +65,7 @@ export const en: LegalTexts = {
         heading: "Visiting the website",
         paragraphs: [
           "Our servers record technical details of each request, such as IP address, time, page and browser type. We need them to keep the site running, stop abuse (for example, too many form submissions from one address) and fix errors. These logs are kept only briefly. Legal basis: our legitimate interest in a secure, working service (6(1)(f)).",
-          "Some parts of the site load content straight from other services: map tiles from OpenStreetMap, nearby places and their pictures from Wikipedia, website icons through Google, and cottage photos from Unsplash. Your browser then contacts those services directly, so they see your IP address, as with any website. We don't send them anything else about you.",
+          "Some parts of the site load content straight from other services: maps from Google Maps (OpenStreetMap where Google Maps isn't available), nearby places and their pictures from Wikipedia, website icons through Google, and cottage photos from Unsplash. Your browser then contacts those services directly, so they see your IP address, as with any website. We don't send them anything else about you.",
         ],
       },
       {
