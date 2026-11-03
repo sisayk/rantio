@@ -249,8 +249,11 @@ export const guestApi = {
     const form = new FormData();
     for (const [k, v] of Object.entries(fields)) form.append(k, String(v));
     for (const uri of photos) form.append("photos", new File(uri) as unknown as Blob);
-    return upload<{ token: string; checkout_url: string | null }>("signups/", form);
+    return upload<{ token: string; checkout_url: string | null; signed_in: boolean; app_key?: string }>("signups/", form);
   },
+  /** The email check: a code to the address, sent back with the form as email_code. */
+  signupEmailCode: (email: string, name: string, lang: string) =>
+    call<{ sent: boolean }>("signups/email-code/", json("POST", { email, name, lang })),
   signupCard: (token: string) =>
     call<{ card_saved: boolean; name: string; card_step: boolean }>(`signups/${encodeURIComponent(token)}/card/`),
   newCardPage: (token: string) =>

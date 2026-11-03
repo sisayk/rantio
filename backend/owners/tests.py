@@ -23,6 +23,7 @@ VALID = {
 }
 
 
+@override_settings(SIGNUP_EMAIL_CHECK=False)  # the email code: tests_trial.EmailCheckTests
 class SignupApiTests(TestCase):
     def setUp(self):
         cache.clear()

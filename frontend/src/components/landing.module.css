@@ -1682,3 +1682,33 @@
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/* The email check: the code sent to the owner's address */
+.codeStep {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--pine-tint);
+  color: var(--lake-deep);
+  font-size: 15px;
+}
+
+.codeInput {
+  max-width: 220px;
+  font-size: 22px !important;
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+
+.textLink {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lake);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}

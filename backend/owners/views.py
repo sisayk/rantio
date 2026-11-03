@@ -8,9 +8,17 @@ from rest_framework import generics, parsers, permissions, views
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
-from . import stripe_api, trial
+from django.contrib.auth import login
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+from django.core.validators import validate_email
+
+from . import app as app_keys
+from . import email_check, stripe_api, trial
+from . import login as owner_login
 from .media_checks import IMAGE_MAX, image_type
-from .models import MonitorInterest, OwnerSignup, SignupPhoto
+from .models import Cottage, CottagePhoto, MonitorInterest, Owner, OwnerSignup, SignupPhoto
+from .regions import REGIONS
 from .serializers import MonitorInterestSerializer, OwnerSignupSerializer
 
 logger = logging.getLogger(__name__)
@@ -39,6 +47,50 @@ def wants_app(request) -> bool:
     return str(request.data.get("app", "")).lower() in ("1", "true")
 
 
+class EmailCodeView(views.APIView):
+    """POST {email, name, lang}: emails a code that the sign-up form then sends as email_code."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
+
+    def post(self, request):
+        email = str(request.data.get("email", "")).strip()
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response({"email": ["invalid"]}, status=400)
+        if not email_check.can_send(email):
+            return Response({"detail": "too_many"}, status=429)
+        lang = str(request.data.get("lang", "en"))
+        email_check.send(email, str(request.data.get("name", ""))[:120], lang)
+        return Response({"sent": True})
+
+
+def become_owner(signup: OwnerSignup) -> Owner:
+    """A checked sign-up is an owner at once, with their cottage (its photos) waiting to be listed."""
+    owner = Owner.objects.filter(email__iexact=signup.email).first()
+    if owner is None:
+        owner = Owner.objects.create(name=signup.name, email=signup.email, phone=signup.phone,
+                                     language=signup.language, signup=signup)
+    elif owner.signup_id is None:
+        owner.signup = signup
+        owner.save(update_fields=["signup"])
+    region = REGIONS.get(signup.country, {}).get(signup.region, "")
+    cottage = Cottage.objects.create(
+        owner=owner, name=(signup.place or region or signup.name)[:120], country=signup.country, region=signup.region,
+        municipality=signup.place[:80], max_guests=2, price_per_night=0, host_languages=[owner.language],
+        status=Cottage.Status.INTAKE,
+    )
+    for i, photo in enumerate(signup.photos.all()):
+        with photo.image.open("rb") as f:
+            data = f.read()
+        CottagePhoto.objects.create(cottage=cottage, position=i,
+                                    image=ContentFile(data, name=photo.image.name.rsplit("/", 1)[-1]))
+    return owner
+
+
 class OwnerSignupCreateView(generics.CreateAPIView):
     """Public endpoint behind the sign-up form (rantio.fi/hosts and the app), with its photos.
 
@@ -60,10 +112,16 @@ class OwnerSignupCreateView(generics.CreateAPIView):
             return error
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        checked = settings.SIGNUP_EMAIL_CHECK
+        if checked and not email_check.check(serializer.validated_data["email"], str(request.data.get("email_code", ""))):
+            return Response({"email_code": ["wrong"]}, status=400)
+        owner = None
         with transaction.atomic():
             signup = serializer.save()
             for i, f in enumerate(photos):
                 SignupPhoto.objects.create(signup=signup, image=f, position=i)
+            if checked:
+                owner = become_owner(signup)
         checkout_url = None
         if trial.enabled():
             try:
@@ -71,7 +129,18 @@ class OwnerSignupCreateView(generics.CreateAPIView):
             except stripe_api.StripeError:
                 logger.exception("No card step for sign-up %s", signup.pk)
         self.notify(signup, len(photos))
-        return Response({**serializer.data, "token": signup.token, "checkout_url": checkout_url}, status=201)
+        answer = {**serializer.data, "token": signup.token, "checkout_url": checkout_url, "signed_in": False}
+        # The email is checked: signed in straight away (the website by cookie, the app by key).
+        if owner:
+            owner_login.user_for(owner)
+            if wants_app(request):
+                platform = str(request.data.get("platform", ""))
+                answer["app_key"] = app_keys.issue_key(owner, name=str(request.data.get("device", ""))[:80],
+                                                       platform=platform if platform in ("ios", "android") else "")
+            else:
+                login(request._request, owner_login.user_for(owner), backend="django.contrib.auth.backends.ModelBackend")
+            answer["signed_in"] = True
+        return Response(answer, status=201)
 
     def notify(self, signup: OwnerSignup, photos: int):
         if settings.SIGNUP_NOTIFY_EMAILS:

@@ -675,6 +675,26 @@ class LoginCode(models.Model):
         return f"Login code for {self.owner} at {self.created_at:%Y-%m-%d %H:%M}"
 
 
+
+class EmailCheck(models.Model):
+    """A six-digit code that proves a sign-up's email address is the owner's (owners/email_check.py)."""
+
+    LIFETIME_MINUTES = 30
+    MAX_ATTEMPTS = 5
+
+    email = models.EmailField(db_index=True)
+    code_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Email check for {self.email} at {self.created_at:%Y-%m-%d %H:%M}"
+
 class RequestStatus(models.TextChoices):
     PENDING = "pending", "Waiting for the owner"
     ACCEPTED = "accepted", "Accepted"

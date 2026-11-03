@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { CONTACT_EMAIL } from "@/lib/content";
@@ -9,6 +9,7 @@ import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { LISTED_ON, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
 import { PLACES } from "@/lib/places";
+import { deviceName, useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
 import { Field } from "@/ui/form";
@@ -23,7 +24,7 @@ const LANG_COUNTRY: Record<string, Country> = { fi: "FI", sv: "SE", nb: "NO", nn
 
 const LONG_SIDE = 2400; // as the listing photos: big enough for any screen, quick to upload
 
-type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimokki" | "photos" | "consent" | "form", string>>;
+type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimokki" | "photos" | "consent" | "code" | "form", string>>;
 // After the form: Stripe's card page for the free trial, then whether the card was saved.
 type Step = "form" | "checking" | "saved" | "notSaved" | "thanks";
 
@@ -35,6 +36,7 @@ export default function ListCottage() {
   const t = m.owner.form;
   const tr = TRIAL[lang];
   const router = useRouter();
+  const { signedUp } = useSession();
   // rantio://list-cottage?signup=… (the welcome page sends the owner back here)
   const params = useLocalSearchParams<{ signup?: string }>();
   const [name, setName] = useState("");
@@ -57,6 +59,11 @@ export default function ListCottage() {
   const [submitted, setToken] = useState("");
   const token = submitted || params.signup || "";
   const [firstName, setFirstName] = useState("");
+  // The email check: the address a code went to, the code typed in, and whether the sign-up signed in.
+  const [codeFor, setCodeFor] = useState("");
+  const [emailCode, setEmailCode] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
+  const codeStep = codeFor !== "" && codeFor === email.trim().toLowerCase();
 
   const askNettimokki = country === "FI" && listed.includes("nettimokki");
   const toggleListed = (key: ListedOn) =>
@@ -153,6 +160,28 @@ export default function ListCottage() {
   const chosen = country ? PLACES[country].find((r) => r.id === region) : undefined;
   const towns = chosen?.cities.map((c) => c.name) ?? [];
   const close = () => (router.canGoBack() ? router.back() : router.replace("/explore"));
+  // Signed in by the sign-up: on to the owner's side, where the cottage is waiting.
+  const finish = () => (isOwner ? router.replace("/today") : close());
+
+  const sendCode = async () => {
+    setBusy(true);
+    try {
+      await guestApi.signupEmailCode(email.trim(), name.trim(), lang);
+      setCodeFor(email.trim().toLowerCase());
+      setEmailCode("");
+      setErrors({});
+    } catch (err) {
+      setErrors(
+        err instanceof ApiError && err.status === 429
+          ? { form: tr.code.tooMany }
+          : err instanceof ApiError && err.status === 400
+            ? { email: t.errors.email }
+            : { form: err instanceof Offline ? m.app.common.offline : t.errors.network.replace("{email}", CONTACT_EMAIL) },
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const submit = async () => {
     const e: Errors = {};
@@ -165,6 +194,9 @@ export default function ListCottage() {
     if (!consent) e.consent = t.errors.consent;
     setErrors(e);
     if (Object.keys(e).length) return;
+    // First a code to the email address; the form goes through once it's typed in.
+    if (!codeStep) return sendCode();
+    if (emailCode.replace(/\D/g, "").length !== 6) return setErrors({ code: tr.code.wrong });
     setBusy(true);
     try {
       const res = await guestApi.listCottage({
@@ -183,7 +215,14 @@ export default function ListCottage() {
         source: "app",
         website: "",
         app: 1,
+        email_code: emailCode.replace(/\D/g, ""),
+        device: deviceName(),
+        platform: Platform.OS === "ios" ? "ios" : "android",
       }, photos);
+      if (res.app_key) {
+        await signedUp(res.app_key);
+        setIsOwner(true);
+      }
       setToken(res.token);
       setFirstName(name.trim().split(" ")[0]);
       if (res.checkout_url) await saveCard(res.checkout_url, res.token);
@@ -193,7 +232,9 @@ export default function ListCottage() {
       setErrors(
         err instanceof ApiError && err.status === 429
           ? { form: t.errors.tooMany }
-          : detail.email
+          : detail.email_code
+            ? { code: tr.code.wrong }
+            : detail.email
             ? { email: t.errors.email }
             : detail.region
               ? { region: t.errors.required }
@@ -237,8 +278,8 @@ export default function ListCottage() {
           {step !== "checking" ? (
             <Button
               kind={step === "notSaved" ? "ghost" : "primary"}
-              label={m.app.common.done}
-              onPress={close}
+              label={isOwner && step !== "notSaved" ? tr.code.toDashboard : m.app.common.done}
+              onPress={finish}
               style={{ alignSelf: "stretch", marginTop: step === "notSaved" ? 0 : space.lg }}
             />
           ) : null}
@@ -423,13 +464,31 @@ export default function ListCottage() {
             <Button kind="ghost" small label={t.privacyLink} onPress={() => openSite(`/${lang}/privacy`)} style={{ alignSelf: "flex-start", paddingHorizontal: 0 }} />
             {errors.consent ? <Text v="small" color={colors.error}>{errors.consent}</Text> : null}
             {errors.form ? <Problem text={errors.form} /> : null}
-            <View style={styles.trial}>
-              <Text v="smallMedium" color={colors.green}>
-                {tr.badge}
-              </Text>
-              <Text v="small">{tr.cardNote}</Text>
-            </View>
-            <Button label={busy ? t.sending : tr.submit} busy={busy} disabled={preparing} onPress={submit} />
+            {codeStep ? (
+              <View style={styles.trial}>
+                <Text v="small">{f(tr.code.sent, { email: email.trim() })}</Text>
+                <Field
+                  label={tr.code.label}
+                  value={emailCode}
+                  onChangeText={(v) => setEmailCode(v.replace(/\D/g, "").slice(0, 6))}
+                  keyboardType="number-pad"
+                  textContentType="oneTimeCode"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  error={errors.code}
+                  style={{ fontSize: 22, letterSpacing: 6 }}
+                />
+                <Button kind="ghost" small label={tr.code.resend} onPress={sendCode} disabled={busy} style={{ alignSelf: "flex-start", paddingHorizontal: 0 }} />
+              </View>
+            ) : (
+              <View style={styles.trial}>
+                <Text v="smallMedium" color={colors.green}>
+                  {tr.badge}
+                </Text>
+                <Text v="small">{tr.cardNote}</Text>
+              </View>
+            )}
+            <Button label={busy ? t.sending : codeStep ? tr.code.confirm : tr.submit} busy={busy} disabled={preparing} onPress={submit} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

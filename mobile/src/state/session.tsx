@@ -31,12 +31,14 @@ type Session = {
   owner: Owner | null;
   signIn: (to: SignInTo, code: string) => Promise<void>;
   signInWith: (provider: "apple" | "google", idToken: string) => Promise<void>;
+  /** Signed in by the sign-up form (its email was checked with a code). */
+  signedUp: (key: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
 const Ctx = createContext<Session | null>(null);
 
-const deviceName = () => [Device.manufacturer, Device.modelName].filter(Boolean).join(" ") || Platform.OS;
+export const deviceName = () => [Device.manufacturer, Device.modelName].filter(Boolean).join(" ") || Platform.OS;
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -97,6 +99,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         const { token } = await ownerApi.social(provider, idToken, deviceName(), Platform.OS === "ios" ? "ios" : "android");
         await keep(token);
       },
+      signedUp: keep,
       signOut: async () => {
         await ownerApi.logout().catch(() => undefined);
         await forget();

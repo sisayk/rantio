@@ -12,7 +12,7 @@ import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import styles from "./landing.module.css";
 
-type Field = "name" | "email" | "country" | "region" | "nettimokki_url" | "photos" | "privacy_consent";
+type Field = "name" | "email" | "country" | "region" | "nettimokki_url" | "photos" | "privacy_consent" | "email_code";
 type Photo = { id: number; blob: Blob; name: string; url: string };
 
 // The country the form starts with, from the page's language (English: none chosen yet).
@@ -41,6 +41,11 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
   const tr = TRIAL[lang];
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [photos, setPhotos] = useState<Photo[]>([]);
+  // The email check: the address a code was sent to; the form goes through with that code.
+  const [email, setEmail] = useState("");
+  const [codeFor, setCodeFor] = useState("");
+  const [signedIn, setSignedIn] = useState(false);
+  const codeStep = codeFor !== "" && codeFor === email.trim().toLowerCase();
   // Where the cottage is listed now; "none" (not anywhere yet) and the sites exclude each other.
   const [listed, setListed] = useState<ListedOn[]>([]);
   const toggleListed = (key: ListedOn) =>
@@ -111,6 +116,25 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     return e;
   }
 
+  async function sendCode(name: string): Promise<boolean> {
+    try {
+      const res = await fetch("/api/signups/email-code/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), name, lang }),
+      });
+      if (res.ok) {
+        setCodeFor(email.trim().toLowerCase());
+        setErrors({});
+        return true;
+      }
+      setErrors(res.status === 429 ? { form: tr.code.tooMany } : res.status === 400 ? { email: f.errors.email } : { form: f.errors.network });
+    } catch {
+      setErrors({ form: f.errors.network });
+    }
+    return false;
+  }
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -120,6 +144,22 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     if (Object.keys(found).length) {
       const first = Object.keys(found)[0];
       (first === "photos" ? picker.current : form.querySelector<HTMLElement>(`[name="${first}"]`))?.focus();
+      return;
+    }
+
+    // First the code to the email address; the form goes through once it's typed in.
+    if (!codeStep) {
+      setState("sending");
+      if (await sendCode(String(data.get("name")).trim())) {
+        setTimeout(() => form.querySelector<HTMLInputElement>('[name="email_code"]')?.focus(), 50);
+      }
+      setState("idle");
+      return;
+    }
+    const emailCode = String(data.get("email_code") ?? "").replace(/\D/g, "");
+    if (emailCode.length !== 6) {
+      setErrors({ email_code: tr.code.wrong });
+      form.querySelector<HTMLInputElement>('[name="email_code"]')?.focus();
       return;
     }
 
@@ -137,6 +177,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       cottage_count: Number(data.get("cottage_count") ?? 1),
       nettimokki_url: askNettimokki ? String(data.get("nettimokki_url") ?? "").trim() : "",
       listed_on: listed.join(","),
+      email_code: emailCode,
       message: String(data.get("message") ?? "").trim(),
       privacy_consent: true,
       source: params.get("utm_source") ?? params.get("ref") ?? "",
@@ -151,7 +192,8 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     try {
       const response = await fetch("/api/signups/", { method: "POST", body: upload });
       if (response.status === 201) {
-        const answer = (await response.json()) as { checkout_url?: string | null };
+        const answer = (await response.json()) as { checkout_url?: string | null; signed_in?: boolean };
+        setSignedIn(!!answer.signed_in);
         // Next: the card for the free trial, on Stripe's page; it brings the owner back to /hosts/welcome.
         if (answer.checkout_url) {
           window.location.assign(answer.checkout_url);
@@ -172,6 +214,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         if (detail.region) mapped.region = f.errors.required;
         if (detail.nettimokki_url) mapped.nettimokki_url = f.errors.nettimokki;
         if (detail.privacy_consent) mapped.privacy_consent = f.errors.consent;
+        if (detail.email_code) mapped.email_code = tr.code.wrong;
         if (detail.photos) mapped.photos = String(detail.photos).includes("too_big") ? tr.photoBig : tr.photoType;
         setErrors(Object.keys(mapped).length ? mapped : { form: f.errors.network });
       } else {
@@ -188,6 +231,11 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       <div className={styles.success} role="status">
         <p className={styles.successTitle}>{f.successTitle}</p>
         <p>{f.success.replace("{name}", doneName)}</p>
+        {signedIn ? (
+          <a className={styles.primaryButton} href={paths.hosting(lang)} style={{ marginTop: 18 }}>
+            {tr.code.toDashboard}
+          </a>
+        ) : null}
       </div>
     );
   }
@@ -214,6 +262,8 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
             type="email"
             autoComplete="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             aria-invalid={!!errors.email}
             aria-describedby={described("email")}
           />
@@ -405,11 +455,34 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         </p>
       ) : null}
 
-      <p className={styles.cardNote}>
-        <span className={styles.trialBadge}>{tr.badge}</span> {tr.cardNote}
-      </p>
+      {codeStep ? (
+        <div className={styles.codeStep}>
+          <p role="status">{tr.code.sent.replace("{email}", email.trim())}</p>
+          <label className={styles.field} data-invalid={!!errors.email_code}>
+            <span>{tr.code.label}</span>
+            <input
+              name="email_code"
+              className={styles.codeInput}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              pattern="\d{6}"
+              aria-invalid={!!errors.email_code}
+              aria-describedby={described("email_code")}
+            />
+            {err("email_code")}
+          </label>
+          <button type="button" className={styles.textLink} onClick={() => sendCode(String(email).trim())} disabled={state === "sending"}>
+            {tr.code.resend}
+          </button>
+        </div>
+      ) : (
+        <p className={styles.cardNote}>
+          <span className={styles.trialBadge}>{tr.badge}</span> {tr.cardNote}
+        </p>
+      )}
       <button className={styles.primaryButton} type="submit" disabled={state === "sending" || preparing}>
-        {state === "sending" ? f.sending : tr.submit}
+        {state === "sending" ? f.sending : codeStep ? tr.code.confirm : tr.submit}
       </button>
     </form>
   );

@@ -42,7 +42,7 @@ class FakeStripe:
         return {"status": "complete" if self.complete else "open", "setup_intent": {"payment_method": "pm_card"}}
 
 
-@override_settings(MEDIA_ROOT=MEDIA, STRIPE_SECRET_KEY="sk_test_x", SIGNUP_NOTIFY_EMAILS=[])
+@override_settings(MEDIA_ROOT=MEDIA, STRIPE_SECRET_KEY="sk_test_x", SIGNUP_NOTIFY_EMAILS=[], SIGNUP_EMAIL_CHECK=False)
 class TrialSignupTests(TestCase):
     @classmethod
     def tearDownClass(cls):
@@ -131,3 +131,55 @@ class TrialSignupTests(TestCase):
         self.sign_up(listed_on="booking,none")
         self.assertEqual(OwnerSignup.objects.get().listed_on, "none")
         self.assertEqual(self.sign_up(listed_on="tripadvisor").status_code, 400)
+
+
+@override_settings(MEDIA_ROOT=MEDIA, STRIPE_SECRET_KEY="", SIGNUP_NOTIFY_EMAILS=[], SIGNUP_EMAIL_CHECK=True)
+class EmailCheckTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.client = APIClient()
+
+    def code_for(self, email="Matti@Example.fi"):
+        from django.core import mail
+
+        res = self.client.post("/api/signups/email-code/", {"email": email, "name": "Matti Virtanen", "lang": "fi"},
+                               format="json")
+        self.assertEqual(res.status_code, 200, res.content)
+        self.assertIn("Rantio-koodisi", mail.outbox[-1].subject)
+        return mail.outbox[-1].subject.rsplit(" ", 1)[-1]
+
+    def sign_up(self, **extra):
+        data = {**VALID, "privacy_consent": "true", "photos": [png("a.png")], **extra}
+        return self.client.post("/api/signups/", data, format="multipart")
+
+    def test_needs_the_right_code(self):
+        self.code_for()
+        self.assertEqual(self.sign_up(email_code="000000").json(), {"email_code": ["wrong"]})
+        self.assertEqual(self.sign_up().status_code, 400)
+        self.assertFalse(OwnerSignup.objects.exists())
+
+    def test_checked_sign_up_is_an_owner_signed_in_with_the_cottage(self):
+        res = self.sign_up(email_code=self.code_for())
+        self.assertEqual(res.status_code, 201, res.content)
+        self.assertTrue(res.json()["signed_in"])
+        owner = Owner.objects.get()
+        self.assertEqual((owner.email, owner.phone, owner.signup), ("matti@example.fi", "+358401234567", OwnerSignup.objects.get()))
+        cottage = owner.cottages.get()
+        self.assertEqual((cottage.name, cottage.status, cottage.photos.count()), ("Savonlinna", "intake", 1))
+        self.assertEqual(self.client.get("/api/owner/me/").status_code, 200)
+        # The code works once.
+        self.client.logout()
+        self.assertEqual(self.sign_up(email_code="x").status_code, 400)
+
+    def test_the_app_gets_a_key(self):
+        res = self.sign_up(email_code=self.code_for(), app="1", platform="ios", device="iPhone")
+        key = res.json()["app_key"]
+        self.assertTrue(key.startswith("stg_"))
+        me = APIClient().get("/api/owner/me/", HTTP_AUTHORIZATION=f"Bearer {key}")
+        self.assertEqual(me.status_code, 200)
+
+    def test_codes_are_limited(self):
+        for _ in range(5):
+            self.code_for()
+        res = self.client.post("/api/signups/email-code/", {"email": "matti@example.fi"}, format="json")
+        self.assertEqual(res.status_code, 429)

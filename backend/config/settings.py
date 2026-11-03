@@ -159,6 +159,10 @@ REST_FRAMEWORK = {
     },
 }
 
+# The sign-up form checks the owner's email with a code, and a checked sign-up becomes an
+# owner who is signed in at once (owners/email_check.py).
+SIGNUP_EMAIL_CHECK = env_bool("SIGNUP_EMAIL_CHECK", True)
+
 # Push notifications to owners' phones through Expo (off in tests).
 APP_PUSH = env_bool("APP_PUSH", True)
 

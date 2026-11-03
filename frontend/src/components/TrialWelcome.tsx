@@ -94,8 +94,9 @@ export default function TrialWelcome({ lang }: { lang: Lang }) {
               {t.backToApp}
             </a>
           ) : state !== "checking" ? (
-            <a className={state === "notSaved" ? styles.quiet : styles.primary} href={paths.hosts(lang)}>
-              {t.home}
+            // The sign-up signed the owner in: their cottage is waiting in the dashboard.
+            <a className={state === "notSaved" ? styles.quiet : styles.primary} href={paths.hosting(lang)}>
+              {TRIAL[lang].code.toDashboard}
             </a>
           ) : null}
         </div>
