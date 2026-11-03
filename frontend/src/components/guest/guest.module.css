@@ -28,6 +28,9 @@
 /* ---------- hero ---------- */
 .hero {
   position: relative;
+  /* Its own layer above the listings below, so the search's calendar and guest
+     pickers open over the cottage cards (whose photos and badges have z-indexes). */
+  z-index: 5;
   min-height: 420px;
   padding: 0 0 40px;
   background:
