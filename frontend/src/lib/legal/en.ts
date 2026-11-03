@@ -35,7 +35,7 @@ export const en: LegalTexts = {
       {
         heading: "Cottage owners",
         paragraphs: [
-          "When you sign up, we save the details from the sign-up form so we can contact you and plan your listings. If you become a customer, we also keep your account, your cottages, bookings, fees and invoices. You sign in with a one-time code sent to your email; codes stop working after 15 minutes and are stored only in scrambled (hashed) form.",
+          "When you sign up, we save the details from the sign-up form so we can contact you and plan your listings. If you become a customer, we also keep your account, your cottages, bookings, fees and invoices. You sign in with a one-time code sent to your email or phone; codes stop working after 15 minutes and are stored only in scrambled (hashed) form. If you sign in with Google or Apple instead, they tell us your account's ID and email address, which we use only to recognise you.",
           "Legal basis: steps you asked for before a contract, and your consent in the sign-up form (article 6(1)(b) and (a)); carrying out the owner service agreement (6(1)(b)); and keeping the accounting records Finnish law requires (6(1)(c)).",
           "What we save:",
         ],
@@ -83,9 +83,10 @@ export const en: LegalTexts = {
         ],
         list: [
           "Hetzner Online (Germany): servers in Helsinki, Finland, where our database and files are kept",
-          "A transactional email service that delivers our emails (sign-in codes, messages and notifications)",
+          "A transactional email and SMS service that delivers our emails and text messages (sign-in codes, messages and notifications)",
           "Stripe: invoices and payments for owners",
           "Anthropic: AI reply drafts, only when an owner asks for one",
+          "Google and Apple: only if an owner chooses to sign in with their Google or Apple account",
           "Beds24: the channel manager that connects owners' calendars and listings to the listing sites",
           "Listing sites such as Airbnb, Booking.com and Vrbo: they receive the cottage listing and calendar from us and send us booking details. They decide for themselves how they use guest data.",
         ],

@@ -35,7 +35,7 @@ export const fi: LegalTexts = {
       {
         heading: "Mökkien omistajat",
         paragraphs: [
-          "Kun ilmoittaudut, tallennamme lomakkeen tiedot, jotta voimme ottaa sinuun yhteyttä ja suunnitella ilmoituksesi. Jos sinusta tulee asiakas, säilytämme myös tilisi, mökkisi, varaukset, maksut ja laskut. Kirjaudut sisään sähköpostiisi lähetettävällä kertakäyttöisellä koodilla. Koodi vanhenee 15 minuutissa, ja tallennamme sen vain salattuna (tiivisteenä).",
+          "Kun ilmoittaudut, tallennamme lomakkeen tiedot, jotta voimme ottaa sinuun yhteyttä ja suunnitella ilmoituksesi. Jos sinusta tulee asiakas, säilytämme myös tilisi, mökkisi, varaukset, maksut ja laskut. Kirjaudut sisään sähköpostiisi tai puhelimeesi lähetettävällä kertakäyttöisellä koodilla. Koodi vanhenee 15 minuutissa, ja tallennamme sen vain salattuna (tiivisteenä). Jos kirjaudut Googlella tai Applella, ne kertovat meille tilisi tunnisteen ja sähköpostiosoitteen, joita käytämme vain tunnistaaksemme sinut.",
           "Käsittelyperuste: pyytämäsi toimet ennen sopimusta ja ilmoittautumislomakkeella antamasi suostumus (6 artiklan 1 kohdan b ja a alakohta), omistajan palvelusopimuksen toteuttaminen (b alakohta) sekä kirjanpitolain edellyttämien tositteiden säilyttäminen (c alakohta).",
           "Mitä tallennamme:",
         ],
@@ -83,9 +83,10 @@ export const fi: LegalTexts = {
         ],
         list: [
           "Hetzner Online (Saksa): palvelimet Helsingissä, joissa tietokantamme ja tiedostomme ovat",
-          "Sähköpostipalvelu, joka toimittaa viestimme (kirjautumiskoodit, viestit ja ilmoitukset)",
+          "Sähköposti- ja tekstiviestipalvelu, joka toimittaa viestimme (kirjautumiskoodit, viestit ja ilmoitukset)",
           "Stripe: omistajien laskut ja maksut",
           "Anthropic: tekoälyn vastausluonnokset, vain kun omistaja pyytää",
+          "Google ja Apple: vain jos omistaja valitsee kirjautumisen Google- tai Apple-tilillään",
           "Beds24: kanavanhallintajärjestelmä, joka yhdistää omistajien kalenterit ja ilmoitukset varaussivustoihin",
           "Varaussivustot, kuten Airbnb, Booking.com ja Vrbo: ne saavat meiltä mökin ilmoituksen ja kalenterin ja lähettävät meille varausten tiedot. Ne päättävät itse, miten käyttävät vieraiden tietoja.",
         ],
