@@ -225,6 +225,9 @@ export const guestApi = {
   draftEnquiry: (e: EnquiryDraft) => call<{ draft: string }>("enquiries/draft/", json("POST", e)),
   thread: (token: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`),
   send: (token: string, body: string) => call<Thread>(`conversations/${encodeURIComponent(token)}/`, json("POST", { body })),
+  /** Where to push when the owner answers; an empty token stops the notifications. */
+  setPush: (token: string, pushToken: string) =>
+    call<{ ok: boolean }>(`conversations/${encodeURIComponent(token)}/push/`, json("POST", { push_token: pushToken })),
   bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),
   quote: (token: string, checkIn: string, checkOut: string) =>
     call<StayQuote>(`book/${encodeURIComponent(token)}/quote/?check_in=${checkIn}&check_out=${checkOut}`),

@@ -662,6 +662,9 @@ class Conversation(models.Model):
     archived = models.BooleanField(default=False)
     owner_read_at = models.DateTimeField(null=True, blank=True)
     guest_read_at = models.DateTimeField(null=True, blank=True)
+    guest_push_token = models.CharField(
+        max_length=200, blank=True, help_text="Expo push token of the guest's phone, if they use the app and allowed notifications."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     last_message_at = models.DateTimeField(null=True, blank=True)
 

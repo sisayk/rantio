@@ -1,10 +1,11 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppState, View } from "react-native";
 
 import { ApiError, guestApi, Offline, type Thread } from "@/api";
 import { getListing } from "@/lib/listings";
 import { formatRange } from "@/text/dates";
+import { registerGuestPush } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { ChatFrame, Composer, Messages } from "@/ui/chat";
@@ -31,6 +32,11 @@ export default function GuestChat() {
         setState("ok");
       })
       .catch((e) => setState(e instanceof ApiError && e.status === 404 ? "missing" : "error"));
+  }, [token]);
+
+  // Notify this phone when the owner answers (the system asks for permission once).
+  useEffect(() => {
+    registerGuestPush(token).catch(() => undefined);
   }, [token]);
 
   useFocusEffect(

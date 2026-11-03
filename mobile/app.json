@@ -75,7 +75,9 @@
       [
         "expo-build-properties",
         {
-          "ios": { "deploymentTarget": "17.0" }
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
         }
       ],
       [
@@ -92,6 +94,12 @@
     "experiments": {
       "typedRoutes": false,
       "reactCompiler": true
+    },
+    "owner": "bona.et",
+    "extra": {
+      "eas": {
+        "projectId": "de9fff25-8c81-4b4f-8949-003b7f0b0ec9"
+      }
     }
   }
 }

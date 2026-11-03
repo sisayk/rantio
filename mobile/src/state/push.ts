@@ -1,12 +1,13 @@
-// Push notifications for owners: new bookings, guest messages and booking requests.
-// The server sends them through Expo's push service to the token we register here.
+// Push notifications. Owners: new bookings, guest messages and booking requests. Guests:
+// the owner's answer in a conversation they follow in the app. The server sends them
+// through Expo's push service to the token we register here.
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { AndroidImportance } from "expo-notifications";
 import { Platform } from "react-native";
 
-import { ownerApi } from "@/api";
+import { guestApi, ownerApi } from "@/api";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -55,11 +56,28 @@ export async function registerForPush(ask = false): Promise<PushState> {
   return "on";
 }
 
+/**
+ * A guest following a conversation: asks once for permission, then tells the server to
+ * push this phone when the owner answers. Quietly does nothing where pushes can't work.
+ */
+export async function registerGuestPush(conversation: string): Promise<PushState> {
+  const id = projectId();
+  if (!Device.isDevice || !id) return "unavailable";
+  await ensureChannel();
+  let { status, canAskAgain } = await Notifications.getPermissionsAsync();
+  if (status !== "granted" && canAskAgain) ({ status, canAskAgain } = await Notifications.requestPermissionsAsync());
+  if (status !== "granted") return canAskAgain ? "off" : "blocked";
+  const token = (await Notifications.getExpoPushTokenAsync({ projectId: id })).data;
+  await guestApi.setPush(conversation, token);
+  return "on";
+}
+
 /** Where a tapped notification should open. */
 export function routeFor(data: Record<string, unknown> | undefined): string | null {
   if (!data) return null;
   if ((data.type === "message" || data.type === "request") && typeof data.conversation === "number")
     return `/thread/${data.conversation}`;
   if (data.type === "booking") return "/calendar";
+  if (data.type === "guest-message" && typeof data.token === "string") return `/chat/${data.token}`;
   return null;
 }

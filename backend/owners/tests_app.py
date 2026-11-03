@@ -123,6 +123,32 @@ class PushTests(TestCase):
         self.assertEqual(msg["body"], "Is the sauna wood-fired?")
         self.assertEqual(msg["data"]["type"], "message")
 
+    def test_the_guest_in_the_app_hears_the_owners_answer(self):
+        from .messaging import add
+        from .models import Conversation, Message
+
+        res = self.client.post("/api/enquiries/", {"listing": "rantasauna", "name": "Lena Berg", "email": "lena@example.com",
+                                                   "lang": "en", "body": "Is the sauna wood-fired?"}, content_type="application/json")
+        token = res.json()["token"]
+        bad = self.client.post(f"/api/conversations/{token}/push/", {"push_token": "nope"}, content_type="application/json")
+        self.assertEqual(bad.status_code, 400)
+        ok = self.client.post(f"/api/conversations/{token}/push/", {"push_token": "ExponentPushToken[guest]"},
+                              content_type="application/json")
+        self.assertEqual(ok.status_code, 200)
+        c = Conversation.objects.get(token=token)
+        with mock.patch.object(app, "_post") as post, self.captureOnCommitCallbacks(execute=True):
+            add(c, Message.Sender.HOST, "Yes, it is.")
+        msg = post.call_args.args[0][0]
+        self.assertEqual(msg["to"], "ExponentPushToken[guest]")
+        self.assertEqual(msg["title"], "Rantasauna")
+        self.assertEqual(msg["data"], {"type": "guest-message", "token": token})
+        # Notifications off in the app: nothing more is sent.
+        self.client.post(f"/api/conversations/{token}/push/", {"push_token": ""}, content_type="application/json")
+        c.refresh_from_db()
+        with mock.patch.object(app, "_post") as post, self.captureOnCommitCallbacks(execute=True):
+            add(c, Message.Sender.HOST, "And the lake is warm.")
+        post.assert_not_called()
+
     def test_a_failed_push_is_only_logged(self):
         with self.assertLogs("owners.app", "ERROR"), mock.patch.object(app, "_post", side_effect=OSError("down")), \
                 self.captureOnCommitCallbacks(execute=True):

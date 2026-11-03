@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/enquiries/", inbox.EnquiryView.as_view(), name="enquiry"),
     path("api/enquiries/draft/", inbox.EnquiryDraftView.as_view(), name="enquiry-draft"),
     path("api/conversations/<str:token>/", inbox.GuestThreadView.as_view(), name="guest-thread"),
+    path("api/conversations/<str:token>/push/", inbox.GuestPushView.as_view(), name="guest-push"),
     path("api/owner/conversations/", inbox.OwnerConversationsView.as_view(), name="owner-conversations"),
     path("api/owner/conversations/<int:pk>/", inbox.OwnerThreadView.as_view(), name="owner-thread"),
     path("api/owner/conversations/<int:pk>/draft/", inbox.OwnerDraftView.as_view(), name="owner-draft"),

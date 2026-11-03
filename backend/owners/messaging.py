@@ -128,6 +128,10 @@ def add(c: Conversation, sender: str, text: str, *, notify: bool = True) -> Mess
     if notify and sender == Message.Sender.HOST and c.replies_here and c.guest_email:
         _send(GUEST_REPLY, c.guest_language, [c.guest_email], name=c.guest_name.split()[0], cottage=cottage_label(c),
               text=_excerpt(text), link=guest_link(c))
+    if notify and sender == Message.Sender.HOST and c.replies_here and c.guest_push_token:
+        # The guest follows this conversation in the app: tell their phone at once.
+        app.push([c.guest_push_token], cottage_label(c), _excerpt(text), {"type": "guest-message", "token": c.token},
+                 who=f"guest of conversation {c.pk}")
     return m
 
 

@@ -158,6 +158,24 @@ class GuestThreadView(APIView):
         return Response(thread(self.get_conversation(token), "guest"), status=status.HTTP_201_CREATED)
 
 
+class GuestPushSerializer(serializers.Serializer):
+    # Empty: the guest turned notifications off (or left the conversation).
+    push_token = serializers.RegexField(r"^(ExponentPushToken\[[\w-]+\]|ExpoPushToken\[[\w-]+\])?$", allow_blank=True)
+
+
+class GuestPushView(GuestThreadView):
+    """POST {push_token}: the guest's phone wants a notification when the owner answers."""
+
+    http_method_names = ["post", "options"]
+
+    def post(self, request, token):
+        c = self.get_conversation(token)
+        data = GuestPushSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        Conversation.objects.filter(pk=c.pk).update(guest_push_token=data.validated_data["push_token"])
+        return Response({"ok": True})
+
+
 class OwnerConversationsView(APIView):
     permission_classes = [IsOwner]
 

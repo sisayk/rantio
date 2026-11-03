@@ -5,8 +5,9 @@ CSRF well, so after the emailed code it gets its own key instead, sent as
 ``Authorization: Bearer <key>``. Only a hash of the key is stored. Each signed-in phone
 is one AppDevice, so signing out on one phone leaves the others signed in.
 
-Pushes go through Expo's push service to every phone the owner has signed in on and
-allowed notifications. A failed push never stops the email or the booking behind it.
+Pushes go through Expo's push service: to every phone the owner has signed in on and
+allowed notifications, and to a guest's phone for the conversation they're following in
+the app. A failed push never stops the email or the booking behind it.
 """
 
 import hashlib
@@ -21,7 +22,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import authentication, exceptions
 
-from .models import AppDevice, Owner
+from .models import AppDevice, Conversation, Owner
 
 logger = logging.getLogger(__name__)
 
@@ -77,23 +78,31 @@ def _post(messages: list[dict]) -> None:
     for msg, ticket in zip(messages, reply.get("data") or []):
         if ticket.get("status") == "error" and (ticket.get("details") or {}).get("error") == "DeviceNotRegistered":
             AppDevice.objects.filter(push_token=msg["to"]).update(push_token="")
+            Conversation.objects.filter(guest_push_token=msg["to"]).update(guest_push_token="")
 
 
-def notify(owner: Owner | None, title: str, body: str, data: dict | None = None) -> None:
-    """Pushes to the owner's phones once the current transaction has committed."""
-    if owner is None or not getattr(settings, "APP_PUSH", True):
-        return
-    tokens = list(owner.app_devices.exclude(push_token="").values_list("push_token", flat=True))
-    if not tokens:
+def push(tokens: list[str], title: str, body: str, data: dict | None = None, *, who: str = "") -> None:
+    """Sends one notification to these phones once the current transaction has committed."""
+    tokens = [t for t in tokens if t]
+    if not tokens or not getattr(settings, "APP_PUSH", True):
         return
     messages = [
-        {"to": t, "title": title[:120], "body": body[:240], "data": data or {}, "sound": "default"} for t in tokens
+        {"to": t, "title": title[:120], "body": body[:240], "data": data or {}, "sound": "default", "priority": "high"}
+        for t in tokens
     ]
 
     def send():
         try:
             _post(messages)
         except Exception:
-            logger.exception("Could not push to owner %s", owner.pk)
+            logger.exception("Could not push to %s", who or "a phone")
 
     transaction.on_commit(send)
+
+
+def notify(owner: Owner | None, title: str, body: str, data: dict | None = None) -> None:
+    """Pushes to the owner's phones."""
+    if owner is None:
+        return
+    tokens = list(owner.app_devices.exclude(push_token="").values_list("push_token", flat=True))
+    push(tokens, title, body, data, who=f"owner {owner.pk}")
