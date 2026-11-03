@@ -83,9 +83,15 @@ as_app_env env NEXT_TELEMETRY_DISABLED=1 npm run build
 step "Helper commands: stugora-manage, stugora-backup"
 install -m 0755 -o root -g root "$DEPLOY_DIR/manage.sh" /usr/local/sbin/stugora-manage
 install -m 0755 -o root -g root "$DEPLOY_DIR/backup.sh" /usr/local/sbin/stugora-backup
+install -m 0755 -o root -g root "$DEPLOY_DIR/geoip-update.sh" /usr/local/sbin/stugora-geoip
+# The visitor's country picks the site's first language; without the file it's the browser's.
+if [ ! -f /srv/stugora/geoip/country.mmdb ]; then
+  /usr/local/sbin/stugora-geoip || echo "    No country database yet; the browser's language decides until it downloads."
+fi
 
 step "systemd services and timers"
-for unit in stugora-django.service stugora-next.service stugora-backup.service stugora-backup.timer; do
+for unit in stugora-django.service stugora-next.service stugora-backup.service stugora-backup.timer \
+  stugora-geoip.service stugora-geoip.timer; do
   install -m 0644 "$DEPLOY_DIR/systemd/$unit" /etc/systemd/system/
 done
 # The background jobs only once the code has their management commands.
@@ -102,7 +108,7 @@ for job in booking-emails:read_booking_emails invoices:make_monthly_invoices cal
 done
 systemctl daemon-reload
 systemctl enable stugora-django.service stugora-next.service >/dev/null
-systemctl enable --now stugora-backup.timer >/dev/null
+systemctl enable --now stugora-backup.timer stugora-geoip.timer >/dev/null
 for timer in "${JOB_TIMERS[@]}"; do
   systemctl enable --now "$timer" >/dev/null
   echo "    $timer enabled."

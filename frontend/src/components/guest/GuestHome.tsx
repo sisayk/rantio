@@ -994,6 +994,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
           </span>
           <a href={paths.privacy(lang)}>{common.footer.privacy}</a>
           <a href={paths.terms(lang)}>{common.footer.terms}</a>
+          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
         </p>
       </footer>
 

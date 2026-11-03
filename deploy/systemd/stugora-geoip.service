@@ -1,0 +1,9 @@
+# Monthly download of the IP-to-country database (deploy/geoip-update.sh).
+[Unit]
+Description=Rantio: update the IP-to-country database
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/stugora-geoip

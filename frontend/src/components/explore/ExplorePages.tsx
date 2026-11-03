@@ -59,6 +59,7 @@ function Shell({ lang, active, children }: { lang: Lang; active: NavPage; childr
           </span>
           <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
           <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
+          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
         </p>
       </footer>
     </div>

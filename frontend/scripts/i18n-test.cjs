@@ -5,7 +5,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { findGaps, getMessages } = require("../src/i18n/index.ts");
 const { countryName, fill, money, number, plural, pluralCategory } = require("../src/i18n/format.ts");
-const { LANG_INFO, LANGS, negotiateLang } = require("../src/i18n/locales.ts");
+const { firstLang, LANG_INFO, LANGS, negotiateLang } = require("../src/i18n/locales.ts");
 const { stripLang, switchLangPath } = require("../src/i18n/paths.ts");
 const { activitiesFor } = require("../src/lib/activities.ts");
 const { FEATURE_GROUPS } = require("../src/lib/catalog.ts");
@@ -32,6 +32,20 @@ test("browser languages map to ours, best match first, English otherwise", () =>
   assert.equal(negotiateLang("nn"), "nn");
   assert.equal(negotiateLang("de;q=1, lt;q=0.5, et;q=0.7"), "et");
   assert.equal(negotiateLang("en;q=0, lv"), "lv");
+});
+
+test("first visit: browser language if it's ours, else the country's for English browsers", () => {
+  assert.equal(firstLang("en-US,en;q=0.9", "FI"), "fi"); // a Finn with an English browser
+  assert.equal(firstLang("en-GB", "SE"), "sv");
+  assert.equal(firstLang("en", "NO"), "nb");
+  assert.equal(firstLang(null, "LT"), "lt");
+  assert.equal(firstLang("sv-FI,sv;q=0.9,fi;q=0.8", "FI"), "sv"); // Swedish-speaking Finn
+  assert.equal(firstLang("et-EE", "FI"), "et"); // an Estonian in Helsinki
+  assert.equal(firstLang("de-DE,de;q=0.9,en;q=0.8", "FI"), "en"); // a German tourist
+  assert.equal(firstLang("de-DE,de;q=0.9,da;q=0.5", "FI"), "da");
+  assert.equal(firstLang("en-US", "US"), "en");
+  assert.equal(firstLang("en-US", null), "en");
+  assert.equal(firstLang("fi", "US"), "fi");
 });
 
 test("switching language keeps the page", () => {

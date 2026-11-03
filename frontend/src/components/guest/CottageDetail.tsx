@@ -190,6 +190,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
           </span>
           <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
           <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
+          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
         </p>
       </footer>
     </div>

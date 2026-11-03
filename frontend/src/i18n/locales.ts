@@ -58,10 +58,10 @@ function toLang(tag: string): Lang | null {
   return isLang(primary) ? primary : null;
 }
 
-/** The best of our languages for an Accept-Language header, or English. */
-export function negotiateLang(header: string | null | undefined): Lang {
-  if (!header) return DEFAULT_LANG;
-  const ranked = header
+/** Accept-Language's tags, most wanted first. */
+function rankedTags(header: string | null | undefined): string[] {
+  if (!header) return [];
+  return header
     .split(",")
     .map((part, index) => {
       const [tag, ...params] = part.trim().split(";");
@@ -70,10 +70,33 @@ export function negotiateLang(header: string | null | undefined): Lang {
       return { tag, weight: Number.isFinite(weight) ? weight : 0, index };
     })
     .filter((x) => x.tag && x.weight > 0)
-    .sort((a, b) => b.weight - a.weight || a.index - b.index);
-  for (const { tag } of ranked) {
+    .sort((a, b) => b.weight - a.weight || a.index - b.index)
+    .map((x) => x.tag);
+}
+
+/** The best of our languages for an Accept-Language header, or English. */
+export function negotiateLang(header: string | null | undefined): Lang {
+  for (const tag of rankedTags(header)) {
     const lang = toLang(tag);
     if (lang) return lang;
   }
   return DEFAULT_LANG;
+}
+
+/**
+ * The language a visitor without a saved choice sees first.
+ *
+ * - Their browser's first language, when it's one of ours other than English
+ *   (a Swedish-speaking Finn gets Swedish, an Estonian in Helsinki Estonian).
+ * - Otherwise, if the browser is in English (or says nothing), the country they're in:
+ *   in Finland Finnish, in Sweden Swedish… Many locals leave their browser in English.
+ * - Otherwise (a German browser, say: probably a visitor) the best match, else English.
+ */
+export function firstLang(header: string | null | undefined, country: string | null | undefined): Lang {
+  const top = rankedTags(header)[0];
+  const topLang = top ? toLang(top) : null;
+  if (topLang && topLang !== DEFAULT_LANG) return topLang;
+  const local = country ? COUNTRY_LANGS[country.toUpperCase()]?.[0] : undefined;
+  if (local && (!top || topLang === DEFAULT_LANG)) return local;
+  return negotiateLang(header);
 }
