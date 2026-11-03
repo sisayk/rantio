@@ -3,10 +3,9 @@
 
 import { AdvancedMarker, InfoWindow, Map, MapControl, ControlPosition, useAdvancedMarkerRef, useMap } from "@vis.gl/react-google-maps";
 import dynamic from "next/dynamic";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { paths } from "@/i18n/paths";
-import { fitWithin, GoogleMaps, PLAIN, toBounds } from "@/lib/googleMaps";
-import { rangeFor } from "@/lib/Map3DView";
+import { type Camera3D, cameraOf, fitWithin, GoogleMaps, GrabMap, PLAIN, toBounds } from "@/lib/googleMaps";
 import type { Listing } from "@/lib/listings";
 import { listingName, unsplash } from "@/lib/listings";
 import type { CottageMapProps, MapFocus } from "./CottageMapLeaflet";
@@ -27,6 +26,13 @@ function FitTo({ focus }: { focus: MapFocus }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, key]);
   return null;
+}
+
+/** If the flat map can't be read: the middle of the focus, from high enough to see it all. */
+function fallbackCamera(focus: MapFocus): Camera3D {
+  const b = toBounds(focus.bounds);
+  const lat = (b.north + b.south) / 2;
+  return { lat, lng: (b.east + b.west) / 2, range: Math.max(5_000, (b.north - b.south) * 111_000 * 1.6) };
 }
 
 function PricePin(props: {
@@ -83,10 +89,16 @@ function PricePin(props: {
 export default function CottageMapGoogle(props: CottageMapProps) {
   const { listings, focus, cities, selectedCity, activeId, lang, names } = props;
   const [open, setOpen] = useState<string | null>(null);
-  const [threeD, setThreeD] = useState(false);
-  const box = toBounds(focus.bounds);
+  // The 3D view's starting camera: exactly what the flat map showed when the button was pressed.
+  const [threeD, setThreeD] = useState<Camera3D | null>(null);
+  const flatRef = useRef<google.maps.Map | null>(null);
   const toggle = (
-    <button type="button" className={styles.map3dToggle} aria-pressed={threeD} onClick={() => setThreeD(!threeD)}>
+    <button
+      type="button"
+      className={styles.map3dToggle}
+      aria-pressed={Boolean(threeD)}
+      onClick={() => setThreeD(threeD ? null : ((flatRef.current && cameraOf(flatRef.current)) ?? fallbackCamera(focus)))}
+    >
       {threeD ? (props.show2d ?? "2D") : (props.show3d ?? "3D")}
     </button>
   );
@@ -98,9 +110,9 @@ export default function CottageMapGoogle(props: CottageMapProps) {
           <Map3DView
             className={styles.map}
             label={props.label}
-            lat={(box.north + box.south) / 2}
-            lng={(box.east + box.west) / 2}
-            range={rangeFor(box)}
+            lat={threeD.lat}
+            lng={threeD.lng}
+            range={threeD.range}
             pins={listings.map((l) => ({
               key: l.id,
               lat: l.lat,
@@ -128,6 +140,7 @@ export default function CottageMapGoogle(props: CottageMapProps) {
           aria-label={props.label}
         >
           <FitTo focus={focus} />
+          <GrabMap mapRef={flatRef} />
 
           {cities.map((c) => {
             const on = c.name === selectedCity;

@@ -3,8 +3,8 @@
 // it only works on rantio.fi because Google Cloud restricts it to that site. Without a key
 // the maps stay on OpenStreetMap (Leaflet), e.g. in local development.
 
-import { APIProvider } from "@vis.gl/react-google-maps";
-import type { ReactNode } from "react";
+import { APIProvider, useMap } from "@vis.gl/react-google-maps";
+import { type ReactNode, type RefObject, useEffect } from "react";
 
 export const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? "";
 // Pins drawn as HTML need a map ID; Google's demo ID works until our own is set.
@@ -70,4 +70,31 @@ export function fitWithin(map: google.maps.Map, bounds: google.maps.LatLngBounds
     watcher.disconnect();
     once?.remove();
   };
+}
+
+/** Where the 3D map's camera starts so it shows what the flat map shows right now. */
+export type Camera3D = { lat: number; lng: number; range: number };
+
+const FOV_3D = 35; // the 3D map's default vertical field of view, in degrees
+
+export function cameraOf(map: google.maps.Map): Camera3D | null {
+  const center = map.getCenter();
+  const zoom = map.getZoom();
+  const height = map.getDiv().clientHeight;
+  if (!center || zoom == null || !height) return null;
+  const lat = center.lat();
+  // Ground metres per screen pixel at this zoom and latitude (Web Mercator), times the
+  // map's height: the strip of ground the flat map shows top to bottom.
+  const metres = ((156_543.03392 * Math.cos((lat * Math.PI) / 180)) / 2 ** zoom) * height;
+  const range = metres / 2 / Math.tan(((FOV_3D / 2) * Math.PI) / 180);
+  return { lat, lng: center.lng(), range };
+}
+
+/** Put inside a <Map>: keeps `mapRef` pointing at that map (the 3D button reads its view). */
+export function GrabMap({ mapRef }: { mapRef: RefObject<google.maps.Map | null> }) {
+  const map = useMap();
+  useEffect(() => {
+    mapRef.current = map;
+  }, [map, mapRef]);
+  return null;
 }

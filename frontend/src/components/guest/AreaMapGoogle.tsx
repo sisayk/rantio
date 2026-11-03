@@ -2,8 +2,8 @@
 
 import { AdvancedMarker, ControlPosition, Map, MapControl, useMap } from "@vis.gl/react-google-maps";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { fitWithin, GoogleMaps, PLAIN, toBounds } from "@/lib/googleMaps";
+import { useEffect, useRef, useState } from "react";
+import { type Camera3D, cameraOf, fitWithin, GoogleMaps, GrabMap, PLAIN, toBounds } from "@/lib/googleMaps";
 import type { NearbyPlace } from "@/lib/nearby";
 import type { AreaMapProps } from "./AreaMapLeaflet";
 import styles from "./guest.module.css";
@@ -32,9 +32,16 @@ function Fit({ lat, lng, places }: { lat: number; lng: number; places: NearbyPla
 }
 
 export default function AreaMapGoogle({ lat, lng, places, activeKey, label, cottageLabel, onHover, show3d, show2d }: AreaMapProps) {
-  const [threeD, setThreeD] = useState(false);
+  // The 3D view starts from exactly what the flat map showed when the button was pressed.
+  const [threeD, setThreeD] = useState<Camera3D | null>(null);
+  const flatRef = useRef<google.maps.Map | null>(null);
   const toggle = (
-    <button type="button" className={styles.map3dToggle} aria-pressed={threeD} onClick={() => setThreeD(!threeD)}>
+    <button
+      type="button"
+      className={styles.map3dToggle}
+      aria-pressed={Boolean(threeD)}
+      onClick={() => setThreeD(threeD ? null : ((flatRef.current && cameraOf(flatRef.current)) ?? { lat, lng, range: 6000 }))}
+    >
       {threeD ? (show2d ?? "2D") : (show3d ?? "3D")}
     </button>
   );
@@ -42,13 +49,14 @@ export default function AreaMapGoogle({ lat, lng, places, activeKey, label, cott
     return (
       <GoogleMaps>
         <div className={styles.mapWrap}>
-          {/* Close in, around the cottage: the lake, the forest, the terrain. */}
+          {/* A closer look tilts more: the lake, the forest, the hills in relief. */}
           <Map3DView
             className={styles.areaMap}
             label={label}
-            lat={lat}
-            lng={lng}
-            range={2500}
+            lat={threeD.lat}
+            lng={threeD.lng}
+            range={threeD.range}
+            tilt={45}
             pins={[
               { key: "cottage", lat, lng, label: cottageLabel, required: true },
               ...places.map((p, i) => ({
@@ -79,6 +87,7 @@ export default function AreaMapGoogle({ lat, lng, places, activeKey, label, cott
           aria-label={label}
         >
           <Fit lat={lat} lng={lng} places={places} />
+          <GrabMap mapRef={flatRef} />
           <AdvancedMarker position={{ lat, lng }} zIndex={2000} anchorLeft="-50%" anchorTop="-50%" title={cottageLabel}>
             <span className="stugora-home" aria-hidden="true">
               <svg viewBox="0 0 24 24">
