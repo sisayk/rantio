@@ -1,7 +1,9 @@
 /* Guest homepage: photo hero with search pill, category row, filter chips,
    four-column listing grid on a soft grey ground. */
 
-.page {
+/* The colours, on the page and on popups drawn outside it (components/OnTop.tsx). */
+.page,
+.modalBackdrop {
   --g-ink: #1d2a2e;
   --g-soft: #5d6a6e;
   --g-line: #e1e5e3;
@@ -10,6 +12,9 @@
   --g-green-deep: #143a2d;
   --g-card-shadow: 0 1px 2px rgba(29, 42, 46, 0.06), 0 4px 14px rgba(29, 42, 46, 0.07);
   --g-float: 0 8px 28px rgba(29, 42, 46, 0.16);
+}
+
+.page {
   background: var(--g-ground);
   color: var(--g-ink);
 }

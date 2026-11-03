@@ -6,6 +6,7 @@ import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { guestApi } from "@/lib/ownerApi";
 import chat from "../chat.module.css";
+import OnTop from "../OnTop";
 import styles from "./guest.module.css";
 
 /** "Message the owner" on a cottage page: a short form that opens a private conversation.
@@ -129,93 +130,95 @@ function ContactDialog({
   }
 
   return (
-    <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div ref={dialog} className={`${styles.modal} ${chat.contactModal}`} role="dialog" aria-modal="true" aria-labelledby="contact-title">
-        <header className={styles.modalHeader}>
-          <button type="button" className={styles.modalClose} aria-label={t.close} onClick={onClose}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
-          </button>
-          <h2 id="contact-title">{t.title}</h2>
-        </header>
-        <form ref={form} className={chat.contactForm} onSubmit={submit}>
-          <p className={chat.contactLead}>
-            <strong>{cottage}</strong> · {t.lead}
-          </p>
-          <div className={chat.fieldRow}>
-            <label>
-              {t.name}
-              <input name="name" required maxLength={120} autoComplete="name" disabled={busy} />
-            </label>
-            <label>
-              {t.email}
-              <input name="email" type="email" required autoComplete="email" disabled={busy} />
-            </label>
-          </div>
-          <p className={chat.fieldHint}>{t.emailHint}</p>
-          <div className={chat.fieldRow}>
-            <label>
-              {t.checkIn} <span className={chat.optional}>({t.optional})</span>
-              <input name="check_in" type="date" disabled={busy} />
-            </label>
-            <label>
-              {t.checkOut} <span className={chat.optional}>({t.optional})</span>
-              <input name="check_out" type="date" disabled={busy} />
-            </label>
-          </div>
-          <div className={chat.fieldRow}>
-            <label>
-              {t.adults} <span className={chat.optional}>({t.optional})</span>
-              <input name="adults" type="number" min={1} max={maxGuests} inputMode="numeric" disabled={busy} />
-            </label>
-            <label>
-              {t.children} <span className={chat.optional}>({t.optional})</span>
-              <input name="children" type="number" min={0} max={Math.max(0, maxGuests - 1)} inputMode="numeric" disabled={busy} />
-            </label>
-          </div>
-          <label>
-            {t.message}
-            <textarea
-              name="body"
-              required
-              rows={5}
-              maxLength={4000}
-              placeholder={t.placeholder}
-              disabled={busy || writing}
-              value={body}
-              onChange={(e) => {
-                setBody(e.target.value);
-                if (ai !== "idle") setAi("idle");
-              }}
-            />
-          </label>
-          <div className={chat.aiRow}>
-            <button type="button" className={chat.aiButton} onClick={help} disabled={busy || writing} aria-busy={writing}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3zM19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z" />
-              </svg>
-              {writing ? t.aiWorking : body.trim() ? t.aiImprove : t.aiWrite}
+    <OnTop>
+      <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+        <div ref={dialog} className={`${styles.modal} ${chat.contactModal}`} role="dialog" aria-modal="true" aria-labelledby="contact-title">
+          <header className={styles.modalHeader}>
+            <button type="button" className={styles.modalClose} aria-label={t.close} onClick={onClose}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
             </button>
-            {ai !== "idle" || !body.trim() ? (
-              <p className={chat.fieldHint} role={ai === "failed" || ai === "off" ? "alert" : undefined}>
-                {ai === "done" ? t.aiNote : ai === "off" ? t.aiOff : ai === "failed" ? t.aiFailed : t.aiHint}
+            <h2 id="contact-title">{t.title}</h2>
+          </header>
+          <form ref={form} className={chat.contactForm} onSubmit={submit}>
+            <p className={chat.contactLead}>
+              <strong>{cottage}</strong> · {t.lead}
+            </p>
+            <div className={chat.fieldRow}>
+              <label>
+                {t.name}
+                <input name="name" required maxLength={120} autoComplete="name" disabled={busy} />
+              </label>
+              <label>
+                {t.email}
+                <input name="email" type="email" required autoComplete="email" disabled={busy} />
+              </label>
+            </div>
+            <p className={chat.fieldHint}>{t.emailHint}</p>
+            <div className={chat.fieldRow}>
+              <label>
+                {t.checkIn} <span className={chat.optional}>({t.optional})</span>
+                <input name="check_in" type="date" disabled={busy} />
+              </label>
+              <label>
+                {t.checkOut} <span className={chat.optional}>({t.optional})</span>
+                <input name="check_out" type="date" disabled={busy} />
+              </label>
+            </div>
+            <div className={chat.fieldRow}>
+              <label>
+                {t.adults} <span className={chat.optional}>({t.optional})</span>
+                <input name="adults" type="number" min={1} max={maxGuests} inputMode="numeric" disabled={busy} />
+              </label>
+              <label>
+                {t.children} <span className={chat.optional}>({t.optional})</span>
+                <input name="children" type="number" min={0} max={Math.max(0, maxGuests - 1)} inputMode="numeric" disabled={busy} />
+              </label>
+            </div>
+            <label>
+              {t.message}
+              <textarea
+                name="body"
+                required
+                rows={5}
+                maxLength={4000}
+                placeholder={t.placeholder}
+                disabled={busy || writing}
+                value={body}
+                onChange={(e) => {
+                  setBody(e.target.value);
+                  if (ai !== "idle") setAi("idle");
+                }}
+              />
+            </label>
+            <div className={chat.aiRow}>
+              <button type="button" className={chat.aiButton} onClick={help} disabled={busy || writing} aria-busy={writing}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3zM19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z" />
+                </svg>
+                {writing ? t.aiWorking : body.trim() ? t.aiImprove : t.aiWrite}
+              </button>
+              {ai !== "idle" || !body.trim() ? (
+                <p className={chat.fieldHint} role={ai === "failed" || ai === "off" ? "alert" : undefined}>
+                  {ai === "done" ? t.aiNote : ai === "off" ? t.aiOff : ai === "failed" ? t.aiFailed : t.aiHint}
+                </p>
+              ) : null}
+            </div>
+            {/* Hidden from people; bots that fill every field are turned away. */}
+            <input name="website" tabIndex={-1} autoComplete="off" className={chat.trap} aria-hidden="true" />
+            {error ? (
+              <p className={chat.error} role="alert">
+                {error}
               </p>
             ) : null}
-          </div>
-          {/* Hidden from people; bots that fill every field are turned away. */}
-          <input name="website" tabIndex={-1} autoComplete="off" className={chat.trap} aria-hidden="true" />
-          {error ? (
-            <p className={chat.error} role="alert">
-              {error}
-            </p>
-          ) : null}
-          <div className={styles.modalFooter}>
-            <span />
-            <button type="submit" className={chat.send} disabled={busy}>
-              {busy ? t.sending : t.send}
-            </button>
-          </div>
-        </form>
+            <div className={styles.modalFooter}>
+              <span />
+              <button type="submit" className={chat.send} disabled={busy}>
+                {busy ? t.sending : t.send}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </OnTop>
   );
 }

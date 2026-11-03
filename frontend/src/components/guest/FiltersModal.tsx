@@ -6,6 +6,7 @@ import { BEDROOM_CHOICES, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog"
 import type { Messages } from "@/i18n";
 import { fill, type Plural, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
+import OnTop from "../OnTop";
 import styles from "./guest.module.css";
 
 export type FilterState = {
@@ -66,60 +67,62 @@ export default function FiltersModal({ lang, t, catalog, cottages, value, result
   }));
 
   return (
-    <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div
-        ref={dialog}
-        className={styles.modal}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="filters-title"
-        tabIndex={-1}
-      >
-        <header className={styles.modalHeader}>
-          <button type="button" className={styles.modalClose} aria-label={t.close} onClick={onClose}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
-          </button>
-          <h2 id="filters-title">{t.title}</h2>
-        </header>
+    <OnTop>
+      <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+        <div
+          ref={dialog}
+          className={styles.modal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="filters-title"
+          tabIndex={-1}
+        >
+          <header className={styles.modalHeader}>
+            <button type="button" className={styles.modalClose} aria-label={t.close} onClick={onClose}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+            <h2 id="filters-title">{t.title}</h2>
+          </header>
 
-        <div className={styles.modalBody}>
-          {groups.slice(0, 1).map((g) => (
-            <FilterSection key={g.id} title={g.title}>
-              {g.options.map(([k, label]) => (
-                <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
-              ))}
-            </FilterSection>
-          ))}
-
-          <FilterSection title={t.reviews}>
-            <Check label={t.rating4} checked={value.rating4} onChange={() => onChange({ ...value, rating4: !value.rating4 })} />
-          </FilterSection>
-
-          <FilterSection title={t.bedrooms}>
-            {BEDROOM_CHOICES.map((n) => (
-              <Check key={n} label={n === 4 ? "4+" : String(n)} checked={value.bedrooms.includes(n)} onChange={() => toggleBedrooms(n)} />
+          <div className={styles.modalBody}>
+            {groups.slice(0, 1).map((g) => (
+              <FilterSection key={g.id} title={g.title}>
+                {g.options.map(([k, label]) => (
+                  <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
+                ))}
+              </FilterSection>
             ))}
-          </FilterSection>
 
-          {groups.slice(1).map((g) => (
-            <FilterSection key={g.id} title={g.title}>
-              {g.options.map(([k, label]) => (
-                <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
+            <FilterSection title={t.reviews}>
+              <Check label={t.rating4} checked={value.rating4} onChange={() => onChange({ ...value, rating4: !value.rating4 })} />
+            </FilterSection>
+
+            <FilterSection title={t.bedrooms}>
+              {BEDROOM_CHOICES.map((n) => (
+                <Check key={n} label={n === 4 ? "4+" : String(n)} checked={value.bedrooms.includes(n)} onChange={() => toggleBedrooms(n)} />
               ))}
             </FilterSection>
-          ))}
-        </div>
 
-        <footer className={styles.modalFooter}>
-          <button type="button" className={styles.textButton} onClick={() => onChange(EMPTY_FILTERS)}>
-            {t.clearAll}
-          </button>
-          <button type="button" className={styles.applyButton} onClick={onClose}>
-            {fill(lang, t.show, { cottages: plural(lang, cottages, resultCount) })}
-          </button>
-        </footer>
+            {groups.slice(1).map((g) => (
+              <FilterSection key={g.id} title={g.title}>
+                {g.options.map(([k, label]) => (
+                  <Check key={k} label={label} icon={k} checked={value.features.includes(k)} onChange={() => toggleFeature(k)} />
+                ))}
+              </FilterSection>
+            ))}
+          </div>
+
+          <footer className={styles.modalFooter}>
+            <button type="button" className={styles.textButton} onClick={() => onChange(EMPTY_FILTERS)}>
+              {t.clearAll}
+            </button>
+            <button type="button" className={styles.applyButton} onClick={onClose}>
+              {fill(lang, t.show, { cottages: plural(lang, cottages, resultCount) })}
+            </button>
+          </footer>
+        </div>
       </div>
-    </div>
+    </OnTop>
   );
 }
 
