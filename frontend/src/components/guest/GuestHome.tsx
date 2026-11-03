@@ -195,6 +195,9 @@ function writeUrl(s: UrlState) {
   }
 }
 
+// Everything west of this longitude is Iceland (its east coast is at about -13.5°).
+const ICELAND_EAST_EDGE = -12;
+
 // The box that holds a set of points, padded so a single town still gets some context.
 function boxAround(points: { lat: number; lng: number }[], pad: number): MapFocus["bounds"] {
   const lats = points.map((p) => p.lat);
@@ -462,7 +465,9 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
     if (regionData) return { bounds: boxAround([...regionData.cities, ...results], 0.05), maxZoom: 10 };
     if (country) return { bounds: boxAround(PLACES[country].flatMap((r) => r.cities), 0.2), maxZoom: 7 };
     const shown = results.length ? results : LISTINGS;
-    return { bounds: boxAround(shown, 0.5), maxZoom: 9 };
+    // Iceland is far out west: framing it too would shrink everything else. Visitors pan to it.
+    const mainland = shown.filter((l) => l.lng > ICELAND_EAST_EDGE);
+    return { bounds: boxAround(mainland.length ? mainland : shown, 0.5), maxZoom: 9 };
   }, [regionCities, city, regionData, country, results]);
 
   function pickCountry(value: Country | "") {

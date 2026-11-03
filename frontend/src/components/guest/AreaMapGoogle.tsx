@@ -57,6 +57,7 @@ export default function AreaMapGoogle({ lat, lng, places, activeKey, label, cott
                 lng: p.lng,
                 label: String(i + 1), // the same numbers as the list beside the map
                 title: p.title,
+                kind: "place" as const,
                 onClick: () => window.open(p.url, "_blank", "noopener"),
               })),
             ]}
