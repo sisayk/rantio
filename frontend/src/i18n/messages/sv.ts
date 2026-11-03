@@ -59,6 +59,8 @@ export const sv: Translation = {
       name: "Ditt namn",
       email: "E-post",
       emailHint: "Vi mejlar dig en privat länk till konversationen. Ägaren ser inte din e-postadress.",
+      sendingAs: "Skickas som",
+      change: "Ändra",
       checkIn: "Ankomst",
       checkOut: "Avresa",
       guests: "Gäster",

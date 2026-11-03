@@ -59,6 +59,8 @@ export const lt: Translation = {
       name: "Jūsų vardas",
       email: "El. paštas",
       emailHint: "Atsiųsime Jums privačią nuorodą į pokalbį el. paštu. Savininkas nemato Jūsų el. pašto adreso.",
+      sendingAs: "Siuntėjas",
+      change: "Keisti",
       checkIn: "Atvykimas",
       checkOut: "Išvykimas",
       guests: "Svečiai",

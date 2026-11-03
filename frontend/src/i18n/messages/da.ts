@@ -59,6 +59,8 @@ export const da: Translation = {
       name: "Dit navn",
       email: "E-mail",
       emailHint: "Vi sender dig et privat link til samtalen på e-mail. Ejeren ser ikke din e-mailadresse.",
+      sendingAs: "Sendes som",
+      change: "Skift",
       checkIn: "Ankomst",
       checkOut: "Afrejse",
       guests: "Gæster",

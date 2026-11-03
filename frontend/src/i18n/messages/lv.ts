@@ -59,6 +59,8 @@ export const lv: Translation = {
       name: "Jūsu vārds",
       email: "E-pasts",
       emailHint: "Mēs nosūtīsim jums e-pastā privātu saiti uz sarunu. Īpašnieks neredz jūsu e-pasta adresi.",
+      sendingAs: "Sūtītājs",
+      change: "Mainīt",
       checkIn: "Ierašanās",
       checkOut: "Izbraukšana",
       guests: "Viesi",

@@ -59,6 +59,8 @@ export const fi: Translation = {
       name: "Nimesi",
       email: "Sähköposti",
       emailHint: "Lähetämme sinulle sähköpostilla yksityisen linkin keskusteluun. Omistaja ei näe sähköpostiosoitettasi.",
+      sendingAs: "Lähettäjä",
+      change: "Vaihda",
       checkIn: "Saapuminen",
       checkOut: "Lähtö",
       guests: "Vieraita",

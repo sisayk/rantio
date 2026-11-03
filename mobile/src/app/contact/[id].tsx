@@ -13,6 +13,7 @@ import { Field } from "@/ui/form";
 import { Button, Icon, Problem, Text } from "@/ui/kit";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
+import { SenderCard, useSender } from "@/ui/sender";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,8 +26,8 @@ export default function Contact() {
   const { addChat } = usePrefs();
   const router = useRouter();
   const c = m.guest.contact;
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const sender = useSender();
+  const { name, email } = sender;
   const [body, setBody] = useState("");
   const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
@@ -65,6 +66,7 @@ export default function Contact() {
         children: adults ? children : null,
         website: "",
       });
+      sender.remember();
       addChat({ token, listing: l.id, at: new Date().toISOString(), kind: "enquiry" });
       router.replace(`/chat/${token}`);
     } catch (e) {
@@ -110,18 +112,24 @@ export default function Contact() {
         <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }} keyboardShouldPersistTaps="handled">
           <Text v="h2">{listingName(m.listingNames, l)}</Text>
           <Text v="small">{c.lead}</Text>
-          <Field label={c.name} value={name} onChangeText={setName} autoComplete="name" textContentType="name" error={tried ? errors.name : null} />
-          <Field
-            label={c.email}
-            value={email}
-            onChangeText={setEmail}
-            autoComplete="email"
-            textContentType="emailAddress"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            hint={c.emailHint}
-            error={tried ? errors.email : null}
-          />
+          {sender.usingKnown ? (
+            <SenderCard name={name} email={email} hint={c.emailHint} onChange={sender.change} />
+          ) : (
+            <>
+              <Field label={c.name} value={name} onChangeText={sender.setName} autoComplete="name" textContentType="name" error={tried ? errors.name : null} />
+              <Field
+                label={c.email}
+                value={email}
+                onChangeText={sender.setEmail}
+                autoComplete="email"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                hint={c.emailHint}
+                error={tried ? errors.email : null}
+              />
+            </>
+          )}
           <View style={{ gap: 6 }}>
             <Text v="smallMedium">
               {c.checkIn} – {c.checkOut} <Text v="small">({c.optional})</Text>

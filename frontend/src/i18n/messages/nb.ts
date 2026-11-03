@@ -59,6 +59,8 @@ export const nb: Translation = {
       name: "Navnet ditt",
       email: "E-post",
       emailHint: "Vi sender deg en privat lenke til samtalen på e-post. Eieren ser ikke e-postadressen din.",
+      sendingAs: "Sendes som",
+      change: "Endre",
       checkIn: "Ankomst",
       checkOut: "Avreise",
       guests: "Gjester",

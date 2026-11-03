@@ -22,7 +22,11 @@ type Stored = {
   chats: GuestChat[];
   homeView?: HomeView;
   rates?: { at: number; rates: Rates };
+  /** The name and email a guest last wrote to an owner with, to fill in next time. */
+  guest?: Sender;
 };
+
+export type Sender = { name: string; email: string };
 
 type Prefs = {
   ready: boolean;
@@ -41,6 +45,8 @@ type Prefs = {
   toggleSaved: (id: string) => void;
   addChat: (c: GuestChat) => void;
   setRates: (r: Rates) => void;
+  guest: Sender | null;
+  setGuest: (g: Sender) => void;
 };
 
 const KEY = "stugora:prefs:v1";
@@ -94,6 +100,8 @@ export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; chil
         update((cur) => ({ saved: cur.saved.includes(id) ? cur.saved.filter((x) => x !== id) : [id, ...cur.saved] })),
       addChat: (c) => update((cur) => ({ chats: [c, ...cur.chats.filter((x) => x.token !== c.token)] })),
       setRates: (r) => update(() => ({ rates: { at: Date.now(), rates: { ...FALLBACK_RATES, ...r, EUR: 1 } } })),
+      guest: s.guest?.email ? s.guest : null,
+      setGuest: (g) => update(() => ({ guest: g })),
     };
   }, [s, ready, deviceLang, update]);
 

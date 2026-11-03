@@ -13,6 +13,7 @@ import { Field } from "@/ui/form";
 import { Button, Card, Empty, Loading, Problem, Section, Text } from "@/ui/kit";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { PageBar } from "@/ui/screen";
+import { SenderCard, useSender } from "@/ui/sender";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,8 +29,8 @@ export default function BookingRequest() {
   const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const sender = useSender();
+  const { name, email } = sender;
   const [phone, setPhone] = useState("");
   const [body, setBody] = useState(b.form.messageDefault);
   const [busy, setBusy] = useState(false);
@@ -109,6 +110,7 @@ export default function BookingRequest() {
         body: body.trim() || b.form.messageDefault,
         website: "",
       });
+      sender.remember();
       addChat({ token: r.token, listing: info.listing_slug, at: new Date().toISOString(), kind: "request" });
       router.replace(`/chat/${r.token}`);
     } catch (e) {
@@ -194,17 +196,23 @@ export default function BookingRequest() {
 
           <Section title={b.form.title}>
             <View style={{ gap: space.lg }}>
-              <Field label={b.form.name} value={name} onChangeText={setName} autoComplete="name" error={tried ? errors.name : null} />
-              <Field
-                label={b.form.email}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                hint={b.form.emailNote}
-                error={tried ? errors.email : null}
-              />
+              {sender.usingKnown ? (
+                <SenderCard name={name} email={email} hint={b.form.emailNote} onChange={sender.change} />
+              ) : (
+                <>
+                  <Field label={b.form.name} value={name} onChangeText={sender.setName} autoComplete="name" error={tried ? errors.name : null} />
+                  <Field
+                    label={b.form.email}
+                    value={email}
+                    onChangeText={sender.setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    hint={b.form.emailNote}
+                    error={tried ? errors.email : null}
+                  />
+                </>
+              )}
               <Field label={b.form.phone} optional={b.form.optional} value={phone} onChangeText={setPhone} keyboardType="phone-pad" autoComplete="tel" />
               <Field label={b.form.message} value={body} onChangeText={setBody} multiline />
               {problem ? <Problem text={problem} /> : null}

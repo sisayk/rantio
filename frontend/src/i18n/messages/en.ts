@@ -68,6 +68,8 @@ export const en = {
       name: "Your name",
       email: "Email",
       emailHint: "We'll email you a private link to the conversation. The owner doesn't see your email address.",
+      sendingAs: "Sending as",
+      change: "Change",
       checkIn: "Arrival",
       checkOut: "Departure",
       guests: "Guests",

@@ -59,6 +59,8 @@ export const et: Translation = {
       name: "Sinu nimi",
       email: "E-post",
       emailHint: "Saadame sulle e-postiga privaatse lingi vestlusele. Omanik ei näe sinu e-posti aadressi.",
+      sendingAs: "Saatja",
+      change: "Muuda",
       checkIn: "Saabumine",
       checkOut: "Lahkumine",
       guests: "Külalisi",

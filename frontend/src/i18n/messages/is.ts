@@ -59,6 +59,8 @@ export const is: Translation = {
       name: "Nafnið þitt",
       email: "Netfang",
       emailHint: "Við sendum þér einkahlekk á samtalið í tölvupósti. Eigandinn sér ekki netfangið þitt.",
+      sendingAs: "Sent sem",
+      change: "Breyta",
       checkIn: "Koma",
       checkOut: "Brottför",
       guests: "Gestir",
