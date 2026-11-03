@@ -231,6 +231,14 @@ Run one by hand: `stugora-manage read_booking_emails`. Logs:
 
 ## Updating the site later
 
+The short way, on your Mac, in a normal terminal: copies the code, gets the HTTPS
+certificate the first time, and runs `deploy.sh` on the server.
+```bash
+bash ~/stugora/deploy/push.sh
+```
+
+Or step by step:
+
 On your Mac, in a normal terminal (only if you copy code with rsync, option 4B):
 ```bash
 rsync -az --delete --exclude-from ~/stugora/deploy/rsync-exclude.txt \
