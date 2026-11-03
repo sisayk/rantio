@@ -39,11 +39,35 @@ export function toBounds(corners: [number, number][]): google.maps.LatLngBoundsL
   return { south: Math.min(...lats), north: Math.max(...lats), west: Math.min(...lngs), east: Math.max(...lngs) };
 }
 
-/** Zooms to `bounds`, but never closer than `maxZoom` (Google's fitBounds has no cap of its own). */
+/** Zooms to `bounds`, but never closer than `maxZoom` (Google's fitBounds has no cap of its own).
+ *  Fits again when the map's box changes size in its first moments: a map that appears (the
+ *  list/map switch, a dynamic import) is often first measured at 0 × 0, and Google then
+ *  zooms out to the whole world. */
 export function fitWithin(map: google.maps.Map, bounds: google.maps.LatLngBoundsLiteral, padding: number, maxZoom: number) {
-  map.fitBounds(bounds, padding);
-  const once = google.maps.event.addListenerOnce(map, "idle", () => {
-    if ((map.getZoom() ?? 0) > maxZoom) map.setZoom(maxZoom);
+  let once: google.maps.MapsEventListener | null = null;
+  const fit = () => {
+    const box = map.getDiv().getBoundingClientRect();
+    if (box.width < 2 * padding + 10 || box.height < 2 * padding + 10) return; // not laid out yet
+    once?.remove();
+    map.fitBounds(bounds, padding);
+    once = google.maps.event.addListenerOnce(map, "idle", () => {
+      if ((map.getZoom() ?? 0) > maxZoom) map.setZoom(maxZoom);
+    });
+  };
+  fit();
+  // Only while the map is settling in, so a visitor who has moved the map isn't sent back.
+  const settledBy = Date.now() + 2000;
+  let size = "";
+  const watcher = new ResizeObserver(([entry]) => {
+    const now = `${Math.round(entry.contentRect.width)}x${Math.round(entry.contentRect.height)}`;
+    if (now !== size && Date.now() < settledBy) {
+      size = now;
+      fit();
+    }
   });
-  return () => once.remove();
+  watcher.observe(map.getDiv());
+  return () => {
+    watcher.disconnect();
+    once?.remove();
+  };
 }
