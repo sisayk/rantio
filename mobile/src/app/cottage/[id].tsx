@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FlatList, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { SITE_URL } from "@/api";
+import { API_URL, SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
@@ -423,7 +423,7 @@ function SiteRow({ channel, last, onPress, big }: { channel: ChannelId; last?: b
       {big ? (
         <ChannelTile channel={channel} />
       ) : (
-        <Image source={{ uri: channelIcon(channel) }} style={{ width: 24, height: 24, borderRadius: 6 }} />
+        <Image source={{ uri: channelIcon(channel, API_URL) }} style={{ width: 24, height: 24, borderRadius: 6 }} />
       )}
       <Text v={big ? "h3" : "bodyMedium"} style={{ flex: 1 }}>
         {CHANNELS[channel].name}
