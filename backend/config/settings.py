@@ -191,8 +191,8 @@ SMS_SENDER = os.environ.get("SMS_SENDER", "Rantio")[:11]  # alphanumeric senders
 #   Google: the OAuth client IDs (web, iOS, Android) whose ID tokens we accept.
 # Public IDs, not secrets: the website's client ("Rantio website" in Google Cloud project rantio).
 GOOGLE_CLIENT_IDS = env_list("GOOGLE_CLIENT_IDS", "42238401416-d9tgb4953a1tova813mof3mgprosvt6l.apps.googleusercontent.com")
-#   Apple: the iOS app's bundle ID and, for the website, the Services ID.
-APPLE_AUDIENCES = env_list("APPLE_AUDIENCES", "fi.rantio.app")
+#   Apple: the iOS app's bundle ID and, for the website, the Services ID (fi.rantio.web).
+APPLE_AUDIENCES = env_list("APPLE_AUDIENCES", "fi.rantio.app,fi.rantio.web")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <info@rantio.fi>")
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"

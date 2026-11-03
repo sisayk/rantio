@@ -147,7 +147,9 @@ export default function OwnerLogin({
       window.AppleID?.auth.init({
         clientId: APPLE_SERVICES_ID,
         scope: "email",
-        redirectURI: `${window.location.origin}${paths.hostingLogin(lang)}`,
+        // The one return address registered for the Services ID at Apple (any page language;
+        // with the popup it's only checked, the page itself stays where it is).
+        redirectURI: "https://rantio.fi/en/hosting/login",
         usePopup: true,
       });
       const res = await window.AppleID?.auth.signIn();
