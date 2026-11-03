@@ -6,7 +6,7 @@ import * as Secure from "expo-secure-store";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 
-import { onApiSignedOut, ownerApi, setApiKey, SignedOut } from "@/api";
+import { onApiSignedOut, ownerApi, setApiKey, SignedOut, type SignInTo } from "@/api";
 import { registerForPush } from "@/state/push";
 
 const KEY = "stugora.ownerKey";
@@ -29,16 +29,25 @@ type Session = {
   /** Changes with each sign-in, so data from an earlier owner on this phone is never shown. */
   sessionId: string | null;
   owner: Owner | null;
-  signIn: (email: string, code: string) => Promise<void>;
+  signIn: (to: SignInTo, code: string) => Promise<void>;
+  signInWith: (provider: "apple" | "google", idToken: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
 const Ctx = createContext<Session | null>(null);
 
+const deviceName = () => [Device.manufacturer, Device.modelName].filter(Boolean).join(" ") || Platform.OS;
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [key, setKey] = useState<string | null>(null);
   const [owner, setOwner] = useState<Owner | null>(null);
+
+  const keep = useCallback(async (token: string) => {
+    await SecureStore.setItemAsync(KEY, token);
+    setApiKey(token);
+    setKey(token);
+  }, []);
 
   const forget = useCallback(async () => {
     setApiKey(null);
@@ -80,19 +89,20 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signedIn: !!key,
       sessionId: key ? key.slice(-10) : null,
       owner,
-      signIn: async (email, code) => {
-        const device = [Device.manufacturer, Device.modelName].filter(Boolean).join(" ") || Platform.OS;
-        const { token } = await ownerApi.verifyCode(email, code, device, Platform.OS === "ios" ? "ios" : "android");
-        await SecureStore.setItemAsync(KEY, token);
-        setApiKey(token);
-        setKey(token);
+      signIn: async (to, code) => {
+        const { token } = await ownerApi.verifyCode(to, code, deviceName(), Platform.OS === "ios" ? "ios" : "android");
+        await keep(token);
+      },
+      signInWith: async (provider, idToken) => {
+        const { token } = await ownerApi.social(provider, idToken, deviceName(), Platform.OS === "ios" ? "ios" : "android");
+        await keep(token);
       },
       signOut: async () => {
         await ownerApi.logout().catch(() => undefined);
         await forget();
       },
     }),
-    [ready, key, owner, forget],
+    [ready, key, owner, forget, keep],
   );
 
   return <Ctx value={value}>{children}</Ctx>;

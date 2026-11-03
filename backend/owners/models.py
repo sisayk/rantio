@@ -189,8 +189,11 @@ class Owner(models.Model):
     signup = models.OneToOneField(OwnerSignup, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=120)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=40, blank=True)
+    phone = models.CharField(max_length=40, blank=True, help_text="Also for signing in with a code by SMS.")
     language = models.CharField(max_length=2, choices=Language.choices, default=Language.FINNISH)
+    # Set the first time the owner signs in with Google or Apple (owners/social.py).
+    google_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
+    apple_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
 
     is_pilot = models.BooleanField(default=False)
     commission_rate = models.DecimalField(

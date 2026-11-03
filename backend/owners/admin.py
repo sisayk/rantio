@@ -85,13 +85,18 @@ class OwnerAdmin(ModelAdmin):
     list_filter = ["is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
-    readonly_fields = ["created_at", "stripe_customer_id"]
+    readonly_fields = ["created_at", "stripe_customer_id", "signs_in_with"]
     fieldsets = [
-        ("Owner", {"fields": ["name", "email", "phone", "language", "user", "signup"], "classes": ["st-grid-2"]}),
+        ("Owner", {"fields": ["name", "email", "phone", "language", "user", "signup", "signs_in_with"], "classes": ["st-grid-2"]}),
         ("Agreement", {"fields": ["is_pilot", "commission_rate", "vat_registered", "agreement_signed_on", "created_at"],
                        "classes": ["st-grid-2"]}),
         ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id"], "classes": ["st-grid-2"]}),
     ]
+
+    @display(description="Signs in with")
+    def signs_in_with(self, obj):
+        ways = ["email code"] + (["SMS code"] if obj.phone else []) + (["Google"] if obj.google_sub else []) + (["Apple"] if obj.apple_sub else [])
+        return ", ".join(ways)
 
 
 class CottagePhotoInline(TabularInline):

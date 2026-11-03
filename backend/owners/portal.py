@@ -1,4 +1,4 @@
-"""Owner dashboard API: sign in with an emailed code, then read your own figures."""
+"""Owner dashboard API: sign in (a code by email or SMS, or Google or Apple), then read your own figures."""
 
 import logging
 
@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 from . import app
 from . import login as owner_login
-from . import messaging
+from . import messaging, social, sms
 from .models import AppDevice, Language, MonitorInterest
 from .statements import booking_row, bookings_for, summary
 
@@ -27,17 +27,85 @@ class IsOwner(permissions.BasePermission):
 
 
 class EmailSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    """Who wants a code: an email address, or a phone number (+358401234567) for a code by SMS."""
+
+    email = serializers.EmailField(required=False, allow_blank=True, default="")
+    phone = serializers.CharField(max_length=40, required=False, allow_blank=True, default="")
     lang = serializers.ChoiceField(choices=Language.values, default=Language.ENGLISH)
 
+    def validate(self, attrs):
+        if attrs["phone"]:
+            attrs["phone"] = sms.normalize(attrs["phone"], country="")
+            if not attrs["phone"]:
+                raise serializers.ValidationError({"phone": "Write the number with its country code."})
+        elif not attrs["email"]:
+            raise serializers.ValidationError({"email": "This field is required."})
+        return attrs
 
-class CodeSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+
+class CodeSerializer(EmailSerializer):
     code = serializers.RegexField(r"^\s*\d{6}\s*$")
     # The phone app asks for a sign-in key instead of a session cookie.
     app = serializers.BooleanField(default=False)
     device = serializers.CharField(max_length=80, required=False, allow_blank=True, default="")
     platform = serializers.ChoiceField(choices=["ios", "android", ""], required=False, default="")
+
+
+class SocialSerializer(serializers.Serializer):
+    provider = serializers.ChoiceField(choices=list(social.PROVIDERS))
+    id_token = serializers.CharField(max_length=8000)
+    app = serializers.BooleanField(default=False)
+    device = serializers.CharField(max_length=80, required=False, allow_blank=True, default="")
+    platform = serializers.ChoiceField(choices=["ios", "android", ""], required=False, default="")
+
+
+def _owner_for(data: dict):
+    if data["phone"]:
+        return owner_login.find_owner_by_phone(data["phone"]) if sms.enabled() else None
+    return owner_login.find_owner(data["email"])
+
+
+def _signed_in(request, owner, data: dict) -> Response:
+    """The website gets a session cookie; the app gets its own sign-in key."""
+    owner_login.user_for(owner)
+    if data["app"]:
+        key = app.issue_key(owner, name=data["device"], platform=data["platform"])
+        return Response({"ok": True, "token": key})
+    login(request._request, owner_login.user_for(owner), backend="django.contrib.auth.backends.ModelBackend")
+    return Response({"ok": True})
+
+
+class OptionsView(APIView):
+    """Which ways of signing in are switched on (the sign-in pages show only those)."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        res = Response({"sms": sms.enabled(), "google": social.enabled("google"), "apple": social.enabled("apple")})
+        res["Cache-Control"] = "public, max-age=300"
+        return res
+
+
+class SocialView(APIView):
+    """POST {provider, id_token}: signs in the owner whose Google or Apple account it is."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login-verify"
+
+    def post(self, request):
+        data = SocialSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        provider = data.validated_data["provider"]
+        if not social.enabled(provider):
+            return Response({"detail": "not_enabled"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            owner = social.owner_for(provider, data.validated_data["id_token"])
+        except social.SignInError as error:
+            return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+        return _signed_in(request, owner, data.validated_data)
 
 
 class RequestCodeView(APIView):
@@ -52,15 +120,16 @@ class RequestCodeView(APIView):
         data = EmailSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         body = {"sent": True}
-        owner = owner_login.find_owner(data.validated_data["email"])
+        owner = _owner_for(data.validated_data)
+        via = "sms" if data.validated_data["phone"] else "email"
         if owner and owner_login.can_send(owner):
             try:
-                code = owner_login.issue_code(owner, data.validated_data["lang"])
+                code = owner_login.issue_code(owner, data.validated_data["lang"], via=via)
                 if settings.DEV_LOGIN_CODES:
                     body["dev_code"] = code  # local development only: no real email is sent
             except Exception:
-                logger.exception("Could not send a login code to owner %s", owner.pk)
-                return Response({"detail": "email_failed"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+                logger.exception("Could not send a login code (%s) to owner %s", via, owner.pk)
+                return Response({"detail": f"{via}_failed"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         return Response(body)
 
 
@@ -73,15 +142,10 @@ class VerifyCodeView(APIView):
     def post(self, request):
         data = CodeSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        owner = owner_login.find_owner(data.validated_data["email"])
+        owner = _owner_for(data.validated_data)
         if not owner or not owner_login.check_code(owner, data.validated_data["code"]):
             return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
-        owner_login.user_for(owner)
-        if data.validated_data["app"]:
-            key = app.issue_key(owner, name=data.validated_data["device"], platform=data.validated_data["platform"])
-            return Response({"ok": True, "token": key})
-        login(request._request, owner_login.user_for(owner), backend="django.contrib.auth.backends.ModelBackend")
-        return Response({"ok": True})
+        return _signed_in(request, owner, data.validated_data)
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")

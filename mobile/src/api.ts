@@ -148,11 +148,19 @@ const json = (method: string, data?: unknown): RequestInit => ({
   body: data === undefined ? undefined : JSON.stringify(data),
 });
 
+export type SignInTo = { email?: string; phone?: string };
+
 export const ownerApi = {
-  requestCode: (email: string, lang: string) =>
-    call<{ sent: boolean; dev_code?: string }>("auth/request-code/", json("POST", { email, lang })),
-  verifyCode: (email: string, code: string, device: string, platform: string) =>
-    call<{ ok: boolean; token: string }>("auth/verify-code/", json("POST", { email, code, app: true, device, platform })),
+  /** A code by email ({ email }) or by SMS ({ phone: "+358…" }). */
+  requestCode: (to: SignInTo, lang: string) =>
+    call<{ sent: boolean; dev_code?: string }>("auth/request-code/", json("POST", { ...to, lang })),
+  verifyCode: (to: SignInTo, code: string, device: string, platform: string) =>
+    call<{ ok: boolean; token: string }>("auth/verify-code/", json("POST", { ...to, code, app: true, device, platform })),
+  /** Which ways of signing in the server has switched on. */
+  signInOptions: () => call<{ sms: boolean; google: boolean; apple: boolean }>("auth/options/"),
+  /** Signs in with an Apple or Google ID token; the app gets its own key back. */
+  social: (provider: "apple" | "google", idToken: string, device: string, platform: string) =>
+    call<{ ok: boolean; token: string }>("auth/social/", json("POST", { provider, id_token: idToken, app: true, device, platform })),
   me: () => call<{ name: string; email: string; language: string; is_pilot: boolean }>("owner/me/", { owner: true }),
   setLanguage: (language: string) =>
     call<{ language: string }>("owner/me/", { ...json("PATCH", { language }), owner: true }),

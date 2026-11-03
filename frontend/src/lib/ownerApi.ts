@@ -467,10 +467,16 @@ export const ownerApi = {
     call<Record<string, never>>(`owner/cottages/${cottage}/photos/${photo}/`, { method: "DELETE" }),
   orderPhotos: (cottage: number, ids: number[]) =>
     call<{ photos: ListingPhoto[] }>(`owner/cottages/${cottage}/photos/order/`, { method: "POST", body: JSON.stringify({ ids }) }),
-  requestCode: (email: string, lang: string) =>
-    call<{ sent: boolean; dev_code?: string }>("auth/request-code/", { method: "POST", body: JSON.stringify({ email, lang }) }),
-  verifyCode: (email: string, code: string) =>
-    call<{ ok: boolean }>("auth/verify-code/", { method: "POST", body: JSON.stringify({ email, code }) }),
+  /** A code by email ({ email }) or by SMS ({ phone: "+358…" }). */
+  requestCode: (to: { email?: string; phone?: string }, lang: string) =>
+    call<{ sent: boolean; dev_code?: string }>("auth/request-code/", { method: "POST", body: JSON.stringify({ ...to, lang }) }),
+  verifyCode: (to: { email?: string; phone?: string }, code: string) =>
+    call<{ ok: boolean }>("auth/verify-code/", { method: "POST", body: JSON.stringify({ ...to, code }) }),
+  /** Which ways of signing in the server has switched on. */
+  signInOptions: () => call<{ sms: boolean; google: boolean; apple: boolean }>("auth/options/"),
+  /** Signs in with a Google or Apple ID token. */
+  social: (provider: "google" | "apple", idToken: string) =>
+    call<{ ok: boolean }>("auth/social/", { method: "POST", body: JSON.stringify({ provider, id_token: idToken }) }),
   me: () => call<{ name: string; email: string }>("owner/me/"),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
   monitor: () => call<{ joined: boolean }>("owner/monitor/"),

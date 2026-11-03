@@ -32,7 +32,8 @@
           "lv",
           "lt"
         ]
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "fi.rantio.app",
@@ -89,7 +90,8 @@
         }
       ],
       "react-native-maps",
-      "expo-localization"
+      "expo-localization",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": false,

@@ -1,4 +1,4 @@
-"""Passwordless sign-in for owners: a six-digit code by email, valid 15 minutes."""
+"""Passwordless sign-in for owners: a six-digit code by email or SMS, valid 15 minutes."""
 
 import hashlib
 import hmac
@@ -13,6 +13,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from . import sms
 from .models import LoginCode, Owner
 
 logger = logging.getLogger(__name__)
@@ -87,12 +88,42 @@ MESSAGES = {
 }
 
 
+# The SMS, per site language. The last line lets iPhones offer the code on rantio.fi only.
+SMS_MESSAGES = {
+    "en": "Your Rantio sign-in code is {code}. It works for {minutes} minutes.",
+    "fi": "Rantio-kirjautumiskoodisi on {code}. Se on voimassa {minutes} minuuttia.",
+    "sv": "Din inloggningskod till Rantio är {code}. Den gäller i {minutes} minuter.",
+    "nb": "Innloggingskoden din til Rantio er {code}. Den gjelder i {minutes} minutter.",
+    "nn": "Innloggingskoden din til Rantio er {code}. Han gjeld i {minutes} minutt.",
+    "da": "Din login-kode til Rantio er {code}. Den gælder i {minutes} minutter.",
+    "is": "Innskráningarkóðinn þinn hjá Rantio er {code}. Hann gildir í {minutes} mínútur.",
+    "et": "Sinu Rantio sisselogimiskood on {code}. See kehtib {minutes} minutit.",
+    "lv": "Tavs Rantio pieteikšanās kods ir {code}. Tas derīgs {minutes} minūtes.",
+    "lt": "Jūsų Rantio prisijungimo kodas yra {code}. Jis galioja {minutes} min.",
+}
+
+
 def _hash(owner: Owner, code: str) -> str:
     return hmac.new(settings.SECRET_KEY.encode(), f"{owner.pk}:{code}".encode(), hashlib.sha256).hexdigest()
 
 
 def find_owner(email: str) -> Owner | None:
     return Owner.objects.filter(email__iexact=email.strip()).first()
+
+
+def owner_country(owner: Owner) -> str:
+    """Where the owner's cottages are (for phone numbers written without the country code)."""
+    return owner.cottages.values_list("country", flat=True).first() or "FI"
+
+
+def find_owner_by_phone(phone: str) -> Owner | None:
+    """The owner whose phone number is this one (+358401234567), however it was typed in."""
+    if not phone:
+        return None
+    for owner in Owner.objects.exclude(phone=""):
+        if sms.normalize(owner.phone, owner_country(owner)) == phone:
+            return owner
+    return None
 
 
 def tries_today(owner: Owner) -> int:
@@ -110,17 +141,22 @@ def can_send(owner: Owner) -> bool:
     return not locked(owner) and owner.login_codes.filter(created_at__gte=since).count() < CODES_PER_HOUR
 
 
-def issue_code(owner: Owner, lang: str) -> str:
-    """Creates a fresh code (older ones stop working) and emails it."""
+def issue_code(owner: Owner, lang: str, via: str = "email") -> str:
+    """Creates a fresh code (older ones stop working) and sends it by email or SMS."""
     code = f"{secrets.randbelow(1_000_000):06d}"
     now = timezone.now()
     owner.login_codes.filter(used_at__isnull=True).update(used_at=now)
     LoginCode.objects.create(
         owner=owner, code_hash=_hash(owner, code), expires_at=now + timedelta(minutes=LoginCode.LIFETIME_MINUTES)
     )
-    subject, body = MESSAGES.get(lang) or MESSAGES.get(owner.language) or MESSAGES["en"]
     first_name = owner.name.split()[0] if owner.name else ""
     values = {"code": code, "name": first_name, "minutes": LoginCode.LIFETIME_MINUTES}
+    if via == "sms":
+        text = (SMS_MESSAGES.get(lang) or SMS_MESSAGES.get(owner.language) or SMS_MESSAGES["en"]).format(**values)
+        domain = settings.SITE_URL.split("://", 1)[-1].split("/")[0].split(":")[0]
+        sms.send(sms.normalize(owner.phone, owner_country(owner)), f"{text}\n\n@{domain} #{code}")
+        return code
+    subject, body = MESSAGES.get(lang) or MESSAGES.get(owner.language) or MESSAGES["en"]
     send_mail(subject.format(**values), body.format(**values), settings.DEFAULT_FROM_EMAIL, [owner.email])
     return code
 

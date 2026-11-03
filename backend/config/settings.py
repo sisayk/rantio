@@ -182,6 +182,16 @@ ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")
+
+# Owner sign-in besides the emailed code (owners/social.py, owners/sms.py). Each one is
+# offered only when it's set up:
+#   SMS code: Brevo's transactional SMS (an API key, "xkeysib-…"; SMS credits in Brevo).
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
+SMS_SENDER = os.environ.get("SMS_SENDER", "Rantio")[:11]  # alphanumeric senders are at most 11 characters
+#   Google: the OAuth client IDs (web, iOS, Android) whose ID tokens we accept.
+GOOGLE_CLIENT_IDS = env_list("GOOGLE_CLIENT_IDS")
+#   Apple: the iOS app's bundle ID and, for the website, the Services ID.
+APPLE_AUDIENCES = env_list("APPLE_AUDIENCES", "fi.rantio.app")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <info@rantio.fi>")
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"

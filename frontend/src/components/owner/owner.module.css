@@ -200,6 +200,106 @@
 
 .loginJoin a { color: var(--o-ink); font-weight: 700; }
 
+/* ---------- Apple and Google, then the code ---------- */
+.socialButtons {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 6px;
+}
+
+/* Apple's own look (black, its logo, "Continue with Apple"), as its guidelines ask. */
+.appleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.appleButton svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.appleButton:disabled {
+  opacity: 0.6;
+}
+
+.googleBox {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.orLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 4px;
+  color: var(--o-soft);
+  font-size: 14px;
+}
+
+.orLine::before,
+.orLine::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--o-line);
+}
+
+.viaTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f1f3f2;
+}
+
+.viaTabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--o-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.viaTabs button[aria-selected="true"] {
+  background: #fff;
+  color: var(--o-ink);
+  box-shadow: 0 1px 3px rgba(29, 42, 46, 0.12);
+}
+
+.phoneRow {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 8px;
+}
+
+.phoneRow select {
+  min-height: 48px;
+  padding: 0 10px;
+  border: 1px solid #b9c2bf;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 16px;
+}
+
 /* ---------- dashboard ---------- */
 .top {
   position: sticky;
