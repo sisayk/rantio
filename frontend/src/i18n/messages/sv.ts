@@ -209,7 +209,7 @@ export const sv: Translation = {
       clearAll: "Rensa allt",
       show: "Visa {cottages}",
     },
-    view: { showMap: "Visa karta", showList: "Visa lista", map: "Karta över stugorna" },
+    view: { showMap: "Visa karta", showList: "Visa lista", map: "Karta över stugorna", show3d: "Visa i 3D", show2d: "Vanlig karta" },
     empty: { title: "Inga stugor matchar dina val", action: "Rensa sökning och filter" },
     card: {
       night: "natt",
@@ -238,6 +238,8 @@ export const sv: Translation = {
       bookTitle: "Kan bokas på",
       bookNote: "Exempelboende. Bokningen öppnar när ägarna ansluter sig.",
       map: "Karta över stugan och omgivningen",
+      show3d: "Visa i 3D",
+      show2d: "Vanlig karta",
       cottage: "Stuga",
     },
     examples: "Exempelboenden. Bilder: Unsplash.",

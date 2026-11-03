@@ -29,6 +29,9 @@ export type CottageMapProps = {
   nightLabel: string;
   onHover: (id: string | null) => void;
   onCity: (name: string) => void;
+  /** The 3D button's labels (Google Maps only). */
+  show3d?: string;
+  show2d?: string;
 };
 
 function FitTo({ focus }: { focus: MapFocus }) {

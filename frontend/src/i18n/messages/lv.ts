@@ -209,7 +209,7 @@ export const lv: Translation = {
       clearAll: "Notīrīt visu",
       show: "Rādīt: {cottages}",
     },
-    view: { showMap: "Rādīt karti", showList: "Rādīt sarakstu", map: "Brīvdienu māju karte" },
+    view: { showMap: "Rādīt karti", showList: "Rādīt sarakstu", map: "Brīvdienu māju karte", show3d: "Rādīt 3D", show2d: "Parastā karte" },
     empty: { title: "Šīm izvēlēm neatbilst neviena brīvdienu māja", action: "Notīrīt meklēšanu un filtrus" },
     card: {
       night: "naktī",
@@ -238,6 +238,8 @@ export const lv: Translation = {
       bookTitle: "Rezervējama šajās vietnēs",
       bookNote: "Piemēra naktsmītne. Rezervēt varēs, kad pievienosies īpašnieki.",
       map: "Brīvdienu mājas un apkārtnes karte",
+      show3d: "Rādīt 3D",
+      show2d: "Parastā karte",
       cottage: "Brīvdienu māja",
     },
     examples: "Naktsmītņu piemēri. Fotoattēli: Unsplash.",

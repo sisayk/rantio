@@ -218,7 +218,7 @@ export const en = {
       clearAll: "Clear all",
       show: "Show {cottages}",
     },
-    view: { showMap: "Show map", showList: "Show list", map: "Map of cottages" },
+    view: { showMap: "Show map", showList: "Show list", map: "Map of cottages", show3d: "Show in 3D", show2d: "Flat map" },
     empty: { title: "No cottages match these choices", action: "Clear search and filters" },
     card: {
       night: "night",
@@ -247,6 +247,8 @@ export const en = {
       bookTitle: "Bookable on these sites",
       bookNote: "Example stay. Booking opens once owners join.",
       map: "Map of the cottage and its surroundings",
+      show3d: "Show in 3D",
+      show2d: "Flat map",
       cottage: "Cottage",
     },
     examples: "Example stays. Photos: Unsplash.",

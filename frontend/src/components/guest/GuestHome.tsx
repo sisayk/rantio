@@ -953,6 +953,8 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 nightLabel={t.card.night}
                 onHover={setActiveId}
                 onCity={(name) => setCity(name === city ? "" : name)}
+                show3d={t.view.show3d}
+                show2d={t.view.show2d}
               />
             </div>
           ) : null}

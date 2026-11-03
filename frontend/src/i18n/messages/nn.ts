@@ -209,7 +209,7 @@ export const nn: Translation = {
       clearAll: "Nullstill alt",
       show: "Vis {cottages}",
     },
-    view: { showMap: "Vis kart", showList: "Vis liste", map: "Kart over hyttene" },
+    view: { showMap: "Vis kart", showList: "Vis liste", map: "Kart over hyttene", show3d: "Vis i 3D", show2d: "Vanleg kart" },
     empty: { title: "Ingen hytter passar til desse vala", action: "Nullstill søk og filter" },
     card: {
       night: "natt",
@@ -238,6 +238,8 @@ export const nn: Translation = {
       bookTitle: "Kan bestillast på desse sidene",
       bookNote: "Eksempel på opphald. Bestillinga opnar når eigarane blir med.",
       map: "Kart over hytta og området rundt",
+      show3d: "Vis i 3D",
+      show2d: "Vanleg kart",
       cottage: "Hytte",
     },
     examples: "Eksempel på opphald. Bilete: Unsplash.",

@@ -15,6 +15,9 @@ export type AreaMapProps = {
   label: string;
   cottageLabel: string;
   onHover: (key: string | null) => void;
+  /** The 3D button's labels (Google Maps only). */
+  show3d?: string;
+  show2d?: string;
 };
 
 const home = L.divIcon({

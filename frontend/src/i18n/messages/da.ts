@@ -209,7 +209,7 @@ export const da: Translation = {
       clearAll: "Ryd alle",
       show: "Vis {cottages}",
     },
-    view: { showMap: "Vis kort", showList: "Vis liste", map: "Kort over sommerhusene" },
+    view: { showMap: "Vis kort", showList: "Vis liste", map: "Kort over sommerhusene", show3d: "Vis i 3D", show2d: "Almindeligt kort" },
     empty: { title: "Ingen sommerhuse matcher dine valg", action: "Ryd søgning og filtre" },
     card: {
       night: "pr. nat",
@@ -238,6 +238,8 @@ export const da: Translation = {
       bookTitle: "Kan bookes på disse sider",
       bookNote: "Eksempel på et ophold. Booking åbner, når ejerne kommer med.",
       map: "Kort over sommerhuset og omgivelserne",
+      show3d: "Vis i 3D",
+      show2d: "Almindeligt kort",
       cottage: "Sommerhus",
     },
     examples: "Eksempler på ophold. Billeder: Unsplash.",

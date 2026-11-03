@@ -209,7 +209,7 @@ export const et: Translation = {
       clearAll: "Tühjenda kõik",
       show: "Näita: {cottages}",
     },
-    view: { showMap: "Näita kaarti", showList: "Näita nimekirja", map: "Puhkemajade kaart" },
+    view: { showMap: "Näita kaarti", showList: "Näita nimekirja", map: "Puhkemajade kaart", show3d: "Näita 3D-s", show2d: "Tavaline kaart" },
     empty: { title: "Nendele valikutele ei vasta ükski puhkemaja", action: "Tühjenda otsing ja filtrid" },
     card: {
       night: "/ öö",
@@ -238,6 +238,8 @@ export const et: Translation = {
       bookTitle: "Broneeritav nendel saitidel",
       bookNote: "Näidismajutus. Broneerimine avaneb, kui omanikud liituvad.",
       map: "Puhkemaja ja selle ümbruse kaart",
+      show3d: "Näita 3D-s",
+      show2d: "Tavaline kaart",
       cottage: "Puhkemaja",
     },
     examples: "Näidismajutused. Fotod: Unsplash.",

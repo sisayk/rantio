@@ -1548,6 +1548,87 @@
   position: relative;
 }
 
+/* Google Maps: the map with its 3D button on top */
+.mapWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map3dToggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--g-ink);
+  font: 700 14px/1 var(--font);
+  box-shadow: 0 2px 8px rgba(29, 42, 46, 0.28);
+  cursor: pointer;
+}
+
+.map3dToggle[aria-pressed="true"] {
+  background: var(--g-ink);
+  color: #fff;
+}
+
+/* Hover preview above a price pin: photo, name, place, price */
+.map :global(.stugora-pin-box) {
+  position: relative;
+  display: inline-block;
+}
+
+.map :global(.stugora-peek) {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  display: grid;
+  gap: 2px;
+  width: 200px;
+  overflow: hidden;
+  padding-bottom: 10px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--g-soft);
+  font: 400 12px/1.35 var(--font);
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 6px 20px rgba(29, 42, 46, 0.3);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.map :global(.stugora-peek img) {
+  display: block;
+  width: 100%;
+  height: 120px;
+  margin-bottom: 6px;
+  object-fit: cover;
+}
+
+.map :global(.stugora-peek > b),
+.map :global(.stugora-peek > i),
+.map :global(.stugora-peek > span) {
+  padding: 0 10px;
+}
+
+.map :global(.stugora-peek > b) {
+  color: var(--g-ink);
+  font-size: 14px;
+}
+
+.map :global(.stugora-peek > i) {
+  font-style: normal;
+}
+
+.map :global(.stugora-peek span b) {
+  color: var(--g-ink);
+}
+
 /* Google Maps: popup without Google's padding, town dots, data credits */
 .mapPopup {
   margin: 0;

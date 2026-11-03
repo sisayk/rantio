@@ -115,6 +115,8 @@ export default function Surroundings({ lang, t, lat, lng }: Props) {
             label={t.map}
             cottageLabel={t.cottage}
             onHover={setActiveKey}
+            show3d={t.show3d}
+            show2d={t.show2d}
           />
         </div>
       </div>

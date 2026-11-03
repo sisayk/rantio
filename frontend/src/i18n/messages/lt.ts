@@ -209,7 +209,7 @@ export const lt: Translation = {
       clearAll: "Išvalyti viską",
       show: "Rodyti: {cottages}",
     },
-    view: { showMap: "Rodyti žemėlapį", showList: "Rodyti sąrašą", map: "Namelių žemėlapis" },
+    view: { showMap: "Rodyti žemėlapį", showList: "Rodyti sąrašą", map: "Namelių žemėlapis", show3d: "Rodyti 3D", show2d: "Įprastas žemėlapis" },
     empty: { title: "Pagal šiuos pasirinkimus namelių nėra", action: "Išvalyti paiešką ir filtrus" },
     card: {
       night: "naktis",
@@ -238,6 +238,8 @@ export const lt: Translation = {
       bookTitle: "Galima užsakyti šiose svetainėse",
       bookNote: "Nakvynės pavyzdys. Užsakymai prasidės, kai prisijungs savininkai.",
       map: "Namelio ir jo apylinkių žemėlapis",
+      show3d: "Rodyti 3D",
+      show2d: "Įprastas žemėlapis",
       cottage: "Namelis",
     },
     examples: "Nakvynių pavyzdžiai. Nuotraukos: Unsplash.",

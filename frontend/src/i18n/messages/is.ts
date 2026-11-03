@@ -209,7 +209,7 @@ export const is: Translation = {
       clearAll: "Hreinsa allt",
       show: "Sýna niðurstöður ({cottages})",
     },
-    view: { showMap: "Sýna kort", showList: "Sýna lista", map: "Kort af sumarbústöðum" },
+    view: { showMap: "Sýna kort", showList: "Sýna lista", map: "Kort af sumarbústöðum", show3d: "Sýna í þrívídd", show2d: "Venjulegt kort" },
     empty: { title: "Enginn bústaður passar við þetta val", action: "Hreinsa leit og síur" },
     card: {
       night: "nóttin",
@@ -238,6 +238,8 @@ export const is: Translation = {
       bookTitle: "Hægt að bóka á þessum síðum",
       bookNote: "Dæmi um gistingu. Bókanir opnast þegar eigendur bætast við.",
       map: "Kort af bústaðnum og umhverfi hans",
+      show3d: "Sýna í þrívídd",
+      show2d: "Venjulegt kort",
       cottage: "Bústaður",
     },
     examples: "Dæmi um gistingu. Myndir: Unsplash.",

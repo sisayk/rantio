@@ -209,7 +209,7 @@ export const fi: Translation = {
       clearAll: "Tyhjennä kaikki",
       show: "Näytä {cottages}",
     },
-    view: { showMap: "Näytä kartta", showList: "Näytä lista", map: "Mökit kartalla" },
+    view: { showMap: "Näytä kartta", showList: "Näytä lista", map: "Mökit kartalla", show3d: "Näytä 3D:nä", show2d: "Tavallinen kartta" },
     empty: { title: "Näillä valinnoilla ei löytynyt mökkejä", action: "Tyhjennä haku ja suodattimet" },
     card: {
       night: "/ yö",
@@ -238,6 +238,8 @@ export const fi: Translation = {
       bookTitle: "Varattavissa näillä sivustoilla",
       bookNote: "Esimerkkikohde. Varaukset avautuvat, kun omistajat liittyvät mukaan.",
       map: "Mökki ja lähialue kartalla",
+      show3d: "Näytä 3D:nä",
+      show2d: "Tavallinen kartta",
       cottage: "Mökki",
     },
     examples: "Esimerkkikohteita. Kuvat: Unsplash.",
