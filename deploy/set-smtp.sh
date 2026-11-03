@@ -14,7 +14,15 @@ OPTS="-i $KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 
 read -rsp "Paste the Brevo SMTP key (it won't show): " SMTP_KEY
 echo
+SMTP_KEY="$(printf '%s' "$SMTP_KEY" | tr -d '[:space:]')"
 [ -n "$SMTP_KEY" ] || { echo "No key given." >&2; exit 1; }
+# Brevo lists each key as **********<last 6>; compare before anything is saved.
+echo "The key you pasted: ${#SMTP_KEY} characters, ending in ...${SMTP_KEY: -6}"
+case "$SMTP_KEY" in
+  xkeysib-*) echo "That looks like a Brevo API key. The SMTP page has its own keys (SMTP & API -> SMTP)." >&2; exit 1 ;;
+esac
+read -rp "Does that match the key in Brevo? [y/N] " OK
+[ "$OK" = y ] || [ "$OK" = Y ] || { echo "Nothing saved."; exit 1; }
 
 # shellcheck disable=SC2086
 { printf '%s\n' "$SMTP_KEY"; cat <<REMOTE
