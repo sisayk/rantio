@@ -147,9 +147,6 @@ export default function SiteFooter({ lang, variant = "guest", current }: { lang:
       <div className={styles.bottom}>
         <span>© Rantio</span>
         <span>{f.note}</span>
-        <a href="https://db-ip.com" rel="noopener">
-          IP Geolocation by DB-IP
-        </a>
       </div>
     </footer>
   );

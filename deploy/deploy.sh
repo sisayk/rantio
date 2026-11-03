@@ -83,10 +83,11 @@ as_app_env env NEXT_TELEMETRY_DISABLED=1 npm run build
 step "Helper commands: stugora-manage, stugora-backup"
 install -m 0755 -o root -g root "$DEPLOY_DIR/manage.sh" /usr/local/sbin/stugora-manage
 install -m 0755 -o root -g root "$DEPLOY_DIR/backup.sh" /usr/local/sbin/stugora-backup
-install -m 0755 -o root -g root "$DEPLOY_DIR/geoip-update.sh" /usr/local/sbin/stugora-geoip
-# The visitor's country picks the site's first language; without the file it's the browser's.
-if [ ! -f /srv/stugora/geoip/country.mmdb ]; then
-  /usr/local/sbin/stugora-geoip || echo "    No country database yet; the browser's language decides until it downloads."
+install -m 0755 -o root -g root "$DEPLOY_DIR/geoip-update.py" /usr/local/sbin/stugora-geoip
+# The visitor's country picks the site's first language; without the table it's the browser's.
+rm -f /srv/stugora/geoip/country.mmdb  # DB-IP's database, used before the registries' lists
+if [ ! -f /srv/stugora/geoip/country.txt ]; then
+  /usr/local/sbin/stugora-geoip || echo "    No country table yet; the browser's language decides until it downloads."
 fi
 
 step "systemd services and timers"

@@ -1,6 +1,6 @@
-# Monthly download of the IP-to-country database (deploy/geoip-update.sh).
+# Daily rebuild of the IP-to-country table from the internet registries' lists (deploy/geoip-update.py).
 [Unit]
-Description=Rantio: update the IP-to-country database
+Description=Rantio: update the IP-to-country table
 Wants=network-online.target
 After=network-online.target
 

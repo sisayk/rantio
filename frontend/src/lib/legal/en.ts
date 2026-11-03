@@ -71,7 +71,7 @@ export const en: LegalTexts = {
       {
         heading: "Visiting the website",
         paragraphs: [
-          "Our servers record technical details of each request, such as IP address, time, page and browser type. We need them to keep the site running, stop abuse (for example, too many form submissions from one address) and fix errors. These logs are kept only briefly. On a first visit the site also looks up, on our own server, which country your IP address is in (using DB-IP's database), so it opens in your country's language; that country isn't stored. Legal basis: our legitimate interest in a secure, working service (6(1)(f)).",
+          "Our servers record technical details of each request, such as IP address, time, page and browser type. We need them to keep the site running, stop abuse (for example, too many form submissions from one address) and fix errors. These logs are kept only briefly. On a first visit the site also looks up, on our own server, which country your IP address is in (using the internet registries' public lists of address ranges), so it opens in your country's language; that country isn't stored. Legal basis: our legitimate interest in a secure, working service (6(1)(f)).",
           "Some parts of the site load content straight from other services: maps from Google Maps (OpenStreetMap where Google Maps isn't available), nearby places and their pictures from Wikipedia, website icons through Google, and cottage photos from Unsplash. Your browser then contacts those services directly, so they see your IP address, as with any website. We don't send them anything else about you.",
         ],
       },

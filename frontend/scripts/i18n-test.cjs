@@ -5,7 +5,8 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { findGaps, getMessages } = require("../src/i18n/index.ts");
 const { countryName, fill, money, number, plural, pluralCategory } = require("../src/i18n/format.ts");
-const { firstLang, LANG_INFO, LANGS, negotiateLang } = require("../src/i18n/locales.ts");
+const { ipKey, lookup, parseTable } = require("../src/i18n/country.ts");
+const { COUNTRY_LANGS, firstLang, LANG_INFO, LANGS, negotiateLang } = require("../src/i18n/locales.ts");
 const { stripLang, switchLangPath } = require("../src/i18n/paths.ts");
 const { activitiesFor } = require("../src/lib/activities.ts");
 const { FEATURE_GROUPS } = require("../src/lib/catalog.ts");
@@ -137,4 +138,28 @@ test("regions use the local name where the language is spoken", () => {
   assert.equal(regionLabel(stockholm, "SE", "fi"), stockholm.name.fi);
   assert.equal(regionLabel(stockholm, "SE", "et"), "Stockholm County");
   assert.equal(regionLabel(nordland, "NO", "nn"), nordland.name.local);
+});
+
+test("IP to country: the registries' ranges, IPv4 and IPv6", () => {
+  // The same format deploy/geoip-update.py writes (documentation addresses here).
+  const table = parseTable(
+    ["4 c0000200 c00002ff FI", "4 c6336400 c63364ff SE", "6 20010db8000000000000000000000000 20010db8ffffffffffffffffffffffff NO", ""].join("\n"),
+  );
+  assert.equal(lookup(table, "192.0.2.1"), "FI");
+  assert.equal(lookup(table, "192.0.2.255"), "FI");
+  assert.equal(lookup(table, "192.0.3.0"), null);
+  assert.equal(lookup(table, "198.51.100.7"), "SE");
+  assert.equal(lookup(table, "::ffff:192.0.2.9"), "FI");
+  assert.equal(lookup(table, "2001:db8::1"), "NO");
+  assert.equal(lookup(table, "[2001:DB8:0:0:0:0:0:abcd]"), "NO");
+  assert.equal(lookup(table, "2001:db9::1"), null);
+  for (const bad of ["", "nonsense", "1.2.3", "300.1.1.1", "1::2::3", "12345::1"]) assert.equal(lookup(table, bad), null, bad);
+  assert.equal(ipKey("10.0.0.1")?.key, "0a000001");
+  assert.equal(ipKey("::1")?.key, "0".repeat(31) + "1");
+});
+
+test("the IP table keeps exactly the countries that have a site language", () => {
+  const script = require("node:fs").readFileSync(require("node:path").join(__dirname, "../../deploy/geoip-update.py"), "utf8");
+  const kept = /COUNTRIES = \{([^}]*)\}/.exec(script)[1].match(/[A-Z]{2}/g).sort();
+  assert.deepEqual(kept, Object.keys(COUNTRY_LANGS).sort());
 });

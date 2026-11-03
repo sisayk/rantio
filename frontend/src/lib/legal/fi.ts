@@ -71,7 +71,7 @@ export const fi: LegalTexts = {
       {
         heading: "Sivuston käyttö",
         paragraphs: [
-          "Palvelimemme kirjaavat jokaisesta pyynnöstä teknisiä tietoja, kuten IP-osoitteen, ajan, sivun ja selaimen tyypin. Tarvitsemme niitä sivuston ylläpitoon, väärinkäytösten estämiseen (esimerkiksi liian moneen lomakkeeseen samasta osoitteesta) ja virheiden korjaamiseen. Lokeja säilytetään vain lyhyen aikaa. Ensimmäisellä käynnillä sivusto selvittää omalla palvelimellamme, missä maassa IP-osoitteesi on (DB-IP:n tietokannasta), jotta sivu avautuu maasi kielellä; maata ei tallenneta. Käsittelyperuste: oikeutettu etumme turvalliseen ja toimivaan palveluun (f alakohta).",
+          "Palvelimemme kirjaavat jokaisesta pyynnöstä teknisiä tietoja, kuten IP-osoitteen, ajan, sivun ja selaimen tyypin. Tarvitsemme niitä sivuston ylläpitoon, väärinkäytösten estämiseen (esimerkiksi liian moneen lomakkeeseen samasta osoitteesta) ja virheiden korjaamiseen. Lokeja säilytetään vain lyhyen aikaa. Ensimmäisellä käynnillä sivusto selvittää omalla palvelimellamme, missä maassa IP-osoitteesi on (internetin osoiterekisterien julkisista luetteloista), jotta sivu avautuu maasi kielellä; maata ei tallenneta. Käsittelyperuste: oikeutettu etumme turvalliseen ja toimivaan palveluun (f alakohta).",
           "Osa sivuston sisällöstä ladataan suoraan muista palveluista: kartat Google Mapsista (OpenStreetMapista, kun Google Maps ei ole käytössä), lähialueen kohteet ja niiden kuvat Wikipediasta, sivustojen kuvakkeet Googlen kautta ja mökkien kuvat Unsplashista. Selaimesi ottaa silloin yhteyttä näihin palveluihin suoraan, joten ne näkevät IP-osoitteesi kuten mikä tahansa verkkosivusto. Emme lähetä niille muuta tietoa sinusta.",
         ],
       },

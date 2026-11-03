@@ -1,8 +1,8 @@
 [Unit]
-Description=Update the IP-to-country database early each month
+Description=Update the IP-to-country table every night
 
 [Timer]
-OnCalendar=*-*-04 04:20:00 Europe/Helsinki
+OnCalendar=*-*-* 04:20:00 Europe/Helsinki
 Persistent=true
 RandomizedDelaySec=1h
 

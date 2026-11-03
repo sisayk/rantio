@@ -452,15 +452,6 @@
   font-size: 13px;
 }
 
-.bottom a {
-  margin-left: auto;
-  text-decoration: none;
-}
-
-.bottom a:hover {
-  text-decoration: underline;
-}
-
 /* ---------- smaller screens ---------- */
 @media (max-width: 1100px) {
   .values {
@@ -507,9 +498,6 @@
   }
   .brand {
     grid-column: 1 / -1;
-  }
-  .bottom a {
-    margin-left: 0;
   }
 }
 
