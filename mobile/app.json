@@ -91,7 +91,13 @@
       ],
       "react-native-maps",
       "expo-localization",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.42238401416-vs5r0jc5usqt7h5r8ifb5dnnqrcg9enl"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

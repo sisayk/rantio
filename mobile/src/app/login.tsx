@@ -1,7 +1,9 @@
+import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 import { ApiError, Offline, ownerApi, type SignInTo } from "@/api";
 import { usePrefs } from "@/state/prefs";
@@ -28,7 +30,15 @@ const CALLING: [string, string][] = [
 ];
 const LANG_COUNTRY: Record<string, string> = { fi: "FI", sv: "SE", nb: "NO", nn: "NO", da: "DK", is: "IS", et: "EE", lv: "LV", lt: "LT" };
 
-/** Owner sign-in: Apple (on iPhone), or a six-digit code by email or SMS. No password. */
+// Google sign-in's public client IDs (Google Cloud project "rantio"). With the website's
+// ID as the server client, the ID token is made for the same audience the website uses.
+const GOOGLE_IOS_CLIENT = "42238401416-vs5r0jc5usqt7h5r8ifb5dnnqrcg9enl.apps.googleusercontent.com";
+const GOOGLE_WEB_CLIENT = "42238401416-d9tgb4953a1tova813mof3mgprosvt6l.apps.googleusercontent.com";
+// Android needs its own client (the app's signing fingerprint) first; until then iPhone only.
+const GOOGLE_HERE = Platform.OS === "ios";
+if (GOOGLE_HERE) GoogleSignin.configure({ iosClientId: GOOGLE_IOS_CLIENT, webClientId: GOOGLE_WEB_CLIENT });
+
+/** Owner sign-in: Apple (on iPhone), Google, or a six-digit code by email or SMS. No password. */
 export default function Login() {
   const { m, lang, f } = useT();
   const t = m.dashboard.login;
@@ -88,6 +98,25 @@ export default function Login() {
     }
   };
 
+  const google = async () => {
+    setProblem(null);
+    try {
+      const res = await GoogleSignin.signIn();
+      if (!isSuccessResponse(res)) return; // closed Google's sheet
+      if (!res.data.idToken) return setProblem(t.socialFailed);
+      setBusy(true);
+      await signInWith("google", res.data.idToken);
+      done();
+    } catch (e) {
+      if (isErrorWithCode(e) && (e.code === statusCodes.SIGN_IN_CANCELLED || e.code === statusCodes.IN_PROGRESS)) return;
+      const detail = e instanceof ApiError ? (e.body as { detail?: string } | undefined)?.detail : undefined;
+      setProblem(detail === "no_owner" || detail === "no_email" ? t.noOwner : e instanceof Offline ? m.app.common.offline : t.socialFailed);
+      setBusy(false);
+    } finally {
+      GoogleSignin.signOut().catch(() => undefined); // let the next sign-in choose an account again
+    }
+  };
+
   const sendCode = async () => {
     if (via === "email" && !EMAIL.test(email.trim())) return setProblem(m.book.errors.email);
     if (via === "phone" && !/^\+[1-9]\d{6,14}$/.test(phone)) return setProblem(t.phone);
@@ -127,15 +156,29 @@ export default function Login() {
 
           {step === "start" ? (
             <>
-              {options.apple && appleHere ? (
+              {(options.apple && appleHere) || (options.google && GOOGLE_HERE) ? (
                 <>
-                  <AppleAuthentication.AppleAuthenticationButton
-                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
-                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                    cornerRadius={radius.pill}
-                    style={{ height: 50 }}
-                    onPress={apple}
-                  />
+                  {options.apple && appleHere ? (
+                    <AppleAuthentication.AppleAuthenticationButton
+                      buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+                      buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                      cornerRadius={radius.pill}
+                      style={{ height: 50 }}
+                      onPress={apple}
+                    />
+                  ) : null}
+                  {options.google && GOOGLE_HERE ? (
+                    <Pressable
+                      onPress={google}
+                      disabled={busy}
+                      style={({ pressed }) => [styles.google, pressed && { opacity: 0.8 }]}
+                      accessibilityRole="button"
+                      accessibilityLabel={t.google}
+                    >
+                      <GoogleG />
+                      <Text v="bodyMedium">{t.google}</Text>
+                    </Pressable>
+                  ) : null}
                   <View style={styles.or}>
                     <View style={styles.orLine} />
                     <Text v="small">{t.or}</Text>
@@ -265,8 +308,43 @@ export default function Login() {
   );
 }
 
+/** Google's four-colour "G", as its sign-in button guidelines show it. */
+function GoogleG() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 48 48">
+      <Path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+      />
+      <Path
+        fill="#4285F4"
+        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+      />
+      <Path
+        fill="#FBBC05"
+        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+      />
+      <Path
+        fill="#34A853"
+        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+      />
+    </Svg>
+  );
+}
+
 const styles = StyleSheet.create({
   or: { flexDirection: "row", alignItems: "center", gap: space.md },
+  google: {
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.sm,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: "#dadce0",
+    backgroundColor: "#fff",
+  },
   orLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
   tabs: { flexDirection: "row", padding: 4, borderRadius: radius.pill, backgroundColor: colors.ground },
   tab: { flex: 1, alignItems: "center", paddingVertical: 10, borderRadius: radius.pill },

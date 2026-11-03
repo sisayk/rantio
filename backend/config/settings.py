@@ -189,8 +189,12 @@ SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
 SMS_SENDER = os.environ.get("SMS_SENDER", "Rantio")[:11]  # alphanumeric senders are at most 11 characters
 #   Google: the OAuth client IDs (web, iOS, Android) whose ID tokens we accept.
-# Public IDs, not secrets: the website's client ("Rantio website" in Google Cloud project rantio).
-GOOGLE_CLIENT_IDS = env_list("GOOGLE_CLIENT_IDS", "42238401416-d9tgb4953a1tova813mof3mgprosvt6l.apps.googleusercontent.com")
+# Public IDs, not secrets: "Rantio website" and "Rantio iPhone app" in Google Cloud project rantio.
+GOOGLE_CLIENT_IDS = env_list(
+    "GOOGLE_CLIENT_IDS",
+    "42238401416-d9tgb4953a1tova813mof3mgprosvt6l.apps.googleusercontent.com,"
+    "42238401416-vs5r0jc5usqt7h5r8ifb5dnnqrcg9enl.apps.googleusercontent.com",
+)
 #   Apple: the iOS app's bundle ID and, for the website, the Services ID (fi.rantio.web).
 APPLE_AUDIENCES = env_list("APPLE_AUDIENCES", "fi.rantio.app,fi.rantio.web")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <info@rantio.fi>")
