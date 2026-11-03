@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
-import { countryName } from "@/i18n/format";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
@@ -31,7 +30,8 @@ type Step = "form" | "checking" | "saved" | "notSaved" | "thanks";
 /** "List your cottage" inside the app: the same sign-up as on rantio.fi/hosts, with photos,
  *  then a card saved on Stripe's page for the 3 free months. */
 export default function ListCottage() {
-  const { m, lang, f } = useT();
+  // country(): the app's own names (Hermes has no Intl.DisplayNames, so not countryName()).
+  const { m, lang, f, country: countryLabel } = useT();
   const t = m.owner.form;
   const tr = TRIAL[lang];
   const router = useRouter();
@@ -299,7 +299,7 @@ export default function ListCottage() {
                   accessibilityState={{ selected: country === c }}
                 >
                   <Text v="smallMedium" color={country === c ? "#fff" : colors.ink}>
-                    {countryName(lang, c)}
+                    {countryLabel(c)}
                   </Text>
                 </Pressable>
               ))}
