@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { LANG_COOKIE, LANG_COOKIE_MAX_AGE, LANG_INFO, type Lang, LANGS } from "@/i18n/locales";
 import { switchLangPath } from "@/i18n/paths";
 import type { Messages } from "@/i18n";
@@ -96,7 +97,9 @@ export function LanguageDialog({
     };
   }, [onClose]);
 
-  return (
+  // Drawn straight into <body>: inside a header with a blur or a transform, a fixed-position
+  // backdrop would be measured against that header and end up squeezed above the page.
+  return createPortal(
     <div className={styles.backdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div ref={dialog} className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <header className={styles.head}>
@@ -160,7 +163,8 @@ export function LanguageDialog({
           </p>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
