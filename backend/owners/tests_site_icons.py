@@ -37,3 +37,20 @@ class SiteIconTests(TestCase):
         block = catalog.split("export const CHANNELS = {", 1)[1].split("} as const;", 1)[0]
         listed = dict(re.findall(r'(\w+): \{ name: "[^"]+", domain: "([^"]+)" \}', block))
         self.assertEqual(listed, site_icons.SITES)
+
+
+class HealthTests(TestCase):
+    def test_health_shows_the_live_commit(self):
+        import json
+        import tempfile
+
+        from django.test import override_settings
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+            json.dump({"deployed": "94b9728366eb6adcd73398b0b778ff97d058f83f", "state": "ok", "at": "2026-11-03T20:00:00+0200"}, f)
+        with override_settings(DEPLOY_STATUS_FILE=f.name):
+            body = self.client.get("/api/health/").json()
+        self.assertEqual(body["deploy"]["live"], "94b9728")
+        self.assertEqual(body["deploy"]["state"], "ok")
+        with override_settings(DEPLOY_STATUS_FILE="/nonexistent.json"):
+            self.assertEqual(self.client.get("/api/health/").json(), {"ok": True})

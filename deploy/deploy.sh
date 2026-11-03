@@ -84,6 +84,7 @@ step "Helper commands: stugora-manage, stugora-backup"
 install -m 0755 -o root -g root "$DEPLOY_DIR/manage.sh" /usr/local/sbin/stugora-manage
 install -m 0755 -o root -g root "$DEPLOY_DIR/backup.sh" /usr/local/sbin/stugora-backup
 install -m 0755 -o root -g root "$DEPLOY_DIR/geoip-update.py" /usr/local/sbin/stugora-geoip
+install -m 0755 -o root -g root "$DEPLOY_DIR/autodeploy.sh" /usr/local/sbin/stugora-autodeploy
 # The visitor's country picks the site's first language; without the table it's the browser's.
 rm -f /srv/stugora/geoip/country.mmdb  # DB-IP's database, used before the registries' lists
 if [ ! -f /srv/stugora/geoip/country.txt ]; then
@@ -92,7 +93,7 @@ fi
 
 step "systemd services and timers"
 for unit in stugora-django.service stugora-next.service stugora-backup.service stugora-backup.timer \
-  stugora-geoip.service stugora-geoip.timer; do
+  stugora-geoip.service stugora-geoip.timer stugora-autodeploy.service stugora-autodeploy.timer; do
   install -m 0644 "$DEPLOY_DIR/systemd/$unit" /etc/systemd/system/
 done
 # The background jobs only once the code has their management commands.
@@ -110,6 +111,10 @@ done
 systemctl daemon-reload
 systemctl enable stugora-django.service stugora-next.service >/dev/null
 systemctl enable --now stugora-backup.timer stugora-geoip.timer >/dev/null
+# Deploys from GitHub on its own once the server has the deploy key (deploy/setup-autodeploy.sh).
+if [ -f /root/.ssh/rantio-deploy ] && [ -d "$APP_DIR/.git" ]; then
+  systemctl enable --now stugora-autodeploy.timer >/dev/null
+fi
 for timer in "${JOB_TIMERS[@]}"; do
   systemctl enable --now "$timer" >/dev/null
   echo "    $timer enabled."

@@ -172,6 +172,8 @@ if DEV_LOGIN_CODES and not DEBUG:
 
 # Links in emails: the public site (guest conversations, the owner inbox) and the admin.
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:3100").rstrip("/")
+# Written by deploy/autodeploy.sh; /api/health/ shows which commit is live.
+DEPLOY_STATUS_FILE = os.environ.get("DEPLOY_STATUS_FILE", "/srv/stugora/deploy-status.json")
 ADMIN_URL = os.environ.get("ADMIN_URL", "http://localhost:8100/admin").rstrip("/")
 
 # Claude suggests owners' replies (owners/assistant.py). Without a key the helper is off.

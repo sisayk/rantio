@@ -110,3 +110,27 @@ class HeroSlidesView(views.APIView):
         res = Response({"slides": slides})
         res["Cache-Control"] = "public, max-age=60"
         return res
+
+
+def health(request):
+    """Up or not, plus which commit is live and how the last automatic deploy went
+    (deploy/autodeploy.sh writes the file). Short commit ids only."""
+    import json
+
+    from django.http import JsonResponse
+
+    body = {"ok": True}
+    try:
+        with open(settings.DEPLOY_STATUS_FILE) as f:
+            data = json.load(f)
+        body["deploy"] = {
+            "live": data.get("deployed", "")[:7],
+            "state": data.get("state", ""),
+            "at": data.get("at", ""),
+            "failed": data.get("failed", "")[:7],
+        }
+    except (OSError, ValueError):
+        pass
+    res = JsonResponse(body)
+    res["Cache-Control"] = "no-store"
+    return res

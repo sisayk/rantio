@@ -25,6 +25,8 @@ Every command block says where it runs: **On your Mac, in a normal terminal** or
 | `nginx/` | nginx site (`stugora.conf`), temporary http-only site, stugora.com redirect, snippets |
 | `systemd/` | Services for Django and Next.js; timers for backups, booking emails, invoices, site calendars |
 | `rsync-exclude.txt` | What stays on the Mac when copying code with rsync |
+| `autodeploy.sh` | Deploys new commits on GitHub's `main` by itself, every two minutes (installed as `stugora-autodeploy`) |
+| `setup-autodeploy.sh` | One-time switch to automatic deploys: **On your Mac, in a normal terminal** `bash ~/stugora/deploy/setup-autodeploy.sh` |
 
 ## 1. Create the server
 

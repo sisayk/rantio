@@ -1,0 +1,10 @@
+# Deploys new commits from GitHub (deploy/autodeploy.sh).
+[Unit]
+Description=Rantio: deploy new code from GitHub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/stugora-autodeploy
+TimeoutStartSec=30min

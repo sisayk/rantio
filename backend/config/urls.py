@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
 from owners import calendar_views, inbound, inbox, listings, newsletter, portal, site_icons
-from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView
+from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, health
 
 admin.site.site_header = "Rantio admin"
 admin.site.site_title = "Rantio"
@@ -59,7 +58,7 @@ urlpatterns = [
     path("api/site-icon/<str:site>/", site_icons.site_icon, name="site-icon"),
     path("api/hero/", HeroSlidesView.as_view(), name="hero-slides"),
     path("api/inbound/booking-email/", inbound.booking_email, name="inbound-booking-email"),
-    path("api/health/", lambda request: JsonResponse({"ok": True}), name="health"),
+    path("api/health/", health, name="health"),
 ]
 
 # Uploaded files in development; in production the web server serves /media/.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Put the code on your Mac live on rantio.fi. Run on the Mac, in a normal terminal:
 #   bash ~/stugora/deploy/push.sh
-# It copies the code to the server (rsync), gets the HTTPS certificate the first time
+# Before automatic deploys are set up, it copies the code to the server (rsync), gets the HTTPS certificate the first time
 # (Let's Encrypt; you accept their terms by running it), and runs deploy.sh there:
 # packages, migrations, site build, restart. A few seconds of downtime at the end.
 set -euo pipefail
@@ -11,6 +11,20 @@ CERT_EMAIL="${RANTIO_CERT_EMAIL:-sisay.kelka@gmail.com}"
 OPTS="-i $KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 [ -f "$KEY" ] || { echo "No SSH key at $KEY." >&2; exit 1; }
 cd "$(dirname "$0")/.."
+
+# Once the server deploys from GitHub (deploy/setup-autodeploy.sh), this sends the code
+# there instead of copying files, then deploys at once and shows the output.
+# shellcheck disable=SC2086
+if git remote get-url origin >/dev/null 2>&1 && ssh $OPTS "$SERVER" test -d /srv/stugora/app/.git; then
+  echo "== Sending the code to GitHub"
+  git push origin main
+  echo "== Deploying on the server"
+  # shellcheck disable=SC2086
+  ssh $OPTS "$SERVER" 'STUGORA_DEPLOY_SHOW=1 /usr/local/sbin/stugora-autodeploy || true; cat /srv/stugora/deploy-status.json'
+  echo
+  echo "Live: https://rantio.fi"
+  exit 0
+fi
 
 echo "== Copying the code to the server"
 # shellcheck disable=SC2086
