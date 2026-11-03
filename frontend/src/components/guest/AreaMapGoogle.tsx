@@ -50,12 +50,13 @@ export default function AreaMapGoogle({ lat, lng, places, activeKey, label, cott
             lng={lng}
             range={2500}
             pins={[
-              { key: "cottage", lat, lng, label: cottageLabel },
+              { key: "cottage", lat, lng, label: cottageLabel, required: true },
               ...places.map((p, i) => ({
                 key: p.key,
                 lat: p.lat,
                 lng: p.lng,
-                label: `${i + 1}. ${p.title}`,
+                label: String(i + 1), // the same numbers as the list beside the map
+                title: p.title,
                 onClick: () => window.open(p.url, "_blank", "noopener"),
               })),
             ]}

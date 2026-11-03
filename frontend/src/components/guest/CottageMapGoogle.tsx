@@ -105,7 +105,8 @@ export default function CottageMapGoogle(props: CottageMapProps) {
               key: l.id,
               lat: l.lat,
               lng: l.lng,
-              label: `${props.pinPrice(l)} · ${listingName(names, l)}`,
+              label: props.pinPrice(l), // the name comes up when pointing at it
+              title: `${listingName(names, l)} · ${props.price(l)}`,
               onClick: () => window.location.assign(paths.cottage(lang, l.id)),
             }))}
           />

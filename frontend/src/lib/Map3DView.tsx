@@ -8,7 +8,12 @@ export type Pin3D = {
   key: string;
   lat: number;
   lng: number;
+  /** Short text on the map: a price or a number. */
   label: string;
+  /** The longer text shown when pointing at the pin (the cottage's or the place's name). */
+  title?: string;
+  /** Always drawn; other pins' labels give way where they would overlap. */
+  required?: boolean;
   onClick?: () => void;
 };
 
@@ -48,7 +53,14 @@ export default function Map3DView({
         style={{ width: "100%", height: "100%" }}
       >
         {pins.map((p) => (
-          <Marker3D key={p.key} position={{ lat: p.lat, lng: p.lng }} label={p.label} title={p.label} onClick={p.onClick} />
+          <Marker3D
+            key={p.key}
+            position={{ lat: p.lat, lng: p.lng }}
+            label={p.label}
+            title={p.title ?? p.label}
+            collisionBehavior={p.required ? "REQUIRED" : "OPTIONAL_AND_HIDES_LOWER_PRIORITY"}
+            onClick={p.onClick}
+          />
         ))}
       </Map3D>
     </div>
