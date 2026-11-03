@@ -905,26 +905,6 @@
   white-space: nowrap;
 }
 
-/* ---------- footer ---------- */
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 24px;
-  max-width: 1280px;
-  margin: 24px auto 0;
-  padding: 32px 40px 48px;
-  border-top: 1px solid var(--line);
-  font-size: 14px;
-  color: var(--ink-soft);
-}
-
-.footerLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-}
-
 /* ---------- Mökki monitor ---------- */
 .monitor {
   border-top: 1px solid var(--line);
@@ -1268,8 +1248,5 @@
   .dayChannel {
     left: 4px;
     font-size: 9px;
-  }
-  .footer {
-    padding: 32px 16px 40px;
   }
 }

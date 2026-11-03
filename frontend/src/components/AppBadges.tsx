@@ -1,41 +1,45 @@
 import { APP_LINKS } from "@/lib/content";
 import styles from "./AppBadges.module.css";
 
-type Texts = { title: string; soon: string; download: string };
+type Texts = { soon: string; download: string };
 
 const STORES = [
   { id: "ios", name: "App Store", platform: "iPhone", href: APP_LINKS.ios },
   { id: "android", name: "Google Play", platform: "Android", href: APP_LINKS.android },
 ] as const;
 
-/** iPhone and Android download buttons for the footer; "Coming soon" until a store link is set. */
-export default function AppBadges({ t }: { t: Texts }) {
+/** iPhone and Android download buttons (the footer's app band); "Coming soon" until a store link is set. */
+export default function AppBadges({ t, light = false }: { t: Texts; light?: boolean }) {
   return (
-    <div className={styles.apps}>
-      <p className={styles.title}>{t.title}</p>
-      <div className={styles.badges}>
-        {STORES.map((s) => {
-          const live = Boolean(s.href);
-          const inner = (
-            <>
-              <PhoneIcon kind={s.id} />
-              <span className={styles.text}>
-                <small>{live ? t.download : t.soon}</small>
-                <strong>{s.name}</strong>
-              </span>
-            </>
-          );
-          return live ? (
-            <a key={s.id} className={styles.badge} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={`${s.platform}: ${t.download} ${s.name}`}>
-              {inner}
-            </a>
-          ) : (
-            <span key={s.id} className={`${styles.badge} ${styles.soon}`} aria-label={`${s.platform}: ${s.name}, ${t.soon}`} title={t.soon}>
-              {inner}
+    <div className={`${styles.badges}${light ? ` ${styles.light}` : ""}`}>
+      {STORES.map((s) => {
+        const live = Boolean(s.href);
+        const inner = (
+          <>
+            <PhoneIcon kind={s.id} />
+            <span className={styles.text}>
+              <small>{live ? t.download : t.soon}</small>
+              <strong>{s.name}</strong>
             </span>
-          );
-        })}
-      </div>
+          </>
+        );
+        return live ? (
+          <a
+            key={s.id}
+            className={styles.badge}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${s.platform}: ${t.download} ${s.name}`}
+          >
+            {inner}
+          </a>
+        ) : (
+          <span key={s.id} className={`${styles.badge} ${styles.soon}`} aria-label={`${s.platform}: ${s.name}, ${t.soon}`} title={t.soon}>
+            {inner}
+          </span>
+        );
+      })}
     </div>
   );
 }

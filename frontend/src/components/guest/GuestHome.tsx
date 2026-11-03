@@ -11,7 +11,6 @@ import { ownerApi } from "@/lib/ownerApi";
 import { forgetOwnerSession, useOwnerSession } from "@/lib/useOwnerSession";
 import CurrencyButton from "../CurrencyButton";
 import { paths } from "@/i18n/paths";
-import { CONTACT_EMAIL } from "@/lib/content";
 import { cityNames, countryNamesAll, regionLabel } from "@/lib/placeNames";
 import LanguageButton, { LanguageDialog, type LanguageNames } from "../LanguagePicker";
 import type { DateRange } from "react-day-picker";
@@ -54,7 +53,7 @@ import {
   Wordmark,
 } from "./icons";
 import styles from "./guest.module.css";
-import AppBadges from "../AppBadges";
+import SiteFooter from "../SiteFooter";
 
 // Leaflet needs the browser, so the map loads on the client only.
 const CottageMap = dynamic(() => import("./CottageMap"), {
@@ -992,18 +991,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         />
       ) : null}
 
-      <footer className={styles.footer}>
-        <AppBadges t={common.apps} />
-        <p>{common.footer.note}</p>
-        <p className={styles.footerLinks}>
-          <span>
-            {common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
-          </span>
-          <a href={paths.privacy(lang)}>{common.footer.privacy}</a>
-          <a href={paths.terms(lang)}>{common.footer.terms}</a>
-          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
-        </p>
-      </footer>
+      <SiteFooter lang={lang} variant="guest" />
 
       {langOpen ? <LanguageDialog lang={lang} t={common.language} names={languages} onClose={() => setLangOpen(false)} /> : null}
     </div>

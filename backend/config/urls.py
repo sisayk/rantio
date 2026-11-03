@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from config.admin_assets_view import admin_css
-from owners import calendar_views, inbound, inbox, listings, portal
+from owners import calendar_views, inbound, inbox, listings, newsletter, portal
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView
 
 admin.site.site_header = "Rantio admin"
@@ -16,6 +16,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/signups/", OwnerSignupCreateView.as_view(), name="owner-signup"),
     path("api/monitor-waitlist/", MonitorInterestCreateView.as_view(), name="monitor-waitlist"),
+    path("api/newsletter/", newsletter.SubscribeView.as_view(), name="newsletter-subscribe"),
+    path("api/newsletter/confirm/", newsletter.ConfirmView.as_view(), name="newsletter-confirm"),
+    path("api/newsletter/unsubscribe/", newsletter.UnsubscribeView.as_view(), name="newsletter-unsubscribe"),
     path("api/auth/request-code/", portal.RequestCodeView.as_view(), name="login-request-code"),
     path("api/auth/verify-code/", portal.VerifyCodeView.as_view(), name="login-verify-code"),
     path("api/auth/logout/", portal.LogoutView.as_view(), name="logout"),

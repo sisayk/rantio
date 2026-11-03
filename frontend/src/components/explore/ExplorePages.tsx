@@ -5,7 +5,6 @@ import { getMessages } from "@/i18n";
 import { countryName, currencyNames, fill, languageNamesIn, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { CONTACT_EMAIL } from "@/lib/content";
 import {
   countCottages,
   cottagesHref,
@@ -20,7 +19,6 @@ import {
 import { COUNTRIES, unsplash } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
-import AppBadges from "../AppBadges";
 import CurrencyButton from "../CurrencyButton";
 import LanguageButton from "../LanguagePicker";
 import HostSwitchLink from "../guest/HostSwitchLink";
@@ -28,6 +26,7 @@ import { ActivityIcon, ArrowLeft, Wordmark } from "../guest/icons";
 import MainNav, { type NavPage } from "../guest/MainNav";
 import g from "../guest/guest.module.css";
 import s from "./explore.module.css";
+import SiteFooter from "../SiteFooter";
 
 function Shell({ lang, active, children }: { lang: Lang; active: NavPage; children: React.ReactNode }) {
   const m = getMessages(lang);
@@ -50,18 +49,7 @@ function Shell({ lang, active, children }: { lang: Lang; active: NavPage; childr
 
       <main className={s.main}>{children}</main>
 
-      <footer className={`${g.footer} ${s.footer}`}>
-        <AppBadges t={m.common.apps} />
-        <p>{m.common.footer.note}</p>
-        <p className={g.footerLinks}>
-          <span>
-            {m.common.footer.contact}: <span className={g.selectable}>{CONTACT_EMAIL}</span>
-          </span>
-          <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
-          <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
-          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
-        </p>
-      </footer>
+      <SiteFooter lang={lang} variant="guest" />
     </div>
   );
 }

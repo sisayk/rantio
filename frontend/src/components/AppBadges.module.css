@@ -1,21 +1,3 @@
-.apps {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 24px;
-  flex-basis: 100%;
-  padding-bottom: 20px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #222;
-}
-
 .badges {
   display: flex;
   flex-wrap: wrap;
@@ -81,16 +63,35 @@ a.badge:focus-visible {
   letter-spacing: -0.01em;
 }
 
+/* White badges, for a dark background. */
+.light .badge {
+  background: #fff;
+  color: #1d2a2e;
+}
+
+.light a.badge:hover {
+  background: #eef1ef;
+}
+
+.light .text small {
+  color: #5d6a6e;
+}
+
+.light a.badge:focus-visible {
+  outline-color: #fff;
+}
+
 @media (max-width: 560px) {
-  .apps {
-    flex-direction: column;
-    align-items: flex-start;
-  }
   .badges {
     width: 100%;
   }
   .badge {
     flex: 1 1 0;
     min-width: 0;
+    padding: 0 12px 0 10px;
+  }
+  .text strong {
+    font-size: 15px;
+    white-space: nowrap;
   }
 }

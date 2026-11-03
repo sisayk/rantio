@@ -2,12 +2,11 @@ import { getMessages } from "@/i18n";
 import { languageNamesIn } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { CONTACT_EMAIL } from "@/lib/content";
 import { getLegal, type LegalKind, legalLang, OTHER_LANGUAGE_NOTE } from "@/lib/legal";
-import AppBadges from "./AppBadges";
 import LanguageButton from "./LanguagePicker";
 import { Wordmark } from "./guest/icons";
 import styles from "./legal.module.css";
+import SiteFooter from "./SiteFooter";
 
 /** The privacy policy or the website terms: one readable column, in English or Finnish. */
 export default function LegalPage({ lang, kind }: { lang: Lang; kind: LegalKind }) {
@@ -48,21 +47,7 @@ export default function LegalPage({ lang, kind }: { lang: Lang; kind: LegalKind 
         </article>
       </main>
 
-      <footer className={styles.footer}>
-        <AppBadges t={m.common.apps} />
-        <p>{m.common.footer.note}</p>
-        <p className={styles.footerLinks}>
-          <span>
-            {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          </span>
-          <a href={paths.privacy(lang)} aria-current={kind === "privacy" ? "page" : undefined}>
-            {m.common.footer.privacy}
-          </a>
-          <a href={paths.terms(lang)} aria-current={kind === "terms" ? "page" : undefined}>
-            {m.common.footer.terms}
-          </a>
-        </p>
-      </footer>
+      <SiteFooter lang={lang} variant="legal" current={kind} />
     </div>
   );
 }

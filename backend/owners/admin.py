@@ -17,7 +17,7 @@ from django.contrib import messages
 from . import booking_emails, invoicing, stripe_api
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
-    Message, MonitorInterest, Owner, OwnerSignup,
+    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup,
 )
 
 
@@ -43,6 +43,33 @@ class MonitorInterestAdmin(ModelAdmin):
     list_filter = ["rents", "country", "language"]
     search_fields = ["email"]
     readonly_fields = ["created_at", "privacy_consent", "source"]
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(ModelAdmin):
+    list_display = ["email", "language", "is_active", "confirmed_at", "unsubscribed_at", "created_at"]
+    list_filter = [("confirmed_at", admin.EmptyFieldListFilter), ("unsubscribed_at", admin.EmptyFieldListFilter), "language"]
+    search_fields = ["email"]
+    readonly_fields = ["token", "created_at", "confirmed_at", "unsubscribed_at", "confirmations_sent", "last_confirmation_at", "source"]
+    actions = ["export_active"]
+
+    @display(description="On the list", boolean=True)
+    def is_active(self, obj):
+        return obj.active
+
+    @admin.action(description="Export confirmed subscribers (CSV)")
+    def export_active(self, request, queryset):
+        import csv
+
+        from django.http import HttpResponse
+
+        res = HttpResponse(content_type="text/csv; charset=utf-8")
+        res["Content-Disposition"] = 'attachment; filename="rantio-newsletter.csv"'
+        out = csv.writer(res)
+        out.writerow(["email", "language", "confirmed_at"])
+        for sub in queryset.filter(confirmed_at__isnull=False, unsubscribed_at__isnull=True):
+            out.writerow([sub.email, sub.language, sub.confirmed_at.isoformat()])
+        return res
 
 
 class CottageInline(TabularInline):

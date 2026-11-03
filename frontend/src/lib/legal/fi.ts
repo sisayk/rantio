@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Päivitetty viimeksi 30.10.2026";
+const UPDATED = "Päivitetty viimeksi 3.11.2026";
 
 export const fi: LegalTexts = {
   privacy: {
@@ -45,6 +45,13 @@ export const fi: LegalTexts = {
           "Mökkiesi kuvaukset, kuvat, hinnat ja kalenterit",
           "Varaukset, vuosimaksut, provisiot, laskut ja niiden maksutilanteen (maksut kulkevat Stripen kautta, emmekä koskaan näe tai tallenna korttinumeroita)",
           "Viestisi vieraiden ja meidän kanssamme",
+        ],
+      },
+      {
+        heading: "Uutiskirje",
+        paragraphs: [
+          "Jos tilaat uutiskirjeemme sivun alareunasta, tallennamme sähköpostiosoitteesi ja sivuston kielen ja lähetämme sinulle vahvistuslinkin. Olet listalla vasta, kun olet avannut sen. Sen jälkeen lähetämme silloin tällöin sähköpostia uusista mökeistä, vuodenajoista ja matkailusta Pohjoismaissa ja Baltiassa. Jokaisessa uutiskirjeessä on linkki tilauksen perumiseen, samoin vahvistussivulla.",
+          "Oikeusperuste: suostumuksesi (6 artiklan 1 kohdan a alakohta), jonka voit perua milloin tahansa perumalla tilauksen. Vahvistamattomat tilaukset poistetaan 30 päivän kuluttua. Jos perut tilauksen, säilytämme vain osoitteesi ja päivämäärän, jotta emme lähetä sinulle enää viestejä.",
         ],
       },
       {
@@ -94,6 +101,7 @@ export const fi: LegalTexts = {
         paragraphs: ["Säilytämme tietoja vain niin kauan kuin tarvitsemme:"],
         list: [
           "Vieraiden keskustelut: enintään 24 kuukautta viimeisestä viestistä, minkä jälkeen ne poistetaan",
+          "Uutiskirje: kunnes perut tilauksen; vahvistamattomat tilaukset 30 päivää",
           "Ilmoittautumiset omistajilta, joista ei tule asiakkaita: enintään 24 kuukautta viimeisestä yhteydenotosta",
           "Omistajien tilit, mökit ja varaukset: sopimuksen ajan ja enintään 12 kuukautta sen päättymisen jälkeen",
           "Laskut ja muu kirjanpitoaineisto: kuusi vuotta tilikauden päättymisestä, kuten kirjanpitolaki edellyttää",

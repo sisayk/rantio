@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Last updated: 30 October 2026";
+const UPDATED = "Last updated: 3 November 2026";
 
 export const en: LegalTexts = {
   privacy: {
@@ -45,6 +45,13 @@ export const en: LegalTexts = {
           "Your cottages' descriptions, photos, prices and calendars",
           "Bookings, yearly fees, commissions, invoices and whether they're paid (payments go through Stripe; we never see or store card numbers)",
           "Your messages with guests and with us",
+        ],
+      },
+      {
+        heading: "Newsletter",
+        paragraphs: [
+          "If you sign up for our newsletter at the bottom of a page, we save your email address and the site's language, and send you a link to confirm. You're on the list only after you click it. We then email you now and then about new cottages, seasons and travel in the Nordics and the Baltics. Every newsletter has a link to unsubscribe, and the confirmation page has one too.",
+          "Legal basis: your consent (article 6(1)(a)), which you can withdraw at any time by unsubscribing. Sign-ups nobody confirms are deleted after 30 days. If you unsubscribe, we keep only your address and the date, so that we don't email you again.",
         ],
       },
       {
@@ -94,6 +101,7 @@ export const en: LegalTexts = {
         paragraphs: ["We keep data only as long as we need it:"],
         list: [
           "Guest conversations: up to 24 months after the last message, then deleted",
+          "Newsletter: until you unsubscribe; unconfirmed sign-ups 30 days",
           "Sign-ups from owners who don't become customers: up to 24 months after our last contact",
           "Owner accounts, cottages and bookings: while the owner agreement runs, and up to 12 months after it ends",
           "Invoices and other accounting records: six years from the end of the financial year, as Finnish accounting law requires",

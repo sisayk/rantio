@@ -1,0 +1,523 @@
+/* The site footer (SiteFooter.tsx). Light, like the rest of the site; its own colours so it
+   looks the same on the guest pages, the hosts page and the legal pages. */
+.footer {
+  --f-ink: #1d2a2e;
+  --f-soft: #5d6a6e;
+  --f-line: #e1e5e3;
+  --f-green: #1d4c3c;
+  --f-green-deep: #143a2d;
+  --f-sand: #f2efe8;
+  --f-yellow: #f2c14e;
+
+  margin-top: 56px;
+  padding: 0 max(40px, calc((100% - 1360px) / 2)) 28px;
+  border-top: 1px solid var(--f-line);
+  background: #fff;
+  color: var(--f-ink);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.footer h2,
+.footer h3 {
+  margin: 0;
+  font: inherit;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: inherit;
+}
+
+/* ---------- what Rantio stands for ---------- */
+.values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px 32px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--f-line);
+}
+
+.value {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.value svg {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--f-sand);
+  fill: none;
+  stroke: var(--f-green);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.value h3 {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.value p {
+  margin-top: 3px;
+  color: var(--f-soft);
+  font-size: 14px;
+}
+
+/* ---------- the app and the newsletter ---------- */
+.bands {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 40px 0;
+}
+
+.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 280px;
+  padding: 36px 0 0 40px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(242, 193, 78, 0.16), transparent 55%),
+    linear-gradient(135deg, var(--f-green), var(--f-green-deep));
+  color: #fff;
+}
+
+.appText {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-bottom: 36px;
+}
+
+.appText h2 {
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.appText p {
+  max-width: 34ch;
+  margin: 10px 0 22px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Two phones, the back one a little higher, cut off by the band's bottom edge. */
+.phones {
+  position: relative;
+  flex: none;
+  align-self: flex-end;
+  width: 300px;
+  height: 260px;
+  margin-right: 28px;
+}
+
+.phone {
+  position: absolute;
+  top: 34px;
+  width: 150px;
+  height: 300px;
+  padding: 6px;
+  border-radius: 30px;
+  background: #101614;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1.5px rgba(255, 255, 255, 0.14);
+}
+
+.back {
+  left: 0;
+  top: 8px;
+  transform: rotate(-6deg);
+}
+
+.front {
+  right: 0;
+  transform: rotate(4deg);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #f5f6f5;
+  color: var(--f-ink);
+}
+
+.island {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  z-index: 2;
+  width: 44px;
+  height: 13px;
+  border-radius: 999px;
+  background: #101614;
+  transform: translateX(-50%);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 28px 9px 8px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(29, 42, 46, 0.12);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.search svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.card {
+  margin: 0 9px 8px;
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #d9dedb;
+}
+
+.card strong,
+.detail strong {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 9.5px;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card small,
+.detail small {
+  display: block;
+  overflow: hidden;
+  color: var(--f-soft);
+  font-size: 8.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hero {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: #d9dedb;
+}
+
+.detail {
+  margin-top: -14px;
+  position: relative;
+  padding: 10px 10px 0;
+  border-radius: 14px 14px 0 0;
+  background: #fff;
+}
+
+.detail strong {
+  font-size: 11px;
+}
+
+.ask {
+  display: block;
+  margin-top: 10px;
+  padding: 6px 0;
+  border-radius: 999px;
+  background: var(--f-green);
+  color: #fff;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-inline: 6px;
+}
+
+/* ---------- newsletter ---------- */
+.news {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px;
+  border-radius: 24px;
+  background: var(--f-sand);
+}
+
+.news h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.news > p {
+  margin: 8px 0 18px;
+  color: var(--f-soft);
+}
+
+.newsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.newsRow input {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #cfd5d2;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--f-ink);
+  font: inherit;
+}
+
+.newsRow input:focus {
+  outline: 2px solid var(--f-green);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.newsRow input[aria-invalid="true"] {
+  border-color: #c4352b;
+}
+
+.newsRow button {
+  flex: none;
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--f-green);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.newsRow button:hover {
+  background: var(--f-green-deep);
+}
+
+.newsRow button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.newsNote,
+.newsError {
+  margin-top: 10px !important;
+  font-size: 13px;
+  color: var(--f-soft);
+}
+
+.newsError {
+  color: #c4352b;
+  font-weight: 600;
+}
+
+.newsDone {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 600;
+}
+
+.newsDone svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--f-green);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ---------- links ---------- */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  padding: 40px 0 32px;
+  border-top: 1px solid var(--f-line);
+}
+
+.wordmark {
+  display: inline-block;
+  font-size: 30px;
+}
+
+.brand p {
+  max-width: 34ch;
+  margin-top: 12px;
+  color: var(--f-soft);
+}
+
+.columns h2 {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--f-soft);
+}
+
+.columns ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.columns li + li {
+  margin-top: 8px;
+}
+
+.columns nav a {
+  text-decoration: none;
+}
+
+.columns nav a:hover,
+.columns nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.email {
+  display: block;
+  color: var(--f-soft);
+  font-size: 13px;
+  user-select: all;
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--f-line);
+  color: var(--f-soft);
+  font-size: 13px;
+}
+
+.bottom a {
+  margin-left: auto;
+  text-decoration: none;
+}
+
+.bottom a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- smaller screens ---------- */
+@media (max-width: 1100px) {
+  .values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bands {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .footer {
+    padding-inline: 16px;
+  }
+  .values {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 28px 0;
+  }
+  .bands {
+    padding: 28px 0;
+  }
+  .app {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 28px 24px 0;
+  }
+  .appText {
+    padding-bottom: 0;
+  }
+  .phones {
+    align-self: center;
+    width: 270px;
+    height: 250px;
+    margin: 28px 0 0;
+  }
+  .news {
+    padding: 24px;
+  }
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+    padding: 28px 0 24px;
+  }
+  .brand {
+    grid-column: 1 / -1;
+  }
+  .bottom a {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .newsRow {
+    flex-direction: column;
+  }
+  .newsRow input {
+    flex: none;
+  }
+}

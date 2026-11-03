@@ -161,6 +161,34 @@ class MonitorInterest(models.Model):
         return self.email
 
 
+class NewsletterSubscriber(models.Model):
+    """Someone who signed up for the guest newsletter in the site footer (double opt-in)."""
+
+    email = models.EmailField(unique=True)
+    language = models.CharField(max_length=2, choices=Language.choices, default=Language.ENGLISH)
+    # The key in the confirmation link and, later, in every newsletter's unsubscribe link.
+    token = models.CharField(max_length=64, unique=True)
+    source = models.CharField(max_length=80, blank=True, help_text="utm_source or referral")
+    created_at = models.DateTimeField(auto_now_add=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True, help_text="Clicked the link in the confirmation email")
+    unsubscribed_at = models.DateTimeField(null=True, blank=True)
+    # How many confirmation emails went out, and when the last one did: the form can't be
+    # used to flood someone else's inbox.
+    confirmations_sent = models.PositiveSmallIntegerField(default=0)
+    last_confirmation_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "newsletter subscriber"
+
+    def __str__(self) -> str:
+        return self.email
+
+    @property
+    def active(self) -> bool:
+        return bool(self.confirmed_at and not self.unsubscribed_at)
+
+
 class Owner(models.Model):
     """A cottage owner who has signed the service agreement."""
 

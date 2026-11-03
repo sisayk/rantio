@@ -6,7 +6,6 @@ import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
-import { CONTACT_EMAIL } from "@/lib/content";
 import { type Listing, listingCurrency, listingName, listingPhotos } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
@@ -19,7 +18,7 @@ import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Wordmark, People, Star } fr
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
-import AppBadges from "../AppBadges";
+import SiteFooter from "../SiteFooter";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
   const m = getMessages(lang);
@@ -181,18 +180,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <AppBadges t={m.common.apps} />
-        <p>{m.common.footer.note}</p>
-        <p className={styles.footerLinks}>
-          <span>
-            {m.common.footer.contact}: <span className={styles.selectable}>{CONTACT_EMAIL}</span>
-          </span>
-          <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
-          <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
-          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
-        </p>
-      </footer>
+      <SiteFooter lang={lang} variant="guest" />
     </div>
   );
 }

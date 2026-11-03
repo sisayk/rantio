@@ -1376,7 +1376,7 @@
   color: var(--g-soft);
 }
 
-/* ---------- host band + footer ---------- */
+/* ---------- host band ---------- */
 .hostBand {
   display: flex;
   align-items: center;
@@ -1409,28 +1409,6 @@
   color: var(--g-green);
   font-weight: 700;
   text-decoration: none;
-}
-
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 24px;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 32px 40px 48px;
-  font-size: 14px;
-  color: var(--g-soft);
-}
-
-.selectable {
-  user-select: all;
-}
-
-.footerLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
 }
 
 /* ---------- responsive ---------- */
@@ -1507,7 +1485,6 @@
   .categoriesInner { padding: 0 8px; justify-content: flex-start; }
   .listingArea { padding: 16px 16px 0; }
   .grid, .gridWithMap { grid-template-columns: 1fr; }
-  .footer { padding: 28px 16px 40px; }
   .popover { position: fixed; left: 16px; right: 16px; top: auto; bottom: 16px; }
   .popoverBare { position: fixed; left: 16px; right: 16px; top: auto; bottom: 16px; }
   .guestPanel { width: 100%; }
@@ -2119,11 +2096,6 @@
 .amenityGroups > div:has(li:nth-child(9)) li {
   margin-bottom: 14px;
   break-inside: avoid;
-}
-
-.detailPage .footer {
-  max-width: 1200px;
-  padding-inline: 32px;
 }
 
 .amenityGroups h3 {

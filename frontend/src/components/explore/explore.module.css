@@ -64,12 +64,6 @@
   padding: 44px 32px 72px;
 }
 
-.page > .footer {
-  width: 100%;
-  max-width: 1200px;
-  padding-inline: 32px;
-  border-top: 1px solid var(--g-line);
-}
 
 /* ---------- page heading ---------- */
 .head {
@@ -494,13 +488,11 @@
   .featuredBody { padding: 24px 24px 28px; }
   .featuredTitle { font-size: 28px; }
   .main { padding: 32px 24px 56px; }
-  .page > .footer { padding-inline: 24px; }
 }
 
 @media (max-width: 600px) {
   .topInner { padding: 8px 16px 0; }
   .main { padding: 24px 16px 48px; }
-  .page > .footer { padding-inline: 16px; }
   .head h1,
   .article h1 { font-size: 32px; }
   .head p { font-size: 17px; }

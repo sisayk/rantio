@@ -3,7 +3,7 @@ import { getMessages } from "@/i18n";
 import { countryName, fill, languageNamesIn, money } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { COMMISSION, CONTACT_EMAIL, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
+import { COMMISSION, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import { COUNTRIES } from "@/lib/listings";
 import { PHOTOS, SHOWCASE_CARDS } from "@/lib/showcase";
@@ -14,9 +14,9 @@ import HostSwitchLink from "./guest/HostSwitchLink";
 import { Wordmark } from "./guest/icons";
 import g from "./guest/guest.module.css";
 import styles from "./landing.module.css";
-import AppBadges from "./AppBadges";
 import MonitorWaitlist from "./MonitorWaitlist";
 import monitorPhoto from "@/assets/mokki-monitor.jpg";
+import SiteFooter from "./SiteFooter";
 
 // July 2027 at an example Saimaa cottage: Nettimökki weeks stay, gaps fill from abroad.
 const JULY_OFFSET = 3; // 1 July 2027 is a Thursday
@@ -312,18 +312,7 @@ export default function Landing({ lang }: { lang: Lang }) {
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <AppBadges t={m.common.apps} />
-        <p>{m.common.footer.note}</p>
-        <p className={styles.footerLinks}>
-          <span>
-            {m.common.footer.contact}: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          </span>
-          <a href={paths.privacy(lang)}>{m.common.footer.privacy}</a>
-          <a href={paths.terms(lang)}>{m.common.footer.terms}</a>
-          <a href="https://db-ip.com" rel="noopener">IP Geolocation by DB-IP</a>
-        </p>
-      </footer>
+      <SiteFooter lang={lang} variant="hosts" />
     </>
   );
 }
