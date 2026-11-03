@@ -59,7 +59,9 @@ g fetch -q origin main
 g reset -q --hard origin/main
 g branch -q --set-upstream-to=origin/main main
 STUGORA_DEPLOY_SHOW=1 bash "$APP/deploy/autodeploy.sh"
-systemctl is-active --quiet stugora-autodeploy.timer && echo "Automatic deploys are on."
+# Make sure the timer runs even if deploy.sh found no deploy key on an earlier run.
+systemctl enable --now stugora-autodeploy.timer >/dev/null
+echo "Automatic deploys are on (stugora-autodeploy.timer: $(systemctl is-active stugora-autodeploy.timer))."
 REMOTE
 
 echo
