@@ -180,7 +180,7 @@ ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <hello@rantio.fi>")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Rantio <info@rantio.fi>")
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )

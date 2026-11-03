@@ -177,7 +177,7 @@ cd ~/stugora/backend && .venv/bin/python manage.py test
 - Move the "Nearby" lookups (frontend/src/lib/nearby.ts) behind a small Django
   endpoint that caches Wikipedia's answer per cottage for a week, so each page
   view doesn't call Wikipedia from the guest's browser
-- Buy rantio.fi and set up hello@rantio.fi (used on the page)
+- Buy rantio.fi and set up info@rantio.fi (used on the page)
 - Privacy policy page (GDPR), naming Anthropic as processor for AI reply suggestions, and a link to it next to the consent box
 - Finnish copy checked by a native speaker
 - Confirm with the accountant that Elda-Auto Tmi charges VAT on Rantio fees

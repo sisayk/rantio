@@ -31,6 +31,8 @@ if [ ! -f /etc/letsencrypt/live/rantio.fi/fullchain.pem ]; then
   printf '#!/bin/sh\nsystemctl reload nginx\n' > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
   chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
 fi
+# The contact and sender address is info@rantio.fi (was hello@ in older settings files).
+sed -i 's/hello@rantio\.fi/info@rantio.fi/g' /srv/stugora/.env
 # Empty Google Maps lines (from an older env.example) would hide frontend/.env.production.
 sed -i '/^NEXT_PUBLIC_GOOGLE_MAPS_KEY=$/d; /^NEXT_PUBLIC_GOOGLE_MAP_ID=$/d' /srv/stugora/.env
 bash /srv/stugora/app/deploy/deploy.sh --skip-pull
