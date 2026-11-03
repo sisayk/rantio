@@ -270,3 +270,19 @@ systemctl restart stugora-django stugora-next
   rantio.fi, or sign-in codes will land in spam.
 - **Uptime check**: a free monitor (UptimeRobot, Better Stack) on
   https://rantio.fi/api/health/.
+
+## Automatic deploys
+
+Since November 2026 the server deploys by itself: `stugora-autodeploy.timer` checks
+github.com/sisayk/rantio every two minutes and deploys new commits on `main`
+(`deploy/autodeploy.sh`). It reads the repo with a read-only deploy key
+(`/root/.ssh/rantio-deploy` on the server; "Rantio server" under the repo's Settings →
+Deploy keys). https://rantio.fi/api/health/ shows the live commit and whether the
+last deploy worked; a failed deploy emails its log to info@rantio.fi.
+
+**On the server (after ssh)**, to deploy at once or look at the last deploy:
+
+```
+systemctl start stugora-autodeploy
+less /var/log/stugora-deploy.log
+```
