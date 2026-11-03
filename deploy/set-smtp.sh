@@ -12,8 +12,11 @@ SMTP_LOGIN="${BREVO_SMTP_LOGIN:-c14c53001@smtp-brevo.com}"
 TEST_TO="${1:-sisay.kelka@gmail.com}"
 OPTS="-i $KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 
-read -rsp "Paste the Brevo SMTP key (it won't show): " SMTP_KEY
+read -rsp "Press Enter to use the key on your clipboard (Brevo's Copy button), or paste it (hidden): " SMTP_KEY
 echo
+if [ -z "$SMTP_KEY" ] && command -v pbpaste >/dev/null; then
+  SMTP_KEY="$(pbpaste)"
+fi
 SMTP_KEY="$(printf '%s' "$SMTP_KEY" | tr -d '[:space:]')"
 [ -n "$SMTP_KEY" ] || { echo "No key given." >&2; exit 1; }
 # Brevo lists each key as **********<last 6>; compare before anything is saved.
