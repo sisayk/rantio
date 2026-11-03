@@ -13,7 +13,7 @@ export const et: Translation = {
       current: "Praegune keel",
     },
     footer: {
-      note: "Rantio on Elda-Auto Tmi kõrvalärinimi.",
+      note: "KMKR nr FI25654596",
       contact: "Kontakt",
       privacy: "Privaatsus",
       terms: "Tingimused",

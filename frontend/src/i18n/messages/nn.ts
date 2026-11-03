@@ -13,7 +13,7 @@ export const nn: Translation = {
       current: "Noverande språk",
     },
     footer: {
-      note: "Rantio er eit handelsnamn for Elda-Auto Tmi.",
+      note: "MVA-nummer FI25654596",
       contact: "Kontakt",
       privacy: "Personvern",
       terms: "Vilkår",

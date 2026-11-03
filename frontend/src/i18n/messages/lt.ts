@@ -13,7 +13,7 @@ export const lt: Translation = {
       current: "Dabartinė kalba",
     },
     footer: {
-      note: "Rantio yra Elda-Auto Tmi prekinis pavadinimas.",
+      note: "PVM mokėtojo kodas FI25654596",
       contact: "Kontaktai",
       privacy: "Privatumas",
       terms: "Sąlygos",

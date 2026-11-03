@@ -13,7 +13,7 @@ export const is: Translation = {
       current: "Núverandi tungumál",
     },
     footer: {
-      note: "Rantio er aukanafn Elda-Auto Tmi.",
+      note: "VSK-númer FI25654596",
       contact: "Hafa samband",
       privacy: "Persónuvernd",
       terms: "Skilmálar",

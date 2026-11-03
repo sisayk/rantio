@@ -13,7 +13,7 @@ export const sv: Translation = {
       current: "Nuvarande språk",
     },
     footer: {
-      note: "Rantio är en bifirma till Elda-Auto Tmi.",
+      note: "Momsregistreringsnummer FI25654596",
       contact: "Kontakt",
       privacy: "Integritet",
       terms: "Villkor",

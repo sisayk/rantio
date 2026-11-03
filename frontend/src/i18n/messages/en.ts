@@ -22,7 +22,7 @@ export const en = {
       current: "Current language",
     },
     footer: {
-      note: "Rantio is a trading name of Elda-Auto Tmi.",
+      note: "VAT FI25654596",
       contact: "Contact",
       privacy: "Privacy",
       terms: "Terms",

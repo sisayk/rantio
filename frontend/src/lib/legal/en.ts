@@ -14,7 +14,7 @@ export const en: LegalTexts = {
       {
         heading: "Who we are",
         paragraphs: [
-          "Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). Elda-Auto Tmi is the controller of the personal data described here.",
+          "Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID 2565459-6, VAT FI25654596). Elda-Auto Tmi is the controller of the personal data described here.",
           `Questions about privacy, or a request about your own data: ${CONTACT_EMAIL}. We answer within a month, usually much sooner.`,
         ],
       },
@@ -154,7 +154,7 @@ export const en: LegalTexts = {
       {
         heading: "Who runs Rantio",
         paragraphs: [
-          `Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID [Y-tunnus]). You can reach us at ${CONTACT_EMAIL}.`,
+          `Rantio is a trading name of Elda-Auto Tmi, a Finnish sole proprietorship (business ID 2565459-6, VAT FI25654596). You can reach us at ${CONTACT_EMAIL}.`,
           "Rantio lists Nordic and Baltic holiday cottages on Airbnb, Booking.com, Vrbo and other sites on behalf of their owners. On rantio.fi you can browse the cottages, see where each one can be booked and send the owner a question.",
         ],
       },

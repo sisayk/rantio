@@ -13,7 +13,7 @@ export const fi: Translation = {
       current: "Nykyinen kieli",
     },
     footer: {
-      note: "Rantio on Elda-Auto Tmi:n aputoiminimi.",
+      note: "ALV-numero FI25654596",
       contact: "Yhteys",
       privacy: "Tietosuoja",
       terms: "Käyttöehdot",

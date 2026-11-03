@@ -13,7 +13,7 @@ export const da: Translation = {
       current: "Nuværende sprog",
     },
     footer: {
-      note: "Rantio er et binavn for Elda-Auto Tmi.",
+      note: "Momsnummer FI25654596",
       contact: "Kontakt",
       privacy: "Privatliv",
       terms: "Vilkår",

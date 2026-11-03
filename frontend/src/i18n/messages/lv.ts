@@ -13,7 +13,7 @@ export const lv: Translation = {
       current: "Pašreizējā valoda",
     },
     footer: {
-      note: "Rantio ir uzņēmuma Elda-Auto Tmi papildu nosaukums.",
+      note: "PVN reģistrācijas Nr. FI25654596",
       contact: "Kontakti",
       privacy: "Privātums",
       terms: "Noteikumi",

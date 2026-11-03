@@ -14,7 +14,7 @@ export const fi: LegalTexts = {
       {
         heading: "Keitä olemme",
         paragraphs: [
-          "Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Elda-Auto Tmi on tässä kuvattujen henkilötietojen rekisterinpitäjä.",
+          "Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus 2565459-6, ALV-numero FI25654596). Elda-Auto Tmi on tässä kuvattujen henkilötietojen rekisterinpitäjä.",
           `Tietosuojaa koskevat kysymykset ja omia tietojasi koskevat pyynnöt: ${CONTACT_EMAIL}. Vastaamme kuukauden kuluessa, yleensä paljon nopeammin.`,
         ],
       },
@@ -154,7 +154,7 @@ export const fi: LegalTexts = {
       {
         heading: "Kuka Rantiota ylläpitää",
         paragraphs: [
-          `Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus [Y-tunnus]). Tavoitat meidät osoitteesta ${CONTACT_EMAIL}.`,
+          `Rantio on suomalaisen toiminimen Elda-Auto Tmi:n aputoiminimi (Y-tunnus 2565459-6, ALV-numero FI25654596). Tavoitat meidät osoitteesta ${CONTACT_EMAIL}.`,
           "Rantio ilmoittaa pohjoismaisia ja baltialaisia lomamökkejä omistajiensa puolesta Airbnb:ssä, Booking.comissa, Vrbossa ja muilla sivustoilla. Rantio.fi:ssä voit selata mökkejä, nähdä mistä kunkin voi varata ja lähettää omistajalle kysymyksen.",
         ],
       },
