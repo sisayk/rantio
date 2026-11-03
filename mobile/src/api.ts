@@ -78,6 +78,9 @@ const devHost = hostUri.split(":")[0];
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL || (hostUri ? `http://${hostUri}` : "https://rantio.fi")).replace(/\/$/, "");
 export const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL || (devHost ? `http://${devHost}:3100` : API_URL)).replace(/\/$/, "");
 
+/** The server sends uploaded photos as "/media/…"; the app needs the whole address. */
+export const mediaUrl = (url: string) => (url.startsWith("/") ? `${API_URL}${url}` : url);
+
 export class SignedOut extends Error {}
 export class ApiError extends Error {
   constructor(
@@ -127,7 +130,8 @@ async function upload<T>(path: string, form: FormData): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/${path}`, { method: "POST", body: form, headers });
-  } catch {
+  } catch (e) {
+    if (__DEV__) console.warn("[upload]", path, e); // what failed, in Metro's terminal
     throw new Offline("offline");
   }
   if (res.status === 401 || res.status === 403) {
@@ -192,9 +196,12 @@ export const ownerApi = {
   setListingStatus: (id: number, action: StatusAction) =>
     call<ListingDetail>(`owner/cottages/${id}/status/`, { ...json("POST", { action }), owner: true }),
   /** A photo from the phone: `uri` is a local file (already resized). */
-  addPhoto: (cottage: number, uri: string, kind?: PhotoKind) => {
+  addPhoto: async (cottage: number, uri: string, kind?: PhotoKind) => {
+    // Expo's fetch sends a file given as a File (expo-file-system), not React Native's
+    // { uri, name, type } object, which it rejects before anything is sent.
+    const { File } = await import("expo-file-system");
     const form = new FormData();
-    form.append("file", { uri, name: "photo.jpg", type: "image/jpeg" } as unknown as Blob);
+    form.append("file", new File(uri) as unknown as Blob);
     if (kind) form.append("kind", kind);
     return upload<ListingPhoto>(`owner/cottages/${cottage}/photos/`, form);
   },

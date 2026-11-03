@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from "react-native";
 
-import { type ListingSummary, ownerApi } from "@/api";
+import { type ListingSummary, mediaUrl, ownerApi } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadow, space } from "@/theme";
@@ -87,7 +87,7 @@ export default function Listings() {
             accessibilityLabel={c.name}
           >
             {c.cover ? (
-              <Image source={{ uri: c.cover }} style={styles.cover} contentFit="cover" transition={150} />
+              <Image source={{ uri: mediaUrl(c.cover) }} style={styles.cover} contentFit="cover" transition={150} />
             ) : (
               <View style={[styles.cover, styles.noCover]}>
                 <Icon name="image-outline" size={34} color={colors.faint} />

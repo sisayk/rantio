@@ -4,7 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, Linking, Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 
-import { ApiError, type ListingPhoto, Offline, ownerApi, type PhotoKind } from "@/api";
+import { ApiError, type ListingPhoto, mediaUrl, Offline, ownerApi, type PhotoKind } from "@/api";
 import { useListing } from "@/state/listing";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
@@ -182,7 +182,7 @@ export default function ListingPhotos() {
                   accessibilityLabel={`${t.kinds[photo.kind]}${i === 0 ? `, ${t.cover}` : ""}`}
                   style={({ pressed }) => [{ width: size }, pressed && { opacity: 0.8 }]}
                 >
-                  <Image source={{ uri: photo.url }} style={[styles.photo, { width: size, height: size * 0.75 }]} contentFit="cover" transition={150} />
+                  <Image source={{ uri: mediaUrl(photo.url) }} style={[styles.photo, { width: size, height: size * 0.75 }]} contentFit="cover" transition={150} />
                   {i === 0 ? (
                     <Text v="tiny" color="#fff" style={styles.badge}>
                       {t.cover}
@@ -217,7 +217,7 @@ export default function ListingPhotos() {
           <View style={{ flex: 1, backgroundColor: colors.page }}>
             <SheetBar title={m.app.listing.photoActions} onClose={() => setChosen(null)} />
             <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }}>
-              <Image source={{ uri: chosen.url }} style={styles.big} contentFit="cover" />
+              <Image source={{ uri: mediaUrl(chosen.url) }} style={styles.big} contentFit="cover" />
               <View style={{ gap: space.sm }}>
                 <Text v="smallMedium">{t.room}</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>

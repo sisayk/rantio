@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
-import { ApiError, ownerApi, type StatusAction } from "@/api";
+import { ApiError, mediaUrl, ownerApi, type StatusAction } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { useListing } from "@/state/listing";
 import { useT } from "@/text/i18n";
@@ -69,7 +69,7 @@ export default function ListingHub() {
       <PageBar title={listing.name} />
       <ScrollView contentContainerStyle={{ paddingBottom: space.xxl * 2 }}>
         {listing.cover ? (
-          <Image source={{ uri: listing.cover }} style={styles.cover} contentFit="cover" transition={150} />
+          <Image source={{ uri: mediaUrl(listing.cover) }} style={styles.cover} contentFit="cover" transition={150} />
         ) : (
           <View style={[styles.cover, styles.noCover]}>
             <Icon name="image-outline" size={40} color={colors.faint} />
