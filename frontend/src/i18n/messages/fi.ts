@@ -953,7 +953,7 @@ export const fi: Translation = {
       plusVat: "+ ALV {vat}",
       empty: "Ei vuosimaksuja tänä vuonna.",
     },
-    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on {fee} + ALV mökkiä kohden; pilottiomistajilla ensimmäinen vuosi on maksuton. Arvonlisävero on 25,5 %.",
+    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on {fee} + ALV mökkiä kohden; ensimmäiset 3 kuukautta ilmoituksen julkaisusta ovat maksuttomia. Arvonlisävero on 25,5 %.",
     ownBooking: "Oma varaus",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

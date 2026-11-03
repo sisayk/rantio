@@ -58,6 +58,8 @@ export type Summary = {
     listing_year: number | null;
     next_fee_on: string | null;
     next_fee: Money | null;
+    /** The last free day while the free trial runs. */
+    trial_until?: string | null;
     bookings: number;
     nights: number;
     payout: Money;

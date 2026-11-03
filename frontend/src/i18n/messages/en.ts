@@ -968,7 +968,7 @@ export const en = {
       plusVat: "+ VAT {vat}",
       empty: "No yearly fees this year.",
     },
-    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is {fee} + VAT per cottage; pilot owners' first year is free. VAT is 25.5%.",
+    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is {fee} + VAT per cottage; the first 3 months after a listing goes live are free. VAT is 25.5%.",
     ownBooking: "Own booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

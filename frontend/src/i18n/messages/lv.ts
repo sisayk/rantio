@@ -956,7 +956,7 @@ export const lv: Translation = {
       plusVat: "+ PVN {vat}",
       empty: "Šogad gada maksu nav.",
     },
-    howItWorks: "Komisija ir daļa no summas, ko vietne jums izmaksā par uzturēšanos (bez uzkopšanas maksas). Par Nettimökki un jūsu pašu rezervācijām komisija netiek ņemta. Gada maksa ir {fee} + PVN par katru māju; pilotprojekta īpašniekiem pirmais gads ir bez maksas. PVN ir 25,5 %.",
+    howItWorks: "Komisija ir daļa no summas, ko vietne jums izmaksā par uzturēšanos (bez uzkopšanas maksas). Par Nettimökki un jūsu pašu rezervācijām komisija netiek ņemta. Gada maksa ir {fee} + PVN par katru māju; pirmie 3 mēneši pēc sludinājuma publicēšanas ir bez maksas. PVN ir 25,5 %.",
     ownBooking: "Pašu rezervācija",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

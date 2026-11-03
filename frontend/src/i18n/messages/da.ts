@@ -956,7 +956,7 @@ export const da: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Ingen årsgebyrer i år.",
     },
-    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er {fee} + moms pr. sommerhus; for pilotejere er det første år gratis. Momsen er 25,5 %.",
+    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er {fee} + moms pr. sommerhus; de første 3 måneder efter at annoncen er gået online, er gratis. Momsen er 25,5 %.",
     ownBooking: "Egen booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

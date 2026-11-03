@@ -242,6 +242,17 @@ export const guestApi = {
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, json("POST", form)),
   rates: () => call<{ rates: Record<string, number>; date?: string }>("rates/"),
-  /** "List your cottage": the same sign-up as on rantio.fi/hosts. */
-  listCottage: (form: Record<string, string | number | boolean>) => call<unknown>("signups/", json("POST", form)),
+  /** "List your cottage": the same sign-up as on rantio.fi/hosts, with its photos (local JPEG files).
+   *  checkout_url, when set, is Stripe's page for saving a card for the free trial. */
+  listCottage: async (fields: Record<string, string | number | boolean>, photos: string[]) => {
+    const { File } = await import("expo-file-system");
+    const form = new FormData();
+    for (const [k, v] of Object.entries(fields)) form.append(k, String(v));
+    for (const uri of photos) form.append("photos", new File(uri) as unknown as Blob);
+    return upload<{ token: string; checkout_url: string | null }>("signups/", form);
+  },
+  signupCard: (token: string) =>
+    call<{ card_saved: boolean; name: string; card_step: boolean }>(`signups/${encodeURIComponent(token)}/card/`),
+  newCardPage: (token: string) =>
+    call<{ card_saved: boolean; checkout_url: string | null }>(`signups/${encodeURIComponent(token)}/card/`, json("POST", { app: true })),
 };

@@ -15,7 +15,7 @@ class InvoiceTests(TestCase):
     def setUp(self):
         self.owner = Owner.objects.create(name="Maija", email="maija@example.fi")
         self.cottage = Cottage.objects.create(owner=self.owner, name="Järvimökki", max_guests=6, price_per_night=150,
-                                              listing_started_on=date(2026, 11, 15))
+                                              listing_started_on=date(2026, 11, 15), trial_months=0)
         with alerts.muted():
             for channel, ci, payout in [
                 ("booking", date(2026, 11, 3), "500.00"),   # charged: 60.00
@@ -53,7 +53,7 @@ class InvoiceTests(TestCase):
     def test_swedish_owner_is_invoiced_in_kronor(self):
         erik = Owner.objects.create(name="Erik", email="erik@example.se", language="sv")
         stuga = Cottage.objects.create(owner=erik, name="Röda stugan", country="SE", max_guests=4, price_per_night=1500,
-                                       listing_started_on=date(2026, 11, 10))
+                                       listing_started_on=date(2026, 11, 10), trial_months=0)
         with alerts.muted():
             Booking.objects.create(cottage=stuga, channel="booking", check_in=date(2026, 11, 5), check_out=date(2026, 11, 8),
                                    owner_payout=Decimal("5500.00"))

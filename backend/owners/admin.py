@@ -17,24 +17,71 @@ from django.contrib import messages
 from . import booking_emails, invoicing, stripe_api
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
-    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup,
+    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, SignupPhoto,
 )
+
+
+class SignupPhotoInline(TabularInline):
+    model = SignupPhoto
+    extra = 0
+    fields = ["preview", "image", "position"]
+    readonly_fields = ["preview"]
+
+    @display(description="Photo")
+    def preview(self, obj):
+        if not obj.pk or not obj.image:
+            return "-"
+        return format_html('<a href="{0}" target="_blank"><img src="{0}" style="height:96px;border-radius:6px"></a>', obj.image.url)
 
 
 @admin.register(OwnerSignup)
 class OwnerSignupAdmin(ModelAdmin):
-    list_display = ["name", "email", "country", "region", "place", "cottage_count", "status", "created_at"]
-    list_filter = ["status", "country", "language"]
+    list_display = ["name", "email", "country", "region", "cottage_count", "listed_now", "photo_count", "card", "status", "created_at"]
+    list_filter = ["status", "country", "language", ("card_saved_at", admin.EmptyFieldListFilter)]
     list_editable = ["status"]
     search_fields = ["name", "email", "phone"]
-    readonly_fields = ["created_at", "privacy_consent", "source"]
+    readonly_fields = ["created_at", "privacy_consent", "source", "card", "stripe_customer_id"]
+    inlines = [SignupPhotoInline]
+    actions = ["copy_photos"]
     fieldsets = [
         ("Who", {"fields": ["name", "email", "phone", "language"], "classes": ["st-grid-2"]}),
-        ("Cottages", {"fields": ["country", "region", "place", "cottage_count", "nettimokki_url"], "classes": ["st-grid-2"]}),
+        ("Cottages", {"fields": ["country", "region", "place", "cottage_count", "listed_on", "nettimokki_url"],
+                      "classes": ["st-grid-2"]}),
         ("Their message", {"fields": ["message"]}),
         ("Follow-up", {"fields": ["status", "internal_notes"]}),
+        ("Free trial", {"fields": ["card", "stripe_customer_id"], "classes": ["st-grid-2"]}),
         ("From the form", {"fields": ["privacy_consent", "source", "created_at"], "classes": ["st-grid-3"]}),
     ]
+
+    @display(description="Listed now")
+    def listed_now(self, obj):
+        return obj.listed_on_display
+
+    @display(description="Photos")
+    def photo_count(self, obj):
+        return obj.photos.count()
+
+    @display(description="Card for the trial")
+    def card(self, obj):
+        return f"Saved {obj.card_saved_at:%-d.%-m.%Y}" if obj.card_saved_at else "Not saved"
+
+    @admin.action(description="Copy the photos to the owner's first cottage")
+    def copy_photos(self, request, queryset):
+        from django.core.files.base import ContentFile
+
+        for signup in queryset:
+            owner = Owner.objects.filter(signup=signup).first()
+            cottage = owner.cottages.order_by("pk").first() if owner else None
+            if not cottage:
+                self.message_user(request, f"{signup.name}: link the sign-up to an owner with a cottage first.", messages.WARNING)
+                continue
+            start = cottage.photos.count()
+            for i, photo in enumerate(signup.photos.all()):
+                with photo.image.open("rb") as f:
+                    data = f.read()
+                CottagePhoto.objects.create(cottage=cottage, position=start + i,
+                                            image=ContentFile(data, name=photo.image.name.rsplit("/", 1)[-1]))
+            self.message_user(request, f"{signup.name}: {signup.photos.count()} photos copied to {cottage.name}.")
 
 
 @admin.register(MonitorInterest)
@@ -85,13 +132,18 @@ class OwnerAdmin(ModelAdmin):
     list_filter = ["is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
-    readonly_fields = ["created_at", "stripe_customer_id", "signs_in_with"]
+    readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with"]
     fieldsets = [
         ("Owner", {"fields": ["name", "email", "phone", "language", "user", "signup", "signs_in_with"], "classes": ["st-grid-2"]}),
         ("Agreement", {"fields": ["is_pilot", "commission_rate", "vat_registered", "agreement_signed_on", "created_at"],
                        "classes": ["st-grid-2"]}),
-        ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id"], "classes": ["st-grid-2"]}),
+        ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id", "card"], "classes": ["st-grid-2"]}),
     ]
+
+    @display(description="Card")
+    def card(self, obj):
+        saved = obj.stripe_payment_method or (obj.signup.stripe_payment_method if obj.signup else "")
+        return "Saved: invoices are charged to it" if saved else "None: invoices are emailed"
 
     @display(description="Signs in with")
     def signs_in_with(self, obj):
@@ -134,7 +186,7 @@ class CottageAdmin(ModelAdmin):
     autocomplete_fields = ["owner"]
     readonly_fields = ["forwarding_address"]
     fieldsets = [
-        ("Cottage", {"fields": ["owner", "name", "status", "listing_slug", "listing_started_on"], "classes": ["st-grid-2"]}),
+        ("Cottage", {"fields": ["owner", "name", "status", "listing_slug", "listing_started_on", "trial_months"], "classes": ["st-grid-2"]}),
         ("Where", {"fields": ["country", "region", "municipality", "nettimokki_url"], "classes": ["st-grid-2"]}),
         ("Nettimökki booking emails", {
             "fields": ["forwarding_address"],

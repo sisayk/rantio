@@ -14,7 +14,7 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
         model = OwnerSignup
         fields = [
             "id", "name", "email", "phone", "language", "country", "region", "place", "cottage_count",
-            "nettimokki_url", "message", "privacy_consent", "source", "website",
+            "nettimokki_url", "listed_on", "message", "privacy_consent", "source", "website",
         ]
         read_only_fields = ["id"]
 
@@ -29,6 +29,14 @@ class OwnerSignupSerializer(serializers.ModelSerializer):
             if not (host == "nettimokki.com" or host.endswith(".nettimokki.com")):
                 raise serializers.ValidationError("Paste the link to your Nettimökki listing.")
         return value
+
+    def validate_listed_on(self, value: str) -> str:
+        keys = [k.strip() for k in value.split(",") if k.strip()]
+        if any(k not in OwnerSignup.LISTED_ON for k in keys):
+            raise serializers.ValidationError("Unknown site.")
+        if "none" in keys and len(keys) > 1:
+            keys = ["none"]
+        return ",".join(dict.fromkeys(keys))
 
     def validate_cottage_count(self, value: int) -> int:
         if value > 50:

@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Last updated: 3 November 2026";
+const UPDATED = "Last updated: 4 November 2026";
 
 export const en: LegalTexts = {
   privacy: {
@@ -35,7 +35,7 @@ export const en: LegalTexts = {
       {
         heading: "Cottage owners",
         paragraphs: [
-          "When you sign up, we save the details from the sign-up form so we can contact you and plan your listings. If you become a customer, we also keep your account, your cottages, bookings, fees and invoices. You sign in with a one-time code sent to your email or phone; codes stop working after 15 minutes and are stored only in scrambled (hashed) form. If you sign in with Google or Apple instead, they tell us your account's ID and email address, which we use only to recognise you.",
+          "When you sign up, we save the details and photos from the sign-up form so we can contact you and make your listings. For the free trial you then save a card on Stripe's page: Stripe keeps the card, and we only learn that one was saved. If you become a customer, we also keep your account, your cottages, bookings, fees and invoices. You sign in with a one-time code sent to your email or phone; codes stop working after 15 minutes and are stored only in scrambled (hashed) form. If you sign in with Google or Apple instead, they tell us your account's ID and email address, which we use only to recognise you.",
           "Legal basis: steps you asked for before a contract, and your consent in the sign-up form (article 6(1)(b) and (a)); carrying out the owner service agreement (6(1)(b)); and keeping the accounting records Finnish law requires (6(1)(c)).",
           "What we save:",
         ],
@@ -199,7 +199,7 @@ export const en: LegalTexts = {
         heading: "Owner accounts",
         paragraphs: [
           "Cottage owners can ask to join through the sign-up form; sending it doesn't commit you to anything. Owners sign in with a one-time code sent to their email, so keep your email account safe and don't share the codes.",
-          "Our service for owners, including the yearly fee per cottage (€99, or SEK 1,080, NOK 1,030, DKK 740 or ISK 13,500 for a cottage in Sweden, Norway, Denmark or Iceland), the 12% commission on bookings from the channels Rantio adds (VAT is added to both) and invoicing through Stripe, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
+          "Our service for owners, including the yearly fee per cottage (€99, or SEK 1,080, NOK 1,030, DKK 740 or ISK 13,500 for a cottage in Sweden, Norway, Denmark or Iceland), the 12% commission on bookings from the channels Rantio adds (VAT is added to both), the free trial (no yearly fee for the first 3 months after a listing goes live) and invoicing through Stripe, charged to the card saved at sign-up, is covered by a separate owner service agreement that we sign with each owner. Where that agreement says something different from these terms, the agreement applies.",
         ],
       },
       {

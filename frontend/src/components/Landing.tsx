@@ -2,6 +2,7 @@
 import { getMessages } from "@/i18n";
 import { countryName, fill, languageNamesIn, money } from "@/i18n/format";
 import { LANG_INFO, type Lang, LANGS } from "@/i18n/locales";
+import { TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { CHANNELS } from "@/lib/catalog";
 import { COMMISSION, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
@@ -245,6 +246,33 @@ export default function Landing({ lang }: { lang: Lang }) {
           </div>
         </section>
 
+        {/* Owners who aren't listed anywhere yet */}
+        <section className={styles.wide} aria-labelledby="scratch-title">
+          <div className={styles.scratch}>
+            <div>
+              <h2 id="scratch-title" className={styles.sectionTitle}>
+                {TRIAL[lang].scratchTitle}
+              </h2>
+              <p className={styles.sectionLead}>{TRIAL[lang].scratchBody}</p>
+            </div>
+            <div className={styles.scratchSide}>
+              <ul className={styles.scratchPoints}>
+                {TRIAL[lang].scratchPoints.map((point) => (
+                  <li key={point}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <a className={styles.primaryButton} href="#ilmoita">
+                {t.hero.cta}
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* How it works */}
         <section className={styles.wide} aria-labelledby="how-title">
           <h2 id="how-title" className={styles.sectionTitle}>
@@ -273,6 +301,10 @@ export default function Landing({ lang }: { lang: Lang }) {
               {fill(lang, t.price.title, { fee })}
             </h2>
             <p className={styles.sectionLead}>{t.price.lead}</p>
+            <div className={styles.priceTrial}>
+              <span className={styles.trialBadge}>{TRIAL[lang].badge}</span>
+              <p>{TRIAL[lang].priceNote}</p>
+            </div>
             <p className={styles.priceTerms}>{t.price.terms}</p>
           </div>
           <div className={styles.priceCard}>

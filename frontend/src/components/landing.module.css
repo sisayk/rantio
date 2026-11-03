@@ -1442,3 +1442,243 @@
     font-size: 9px;
   }
 }
+
+/* ---------- Sign-up photos and the free trial ---------- */
+.photoSet {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.photoSet legend {
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.photoHint {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photoThumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.photoThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photoThumb button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--pill);
+  background: rgba(30, 42, 48, 0.75);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.photoAdd {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  aspect-ratio: 1;
+  padding: 8px;
+  border: 1.5px dashed #b3bcbf;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.photoAdd span {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--lake);
+}
+
+.photoAdd input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.photoAdd:focus-within {
+  border-color: var(--ink);
+  border-style: solid;
+}
+
+.photoAdd[data-invalid="true"] {
+  border-color: var(--error);
+}
+
+.photoAdd[data-busy] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.trialBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--pill);
+  background: var(--pine-tint);
+  color: var(--lake-deep);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cardNote {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.priceTrial {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--pine-tint);
+  color: var(--lake-deep);
+  font-size: 15px;
+}
+
+.priceTrial .trialBadge {
+  background: var(--lake);
+  color: #fff;
+}
+
+/* Owners who aren't listed anywhere yet */
+.scratch {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 32px 56px;
+  align-items: center;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.scratchSide {
+  display: grid;
+  gap: 22px;
+  justify-items: start;
+}
+
+.scratchPoints {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.scratchPoints li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scratchPoints svg {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: var(--lake);
+  color: #fff;
+}
+
+@media (max-width: 860px) {
+  .scratch {
+    grid-template-columns: 1fr;
+    padding: 28px 22px;
+  }
+}
+
+/* Where the cottage is listed now */
+.listedSet {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.listedSet legend {
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.listedChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.listedChip {
+  position: relative;
+  cursor: pointer;
+}
+
+.listedChip input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.listedChip span {
+  display: inline-block;
+  padding: 9px 16px;
+  border: 1px solid #b3bcbf;
+  border-radius: var(--pill);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.listedChip input:checked + span {
+  border-color: var(--lake);
+  background: var(--lake);
+  color: #fff;
+}
+
+.listedChip input:focus-visible + span {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

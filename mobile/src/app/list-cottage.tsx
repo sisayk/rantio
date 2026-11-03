@@ -1,12 +1,14 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { countryName } from "@/i18n/format";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
+import { LISTED_ON, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
 import { PLACES } from "@/lib/places";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
@@ -20,13 +22,21 @@ const NETTIMOKKI = /^https?:\/\/([a-z0-9-]+\.)*nettimokki\.com(\/|$)/i;
 // The country the form starts with, from the app's language (English: none chosen yet).
 const LANG_COUNTRY: Record<string, Country> = { fi: "FI", sv: "SE", nb: "NO", nn: "NO", da: "DK", is: "IS", et: "EE", lv: "LV", lt: "LT" };
 
-type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimokki" | "consent" | "form", string>>;
+const LONG_SIDE = 2400; // as the listing photos: big enough for any screen, quick to upload
 
-/** "List your cottage" inside the app: the same sign-up as on rantio.fi/hosts. */
+type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimokki" | "photos" | "consent" | "form", string>>;
+// After the form: Stripe's card page for the free trial, then whether the card was saved.
+type Step = "form" | "checking" | "saved" | "notSaved" | "thanks";
+
+/** "List your cottage" inside the app: the same sign-up as on rantio.fi/hosts, with photos,
+ *  then a card saved on Stripe's page for the 3 free months. */
 export default function ListCottage() {
   const { m, lang, f } = useT();
   const t = m.owner.form;
+  const tr = TRIAL[lang];
   const router = useRouter();
+  // rantio://list-cottage?signup=… (the welcome page sends the owner back here)
+  const params = useLocalSearchParams<{ signup?: string }>();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -37,10 +47,105 @@ export default function ListCottage() {
   const [nettimokki, setNettimokki] = useState("");
   const [message, setMessage] = useState("");
   const [consent, setConsent] = useState(false);
+  const [listed, setListed] = useState<ListedOn[]>([]);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [preparing, setPreparing] = useState(false);
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [done, setDone] = useState(false);
+  const [step, setStep] = useState<Step>(params.signup ? "checking" : "form");
+  const [submitted, setToken] = useState("");
+  const token = submitted || params.signup || "";
+  const [firstName, setFirstName] = useState("");
+
+  const askNettimokki = country === "FI" && listed.includes("nettimokki");
+  const toggleListed = (key: ListedOn) =>
+    setListed((now) =>
+      now.includes(key) ? now.filter((k) => k !== key) : key === "none" ? ["none"] : [...now.filter((k) => k !== "none"), key],
+    );
+
+  const showCard = useCallback((res: { card_saved: boolean; name: string; card_step: boolean }) => {
+    if (res.name) setFirstName(res.name);
+    setStep(res.card_saved ? "saved" : res.card_step ? "notSaved" : "thanks");
+  }, []);
+  const checkCard = async (signup: string) => {
+    setStep("checking");
+    await guestApi.signupCard(signup).then(showCard, () => setStep("notSaved"));
+  };
+
+  useEffect(() => {
+    // Opened by the link from the welcome page: the screen starts on "checking".
+    if (!params.signup) return;
+    guestApi.signupCard(params.signup).then(showCard, () => setStep("notSaved"));
+  }, [params.signup, showCard]);
+
+  // Stripe's page in a browser sheet; the welcome page opens rantio://list-cottage, which closes it.
+  const saveCard = async (url: string, signup: string) => {
+    const WebBrowser = await import("expo-web-browser");
+    await WebBrowser.openAuthSessionAsync(url, "rantio://list-cottage").catch(() => undefined);
+    await checkCard(signup);
+  };
+
+  const retryCard = async () => {
+    setBusy(true);
+    try {
+      const res = await guestApi.newCardPage(token);
+      if (res.checkout_url) await saveCard(res.checkout_url, token);
+      else setStep(res.card_saved ? "saved" : "thanks");
+    } catch {
+      setErrors({ form: f(tr.welcome.failed, { email: CONTACT_EMAIL }) });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const addPhotos = async () => {
+    setErrors((e) => ({ ...e, photos: undefined }));
+    let ImagePicker: typeof import("expo-image-picker");
+    let Manipulator: typeof import("expo-image-manipulator");
+    try {
+      ImagePicker = await import("expo-image-picker");
+      Manipulator = await import("expo-image-manipulator");
+    } catch {
+      return setErrors((e) => ({ ...e, photos: tr.photoType }));
+    }
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert(m.app.listing.permission, undefined, [
+        { text: m.app.common.cancel, style: "cancel" },
+        { text: m.app.menu.openSettings, onPress: () => Linking.openSettings() },
+      ]);
+      return;
+    }
+    const room = MAX_SIGNUP_PHOTOS - photos.length;
+    if (room <= 0) return setErrors((e) => ({ ...e, photos: tr.tooManyPhotos }));
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 1,
+      exif: false,
+      allowsMultipleSelection: true,
+      selectionLimit: room,
+      orderedSelection: true,
+      preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+    });
+    if (result.canceled || !result.assets.length) return;
+    setPreparing(true);
+    const ready: string[] = [];
+    for (const a of result.assets.slice(0, room)) {
+      try {
+        // A JPEG no longer than LONG_SIDE, as the website makes before uploading.
+        const ctx = Manipulator.ImageManipulator.manipulate(a.uri);
+        if (Math.max(a.width, a.height) > LONG_SIDE) ctx.resize(a.width >= a.height ? { width: LONG_SIDE } : { height: LONG_SIDE });
+        const image = await ctx.renderAsync();
+        const saved = await image.saveAsync({ compress: 0.82, format: Manipulator.SaveFormat.JPEG });
+        ready.push(saved.uri);
+      } catch {
+        setErrors((e) => ({ ...e, photos: tr.photoType }));
+      }
+    }
+    setPreparing(false);
+    setPhotos((now) => [...now, ...ready].slice(0, MAX_SIGNUP_PHOTOS));
+  };
 
   const regions = country
     ? [...PLACES[country]].sort((a, b) => regionLabel(a, country, lang).localeCompare(regionLabel(b, country, lang), lang))
@@ -55,13 +160,14 @@ export default function ListCottage() {
     if (!EMAIL.test(email.trim())) e.email = email.trim() ? t.errors.email : t.errors.required;
     if (!country) e.country = t.errors.required;
     else if (!region) e.region = t.errors.required;
-    if (country === "FI" && nettimokki.trim() && !NETTIMOKKI.test(nettimokki.trim())) e.nettimokki = t.errors.nettimokki;
+    if (askNettimokki && nettimokki.trim() && !NETTIMOKKI.test(nettimokki.trim())) e.nettimokki = t.errors.nettimokki;
+    if (!photos.length) e.photos = tr.photosRequired;
     if (!consent) e.consent = t.errors.consent;
     setErrors(e);
     if (Object.keys(e).length) return;
     setBusy(true);
     try {
-      await guestApi.listCottage({
+      const res = await guestApi.listCottage({
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -70,13 +176,18 @@ export default function ListCottage() {
         region,
         place: place.trim().slice(0, 100),
         cottage_count: count,
-        nettimokki_url: country === "FI" ? nettimokki.trim() : "",
+        nettimokki_url: askNettimokki ? nettimokki.trim() : "",
+        listed_on: listed.join(","),
         message: message.trim(),
         privacy_consent: true,
         source: "app",
         website: "",
-      });
-      setDone(true);
+        app: 1,
+      }, photos);
+      setToken(res.token);
+      setFirstName(name.trim().split(" ")[0]);
+      if (res.checkout_url) await saveCard(res.checkout_url, res.token);
+      else setStep("thanks");
     } catch (err) {
       const detail = err instanceof ApiError && err.status === 400 ? err.body : {};
       setErrors(
@@ -88,26 +199,49 @@ export default function ListCottage() {
               ? { region: t.errors.required }
               : detail.nettimokki_url
                 ? { nettimokki: t.errors.nettimokki }
-                : { form: err instanceof Offline ? m.app.common.offline : t.errors.network.replace("{email}", CONTACT_EMAIL) },
+                : detail.photos
+                  ? { photos: String(detail.photos).includes("too_big") ? tr.photoBig : tr.photoType }
+                  : { form: err instanceof Offline ? m.app.common.offline : t.errors.network.replace("{email}", CONTACT_EMAIL) },
       );
     } finally {
       setBusy(false);
     }
   };
 
-  if (done) {
+  if (step !== "form") {
+    const [title, lead] =
+      step === "saved"
+        ? [tr.welcome.title, f(tr.welcome.lead, { name: firstName })]
+        : step === "notSaved"
+          ? [tr.welcome.notSavedTitle, tr.welcome.notSavedLead]
+          : step === "thanks"
+            ? [t.successTitle, f(t.success, { name: firstName })]
+            : [tr.welcome.checking, ""];
     return (
       <View style={{ flex: 1, backgroundColor: colors.page }}>
         <SheetBar title={m.owner.nav.cta} onClose={close} />
         <View style={styles.done}>
-          <Text style={{ fontSize: 56, lineHeight: 64 }}>🏡</Text>
+          {step === "checking" ? <ActivityIndicator color={colors.green} /> : <Text style={{ fontSize: 56, lineHeight: 64 }}>{step === "notSaved" ? "💳" : "🏡"}</Text>}
           <Text v="title" style={{ textAlign: "center" }}>
-            {t.successTitle}
+            {title}
           </Text>
-          <Text v="body" color={colors.soft} style={{ textAlign: "center" }}>
-            {f(t.success, { name: name.trim().split(" ")[0] })}
-          </Text>
-          <Button label={m.app.common.done} onPress={close} style={{ alignSelf: "stretch", marginTop: space.lg }} />
+          {lead ? (
+            <Text v="body" color={colors.soft} style={{ textAlign: "center" }}>
+              {lead}
+            </Text>
+          ) : null}
+          {errors.form ? <Problem text={errors.form} /> : null}
+          {step === "notSaved" ? (
+            <Button label={tr.welcome.retry} busy={busy} onPress={retryCard} style={{ alignSelf: "stretch", marginTop: space.lg }} />
+          ) : null}
+          {step !== "checking" ? (
+            <Button
+              kind={step === "notSaved" ? "ghost" : "primary"}
+              label={m.app.common.done}
+              onPress={close}
+              style={{ alignSelf: "stretch", marginTop: step === "notSaved" ? 0 : space.lg }}
+            />
+          ) : null}
         </View>
       </View>
     );
@@ -212,7 +346,25 @@ export default function ListCottage() {
               ))}
             </View>
 
-            {country === "FI" ? (
+            <Text v="smallMedium">{tr.listedOn}</Text>
+            <Text v="small">{tr.listedHint}</Text>
+            <View style={styles.chips}>
+              {LISTED_ON.map((key) => (
+                <Pressable
+                  key={key}
+                  onPress={() => toggleListed(key)}
+                  style={[styles.chip, listed.includes(key) && styles.chipOn]}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: listed.includes(key) }}
+                >
+                  <Text v="smallMedium" color={listed.includes(key) ? "#fff" : colors.ink}>
+                    {tr.listedOptions[key]}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {askNettimokki ? (
               <Field
                 label={t.nettimokki}
                 optional={t.optional}
@@ -226,6 +378,42 @@ export default function ListCottage() {
             ) : null}
             <Field label={t.message} optional={t.optional} value={message} onChangeText={setMessage} multiline maxLength={2000} />
 
+            <Text v="bodyMedium" style={{ marginTop: space.sm }}>
+              {tr.photos}
+            </Text>
+            <Text v="small">{tr.photosHint}</Text>
+            <View style={styles.photoGrid}>
+              {photos.map((uri, i) => (
+                <View key={uri} style={styles.photo}>
+                  <Image source={{ uri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+                  <Pressable
+                    onPress={() => setPhotos((now) => now.filter((u) => u !== uri))}
+                    style={styles.photoRemove}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${tr.removePhoto} ${i + 1}`}
+                    hitSlop={8}
+                  >
+                    <Icon name="close" size={16} color="#fff" />
+                  </Pressable>
+                </View>
+              ))}
+              {photos.length < MAX_SIGNUP_PHOTOS ? (
+                <Pressable
+                  onPress={addPhotos}
+                  disabled={preparing}
+                  style={[styles.photo, styles.photoAdd, errors.photos ? { borderColor: colors.error } : null]}
+                  accessibilityRole="button"
+                  accessibilityLabel={tr.addPhotos}
+                >
+                  {preparing ? <ActivityIndicator color={colors.green} /> : <Icon name="add" size={28} color={colors.green} />}
+                  <Text v="tiny" style={{ textAlign: "center" }}>
+                    {tr.addPhotos}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
+            {errors.photos ? <Text v="small" color={colors.error}>{errors.photos}</Text> : null}
+
             <Pressable onPress={() => setConsent(!consent)} style={styles.consent} accessibilityRole="checkbox" accessibilityState={{ checked: consent }}>
               <Icon name={consent ? "checkbox" : "square-outline"} size={24} color={errors.consent ? colors.error : colors.green} />
               <Text v="small" style={{ flex: 1 }}>
@@ -235,7 +423,13 @@ export default function ListCottage() {
             <Button kind="ghost" small label={t.privacyLink} onPress={() => openSite(`/${lang}/privacy`)} style={{ alignSelf: "flex-start", paddingHorizontal: 0 }} />
             {errors.consent ? <Text v="small" color={colors.error}>{errors.consent}</Text> : null}
             {errors.form ? <Problem text={errors.form} /> : null}
-            <Button label={busy ? t.sending : t.submit} busy={busy} onPress={submit} />
+            <View style={styles.trial}>
+              <Text v="smallMedium" color={colors.green}>
+                {tr.badge}
+              </Text>
+              <Text v="small">{tr.cardNote}</Text>
+            </View>
+            <Button label={busy ? t.sending : tr.submit} busy={busy} disabled={preparing} onPress={submit} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -285,5 +479,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   consent: { flexDirection: "row", gap: space.sm, alignItems: "center" },
+  photoGrid: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
+  photo: { width: 92, height: 92, borderRadius: radius.sm, overflow: "hidden", backgroundColor: colors.ground },
+  photoAdd: { alignItems: "center", justifyContent: "center", gap: 2, borderWidth: 1.5, borderStyle: "dashed", borderColor: colors.line, padding: 4 },
+  photoRemove: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(30, 42, 48, 0.75)",
+  },
+  trial: { gap: 4, padding: space.md, borderRadius: radius.sm, backgroundColor: colors.ground },
   done: { flex: 1, alignItems: "center", justifyContent: "center", gap: space.md, padding: space.xl },
 });

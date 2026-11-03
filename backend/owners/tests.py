@@ -136,18 +136,31 @@ class CommissionTests(TestCase):
 
     def test_pilot_first_year_free_then_paid(self):
         pilot = Owner.objects.create(name="Pilot", email="pilot@example.fi", is_pilot=True)
-        cottage = Cottage.objects.create(owner=pilot, name="Kelo", region="lapland", max_guests=4, price_per_night=Decimal("180"))
+        cottage = Cottage.objects.create(owner=pilot, name="Kelo", region="lapland", max_guests=4, price_per_night=Decimal("180"),
+                                         trial_months=0)
         self.assertEqual(cottage.yearly_fee(1), Decimal("0.00"))
         self.assertEqual(cottage.yearly_fee(2), Decimal("99.00"))
 
     def test_listing_years(self):
+        self.cottage.trial_months = 0  # listed before the free trial
         self.cottage.listing_started_on = date(2026, 10, 31)
         self.assertIsNone(self.cottage.listing_year_on(date(2026, 10, 30)))
         self.assertEqual(self.cottage.listing_year_on(date(2027, 10, 30)), 1)
         self.assertEqual(self.cottage.listing_year_on(date(2027, 10, 31)), 2)
         self.assertEqual(self.cottage.listing_year_starts_on(2), date(2027, 10, 31))
 
+    def test_free_trial_comes_before_listing_year_1(self):
+        self.cottage.listing_started_on = date(2026, 11, 30)
+        self.assertEqual(self.cottage.trial_months, 3)
+        self.assertEqual(self.cottage.listing_year_on(date(2026, 11, 30)), 0)
+        self.assertEqual(self.cottage.listing_year_on(date(2027, 2, 27)), 0)
+        self.assertEqual(self.cottage.trial_ends_on, date(2027, 2, 28))
+        self.assertEqual(self.cottage.listing_year_on(date(2027, 2, 28)), 1)
+        self.assertEqual(self.cottage.listing_year_starts_on(2), date(2028, 2, 29))  # 15 months after, a leap year
+        self.assertEqual(self.cottage.listing_year_on(date(2028, 2, 29)), 2)
+
     def test_listing_year_clamps_month_end(self):
+        self.cottage.trial_months = 0
         self.cottage.listing_started_on = date(2028, 2, 29)
         self.assertEqual(self.cottage.listing_year_starts_on(2), date(2029, 2, 28))
 

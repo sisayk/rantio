@@ -956,7 +956,7 @@ export const is: Translation = {
       plusVat: "+ VSK {vat}",
       empty: "Engin árgjöld í ár.",
     },
-    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er {fee} + VSK á hvern bústað; fyrir tilraunaeigendur er fyrsta árið ókeypis. Virðisaukaskattur er 25,5 %.",
+    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er {fee} + VSK á hvern bústað; fyrstu 3 mánuðirnir eftir að auglýsingin fer í loftið eru ókeypis. Virðisaukaskattur er 25,5 %.",
     ownBooking: "Eigin bókun",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

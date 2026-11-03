@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Päivitetty viimeksi 3.11.2026";
+const UPDATED = "Päivitetty viimeksi 4.11.2026";
 
 export const fi: LegalTexts = {
   privacy: {
@@ -35,7 +35,7 @@ export const fi: LegalTexts = {
       {
         heading: "Mökkien omistajat",
         paragraphs: [
-          "Kun ilmoittaudut, tallennamme lomakkeen tiedot, jotta voimme ottaa sinuun yhteyttä ja suunnitella ilmoituksesi. Jos sinusta tulee asiakas, säilytämme myös tilisi, mökkisi, varaukset, maksut ja laskut. Kirjaudut sisään sähköpostiisi tai puhelimeesi lähetettävällä kertakäyttöisellä koodilla. Koodi vanhenee 15 minuutissa, ja tallennamme sen vain salattuna (tiivisteenä). Jos kirjaudut Googlella tai Applella, ne kertovat meille tilisi tunnisteen ja sähköpostiosoitteen, joita käytämme vain tunnistaaksemme sinut.",
+          "Kun ilmoittaudut, tallennamme lomakkeen tiedot ja kuvat, jotta voimme ottaa sinuun yhteyttä ja tehdä ilmoituksesi. Maksutonta kokeilua varten tallennat sen jälkeen kortin Stripen sivulla: Stripe säilyttää kortin, ja me saamme tietää vain, että kortti on tallennettu. Jos sinusta tulee asiakas, säilytämme myös tilisi, mökkisi, varaukset, maksut ja laskut. Kirjaudut sisään sähköpostiisi tai puhelimeesi lähetettävällä kertakäyttöisellä koodilla. Koodi vanhenee 15 minuutissa, ja tallennamme sen vain salattuna (tiivisteenä). Jos kirjaudut Googlella tai Applella, ne kertovat meille tilisi tunnisteen ja sähköpostiosoitteen, joita käytämme vain tunnistaaksemme sinut.",
           "Käsittelyperuste: pyytämäsi toimet ennen sopimusta ja ilmoittautumislomakkeella antamasi suostumus (6 artiklan 1 kohdan b ja a alakohta), omistajan palvelusopimuksen toteuttaminen (b alakohta) sekä kirjanpitolain edellyttämien tositteiden säilyttäminen (c alakohta).",
           "Mitä tallennamme:",
         ],
@@ -199,7 +199,7 @@ export const fi: LegalTexts = {
         heading: "Omistajien tilit",
         paragraphs: [
           "Mökkien omistajat voivat ilmoittautua mukaan lomakkeella; lomakkeen lähettäminen ei sido sinua mihinkään. Omistajat kirjautuvat sisään sähköpostiin lähetettävällä kertakäyttöisellä koodilla, joten pidä sähköpostitilisi turvassa äläkä jaa koodeja.",
-          "Palvelustamme omistajille, kuten vuosimaksusta mökkiä kohden (99 euroa, tai Ruotsissa, Norjassa, Tanskassa tai Islannissa olevasta mökistä 1 080 SEK, 1 030 NOK, 740 DKK tai 13 500 ISK), 12 prosentin provisiosta Rantion lisäämien kanavien varauksista (molempiin lisätään arvonlisävero) ja laskutuksesta Stripen kautta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
+          "Palvelustamme omistajille, kuten vuosimaksusta mökkiä kohden (99 euroa, tai Ruotsissa, Norjassa, Tanskassa tai Islannissa olevasta mökistä 1 080 SEK, 1 030 NOK, 740 DKK tai 13 500 ISK), 12 prosentin provisiosta Rantion lisäämien kanavien varauksista (molempiin lisätään arvonlisävero), maksuttomasta kokeilusta (ei vuosimaksua 3 ensimmäiseltä kuukaudelta ilmoituksen julkaisusta) ja laskutuksesta Stripen kautta ilmoittautuessa tallennetulta kortilta, sovitaan erillisessä palvelusopimuksessa, jonka allekirjoitamme jokaisen omistajan kanssa. Jos sopimus poikkeaa näistä ehdoista, noudatetaan sopimusta.",
         ],
       },
       {

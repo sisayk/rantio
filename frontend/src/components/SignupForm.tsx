@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
+import { LISTED_ON, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
+import { ACCEPTED, preparePhoto } from "@/lib/imagePrep";
 import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import styles from "./landing.module.css";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
-
-type Field = "name" | "email" | "country" | "region" | "nettimokki_url" | "privacy_consent";
+type Field = "name" | "email" | "country" | "region" | "nettimokki_url" | "photos" | "privacy_consent";
+type Photo = { id: number; blob: Blob; name: string; url: string };
 
 // The country the form starts with, from the page's language (English: none chosen yet).
 const LANG_COUNTRY: Partial<Record<Lang, Country>> = {
@@ -37,7 +38,52 @@ type Props = {
 
 export default function SignupForm({ lang, f: words, countries }: Props) {
   const f = { ...words, errors: { ...words.errors, network: words.errors.network.replace("{email}", CONTACT_EMAIL) } };
+  const tr = TRIAL[lang];
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  // Where the cottage is listed now; "none" (not anywhere yet) and the sites exclude each other.
+  const [listed, setListed] = useState<ListedOn[]>([]);
+  const toggleListed = (key: ListedOn) =>
+    setListed((now) =>
+      now.includes(key) ? now.filter((k) => k !== key) : key === "none" ? ["none"] : [...now.filter((k) => k !== "none"), key],
+    );
+  const [preparing, setPreparing] = useState(false);
+  const nextId = useRef(1);
+  const picker = useRef<HTMLInputElement>(null);
+  // Let go of the previews' memory when the form goes away.
+  const shown = useRef(photos);
+  useEffect(() => {
+    shown.current = photos;
+  }, [photos]);
+  useEffect(() => () => shown.current.forEach((p) => URL.revokeObjectURL(p.url)), []);
+
+  async function addPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    const room = MAX_SIGNUP_PHOTOS - photos.length;
+    const chosen = Array.from(files).slice(0, Math.max(room, 0));
+    let problem = files.length > room ? tr.tooManyPhotos : "";
+    setPreparing(true);
+    const added: Photo[] = [];
+    for (const file of chosen) {
+      try {
+        const ready = await preparePhoto(file);
+        added.push({ id: nextId.current++, ...ready, url: URL.createObjectURL(ready.blob) });
+      } catch (e) {
+        problem = (e as Error).message === "too_big" ? tr.photoBig : tr.photoType;
+      }
+    }
+    setPreparing(false);
+    setPhotos((now) => [...now, ...added]);
+    setErrors((now) => ({ ...now, photos: problem || undefined }));
+  }
+
+  function removePhoto(id: number) {
+    setPhotos((now) => {
+      const gone = now.find((p) => p.id === id);
+      if (gone) URL.revokeObjectURL(gone.url);
+      return now.filter((p) => p.id !== id);
+    });
+  }
   const [errors, setErrors] = useState<Errors>({});
   const [doneName, setDoneName] = useState("");
   // Where the cottage is: the country, then one of its official regions, then (optional) the town.
@@ -47,7 +93,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     ? [...PLACES[country]].sort((a, b) => regionLabel(a, country, lang).localeCompare(regionLabel(b, country, lang), lang))
     : [];
   const towns = PLACES[country as Country]?.find((r) => r.id === region)?.cities.map((c) => c.name) ?? [];
-  const inFinland = country === "FI";
+  const askNettimokki = country === "FI" && listed.includes("nettimokki");
 
   function validate(data: FormData): Errors {
     const e: Errors = {};
@@ -60,6 +106,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     if (!data.get("country")) e.country = f.errors.required;
     else if (!data.get("region")) e.region = f.errors.required;
     if (link && !/^https?:\/\/([a-z0-9-]+\.)*nettimokki\.com(\/|$)/i.test(link)) e.nettimokki_url = f.errors.nettimokki;
+    if (!photos.length) e.photos = tr.photosRequired;
     if (!data.get("privacy_consent")) e.privacy_consent = f.errors.consent;
     return e;
   }
@@ -71,7 +118,8 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     const found = validate(data);
     setErrors(found);
     if (Object.keys(found).length) {
-      form.querySelector<HTMLElement>(`[name="${Object.keys(found)[0]}"]`)?.focus();
+      const first = Object.keys(found)[0];
+      (first === "photos" ? picker.current : form.querySelector<HTMLElement>(`[name="${first}"]`))?.focus();
       return;
     }
 
@@ -87,21 +135,28 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         .trim()
         .slice(0, 100),
       cottage_count: Number(data.get("cottage_count") ?? 1),
-      nettimokki_url: country === "FI" ? String(data.get("nettimokki_url") ?? "").trim() : "",
+      nettimokki_url: askNettimokki ? String(data.get("nettimokki_url") ?? "").trim() : "",
+      listed_on: listed.join(","),
       message: String(data.get("message") ?? "").trim(),
       privacy_consent: true,
       source: params.get("utm_source") ?? params.get("ref") ?? "",
       website: String(data.get("website") ?? ""),
     };
 
+    const upload = new FormData();
+    for (const [key, value] of Object.entries(body)) upload.append(key, String(value));
+    photos.forEach((p) => upload.append("photos", p.blob, p.name));
+
     setState("sending");
     try {
-      const response = await fetch(`${API_URL}/api/signups/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch("/api/signups/", { method: "POST", body: upload });
       if (response.status === 201) {
+        const answer = (await response.json()) as { checkout_url?: string | null };
+        // Next: the card for the free trial, on Stripe's page; it brings the owner back to /hosts/welcome.
+        if (answer.checkout_url) {
+          window.location.assign(answer.checkout_url);
+          return;
+        }
         setDoneName(body.name.split(" ")[0]);
         setState("done");
         return;
@@ -117,6 +172,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         if (detail.region) mapped.region = f.errors.required;
         if (detail.nettimokki_url) mapped.nettimokki_url = f.errors.nettimokki;
         if (detail.privacy_consent) mapped.privacy_consent = f.errors.consent;
+        if (detail.photos) mapped.photos = String(detail.photos).includes("too_big") ? tr.photoBig : tr.photoType;
         setErrors(Object.keys(mapped).length ? mapped : { form: f.errors.network });
       } else {
         setErrors({ form: f.errors.network });
@@ -247,7 +303,20 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         </div>
       </fieldset>
 
-      {inFinland ? (
+      <fieldset className={styles.listedSet}>
+        <legend>{tr.listedOn}</legend>
+        <p className={styles.photoHint}>{tr.listedHint}</p>
+        <div className={styles.listedChips}>
+          {LISTED_ON.map((key) => (
+            <label key={key} className={styles.listedChip}>
+              <input type="checkbox" checked={listed.includes(key)} onChange={() => toggleListed(key)} />
+              <span>{tr.listedOptions[key]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {askNettimokki ? (
         <label className={styles.field} data-invalid={!!errors.nettimokki_url}>
           <span>
             {f.nettimokki} <em>({f.optional})</em>
@@ -270,6 +339,44 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         </span>
         <textarea name="message" rows={3} maxLength={2000} />
       </label>
+
+      <fieldset className={styles.photoSet} aria-describedby={`photos-hint${errors.photos ? " photos-error" : ""}`}>
+        <legend>{tr.photos}</legend>
+        <p id="photos-hint" className={styles.photoHint}>
+          {tr.photosHint}
+        </p>
+        <ul className={styles.photoGrid}>
+          {photos.map((p, i) => (
+            <li key={p.id} className={styles.photoThumb}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- a local preview (blob: URL) */}
+              <img src={p.url} alt={`${tr.photos} ${i + 1}`} />
+              <button type="button" onClick={() => removePhoto(p.id)} aria-label={`${tr.removePhoto} ${i + 1}`}>
+                ×
+              </button>
+            </li>
+          ))}
+          {photos.length < MAX_SIGNUP_PHOTOS ? (
+            <li>
+              <label className={styles.photoAdd} data-invalid={!!errors.photos} data-busy={preparing || undefined}>
+                <input
+                  ref={picker}
+                  type="file"
+                  accept={ACCEPTED.join(",")}
+                  multiple
+                  onChange={(e) => {
+                    addPhotos(e.target.files);
+                    e.target.value = "";
+                  }}
+                  aria-invalid={!!errors.photos}
+                />
+                <span aria-hidden="true">+</span>
+                {tr.addPhotos}
+              </label>
+            </li>
+          ) : null}
+        </ul>
+      </fieldset>
+      {err("photos")}
 
       <label className={styles.honeypot} aria-hidden="true">
         Website
@@ -298,8 +405,11 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         </p>
       ) : null}
 
-      <button className={styles.primaryButton} type="submit" disabled={state === "sending"}>
-        {state === "sending" ? f.sending : f.submit}
+      <p className={styles.cardNote}>
+        <span className={styles.trialBadge}>{tr.badge}</span> {tr.cardNote}
+      </p>
+      <button className={styles.primaryButton} type="submit" disabled={state === "sending" || preparing}>
+        {state === "sending" ? f.sending : tr.submit}
       </button>
     </form>
   );

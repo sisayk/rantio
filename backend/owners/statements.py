@@ -10,7 +10,7 @@ cottages in more than one currency.
 """
 
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from . import rates as fx
@@ -124,7 +124,7 @@ def summary(owner: Owner, year: int, today: date) -> dict:
         start = max(date(year, 1, 1), cottage.listing_started_on or date(year, 1, 1))
         open_days = max((date(year + 1, 1, 1) - start).days, 0) if cottage.status == Cottage.Status.LIVE else 0
         listing_year = cottage.listing_year_on(today)
-        next_fee_on = cottage.listing_year_starts_on(listing_year + 1) if listing_year else None
+        next_fee_on = cottage.listing_year_starts_on(listing_year + 1) if listing_year is not None else None
         pc = per_cottage[cottage.pk]
         cottage_rows.append({
             "id": cottage.pk,
@@ -138,7 +138,9 @@ def summary(owner: Owner, year: int, today: date) -> dict:
             "listing_started_on": cottage.listing_started_on.isoformat() if cottage.listing_started_on else None,
             "listing_year": listing_year,
             "next_fee_on": next_fee_on.isoformat() if next_fee_on else None,
-            "next_fee": money(cottage.yearly_fee(listing_year + 1)) if listing_year else None,
+            "next_fee": money(cottage.yearly_fee(listing_year + 1)) if listing_year is not None else None,
+            # During the free trial (listing year 0): its last day is the day before the first fee.
+            "trial_until": (next_fee_on - timedelta(days=1)).isoformat() if listing_year == 0 and next_fee_on else None,
             "bookings": pc["bookings"],
             "nights": pc["nights"],
             "payout": money(pc["payout"]),

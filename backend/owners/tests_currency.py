@@ -76,7 +76,7 @@ class SwedishOwnerTests(TestCase):
         self.owner = Owner.objects.create(name="Erik Lund", email="erik@example.se", language="sv")
         self.cottage = Cottage.objects.create(
             owner=self.owner, name="Röda stugan", country="SE", max_guests=4,
-            price_per_night=Decimal("1450"), status=Cottage.Status.LIVE, listing_started_on=date(2026, 3, 1),
+            price_per_night=Decimal("1450"), status=Cottage.Status.LIVE, listing_started_on=date(2026, 3, 1), trial_months=0,
         )
         Booking.objects.create(cottage=self.cottage, channel=Booking.Channel.AIRBNB, check_in=date(2026, 7, 1),
                                check_out=date(2026, 7, 5), owner_payout=Decimal("5000.00"))

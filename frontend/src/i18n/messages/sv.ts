@@ -956,7 +956,7 @@ export const sv: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Inga årsavgifter i år.",
     },
-    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är {fee} + moms per stuga; för pilotägare är första året gratis. Momsen är 25,5 %.",
+    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är {fee} + moms per stuga; de första 3 månaderna efter att annonsen publicerats är gratis. Momsen är 25,5 %.",
     ownBooking: "Egen bokning",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

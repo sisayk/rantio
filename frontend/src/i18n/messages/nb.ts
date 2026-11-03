@@ -956,7 +956,7 @@ export const nb: Translation = {
       plusVat: "+ mva. {vat}",
       empty: "Ingen årsavgifter i år.",
     },
-    howItWorks: "Provisjonen er en andel av det nettstedet betaler deg for oppholdet (vaskeavgift ikke medregnet). Nettimökki og dine egne bookinger koster aldri noe. Årsavgiften er {fee} + mva. per hytte; for piloteiere er første år gratis. Merverdiavgiften er 25,5 %.",
+    howItWorks: "Provisjonen er en andel av det nettstedet betaler deg for oppholdet (vaskeavgift ikke medregnet). Nettimökki og dine egne bookinger koster aldri noe. Årsavgiften er {fee} + mva. per hytte; de første 3 månedene etter at annonsen er publisert er gratis. Merverdiavgiften er 25,5 %.",
     ownBooking: "Egen booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

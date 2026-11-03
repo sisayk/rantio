@@ -956,7 +956,7 @@ export const et: Translation = {
       plusVat: "+ km {vat}",
       empty: "Sel aastal aastatasusid pole.",
     },
-    howItWorks: "Vahendustasu on osa summast, mille kanal sulle majutuse eest maksab (koristustasu arvestamata). Nettimökki ja sinu enda broneeringute eest tasu ei võeta. Aastatasu on {fee} + käibemaks maja kohta; pilootomanikel on esimene aasta tasuta. Käibemaks on 25,5 %.",
+    howItWorks: "Vahendustasu on osa summast, mille kanal sulle majutuse eest maksab (koristustasu arvestamata). Nettimökki ja sinu enda broneeringute eest tasu ei võeta. Aastatasu on {fee} + käibemaks maja kohta; esimesed 3 kuud pärast kuulutuse avaldamist on tasuta. Käibemaks on 25,5 %.",
     ownBooking: "Oma broneering",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

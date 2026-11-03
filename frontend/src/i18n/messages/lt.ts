@@ -961,7 +961,7 @@ export const lt: Translation = {
       plusVat: "+ PVM {vat}",
       empty: "Šiais metais metinių mokesčių nėra.",
     },
-    howItWorks: "Komisinis mokestis yra dalis sumos, kurią svetainė Jums išmoka už viešnagę (be valymo mokesčio). Už Nettimökki ir Jūsų pačių užsakymus mokestis neimamas. Metinis mokestis – {fee} + PVM už namelį; bandomiesiems savininkams pirmieji metai nemokami. PVM – 25,5 %.",
+    howItWorks: "Komisinis mokestis yra dalis sumos, kurią svetainė Jums išmoka už viešnagę (be valymo mokesčio). Už Nettimökki ir Jūsų pačių užsakymus mokestis neimamas. Metinis mokestis – {fee} + PVM už namelį; pirmieji 3 mėnesiai po skelbimo paskelbimo nemokami. PVM – 25,5 %.",
     ownBooking: "Savas užsakymas",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

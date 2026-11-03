@@ -132,7 +132,7 @@ class SummaryTests(TestCase):
         self.owner = make_owner(is_pilot=True)  # 10 %, first listing year free
         self.cottage = Cottage.objects.create(
             owner=self.owner, name="Järvihuvila", max_guests=6, price_per_night=Decimal("150"),
-            status=Cottage.Status.LIVE, listing_started_on=date(2026, 3, 1),
+            status=Cottage.Status.LIVE, listing_started_on=date(2026, 3, 1), trial_months=0,
         )
         add = lambda channel, d, nights, payout, **kw: Booking.objects.create(  # noqa: E731
             cottage=self.cottage, channel=channel, check_in=d, check_out=d + timedelta(days=nights),

@@ -14,7 +14,11 @@ from .regions import REGION_CHOICES, REGIONS
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
 # - €99 yearly fee per cottage (or the set amount in the cottage's own currency,
-#   YEARLY_FEES), invoiced when each listing year starts; pilot owners' first year is free.
+#   YEARLY_FEES), invoiced when each listing year starts.
+# - Free trial (4 Nov 2026): the first TRIAL_MONTHS after a cottage goes live are free;
+#   listing year 1 (and its fee) starts when the trial ends. The owner saves a card at
+#   sign-up (owners/trial.py) and Rantio's invoices are charged to it. This replaced the
+#   pilot deal (first year free, 10 %); is_pilot stays only for owners who already had it.
 # - Commission is a share of the owner's payout for the stay (after platform
 #   fees, cleaning fees excluded); Nettimökki bookings are never charged.
 # - Both carry Finnish VAT.
@@ -33,6 +37,7 @@ YEARLY_FEES = {
 }
 VAT_RATE = Decimal("25.50")
 LISTING_TERM_MONTHS = 12
+TRIAL_MONTHS = 3
 
 CENT = Decimal("0.01")
 
@@ -107,6 +112,10 @@ class OwnerSignup(models.Model):
     place = models.CharField(max_length=100, blank=True, help_text="Nearest town or municipality, as the owner wrote it")
     cottage_count = models.PositiveSmallIntegerField(default=1, validators=[MinValueValidator(1)])
     nettimokki_url = models.URLField(blank=True)
+    listed_on = models.CharField(
+        max_length=80, blank=True,
+        help_text="Where the cottage is listed now, from the form: nettimokki, airbnb, booking, vrbo, other or none.",
+    )
     message = models.TextField(blank=True, max_length=2000)
     privacy_consent = models.BooleanField(default=False)
     source = models.CharField(max_length=80, blank=True, help_text="utm_source or referral")
@@ -115,11 +124,30 @@ class OwnerSignup(models.Model):
     internal_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # The card step after the form (owners/trial.py): a Stripe customer and the card they saved.
+    token = models.CharField(max_length=32, unique=True, null=True, editable=False)
+    stripe_customer_id = models.CharField(max_length=40, blank=True, editable=False)
+    stripe_checkout_id = models.CharField(max_length=80, blank=True, editable=False)
+    stripe_payment_method = models.CharField(max_length=40, blank=True, editable=False)
+    card_saved_at = models.DateTimeField(null=True, blank=True, editable=False)
+
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
         return f"{self.name} <{self.email}>"
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(18)
+        super().save(*args, **kwargs)
+
+    LISTED_ON = {"nettimokki": "Nettimökki", "airbnb": "Airbnb", "booking": "Booking.com", "vrbo": "Vrbo",
+                 "other": "somewhere else", "none": "nowhere yet"}
+
+    @property
+    def listed_on_display(self) -> str:
+        return ", ".join(self.LISTED_ON[k] for k in self.listed_on.split(",") if k in self.LISTED_ON) or "-"
 
     @property
     def location_display(self) -> str:
@@ -195,7 +223,9 @@ class Owner(models.Model):
     google_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
     apple_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
 
-    is_pilot = models.BooleanField(default=False)
+    is_pilot = models.BooleanField(
+        default=False, help_text="The old pilot deal (first year free, 10 %). New owners get the free trial instead."
+    )
     commission_rate = models.DecimalField(
         max_digits=5, decimal_places=2, default=STANDARD_COMMISSION_RATE,
         help_text="Percent of the owner's payout, before VAT.",
@@ -210,6 +240,8 @@ class Owner(models.Model):
         "directly, so Airbnb stays are left off the monthly invoice.",
     )
     stripe_customer_id = models.CharField(max_length=40, blank=True, editable=False)
+    # The card the owner saved for Rantio's invoices; they're charged to it automatically.
+    stripe_payment_method = models.CharField(max_length=40, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -350,7 +382,10 @@ class Cottage(models.Model):
     updated_at = models.DateTimeField(default=timezone.now)
 
     listing_started_on = models.DateField(
-        null=True, blank=True, help_text="First day of listing year 1; each year renews with the yearly fee."
+        null=True, blank=True, help_text="The day the listing went live; the free trial starts here."
+    )
+    trial_months = models.PositiveSmallIntegerField(
+        default=TRIAL_MONTHS, help_text="Free months after going live, before listing year 1 and its fee start."
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -372,16 +407,23 @@ class Cottage(models.Model):
         return COUNTRY_CURRENCY.get(self.country, "EUR")
 
     def listing_year_on(self, day: date) -> int | None:
-        """1 for the first 12 months after listing_started_on, 2 for the next, and so on."""
+        """0 during the free trial, 1 for the 12 months after it, 2 for the next, and so on."""
         if not self.listing_started_on or day < self.listing_started_on:
             return None
+        if day < self.trial_ends_on:
+            return 0
         year = 1
-        while add_months(self.listing_started_on, LISTING_TERM_MONTHS * year) <= day:
+        while self.listing_year_starts_on(year + 1) <= day:
             year += 1
         return year
 
+    @property
+    def trial_ends_on(self) -> date | None:
+        """The first day after the free trial (the day listing year 1 starts)."""
+        return add_months(self.listing_started_on, self.trial_months) if self.listing_started_on else None
+
     def listing_year_starts_on(self, year: int) -> date:
-        return add_months(self.listing_started_on, LISTING_TERM_MONTHS * (year - 1))
+        return add_months(self.listing_started_on, self.trial_months + LISTING_TERM_MONTHS * (year - 1))
 
     def yearly_fee(self, year: int) -> Decimal:
         """In the cottage's currency (a Swedish cottage's in kronor)."""
@@ -450,6 +492,29 @@ def _remove_photo_file(sender, instance: CottagePhoto, **kwargs):
         storage, name = instance.image.storage, instance.image.name
         transaction.on_commit(lambda: storage.delete(name))
 
+
+
+def signup_photo_path(photo: "SignupPhoto", filename: str) -> str:
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
+    return f"signups/{photo.signup_id}/{secrets.token_hex(8)}.{ext}"
+
+
+class SignupPhoto(models.Model):
+    """A photo sent with the sign-up form; copied to the cottage when its listing is made."""
+
+    signup = models.ForeignKey(OwnerSignup, on_delete=models.CASCADE, related_name="photos")
+    image = models.FileField(upload_to=signup_photo_path)
+    position = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["position", "pk"]
+
+    def __str__(self) -> str:
+        return f"{self.signup.name}: photo {self.position + 1}"
+
+
+post_delete.connect(_remove_photo_file, sender=SignupPhoto)
 
 class Booking(models.Model):
     """One stay, from any channel. Commission is only charged on Rantio's channels."""

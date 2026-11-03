@@ -6,6 +6,7 @@ import { fill, number, plural } from "@/i18n/format";
 import { YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
+import { TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { type BookingRow, ownerApi, SignedOut, type Summary } from "@/lib/ownerApi";
 import { Bed, CalendarIcon, People } from "../guest/icons";
@@ -286,7 +287,8 @@ export default function OwnerDashboard({
                     <>
                       <span className={styles.cottageLine}>
                         {c.listing_year ? fill(lang, t.cottages.listingYear, { n: String(c.listing_year) }) : null}
-                        {c.listing_year ? " · " : null}
+                        {c.trial_until ? fill(lang, TRIAL[lang].trialUntil, { date: fmt.date(c.trial_until) }) : null}
+                        {c.listing_year || c.trial_until ? " · " : null}
                         {plural(lang, t.cottages.nightsBooked, c.nights)}
                       </span>
                       {c.occupancy !== null ? (
