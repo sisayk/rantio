@@ -23,7 +23,12 @@ SMTP_KEY="$(printf '%s' "$SMTP_KEY" | tr -d '[:space:]')"
 echo "The key you pasted: ${#SMTP_KEY} characters, ending in ...${SMTP_KEY: -6}"
 case "$SMTP_KEY" in
   xkeysib-*) echo "That looks like a Brevo API key. The SMTP page has its own keys (SMTP & API -> SMTP)." >&2; exit 1 ;;
+  *[!A-Za-z0-9_-]*) echo "That isn't an SMTP key (it has characters like / or ~; maybe this command was on the clipboard). Copy the key in Brevo again and rerun; nothing was saved." >&2; exit 1 ;;
 esac
+if [ "${#SMTP_KEY}" -lt 40 ]; then
+  echo "That's too short for a Standard Brevo SMTP key (64 characters). Copy the key in Brevo again and rerun; nothing was saved." >&2
+  exit 1
+fi
 read -rp "Does that match the key in Brevo? [y/N] " OK
 [ "$OK" = y ] || [ "$OK" = Y ] || { echo "Nothing saved."; exit 1; }
 
