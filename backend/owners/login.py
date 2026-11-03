@@ -2,17 +2,25 @@
 
 import hashlib
 import hmac
+import logging
 import secrets
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from .models import LoginCode, Owner
 
+logger = logging.getLogger(__name__)
+
 CODES_PER_HOUR = 5  # per owner, on top of the per-IP throttle
+# Code tries per owner in any 24 hours, right or wrong. Someone signing in for real uses one
+# or two; someone guessing gets 15 of a million chances a day per owner, from any number of IPs.
+TRIES_PER_DAY = 15
 
 # Subject and body per site language (frontend/src/i18n/locales.ts); English for anything else.
 MESSAGES = {
@@ -87,9 +95,19 @@ def find_owner(email: str) -> Owner | None:
     return Owner.objects.filter(email__iexact=email.strip()).first()
 
 
+def tries_today(owner: Owner) -> int:
+    since = timezone.now() - timedelta(hours=24)
+    return owner.login_codes.filter(created_at__gte=since).aggregate(n=Sum("attempts"))["n"] or 0
+
+
+def locked(owner: Owner) -> bool:
+    """Too many code tries in the last 24 hours: no codes are sent or accepted until it calms down."""
+    return tries_today(owner) >= TRIES_PER_DAY
+
+
 def can_send(owner: Owner) -> bool:
     since = timezone.now() - timedelta(hours=1)
-    return owner.login_codes.filter(created_at__gte=since).count() < CODES_PER_HOUR
+    return not locked(owner) and owner.login_codes.filter(created_at__gte=since).count() < CODES_PER_HOUR
 
 
 def issue_code(owner: Owner, lang: str) -> str:
@@ -108,15 +126,25 @@ def issue_code(owner: Owner, lang: str) -> str:
 
 
 def check_code(owner: Owner, code: str) -> bool:
-    """True once for the newest unused, unexpired code; five wrong tries end that code."""
-    login = owner.login_codes.filter(used_at__isnull=True, expires_at__gt=timezone.now()).first()
-    if not login or login.attempts >= LoginCode.MAX_ATTEMPTS:
-        return False
-    login.attempts += 1
-    ok = hmac.compare_digest(login.code_hash, _hash(owner, code.strip()))
-    if ok:
-        login.used_at = timezone.now()
-    login.save(update_fields=["attempts", "used_at"])
+    """True once for the newest unused, unexpired code; five wrong tries end that code.
+
+    The row is locked while it's checked, so tries sent at the same moment are counted one by one.
+    """
+    with transaction.atomic():
+        login = (
+            owner.login_codes.select_for_update()
+            .filter(used_at__isnull=True, expires_at__gt=timezone.now())
+            .first()
+        )
+        if not login or login.attempts >= LoginCode.MAX_ATTEMPTS or locked(owner):
+            return False
+        login.attempts += 1
+        ok = hmac.compare_digest(login.code_hash, _hash(owner, code.strip()))
+        if ok:
+            login.used_at = timezone.now()
+        login.save(update_fields=["attempts", "used_at"])
+    if not ok and tries_today(owner) == TRIES_PER_DAY:
+        logger.error("Sign-in locked for owner %s: %s code tries in 24 hours", owner.pk, TRIES_PER_DAY)
     return ok
 
 

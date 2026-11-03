@@ -37,7 +37,9 @@ def env_list(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
 
-DEBUG = env_bool("DJANGO_DEBUG", True)
+# Off unless switched on: a production server missing this line must not run in debug mode.
+# manage.py switches it on for local development (runserver, tests) when there's no real secret key.
+DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
 if not DEBUG and SECRET_KEY.startswith("dev-only"):
     raise RuntimeError("Set DJANGO_SECRET_KEY in production.")
@@ -132,6 +134,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # The Next.js site calls the API from the browser.
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:3100,http://localhost:3000")
 
+# Rate limits (and anything else cached) are shared by all gunicorn workers and survive
+# worker restarts in production; manage.py createcachetable makes the table (deploy.sh).
+if not DEBUG:
+    CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"}}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
@@ -160,6 +167,8 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 SESSION_COOKIE_SAMESITE = "Lax"
 # Local development shows the emailed sign-in code on the login page too.
 DEV_LOGIN_CODES = env_bool("DEV_LOGIN_CODES", DEBUG)
+if DEV_LOGIN_CODES and not DEBUG:
+    raise RuntimeError("DEV_LOGIN_CODES shows sign-in codes to anyone; it only works with DJANGO_DEBUG=true.")
 
 # Links in emails: the public site (guest conversations, the owner inbox) and the admin.
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:3100").rstrip("/")

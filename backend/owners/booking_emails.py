@@ -168,27 +168,53 @@ def parse(subject: str, body: str, today: date | None = None) -> Parsed:
 
 # ---------- which cottage ----------
 
-def find_cottage(msg: EmailMessage, body: str) -> tuple[Cottage | None, str]:
+def sender_verified(msg: EmailMessage, address: str) -> bool:
+    """Whether our mail server vouched for the sender: DMARC passed for the From address's domain.
+
+    Only the topmost Authentication-Results header counts; it's the one our own mail
+    server added. Lower ones can be written by whoever sent the email.
+    """
+    results = msg.get_all("Authentication-Results") or []
+    if not results or "@" not in address:
+        return False
+    domain = re.escape(address.rsplit("@", 1)[1].lower())
+    return bool(re.search(rf"\bdmarc=pass\b[^;]*\bheader\.from={domain}\b", str(results[0]).lower()))
+
+
+def find_cottage(msg: EmailMessage, body: str) -> tuple[Cottage | None, str, bool]:
+    """The cottage an email is about, why not if none, and whether its dates may be changed automatically.
+
+    The cottage's private bookings+<code> address is trusted. Without it, the owner is
+    recognised by their email, but anyone can write an owner's address into an email
+    (their addresses are public on listing sites), so the dates only change when our
+    mail server confirms the owner really sent it; otherwise it waits in "Needs a look".
+    """
     to = addresses(msg, "To", "Cc", "Delivered-To", "X-Original-To", "X-Forwarded-To", "Envelope-To", "Resent-To")
     for a in to:
         if m := PLUS_CODE.search(a + "@"):
             cottage = Cottage.objects.filter(inbound_code=m.group(1).lower()).select_related("owner").first()
             if cottage:
-                return cottage, ""
+                return cottage, "", True
     # No code: the owner forwarded to the plain address. Recognise them by their email.
+    sender = next(iter(addresses(msg, "From")), "")
     people = set(addresses(msg, "From", "Sender", "Reply-To", "Resent-From", "X-Forwarded-For", "To", "Delivered-To"))
     people |= {a.lower() for a in re.findall(r"[\w.+-]+@[\w-]+\.[\w.-]+", body)}
     owner = Owner.objects.filter(email__in=people).first()
     if not owner:
-        return None, "No cottage code in the address and no owner's email in the message."
+        return None, "No cottage code in the address and no owner's email in the message.", False
+    trusted = sender == owner.email.lower() and sender_verified(msg, sender)
+    unverified = (
+        f"Sent to the address without the cottage code, and the mail server couldn't confirm it came from "
+        f"{owner.email}. If it's genuine, add the dates by hand and give {owner.name} the cottage's forwarding address."
+    )
     cottages = list(owner.cottages.all())
     if len(cottages) == 1:
-        return cottages[0], ""
+        return cottages[0], "" if trusted else unverified, trusted
     for c in cottages:  # several cottages: the Nettimökki link or the name in the email decides
         cid = NETTIMOKKI_ID.search(c.nettimokki_url or "")
         if (cid and cid.group(1) in body) or c.name.lower() in body.lower():
-            return c, ""
-    return None, f"{owner.name} has {len(cottages)} cottages and the email doesn't say which."
+            return c, "" if trusted else unverified, trusted
+    return None, f"{owner.name} has {len(cottages)} cottages and the email doesn't say which.", False
 
 
 # ---------- storing it ----------
@@ -219,9 +245,9 @@ def reread(email: InboundEmail) -> InboundEmail:
 
 
 def process(email: InboundEmail, msg: EmailMessage) -> InboundEmail:
-    cottage, why = find_cottage(msg, email.body)
+    cottage, why, trusted = find_cottage(msg, email.body)
     email.cottage = cottage
-    if not cottage:
+    if not cottage or not trusted:
         return _done(email, InboundEmail.Status.REVIEW, why)
     p = parse(email.subject, email.body)
     if p.kind == "unclear":

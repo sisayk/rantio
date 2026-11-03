@@ -17,9 +17,15 @@ def d(day: date) -> str:
     return f"{day.day}.{day.month}.{day.year}"
 
 
-def raw(to: str, subject: str, body: str, frm: str = "noreply@nettimokki.com", mid: str = "<a1@nettimokki.com>") -> str:
-    return (f"From: Nettimökki <{frm}>\r\nTo: {to}\r\nSubject: {subject}\r\nMessage-ID: {mid}\r\n"
+def raw(to: str, subject: str, body: str, frm: str = "noreply@nettimokki.com", mid: str = "<a1@nettimokki.com>",
+        auth: str = "") -> str:
+    head = f"Authentication-Results: {auth}\r\n" if auth else ""
+    return (f"{head}From: Nettimökki <{frm}>\r\nTo: {to}\r\nSubject: {subject}\r\nMessage-ID: {mid}\r\n"
             f"Content-Type: text/plain; charset=utf-8\r\n\r\n{body}")
+
+
+def passed(domain: str) -> str:
+    return f"mx.rantio.fi; dkim=pass header.i=@{domain}; spf=pass; dmarc=pass (p=NONE) header.from={domain}"
 
 
 FINNISH = (
@@ -67,8 +73,36 @@ class BookingEmailTests(TestCase):
 
     def test_owner_forwarding_by_hand_is_recognised(self):
         body = "---------- Forwarded message ---------\n" + FINNISH.format(ci=d(IN), co=d(OUT))
-        email = ingest(raw("bookings@rantio.fi", "Fwd: Uusi varaus", body, frm="maija@example.fi", mid="<x@gmail.com>"))
+        email = ingest(raw("bookings@rantio.fi", "Fwd: Uusi varaus", body, frm="maija@example.fi", mid="<x@gmail.com>",
+                           auth=passed("example.fi")))
         self.assertEqual((email.status, email.cottage), (InboundEmail.Status.BOOKED, self.cottage))
+
+    def test_unverified_owner_address_only_needs_a_look(self):
+        """Anyone can put an owner's public address in From or in the text: no dates change."""
+        body = FINNISH.format(ci=d(IN), co=d(OUT))
+        forged = [
+            raw("bookings@rantio.fi", "Uusi varaus", body, frm="maija@example.fi", mid="<f1@x>"),
+            raw("bookings@rantio.fi", "Uusi varaus", body, frm="maija@example.fi", mid="<f2@x>",
+                auth="mx.rantio.fi; dmarc=fail header.from=example.fi"),
+            raw("bookings@rantio.fi", "Uusi varaus", body + "\nmaija@example.fi", frm="x@evil.test", mid="<f3@x>",
+                auth=passed("evil.test")),
+        ]
+        for r in forged:
+            email = ingest(r)
+            self.assertEqual((email.status, email.cottage), (InboundEmail.Status.REVIEW, self.cottage))
+        # A forged verdict below our own server's header doesn't count either.
+        r = raw("bookings@rantio.fi", "Uusi varaus", body, frm="maija@example.fi", mid="<f4@x>",
+                auth="mx.rantio.fi; dmarc=fail header.from=example.fi")
+        r = r.replace("From:", f"Authentication-Results: {passed('example.fi')}\r\nFrom:", 1)
+        self.assertEqual(ingest(r).status, InboundEmail.Status.REVIEW)
+        self.assertFalse(Booking.objects.exists())
+
+    def test_unverified_cancellation_keeps_the_booking(self):
+        ingest(raw(self.cottage.forwarding_address, "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT))))
+        email = ingest(raw("bookings@rantio.fi", "Varaus peruttu", f"Varaus {d(IN)} - {d(OUT)} on peruttu.",
+                           frm="maija@example.fi", mid="<c9@x>"))
+        self.assertEqual(email.status, InboundEmail.Status.REVIEW)
+        self.assertFalse(Booking.objects.get().cancelled)
 
     def test_unknown_sender_needs_a_look(self):
         email = ingest(raw("bookings@rantio.fi", "Uusi varaus", FINNISH.format(ci=d(IN), co=d(OUT)), frm="x@y.fi"))

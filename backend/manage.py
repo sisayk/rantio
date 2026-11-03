@@ -8,6 +8,10 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+    # Local development: debug mode unless told otherwise. On the server the .env file
+    # has a real secret key and DJANGO_DEBUG=false, so this changes nothing there.
+    if not os.environ.get("DJANGO_SECRET_KEY"):
+        os.environ.setdefault("DJANGO_DEBUG", "true")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

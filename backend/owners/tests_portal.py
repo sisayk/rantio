@@ -65,6 +65,25 @@ class LoginTests(TestCase):
             self.assertEqual(self.verify(wrong).status_code, 400)
         self.assertEqual(self.verify(code).status_code, 400)
 
+    def test_too_many_tries_in_a_day_lock_sign_in(self):
+        """Guessing spread over many codes (and many IPs) still stops at TRIES_PER_DAY."""
+        from . import login as owner_login
+
+        for _ in range(owner_login.TRIES_PER_DAY // LoginCode.MAX_ATTEMPTS):
+            code = owner_login.issue_code(self.owner, "fi")
+            wrong = "000000" if code != "000000" else "111111"
+            for _ in range(LoginCode.MAX_ATTEMPTS):
+                self.assertFalse(owner_login.check_code(self.owner, wrong))
+            LoginCode.objects.update(created_at=timezone.now() - timedelta(hours=2))  # past the hourly limit
+        self.assertTrue(owner_login.locked(self.owner))
+        self.assertFalse(owner_login.can_send(self.owner))
+        code = owner_login.issue_code(self.owner, "fi")
+        self.assertFalse(owner_login.check_code(self.owner, code))  # even the right code
+        # A day later it works again.
+        LoginCode.objects.update(created_at=timezone.now() - timedelta(hours=25))
+        code = owner_login.issue_code(self.owner, "fi")
+        self.assertTrue(owner_login.check_code(self.owner, code))
+
     def test_expired_code_fails(self):
         self.request_code()
         code = self.code_from_mail()

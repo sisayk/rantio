@@ -65,6 +65,7 @@ as_app "$VENV/bin/pip" install -q -r "$APP_DIR/backend/requirements-prod.txt"
 step "Database migrations"
 cd "$APP_DIR/backend"
 as_app_env "$VENV/bin/python" manage.py migrate --noinput
+as_app_env "$VENV/bin/python" manage.py createcachetable  # shared rate limits
 
 step "Django admin files (collectstatic)"
 as_app_env "$VENV/bin/python" manage.py collectstatic --noinput -v0
