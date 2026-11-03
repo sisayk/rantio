@@ -23,7 +23,6 @@ import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
-import { openSite } from "@/ui/settings";
 
 const SEASON_TONE = { summer: "green", winter: "neutral", autumn: "berry", darkSeason: "neutral", allYear: "green" } as const;
 
@@ -284,7 +283,7 @@ export default function Cottage() {
           <Text v="small" style={{ marginTop: space.md }}>
             {m.guest.detail.bookNote}
           </Text>
-          <Button kind="ghost" label={m.app.profile.listCottage} onPress={() => openSite(`/${lang}/hosts`)} style={{ alignSelf: "flex-start", marginTop: space.sm, paddingHorizontal: 0 }} />
+          <Button kind="ghost" label={m.app.profile.listCottage} onPress={() => router.push("/list-cottage")} style={{ alignSelf: "flex-start", marginTop: space.sm, paddingHorizontal: 0 }} />
         </View>
       </ScrollView>
 

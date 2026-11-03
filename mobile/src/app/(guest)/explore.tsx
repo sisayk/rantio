@@ -16,7 +16,6 @@ import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit
 import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
-import { openSite } from "@/ui/settings";
 
 type Stay = { start: string | null; end: string | null; adults: number; children: number };
 const NO_STAY: Stay = { start: null, end: null, adults: 0, children: 0 };
@@ -187,7 +186,7 @@ export default function Explore() {
         </View>
       </Card>
       <View style={{ flexDirection: "row", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
-        <Button small label={m.guest.hostBand.cta} onPress={() => openSite(`/${lang}/hosts`)} />
+        <Button small label={m.guest.hostBand.cta} onPress={() => router.push("/list-cottage")} />
         <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
       </View>
       <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl, marginTop: space.xl }}>

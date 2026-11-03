@@ -242,4 +242,6 @@ export const guestApi = {
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, json("POST", form)),
   rates: () => call<{ rates: Record<string, number>; date?: string }>("rates/"),
+  /** "List your cottage": the same sign-up as on rantio.fi/hosts. */
+  listCottage: (form: Record<string, string | number | boolean>) => call<unknown>("signups/", json("POST", form)),
 };

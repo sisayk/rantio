@@ -14,7 +14,6 @@ import { colors, fonts, radius, space } from "@/theme";
 import { Field } from "@/ui/form";
 import { Button, Logo, Problem, Text } from "@/ui/kit";
 import { SheetBar } from "@/ui/screen";
-import { openSite } from "@/ui/settings";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Calling codes for the phone number, the app language's country first.
@@ -262,7 +261,7 @@ export default function Login() {
               <Button label={busy ? t.sending : t.send} busy={busy} onPress={sendCode} />
               <View style={{ marginTop: space.xl, gap: space.sm }}>
                 <Text v="h3">{t.notOwner}</Text>
-                <Button kind="secondary" label={t.join} onPress={() => openSite(`/${lang}/hosts`)} />
+                <Button kind="secondary" label={t.join} onPress={() => router.push("/list-cottage")} />
               </View>
             </>
           ) : (

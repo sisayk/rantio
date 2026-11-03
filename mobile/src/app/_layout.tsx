@@ -65,6 +65,7 @@ function Root() {
         <Stack.Screen name="(guest)" options={{ animation: "fade" }} />
         <Stack.Screen name="(host)" options={{ animation: "fade" }} />
         <Stack.Screen name="login" options={{ presentation: "modal" }} />
+        <Stack.Screen name="list-cottage" options={{ presentation: "modal" }} />
         <Stack.Screen name="contact/[id]" options={{ presentation: "modal" }} />
         {/* Full sheets like the other pickers: in a detented form sheet iOS laid the list out over the title bar. */}
         <Stack.Screen name="language" options={{ presentation: "modal" }} />

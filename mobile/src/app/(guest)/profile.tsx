@@ -7,10 +7,10 @@ import { useT } from "@/text/i18n";
 import { colors, radius, shadowFloat, space } from "@/theme";
 import { Avatar, Button, Icon, Logo, Text, Wordmark } from "@/ui/kit";
 import { SwitchPill, TabScreen } from "@/ui/screen";
-import { AboutRows, openSite, SettingsRows } from "@/ui/settings";
+import { AboutRows, SettingsRows } from "@/ui/settings";
 
 export default function Profile() {
-  const { m, lang } = useT();
+  const { m } = useT();
   const { setMode } = usePrefs();
   const { signedIn, owner } = useSession();
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function Profile() {
           )}
         </View>
 
-        <Pressable onPress={() => openSite(`/${lang}/hosts`)} style={({ pressed }) => [styles.hostCard, shadowFloat, pressed && { opacity: 0.85 }]} accessibilityRole="link">
+        <Pressable onPress={() => router.push("/list-cottage")} style={({ pressed }) => [styles.hostCard, shadowFloat, pressed && { opacity: 0.85 }]} accessibilityRole="link">
           <Text style={{ fontSize: 44, lineHeight: 52 }}>🏡</Text>
           <View style={{ flex: 1, gap: 2 }}>
             <Text v="h3">{m.guest.becomeHost}</Text>
