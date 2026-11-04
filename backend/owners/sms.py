@@ -99,4 +99,6 @@ def check_key() -> tuple[bool, str]:
                 return False, why
         except OSError as e:
             return False, f"Brevo couldn't be reached ({e})"
-    return False, why
+    # Brevo got past the key (no 401/403) but wouldn't give the statistics to a key limited to
+    # sending; the key was still used and accepted.
+    return True, why

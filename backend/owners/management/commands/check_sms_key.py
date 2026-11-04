@@ -21,7 +21,7 @@ class Command(BaseCommand):
             return
         ok, why = sms.check_key()
         if ok:
-            self.stdout.write("Brevo accepts the SMS key.")
+            self.stdout.write("Brevo accepts the SMS key." + (f" (Its SMS statistics weren't available: {why}.)" if why else ""))
             return
         self.stderr.write(f"The Brevo SMS key didn't work: {why}")
         if settings.SIGNUP_NOTIFY_EMAILS:
