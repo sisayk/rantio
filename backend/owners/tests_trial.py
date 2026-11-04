@@ -69,6 +69,7 @@ class TrialSignupTests(TestCase):
         self.assertEqual(signup.photos.count(), 2)
         self.assertEqual(res.json()["checkout_url"], "https://checkout.stripe.com/c/pay/cs_1")
         session = dict(self.stripe.posts)["/checkout/sessions"]
+        self.assertNotIn("payment_method_types", session)  # Stripe refuses it
         self.assertEqual((session["mode"], session["currency"], session["locale"]), ("setup", "eur", "fi"))
         self.assertIn("3 kuukautta maksutta", session["custom_text"]["submit"]["message"])
         self.assertIn("99 €", session["custom_text"]["submit"]["message"])

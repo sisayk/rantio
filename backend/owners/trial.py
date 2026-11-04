@@ -118,7 +118,8 @@ def checkout(signup: OwnerSignup, app: bool = False) -> str:
         "mode": "setup",
         "customer": ensure_customer(signup),
         "currency": currency.lower(),
-        "payment_method_types": ["card"],
+        # No payment_method_types: Stripe refuses it now; the methods shown are set in the
+        # Stripe Dashboard (Settings > Payment methods).
         "locale": STRIPE_LOCALES.get(lang, "auto"),
         "success_url": welcome_url(signup, app),
         "cancel_url": welcome_url(signup, app, cancelled="1"),
