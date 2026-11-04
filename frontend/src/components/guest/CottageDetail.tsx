@@ -126,7 +126,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
               </ul>
             </section>
 
-            <Surroundings lang={lang} t={d} lat={l.lat} lng={l.lng} />
+            <Surroundings lang={lang} t={d} lat={l.lat} lng={l.lng} country={l.country} />
 
             <section className={styles.detailSection} aria-labelledby="amenities-title">
               <h2 id="amenities-title">{d.amenitiesTitle}</h2>

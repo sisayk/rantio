@@ -156,8 +156,14 @@ REST_FRAMEWORK = {
         "ai-draft": os.environ.get("AI_DRAFT_THROTTLE_RATE", "60/hour"),
         "guest-ai-draft": os.environ.get("GUEST_AI_DRAFT_THROTTLE_RATE", "20/hour"),
         "booking-request": os.environ.get("BOOKING_REQUEST_THROTTLE_RATE", "10/hour"),
+        "geocode": os.environ.get("GEOCODE_THROTTLE_RATE", "120/hour"),
+        "events": os.environ.get("EVENTS_THROTTLE_RATE", "300/hour"),
     },
 }
+
+# Events near a cottage (owners/events.py): Ticketmaster's Discovery API key, when there is
+# one (developer.ticketmaster.com). Linked Events (Helsinki region) needs no key.
+TICKETMASTER_API_KEY = os.environ.get("TICKETMASTER_API_KEY", "")
 
 # The sign-up form checks the owner's email with a code, and a checked sign-up becomes an
 # owner who is signed in at once (owners/email_check.py).

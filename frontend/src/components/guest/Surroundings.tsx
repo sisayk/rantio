@@ -8,6 +8,7 @@ import { number } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { findNearby, type NearbyPlace } from "@/lib/nearby";
 import { External, Pin } from "./icons";
+import NearbyEvents from "./NearbyEvents";
 import styles from "./guest.module.css";
 
 const AreaMap = dynamic(() => import("./AreaMap"), {
@@ -20,9 +21,9 @@ const FIRST = 8;
 type State = { status: "loading" } | { status: "ready"; places: NearbyPlace[] } | { status: "error" };
 
 /** Places near the cottage, listed beside a map; loaded from Wikipedia in the browser. */
-type Props = { lang: Lang; t: Messages["guest"]["detail"]; lat: number; lng: number };
+type Props = { lang: Lang; t: Messages["guest"]["detail"]; lat: number; lng: number; country: string };
 
-export default function Surroundings({ lang, t, lat, lng }: Props) {
+export default function Surroundings({ lang, t, lat, lng, country }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [all, setAll] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -53,6 +54,7 @@ export default function Surroundings({ lang, t, lat, lng }: Props) {
     <section className={styles.detailSection} aria-labelledby="nearby-title">
       <h2 id="nearby-title">{t.nearbyTitle}</h2>
       <p className={styles.sectionLead}>{t.nearbyLead}</p>
+      <NearbyEvents lang={lang} lat={lat} lng={lng} country={country} />
       <div className={styles.nearbyLayout}>
         <div>
           {state.status === "loading" ? (

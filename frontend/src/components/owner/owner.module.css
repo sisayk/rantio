@@ -1086,3 +1086,14 @@
 @media (max-width: 760px) {
   .monitorCard { grid-template-columns: 1fr; }
 }
+
+/* Phones: a compact header, so the page starts with the work. */
+@media (max-width: 760px) {
+  .page { --o-top: 53px; }
+  .topInner { padding-block: 6px; }
+  .brand { font-size: 21px; }
+  .logo { width: 30px; height: 30px; }
+  .topNav .outline { min-height: 34px; padding: 5px 12px; font-size: 13px; }
+  .switchLink { padding: 6px 8px; font-size: 13px; }
+  .main { padding-top: 16px; padding-bottom: 96px; }
+}

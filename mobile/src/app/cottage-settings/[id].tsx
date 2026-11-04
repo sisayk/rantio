@@ -14,7 +14,7 @@ import { SiteIcon } from "@/ui/host";
 import { Button, Card, Loading, Problem, Section, Text } from "@/ui/kit";
 import { PageBar } from "@/ui/screen";
 
-const SITES = ["airbnb", "booking", "vrbo"] as const;
+const SITES = ["airbnb", "booking", "vrbo", "agoda"] as const;
 
 /** One cottage's booking link and the calendar links that tie it to each booking site. */
 export default function CottageSettings() {

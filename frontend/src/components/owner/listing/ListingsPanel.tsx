@@ -52,7 +52,7 @@ export default function ListingsPanel({ lang, l }: { lang: Lang; l: Messages["li
       <strong>{number(lang, n)}</strong>
     </a>
   );
-  const siteName = (ch: string) => ({ airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", nettimokki: "Nettimökki" })[ch] ?? ch;
+  const siteName = (ch: string) => ({ airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", agoda: "Agoda", nettimokki: "Nettimökki" })[ch] ?? ch;
 
   return (
     <section aria-labelledby="listings-panel" className={`${o.section} ${o.card}`}>

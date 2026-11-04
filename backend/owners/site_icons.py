@@ -19,6 +19,7 @@ SITES = {
     "booking": "booking.com",
     "vrbo": "vrbo.com",
     "expedia": "expedia.com",
+    "agoda": "agoda.com",
     "google": "google.com",
     "holidu": "holidu.com",
     "hometogo": "hometogo.com",

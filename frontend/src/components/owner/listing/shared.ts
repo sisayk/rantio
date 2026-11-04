@@ -11,7 +11,7 @@ export const CHECK_SECTION: Record<ChecklistKey, Section> = {
   cover: "photos",
   photos: "photos",
   description: "basics",
-  location: "basics",
+  location: "location",
   price: "pricing",
   pin: "location",
   amenities: "amenities",

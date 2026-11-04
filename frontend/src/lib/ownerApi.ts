@@ -139,7 +139,7 @@ export type CalendarCottage = {
   booking_link: string;
   booking_requests_open: boolean;
   forwarding_address: string;
-  export: Record<"airbnb" | "booking" | "vrbo" | "all", string>;
+  export: Record<"airbnb" | "booking" | "vrbo" | "agoda" | "all", string>;
   feeds: CalendarFeed[];
 };
 
@@ -278,7 +278,7 @@ export type ChecklistKey =
   | "cover" | "description" | "location" | "price" | "photos" | "pin" | "amenities" | "rules" | "arrival" | "availability";
 export type ChannelState = "connected" | "attention" | "failed" | "pending" | "not_connected" | "email";
 export type ListingChannel = {
-  channel: "airbnb" | "booking" | "vrbo" | "nettimokki";
+  channel: "airbnb" | "booking" | "vrbo" | "agoda" | "nettimokki";
   state: ChannelState;
   last_synced_at: string | null;
   error: string;
@@ -329,6 +329,8 @@ export type ListingFields = {
   name: string;
   property_type: PropertyType;
   country: string;
+  /** One of the country's regions (lib/places.ts ids), or "" when not chosen. */
+  region: string;
   municipality: string;
   address: string;
   latitude: number | null;
@@ -452,6 +454,9 @@ export const ownerApi = {
   createListing: (name: string) => call<ListingDetail>("owner/cottages/", { method: "POST", body: JSON.stringify({ name }) }),
   listing: (id: number) => call<ListingDetail>(`owner/cottages/${id}/`),
   listingPreview: (id: number) => call<ListingPreview>(`owner/cottages/${id}/preview/`),
+  /** A suggested pin for the address: only a suggestion, never saved by itself. */
+  geocode: (q: { address: string; municipality: string; country: string }) =>
+    call<{ found: boolean; lat?: number; lng?: number; label?: string }>(`owner/geocode/?${new URLSearchParams(q)}`),
   saveListing: (id: number, fields: Partial<ListingFields>) =>
     call<ListingDetail>(`owner/cottages/${id}/`, { method: "PATCH", body: JSON.stringify(fields) }),
   setListingStatus: (id: number, action: StatusAction) =>

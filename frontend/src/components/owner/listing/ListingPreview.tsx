@@ -191,7 +191,7 @@ export default function ListingPreview({
             </div>
             <div className={s.previewSection}>
               <h2>{p.whereTitle}</h2>
-              {point ? <PinMap point={point} fallback={point} approximate={!data.show_exact_location} label={p.whereTitle} /> : null}
+              {point ? <PinMap point={point} suggestion={null} bounds={[point.lat, point.lng, point.lat, point.lng]} approximate={!data.show_exact_location} label={p.whereTitle} /> : null}
               {!data.show_exact_location ? <p className={s.muted}>{p.approximate}</p> : null}
               {data.nearby.length ? (
                 <>

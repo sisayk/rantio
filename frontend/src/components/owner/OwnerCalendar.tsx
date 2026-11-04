@@ -22,7 +22,7 @@ import cal from "./calendar.module.css";
 import styles from "./owner.module.css";
 
 type Kind = CalendarEntry["kind"] | "clash";
-const SITES = ["airbnb", "booking", "vrbo"] as const;
+const SITES = ["airbnb", "booking", "vrbo", "agoda"] as const;
 
 // Dates are handled as "YYYY-MM-DD" strings in the cottage's own calendar days.
 const iso = (d: Date) =>
@@ -712,7 +712,7 @@ function SiteRow({
   const [url, setUrl] = useState(feed?.url ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const name = { airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo" }[site];
+  const name = { airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", agoda: "Agoda" }[site];
 
   async function save() {
     if (!url.trim().toLowerCase().startsWith("https://")) {

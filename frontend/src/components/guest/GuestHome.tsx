@@ -482,6 +482,9 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
 
   const placeLabel = (l: Listing) => `${l.place}, ${countries[l.country]}`;
 
+  // The cottage page gets the chosen dates too, for its events during the stay.
+  const stayQuery = dates?.from && dates?.to ? `?from=${isoDay(dates.from)}&to=${isoDay(dates.to)}` : "";
+
   function renderCard(l: Listing) {
     const isSaved = saved.includes(l.id);
     return (
@@ -495,7 +498,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         <div className={styles.cardPhoto}>
           <CardPhotos
             photos={listingPhotos(l)}
-            href={paths.cottage(lang, l.id)}
+            href={paths.cottage(lang, l.id) + stayQuery}
             name={listingName(names, l)}
             labels={{ prev: t.photos.prev, next: t.photos.next }}
           />
@@ -513,7 +516,7 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         <div className={styles.cardBody}>
           <div className={styles.cardHead}>
             <h3 className={styles.cardTitle}>
-              <a className={styles.cardLink} href={paths.cottage(lang, l.id)}>
+              <a className={styles.cardLink} href={paths.cottage(lang, l.id) + stayQuery}>
                 {listingName(names, l)}
               </a>
             </h3>

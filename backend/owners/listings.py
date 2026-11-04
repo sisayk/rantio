@@ -38,6 +38,7 @@ from .calendar import FEED_CHANNELS
 from .media_checks import IMAGE_MAX, image_type
 from .models import Booking, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, Language, NightPrice
 from .portal import IsOwner
+from .regions import REGION_CHOICES, valid_region
 
 MAX_PHOTOS = 40
 SUGGESTED_PHOTOS = 5
@@ -318,6 +319,8 @@ class CottageSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=120, trim_whitespace=True, min_length=1)
     property_type = serializers.ChoiceField(choices=Cottage.PropertyType.choices, required=False)
     country = serializers.ChoiceField(choices=Cottage._meta.get_field("country").choices, required=False)
+    # One of the country's official regions (regions.py); blank when not chosen yet.
+    region = serializers.ChoiceField(choices=[("", "")] + list(REGION_CHOICES), required=False, allow_blank=True)
     municipality = text(80)
     address = text(200)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6, min_value=Decimal("-90"), max_value=Decimal("90"), required=False, allow_null=True)
@@ -365,8 +368,8 @@ class CottageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cottage
         fields = [
-            "name", "property_type", "country", "municipality", "address", "latitude", "longitude", "show_exact_location",
-            "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
+            "name", "property_type", "country", "region", "municipality", "address", "latitude", "longitude",
+            "show_exact_location", "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
             "nearby", "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price",
             "cleaning_fee", "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount",
             "security_deposit", "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by",
@@ -391,6 +394,13 @@ class CottageSerializer(serializers.ModelSerializer):
         return list(dict.fromkeys(value))
 
     def validate(self, attrs):
+        # The region belongs to the country; a new country drops a region it doesn't have.
+        country = attrs.get("country", self.instance.country if self.instance else "FI")
+        if "region" in attrs:
+            if attrs["region"] and not valid_region(country, attrs["region"]):
+                raise serializers.ValidationError({"region": "Choose one of the country's regions."})
+        elif "country" in attrs and self.instance and self.instance.region and not valid_region(country, self.instance.region):
+            attrs["region"] = ""
         lat, lng = attrs.get("latitude", ...), attrs.get("longitude", ...)
         if (lat is None) != (lng is None) and ... not in (lat, lng):
             raise serializers.ValidationError({"latitude": "Set both or neither."})
@@ -488,6 +498,7 @@ class OwnerCottagesView(APIView):
         cottage = Cottage.objects.create(
             owner=owner, name=data.validated_data["name"], max_guests=2, price_per_night=Decimal("0.00"),
             country=signup.country if signup else Cottage._meta.get_field("country").default,
+            region=signup.region if signup else "",
             host_languages=[owner.language], status=Cottage.Status.INTAKE,
         )
         log(cottage, request, "create")

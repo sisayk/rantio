@@ -86,6 +86,7 @@ export const en: LegalTexts = {
           "A transactional email and SMS service that delivers our emails and text messages (sign-in codes, messages and notifications)",
           "Stripe: invoices and payments for owners",
           "Anthropic: AI reply drafts, only when an owner asks for one",
+          "OpenStreetMap (Nominatim): finds the cottage's street address on the map when an owner places the pin; only the address, town and country are sent",
           "Google and Apple: only if an owner chooses to sign in with their Google or Apple account",
           "Beds24: the channel manager that connects owners' calendars and listings to the listing sites",
           "Listing sites such as Airbnb, Booking.com and Vrbo: they receive the cottage listing and calendar from us and send us booking details. They decide for themselves how they use guest data.",

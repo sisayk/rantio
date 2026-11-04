@@ -7,6 +7,7 @@ export const CHANNELS = {
   booking: { name: "Booking.com", domain: "booking.com" },
   vrbo: { name: "Vrbo", domain: "vrbo.com" },
   expedia: { name: "Expedia", domain: "expedia.com" },
+  agoda: { name: "Agoda", domain: "agoda.com" },
   google: { name: "Google Vacation Rentals", domain: "google.com" },
   holidu: { name: "Holidu", domain: "holidu.com" },
   hometogo: { name: "HomeToGo", domain: "hometogo.com" },
@@ -22,7 +23,7 @@ export const CHANNELS = {
 export type ChannelId = keyof typeof CHANNELS;
 
 // Sites Rantio lists on in each country, most-used first.
-const GLOBAL: ChannelId[] = ["airbnb", "booking", "vrbo", "expedia", "google", "holidu", "hometogo"];
+const GLOBAL: ChannelId[] = ["airbnb", "booking", "vrbo", "expedia", "agoda", "google", "holidu", "hometogo"];
 export const CHANNELS_BY_COUNTRY: Record<string, ChannelId[]> = {
   FI: [...GLOBAL, "nettimokki", "lomarengas"],
   SE: [...GLOBAL, "novasol", "stugsommar"],

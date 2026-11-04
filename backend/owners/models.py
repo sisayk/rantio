@@ -524,6 +524,7 @@ class Booking(models.Model):
         BOOKING = "booking", "Booking.com"
         VRBO = "vrbo", "Vrbo"
         EXPEDIA = "expedia", "Expedia"
+        AGODA = "agoda", "Agoda"
         GOOGLE = "google", "Google Vacation Rentals"
         HOLIDU = "holidu", "Holidu"
         HOMETOGO = "hometogo", "HomeToGo"

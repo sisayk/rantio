@@ -246,5 +246,6 @@ class ListingTests(TestCase):
                                     last_synced_at=now - timedelta(hours=5))
         row = self.client.get("/api/owner/cottages/").json()["cottages"][0]
         states = {ch["channel"]: ch["state"] for ch in row["channels"]}
-        self.assertEqual(states, {"airbnb": "connected", "booking": "failed", "vrbo": "attention", "nettimokki": "not_connected"})
+        self.assertEqual(states, {"airbnb": "connected", "booking": "failed", "vrbo": "attention", "agoda": "not_connected",
+                                  "nettimokki": "not_connected"})
         self.assertTrue(row["attention"])

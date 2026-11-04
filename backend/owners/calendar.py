@@ -29,7 +29,7 @@ from .models import Booking, CalendarBlock, CalendarFeed, Conversation, Cottage,
 logger = logging.getLogger(__name__)
 
 # Sites that let a host paste a calendar link to import, and give one to export.
-FEED_CHANNELS = [Booking.Channel.AIRBNB, Booking.Channel.BOOKING, Booking.Channel.VRBO]
+FEED_CHANNELS = [Booking.Channel.AIRBNB, Booking.Channel.BOOKING, Booking.Channel.VRBO, Booking.Channel.AGODA]
 MAX_FEED_BYTES = 2_000_000
 FETCH_TIMEOUT = 20
 HORIZON_DAYS = 2 * 365  # nothing further ahead is exported or imported

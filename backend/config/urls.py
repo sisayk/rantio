@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path
 
 from config.admin_assets_view import admin_css
-from owners import calendar_views, inbound, inbox, listings, newsletter, portal, site_icons
+from owners import calendar_views, events, geocode, inbound, inbox, listings, newsletter, portal, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
 
@@ -14,6 +14,7 @@ admin.site.site_title = "Rantio"
 urlpatterns = [
     path("admin/_assets/stugora-admin.css", admin_css, name="admin_css"),
     path("admin/", admin.site.urls),
+    path("api/events/", events.EventsView.as_view(), name="events"),
     path("api/signups/", OwnerSignupCreateView.as_view(), name="owner-signup"),
     path("api/signups/email-code/", EmailCodeView.as_view(), name="owner-signup-email-code"),
     path("api/signups/<str:token>/card/", SignupCardView.as_view(), name="owner-signup-card"),
@@ -48,6 +49,7 @@ urlpatterns = [
     path("api/owner/calendar/feeds/", calendar_views.OwnerFeedsView.as_view(), name="owner-feeds"),
     path("api/owner/calendar/feeds/<int:pk>/", calendar_views.OwnerFeedView.as_view(), name="owner-feed"),
     path("api/owner/cottages/", listings.OwnerCottagesView.as_view(), name="owner-cottages"),
+    path("api/owner/geocode/", geocode.GeocodeView.as_view(), name="owner-geocode"),
     path("api/owner/cottages/<int:pk>/", listings.OwnerCottageView.as_view(), name="owner-cottage"),
     path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
     path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),

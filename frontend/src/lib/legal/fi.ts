@@ -86,6 +86,7 @@ export const fi: LegalTexts = {
           "Sähköposti- ja tekstiviestipalvelu, joka toimittaa viestimme (kirjautumiskoodit, viestit ja ilmoitukset)",
           "Stripe: omistajien laskut ja maksut",
           "Anthropic: tekoälyn vastausluonnokset, vain kun omistaja pyytää",
+          "OpenStreetMap (Nominatim): etsii mökin katuosoitteen kartalta, kun omistaja asettaa nastaa; palveluun lähetetään vain osoite, paikkakunta ja maa",
           "Google ja Apple: vain jos omistaja valitsee kirjautumisen Google- tai Apple-tilillään",
           "Beds24: kanavanhallintajärjestelmä, joka yhdistää omistajien kalenterit ja ilmoitukset varaussivustoihin",
           "Varaussivustot, kuten Airbnb, Booking.com ja Vrbo: ne saavat meiltä mökin ilmoituksen ja kalenterin ja lähettävät meille varausten tiedot. Ne päättävät itse, miten käyttävät vieraiden tietoja.",

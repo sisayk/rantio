@@ -20,7 +20,10 @@ import {
   SignedOut,
   type StatusAction,
 } from "@/lib/ownerApi";
+import { LOCATION } from "@/i18n/messages/locationEditor";
+import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
+import { type Bounds, COUNTRY_BOUNDS, REGION_BOUNDS } from "@/lib/regionBounds";
 import HostingHeader from "../HostingHeader";
 import SiteIcon from "../SiteIcon";
 import o from "../owner.module.css";
@@ -35,7 +38,7 @@ type L = Messages["listings"];
 type Errors = Record<string, unknown>;
 
 const FIELDS = [
-  "name", "property_type", "country", "municipality", "address", "latitude", "longitude", "show_exact_location",
+  "name", "property_type", "country", "region", "municipality", "address", "latitude", "longitude", "show_exact_location",
   "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions", "nearby",
   "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price", "cleaning_fee",
   "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount", "security_deposit",
@@ -55,6 +58,7 @@ const FIELD_SECTION: Record<string, Section> = {
   pets_allowed: "rules", smoking_allowed: "rules", events_allowed: "rules", quiet_hours: "rules", house_rules: "rules",
   waste_instructions: "rules", sauna_instructions: "rules", fireplace_instructions: "rules",
   arrival_instructions: "arrival", departure_instructions: "arrival", access_details: "arrival",
+  country: "location", region: "location", municipality: "location", address: "location",
   latitude: "location", longitude: "location", show_exact_location: "location", nearby: "location",
   nettimokki_url: "calendar",
 };
@@ -62,10 +66,18 @@ const FIELD_SECTION: Record<string, Section> = {
 const TYPES: PropertyType[] = ["cottage", "cabin", "villa", "holiday_home", "apartment", "farmhouse", "other"];
 const NEARBY: NearbyKind[] = ["lake", "beach", "ski", "hiking", "grocery", "restaurant", "transport", "evCharging", "airport", "station", "other"];
 const COUNTRIES = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT"];
-const CENTER: Record<string, { lat: number; lng: number }> = {
-  FI: { lat: 62.5, lng: 26 }, SE: { lat: 62, lng: 15.5 }, NO: { lat: 63, lng: 10.5 }, DK: { lat: 56, lng: 10 },
-  IS: { lat: 64.9, lng: -18.6 }, EE: { lat: 58.7, lng: 25.5 }, LV: { lat: 56.9, lng: 24.6 }, LT: { lat: 55.3, lng: 23.9 },
-};
+type Point = { lat: number; lng: number };
+
+/** What the map opens on when the cottage has no pin yet: its town if we know it, else its
+ *  region, else its country. Only a view: none of these is ever saved as the cottage's position. */
+function mapBounds(country: string, region: string, municipality: string): Bounds {
+  const regions = PLACES[country as keyof typeof PLACES] ?? [];
+  const name = municipality.trim().toLowerCase();
+  const town = name ? regions.flatMap((r) => (region && r.id !== region ? [] : r.cities)).find((c) => c.name.toLowerCase() === name) : undefined;
+  if (town) return [town.lat - 0.06, town.lng - 0.12, town.lat + 0.06, town.lng + 0.12];
+  const byRegion = REGION_BOUNDS[country as keyof typeof REGION_BOUNDS]?.[region];
+  return byRegion ?? COUNTRY_BOUNDS[country as keyof typeof COUNTRY_BOUNDS] ?? COUNTRY_BOUNDS.FI;
+}
 
 function pick(d: ListingDetail): ListingFields {
   const out = {} as Record<string, unknown>;
@@ -113,6 +125,12 @@ export default function ListingEditor({
   const toasts = useToasts();
   const fmt = useMemo(() => dateFormats(lang), [lang]);
   const panelRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const [allSections, setAllSections] = useState(false);
+  // A position found from the address: shown on the map until the owner uses or moves it.
+  const [suggestion, setSuggestion] = useState<(Point & { for: string }) | null>(null);
+  const [lookup, setLookup] = useState<"idle" | "finding" | "notFound">("idle");
+  const lookupSeq = useRef(0);
 
   const signedOut = useCallback(() => window.location.replace(paths.hostingLogin(lang)), [lang]);
 
@@ -179,7 +197,44 @@ export default function ListingEditor({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, l.leave]);
 
+  // The open section's tab stays in view in the scrolling bar on phones and tablets.
+  useEffect(() => {
+    navRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [section, state]);
+
+  const addressQuery = form ? `${form.country}|${form.municipality.trim()}|${form.address.trim()}` : "";
+  const hasPin = form ? form.latitude !== null && form.longitude !== null : true;
+  const findAddress = useCallback(async () => {
+    if (!form || !form.address.trim()) return;
+    const seq = ++lookupSeq.current;
+    const asked = `${form.country}|${form.municipality.trim()}|${form.address.trim()}`;
+    setLookup("finding");
+    try {
+      const res = await ownerApi.geocode({ address: form.address.trim(), municipality: form.municipality.trim(), country: form.country });
+      if (seq !== lookupSeq.current) return;
+      if (res.found && res.lat !== undefined && res.lng !== undefined) {
+        setSuggestion({ lat: res.lat, lng: res.lng, for: asked });
+        setLookup("idle");
+      } else {
+        setSuggestion(null);
+        setLookup("notFound");
+      }
+    } catch {
+      if (seq === lookupSeq.current) setLookup("notFound");
+    }
+  }, [form]);
+
+  // With an address and no pin, the Location section looks the address up by itself.
+  useEffect(() => {
+    if (section !== "location" || hasPin || !addressQuery.split("|")[2] || suggestion?.for === addressQuery) return;
+    const timer = window.setTimeout(() => void findAddress(), 700);
+    return () => window.clearTimeout(timer);
+    // findAddress reads the form, which addressQuery follows
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section, hasPin, addressQuery]);
+
   const go = (next: Section) => {
+    setAllSections(false);
     setSection(next);
     window.history.replaceState(window.history.state, "", `#${next}`);
     panelRef.current?.focus({ preventScroll: true });
@@ -431,20 +486,6 @@ export default function ListingEditor({
             ))}
           </select>
         </label>
-        <label className={s.field}>
-          <span>{l.basics.country}</span>
-          <select className={s.select} value={f.country} onChange={(e) => set("country", e.target.value)}>
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {countries[c] ?? c}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className={s.grid2}>
-        {text("municipality", l.basics.municipality, { max: 80 })}
-        {text("address", l.basics.address, { max: 200, hint: l.basics.addressHint })}
       </div>
       <div className={s.grid3}>
         {numberField("max_guests", l.basics.guests, { min: 1, max: 50 })}
@@ -791,42 +832,137 @@ export default function ListingEditor({
     </section>
   );
 
+  const lt = LOCATION[lang];
   const point = f.latitude !== null && f.longitude !== null ? { lat: f.latitude, lng: f.longitude } : null;
-  const town = (PLACES[f.country as keyof typeof PLACES] ?? [])
-    .flatMap((r) => r.cities)
-    .find((c) => c.name.toLowerCase() === f.municipality.trim().toLowerCase());
+  const savedPoint = saved && saved.latitude !== null && saved.longitude !== null ? { lat: saved.latitude, lng: saved.longitude } : null;
+  const pinSaved = Boolean(point && savedPoint && point.lat === savedPoint.lat && point.lng === savedPoint.lng);
+  const shownSuggestion = !point && suggestion && suggestion.for === addressQuery ? suggestion : null;
+  const regions = [...(PLACES[f.country as keyof typeof PLACES] ?? [])].sort((a, b) =>
+    regionLabel(a, f.country, lang).localeCompare(regionLabel(b, f.country, lang), lang),
+  );
+  const regionRow = regions.find((r) => r.id === f.region);
+  const regionName = regionRow ? regionLabel(regionRow, f.country, lang) : "";
+  const countryName = countries[f.country] ?? f.country;
+  const locationDirty = dirtyKeys.some((k) => FIELD_SECTION[k] === "location");
+  const placePin = (p: Point) => {
+    setSuggestion(null);
+    setForm((x) => (x ? { ...x, latitude: round6(p.lat), longitude: round6(p.lng) } : x));
+  };
   const setNearby = (i: number, patch: Partial<Nearby>) => set("nearby", f.nearby.map((x, j) => (j === i ? { ...x, ...patch } : x)));
   const round6 = (n: number) => Math.round(n * 1e6) / 1e6;
+
+  // Where the owner is: the pin saved, placed, suggested from the address, or only an area.
+  const where: { state: "confirmed" | "placed" | "suggested" | "region" | "country"; title: string; body: string } = pinSaved
+    ? { state: "confirmed", title: lt.status.confirmed, body: lt.status.confirmedBody }
+    : point
+      ? { state: "placed", title: lt.status.placed, body: lt.status.placedBody }
+      : shownSuggestion
+        ? { state: "suggested", title: lt.status.suggested, body: lt.status.suggestedBody }
+        : regionName
+          ? { state: "region", title: fill(lang, lt.status.region, { region: regionName }), body: fill(lang, lt.status.regionBody, { region: regionName }) }
+          : { state: "country", title: fill(lang, lt.status.country, { country: countryName }), body: lt.status.countryBody };
 
   const location = (
     <section className={s.panel} aria-labelledby="sec-location">
       <h2 id="sec-location">{l.location.title}</h2>
-      <p className={s.panelLead}>{l.location.lead}</p>
-      <div className={s.row}>
-        <span className={s.muted}>{[f.municipality, countries[f.country]].filter(Boolean).join(", ")}</span>
-        <span className={s.spacer} />
-        {town ? (
-          <button type="button" className={s.button} onClick={() => setForm((x) => (x ? { ...x, latitude: town.lat, longitude: town.lng } : x))}>
-            {l.location.findTown}
-          </button>
+      <div className={s.locStatus} data-state={where.state} role="status" aria-live="polite">
+        <span className={s.locIcon} aria-hidden="true">
+          {where.state === "confirmed" ? <Check /> : where.state === "placed" ? "!" : where.state === "suggested" ? "?" : ""}
+        </span>
+        <span>
+          <strong>{where.title}</strong>
+          <span>{where.body}</span>
+        </span>
+      </div>
+
+      <div className={s.group} style={{ borderTop: 0, paddingTop: 0 }}>
+        <h3>{lt.where}</h3>
+        <p className={s.hint}>{lt.whereLead}</p>
+        <div className={s.grid2}>
+          <label className={s.field}>
+            <span>{l.basics.country}</span>
+            <select
+              className={s.select}
+              value={f.country}
+              onChange={(e) => {
+                const next = e.target.value;
+                setSuggestion(null);
+                setForm((x) => (x ? { ...x, country: next, region: "" } : x));
+              }}
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c} value={c}>
+                  {countries[c] ?? c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={s.field}>
+            <span>{lt.region}</span>
+            <select className={s.select} value={f.region} aria-invalid={Boolean(err("region"))} onChange={(e) => set("region", e.target.value)}>
+              <option value="">{regions.length ? lt.regionPlaceholder : lt.regionFirst}</option>
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {regionLabel(r, f.country, lang)}
+                </option>
+              ))}
+            </select>
+            {err("region") ? <span className={s.error}>{l.invalid}: {err("region")}</span> : null}
+          </label>
+        </div>
+        <div className={s.grid2}>
+          {text("municipality", l.basics.municipality, { max: 80 })}
+          {text("address", l.basics.address, { max: 200, hint: l.basics.addressHint })}
+        </div>
+      </div>
+
+      <div className={s.group}>
+        <h3>{lt.pin}</h3>
+        <p className={s.hint}>{lt.pinLead}</p>
+        {(!point && f.address.trim()) || shownSuggestion || point ? (
+        <div className={s.row}>
+          {!point && f.address.trim() ? (
+            <button type="button" className={s.button} onClick={() => void findAddress()} disabled={lookup === "finding"}>
+              {lookup === "finding" ? lt.finding : lt.findAddress}
+            </button>
+          ) : null}
+          {shownSuggestion ? (
+            <button type="button" className={o.primary} onClick={() => placePin(shownSuggestion)}>
+              {lt.usePosition}
+            </button>
+          ) : null}
+          <span className={s.spacer} />
+          {point ? (
+            <button type="button" className={s.ghost} onClick={() => setForm((x) => (x ? { ...x, latitude: null, longitude: null } : x))}>
+              {l.location.removePin}
+            </button>
+          ) : null}
+        </div>
         ) : null}
-        {point ? (
-          <button type="button" className={s.ghost} onClick={() => setForm((x) => (x ? { ...x, latitude: null, longitude: null } : x))}>
-            {l.location.removePin}
-          </button>
+        {lookup === "notFound" && !point ? <p className={s.notice}>{lt.notFound}</p> : null}
+        {!point && !f.address.trim() && !shownSuggestion ? <p className={s.hint}>{lt.addAddress}</p> : null}
+        <div className={s.mapWrap}>
+          <PinMap
+            point={point}
+            suggestion={shownSuggestion}
+            bounds={mapBounds(f.country, f.region, f.municipality)}
+            approximate={!f.show_exact_location}
+            label={l.location.title}
+            onChange={placePin}
+          />
+        </div>
+        <p className={s.hint}>{lt.touchHint}</p>
+        {toggle("show_exact_location", l.location.exact)}
+        <p className={s.hint}>{f.show_exact_location ? l.location.exactOn : l.location.approximate}</p>
+        {err("latitude") ? <p className={s.error}>{l.invalid}</p> : null}
+        {locationDirty ? (
+          <div className={s.row}>
+            <button type="button" className={o.primary} disabled={saving} onClick={() => void save()}>
+              {saving ? l.saving : lt.saveLocation}
+            </button>
+          </div>
         ) : null}
       </div>
-      <PinMap
-        point={point}
-        fallback={town ?? CENTER[f.country] ?? CENTER.FI}
-        approximate={!f.show_exact_location}
-        label={l.location.title}
-        onChange={(p) => setForm((x) => (x ? { ...x, latitude: round6(p.lat), longitude: round6(p.lng) } : x))}
-      />
-      {!point ? <p className={s.hint}>{l.location.noPin}</p> : null}
-      {toggle("show_exact_location", l.location.exact)}
-      <p className={s.hint}>{f.show_exact_location ? l.location.exactOn : l.location.approximate}</p>
-      {err("latitude") ? <p className={s.error}>{l.invalid}</p> : null}
       <div className={s.group}>
         <h3>{l.location.nearby}</h3>
         <p className={s.hint}>{l.location.nearbyLead}</p>
@@ -1067,18 +1203,33 @@ export default function ListingEditor({
         ) : null}
 
         <div className={s.editor}>
-          <nav className={s.sideNav} aria-label={l.sections}>
-            {SECTIONS.map((x) => (
-              <button key={x} type="button" className={s.navItem} aria-current={section === x} onClick={() => go(x)}>
-                {l.nav[x]}
-                {todoSections.has(x) ? <span className={s.navTodo} aria-label={l.checklist.needed} /> : null}
-              </button>
-            ))}
-          </nav>
+          <div className={s.sectionBar}>
+            <nav ref={navRef} className={s.sideNav} aria-label={l.sections}>
+              {SECTIONS.map((x) => (
+                <button key={x} type="button" className={s.navItem} aria-current={section === x} onClick={() => go(x)}>
+                  {l.nav[x]}
+                  {todoSections.has(x) ? <span className={s.navTodo} aria-label={l.checklist.needed} /> : null}
+                </button>
+              ))}
+            </nav>
+            <button type="button" className={s.allSections} onClick={() => setAllSections(true)} aria-label={LOCATION[lang].allSections}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
           <div>
-            <div ref={panelRef} tabIndex={-1} style={{ outline: "none", scrollMarginTop: 90 }}>
+            <div ref={panelRef} tabIndex={-1} className={s.panelHolder}>
               {views[section]}
             </div>
+            {SECTIONS.indexOf(section) < SECTIONS.length - 1 ? (
+              <div className={s.nextRow}>
+                <button type="button" className={s.nextButton} onClick={() => go(SECTIONS[SECTIONS.indexOf(section) + 1])}>
+                  {fill(lang, LOCATION[lang].next, { section: l.nav[SECTIONS[SECTIONS.indexOf(section) + 1]] })}
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            ) : null}
             <div className={s.saveBar} data-dirty={dirty}>
               <span className={s.saveState} data-dirty={dirty}>
                 {dirty ? l.unsaved : l.allSaved}
@@ -1095,6 +1246,23 @@ export default function ListingEditor({
         </div>
       </main>
 
+      <Dialog open={allSections} title={LOCATION[lang].allSections} onClose={() => setAllSections(false)}>
+        <ul className={s.sectionList}>
+          {SECTIONS.map((x) => (
+            <li key={x}>
+              <button type="button" aria-current={section === x} onClick={() => go(x)}>
+                <span>{l.nav[x]}</span>
+                {todoSections.has(x) ? <span className={s.need}>{l.checklist.needed}</span> : null}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className={s.dialogActions}>
+          <button type="button" className={s.button} onClick={() => setAllSections(false)}>
+            {LOCATION[lang].close}
+          </button>
+        </div>
+      </Dialog>
       <Dialog open={confirm === "pause"} title={l.status.pauseTitle} onClose={() => setConfirm(null)}>
         <p>{l.status.pauseBody}</p>
         <div className={s.dialogActions}>
