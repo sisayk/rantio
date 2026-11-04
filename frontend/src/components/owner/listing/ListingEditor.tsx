@@ -86,6 +86,16 @@ function pick(d: ListingDetail): ListingFields {
 }
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const langName = (code: string) => LANG_INFO[code as Lang]?.native ?? code;
+
+function Sparkle() {
+  return (
+    <svg className={s.sparkle} width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8 1.5l1.4 4.1 4.1 1.4-4.1 1.4L8 12.5 6.6 8.4 2.5 7l4.1-1.4z" fill="currentColor" />
+      <path d="M13 11l.6 1.4 1.4.6-1.4.6L13 15l-.6-1.4-1.4-.6 1.4-.6z" fill="currentColor" opacity=".7" />
+    </svg>
+  );
+}
 const draftKey = (id: number) => `stugora.listing.${id}.draft`;
 
 export default function ListingEditor({
@@ -141,6 +151,29 @@ export default function ListingEditor({
     setForm((f) => (keepForm && f ? f : fields));
   }, []);
 
+  // Translations arrive while the owner may be editing: take the new saved state, and keep every
+  // field and language the owner has changed since the last save.
+  const savedRef = useRef<ListingFields | null>(null);
+  useEffect(() => {
+    savedRef.current = saved;
+  }, [saved]);
+  const takeTranslations = useCallback((d: ListingDetail) => {
+    const fields = pick(d);
+    const before = savedRef.current;
+    setDetail(d);
+    setSaved(fields);
+    setForm((f) => {
+      if (!f || !before) return fields;
+      const next = { ...f } as Record<string, unknown>;
+      for (const k of FIELDS) if (same(f[k], before[k])) next[k] = fields[k];
+      const descriptions = { ...fields.descriptions };
+      for (const [code, body] of Object.entries(f.descriptions)) if (body !== (before.descriptions[code] ?? "")) descriptions[code] = body;
+      return { ...(next as ListingFields), descriptions };
+    });
+  }, []);
+  const [startingTranslation, setStartingTranslation] = useState(false);
+  const translating = (detail?.translation?.pending.length ?? 0) > 0;
+
   useEffect(() => {
     const timer = window.setTimeout(async () => {
       ownerApi.me().then((me) => setOwner(me.name), () => undefined);
@@ -195,6 +228,47 @@ export default function ListingEditor({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, l.leave]);
+
+  // While AI translates the description, the languages are fetched as they are done.
+  useEffect(() => {
+    if (!translating) return;
+    let stopped = false;
+    let timer = 0;
+    const poll = async () => {
+      try {
+        const d = await ownerApi.listing(id);
+        if (stopped) return;
+        takeTranslations(d);
+        if (!d.translation.pending.length) return;
+      } catch (err) {
+        if (err instanceof SignedOut) return signedOut();
+      }
+      if (!stopped) timer = window.setTimeout(poll, 2500);
+    };
+    timer = window.setTimeout(poll, 2500);
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+    };
+  }, [translating, id, takeTranslations, signedOut]);
+
+  const wasTranslating = useRef(false);
+  useEffect(() => {
+    if (wasTranslating.current && !translating && !detail?.translation.failed.length) toasts.push("ok", l.basics.ai.done);
+    wasTranslating.current = translating;
+  }, [translating, detail, toasts, l.basics.ai.done]);
+
+  async function translateNow(source?: string) {
+    setStartingTranslation(true);
+    try {
+      takeTranslations(await ownerApi.translateListing(id, source));
+    } catch (err) {
+      if (err instanceof SignedOut) return signedOut();
+      toasts.push("error", l.basics.ai.error);
+    } finally {
+      setStartingTranslation(false);
+    }
+  }
 
   // The open section's tab stays in view in the scrolling bar on phones and tablets.
   useEffect(() => {
@@ -363,6 +437,24 @@ export default function ListingEditor({
 
   const f = form;
   const err = (k: string) => fieldError(errors, k);
+  const ai = (() => {
+    const t = detail?.translation;
+    const auto = detail?.descriptions_auto ?? {};
+    const kept = saved?.descriptions ?? {};
+    const own = LANG_CODES.filter((c) => kept[c]?.trim() && !auto[c]);
+    return {
+      on: Boolean(t?.enabled),
+      auto,
+      pending: new Set(t?.pending ?? []),
+      failed: t?.failed ?? [],
+      // A language counts as AI-translated while it still holds the translation as saved.
+      isAuto: (c: string) => Boolean(auto[c]) && (f.descriptions[c] ?? "") === (kept[c] ?? ""),
+      // The owner's own text, saved, is what gets translated; not while it has unsaved changes.
+      canStart: Boolean(t?.enabled) && own.length > 0 && !dirtyKeys.includes("descriptions"),
+      missing: LANG_CODES.some((c) => !kept[c]?.trim()),
+      source: own.includes(descLang) ? descLang : undefined,
+    };
+  })();
   const currency = isCurrency(detail.currency) ? detail.currency : "EUR";
   const connected = detail.channels.filter((c) => c.feed_id !== null).length;
   const check = checklist(f, photos, connected);
@@ -517,23 +609,64 @@ export default function ListingEditor({
       </fieldset>
       <div className={s.group}>
         <h3>{l.basics.descriptions}</h3>
-        <p className={s.hint}>{l.basics.descriptionsLead}</p>
+        <p className={s.hint}>{ai.on ? l.basics.ai.lead : l.basics.descriptionsLead}</p>
         <div className={s.tabs} role="tablist" aria-label={l.basics.descriptions}>
-          {LANG_CODES.map((code) => (
-            <button
-              key={code}
-              type="button"
-              role="tab"
-              className={s.tab}
-              aria-selected={descLang === code}
-              data-written={Boolean(f.descriptions[code]?.trim())}
-              title={f.descriptions[code]?.trim() ? l.basics.written : undefined}
-              onClick={() => setDescLang(code)}
-            >
-              {LANG_INFO[code].native}
-            </button>
-          ))}
+          {LANG_CODES.map((code) => {
+            const auto = ai.isAuto(code);
+            const pending = ai.pending.has(code);
+            const written = Boolean(f.descriptions[code]?.trim());
+            const label = pending ? l.basics.ai.pendingTab : auto ? l.basics.ai.autoTab : written ? l.basics.written : undefined;
+            return (
+              <button
+                key={code}
+                type="button"
+                role="tab"
+                className={s.tab}
+                aria-selected={descLang === code}
+                data-written={written && !auto && !pending}
+                data-pending={pending}
+                title={label}
+                onClick={() => setDescLang(code)}
+              >
+                {LANG_INFO[code].native}
+                {auto ? (
+                  <span className={s.aiBadge} aria-hidden="true">
+                    {l.basics.ai.badge}
+                  </span>
+                ) : null}
+                {label ? <span className={s.visuallyHidden}>, {label}</span> : null}
+              </button>
+            );
+          })}
         </div>
+        {ai.pending.size ? (
+          <p className={s.aiStatus} role="status">
+            <span className={s.aiSpinner} aria-hidden="true" />
+            {l.basics.ai.working}
+          </p>
+        ) : ai.failed.length ? (
+          <p className={s.aiStatus} role="status">
+            {fill(lang, l.basics.ai.failed, { langs: ai.failed.map(langName).join(", ") })}
+            {ai.canStart ? (
+              <button type="button" className={s.ghost} disabled={startingTranslation} onClick={() => void translateNow(ai.source)}>
+                {l.basics.ai.retry}
+              </button>
+            ) : null}
+          </p>
+        ) : ai.canStart && ai.missing ? (
+          <p className={s.aiStatus}>
+            <button type="button" className={s.aiStart} disabled={startingTranslation} onClick={() => void translateNow(ai.source)}>
+              <Sparkle />
+              {l.basics.ai.fill}
+            </button>
+          </p>
+        ) : null}
+        {ai.isAuto(descLang) ? (
+          <p className={s.aiNote}>
+            <Sparkle />
+            <span>{fill(lang, l.basics.ai.note, { from: langName(ai.auto[descLang]) })}</span>
+          </p>
+        ) : null}
         <label className={s.field}>
           <span className={s.visuallyHidden}>
             {l.basics.descriptions} ({LANG_INFO[descLang].native})

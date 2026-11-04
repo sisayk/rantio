@@ -395,7 +395,19 @@ export type ListingDetail = ListingSummary &
     forwarding_address: string;
     nettimokki_url: string;
     links: OtherListing[];
+    /** Languages AI translated, each with the language it came from. The owner's own are never listed. */
+    descriptions_auto: Record<string, string>;
+    translation: ListingTranslation;
   };
+
+/** The description's translation into the languages the owner hasn't written (backend owners/translate.py). */
+export type ListingTranslation = {
+  enabled: boolean;
+  /** Still on their way; poll the listing until this is empty. */
+  pending: string[];
+  failed: string[];
+  from: string | null;
+};
 
 /** The listing as guests see it: no address, codes or arrival notes; the location rounded unless shown exactly. */
 export type ListingPreview = Omit<ListingDetail, "address" | "arrival_instructions" | "departure_instructions" | "access_details" | "history" | "checklist" | "channels"> & {
@@ -461,6 +473,8 @@ export const ownerApi = {
     call<{ found: boolean; lat?: number; lng?: number; label?: string }>(`owner/geocode/?${new URLSearchParams(q)}`),
   saveListing: (id: number, fields: Partial<ListingFields>) =>
     call<ListingDetail>(`owner/cottages/${id}/`, { method: "PATCH", body: JSON.stringify(fields) }),
+  translateListing: (id: number, source?: string) =>
+    call<ListingDetail>(`owner/cottages/${id}/translate/`, { method: "POST", body: JSON.stringify(source ? { source } : {}) }),
   setListingStatus: (id: number, action: StatusAction) =>
     call<ListingDetail>(`owner/cottages/${id}/status/`, { method: "POST", body: JSON.stringify({ action }) }),
   duplicateListing: (id: number) => call<ListingDetail>(`owner/cottages/${id}/duplicate/`, { method: "POST" }),

@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Guļbūves māja pie sava krasta, ar malkas pirti, airu laivu un vakara sauli pār ezeru…",
     written: "Uzrakstīts",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Rakstiet vienā valodā un saglabājiet. Pēc tam MI to pārtulko pārējās valodās. Jūsu pašu rakstītie teksti nekad netiek mainīti.",
+      badge: "MI",
+      autoTab: "Tulkots ar MI",
+      pendingTab: "Tiek tulkots…",
+      note: "Tulkots ar MI, oriģinālvaloda: {from}. Izlasiet to: kad to mainīsiet, tas būs jūsu un vairs netiks aizstāts.",
+      working: "Tiek tulkots pārējās valodās… Tulkojumi parādīsies šeit, tiklīdz būs gatavi.",
+      done: "Tulkojumi ir gatavi.",
+      failed: "Šos neizdevās iztulkot: {langs}.",
+      retry: "Mēģināt vēlreiz",
+      fill: "Tulkot pārējās valodās ar MI",
+      error: "Tulkošanu neizdevās sākt. Mēģiniet vēlreiz pēc brīža.",
+    },
   },
 
   photos: {

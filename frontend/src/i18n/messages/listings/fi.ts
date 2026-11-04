@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Hirsimökki omalla rannalla: puusauna, soutuvene ja ilta-aurinko järven yllä…",
     written: "Kirjoitettu",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Kirjoita kuvaus yhdellä kielellä ja tallenna. Tekoäly kääntää sen sitten muille kielille. Itse kirjoittamiasi tekstejä ei koskaan muuteta.",
+      badge: "AI",
+      autoTab: "Tekoälyn kääntämä",
+      pendingTab: "Käännetään…",
+      note: "Tekoälyn kääntämä, lähtökieli: {from}. Lue se läpi: kun muokkaat sitä, se on sinun eikä sitä enää korvata.",
+      working: "Käännetään muille kielille… Käännökset tulevat näkyviin sitä mukaa kuin ne valmistuvat.",
+      done: "Käännökset ovat valmiit.",
+      failed: "Näitä ei saatu käännettyä: {langs}.",
+      retry: "Yritä uudelleen",
+      fill: "Käännä muille kielille tekoälyllä",
+      error: "Kääntämistä ei voitu aloittaa. Yritä hetken päästä uudelleen.",
+    },
   },
 
   photos: {

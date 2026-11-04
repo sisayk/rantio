@@ -322,6 +322,82 @@
 }
 .tab[aria-selected="true"] { border-color: var(--o-ink); box-shadow: inset 0 0 0 1px var(--o-ink); }
 .tab[data-written="true"]::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--o-green); }
+.tab[data-pending="true"]::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b7892f;
+  animation: aiPulse 1.1s ease-in-out infinite;
+}
+.aiBadge {
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: #f6ecd6;
+  color: #7a5a17;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+.sparkle { flex: none; color: #b7892f; }
+.aiStatus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  color: var(--o-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.aiStatus .ghost { min-height: 0; padding: 2px 6px; font-size: 13px; }
+.aiSpinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ecdcb6;
+  border-top-color: #b7892f;
+  border-radius: 50%;
+  animation: aiSpin 0.8s linear infinite;
+}
+.aiStart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid #e5d2a6;
+  border-radius: 999px;
+  background: #fbf6ea;
+  color: var(--o-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.aiStart:hover { background: #f6ecd6; }
+.aiStart:disabled { opacity: 0.6; cursor: default; }
+.aiStart:focus-visible { outline: 2px solid var(--o-ink); outline-offset: 2px; }
+.aiNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #ecdcb6;
+  border-radius: 10px;
+  background: #fbf6ea;
+  color: #5b4a24;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.aiNote .sparkle { margin-top: 2px; }
+@keyframes aiPulse { 50% { opacity: 0.3; } }
+@keyframes aiSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .tab[data-pending="true"]::after, .aiSpinner { animation: none; }
+}
 
 .saveBar {
   position: sticky;

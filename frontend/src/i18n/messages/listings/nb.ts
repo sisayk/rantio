@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "En tømmerhytte med egen strand, vedfyrt badstue, robåt og kveldssol over vannet…",
     written: "Skrevet",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Skriv på ett språk og lagre. Deretter oversetter KI teksten til de andre språkene. Det du skriver selv, endres aldri.",
+      badge: "KI",
+      autoTab: "Oversatt med KI",
+      pendingTab: "Oversettes…",
+      note: "Oversatt med KI, originalspråk: {from}. Les gjennom: når du endrer teksten, blir den din og erstattes ikke.",
+      working: "Oversetter til de andre språkene … De vises her etter hvert som de blir klare.",
+      done: "Oversettelsene er klare.",
+      failed: "Disse kunne ikke oversettes: {langs}.",
+      retry: "Prøv igjen",
+      fill: "Oversett til de andre språkene med KI",
+      error: "Oversettelsen kunne ikke starte. Prøv igjen om litt.",
+    },
   },
 
   photos: {

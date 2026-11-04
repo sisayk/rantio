@@ -340,6 +340,16 @@ class Cottage(models.Model):
         help_text="The description in each language the owner wrote, {\"en\": \"…\", \"sv\": \"…\"}. "
         "description_en and description_fi mirror the en and fi entries.",
     )
+    descriptions_auto = models.JSONField(
+        default=dict, blank=True,
+        help_text="Languages Claude translated, each mapped to the language it was translated from, {\"sv\": \"en\"}. "
+        "Languages the owner wrote are never here and are never overwritten.",
+    )
+    translating = models.JSONField(
+        default=dict, blank=True,
+        help_text="While translations are being written: {\"job\": \"…\", \"from\": \"en\", \"langs\": [\"sv\", …], \"started\": \"…\"}. "
+        "Afterwards {\"failed\": [\"…\"]} if some languages couldn't be done, else empty.",
+    )
     address = models.CharField(max_length=200, blank=True, help_text="Street address. Never shown to guests before a booking.")
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

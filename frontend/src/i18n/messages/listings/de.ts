@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Ein Blockhaus am eigenen Ufer, mit Holzsauna, Ruderboot und Abendsonne über dem See…",
     written: "Verfasst",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Schreib in einer Sprache und speichere. Danach übersetzt KI den Text in die anderen Sprachen. Was du selbst schreibst, wird nie geändert.",
+      badge: "KI",
+      autoTab: "Mit KI übersetzt",
+      pendingTab: "Wird übersetzt …",
+      note: "Mit KI übersetzt, Originalsprache: {from}. Lies den Text durch: Sobald du ihn änderst, gehört er dir und wird nicht mehr ersetzt.",
+      working: "Übersetzung in die anderen Sprachen läuft … Die Texte erscheinen hier, sobald sie fertig sind.",
+      done: "Die Übersetzungen sind fertig.",
+      failed: "Diese konnten nicht übersetzt werden: {langs}.",
+      retry: "Erneut versuchen",
+      fill: "Mit KI in die anderen Sprachen übersetzen",
+      error: "Die Übersetzung konnte nicht starten. Versuch es gleich noch einmal.",
+    },
   },
 
   photos: {

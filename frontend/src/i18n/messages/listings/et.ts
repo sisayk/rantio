@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Palkmaja oma kaldal, puuküttega saun, sõudepaat ja õhtupäike järve kohal…",
     written: "Kirjutatud",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Kirjuta ühes keeles ja salvesta. Seejärel tõlgib tehisintellekt teksti teistesse keeltesse. Seda, mida ise kirjutad, ei muudeta kunagi.",
+      badge: "TI",
+      autoTab: "Tehisintellekti tõlge",
+      pendingTab: "Tõlgitakse…",
+      note: "Tehisintellekti tõlge, lähtekeel: {from}. Loe see läbi: kui seda muudad, on see sinu oma ja seda enam ei asendata.",
+      working: "Tõlgitakse teistesse keeltesse… Tõlked ilmuvad siia kohe, kui need valmis saavad.",
+      done: "Tõlked on valmis.",
+      failed: "Neid ei õnnestunud tõlkida: {langs}.",
+      retry: "Proovi uuesti",
+      fill: "Tõlgi tehisintellektiga teistesse keeltesse",
+      error: "Tõlkimist ei õnnestunud alustada. Proovi hetke pärast uuesti.",
+    },
   },
 
   photos: {

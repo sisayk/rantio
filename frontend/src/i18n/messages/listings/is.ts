@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Bjálkabústaður við eigin strönd, með viðarkyntu gufubaði, árabát og kvöldsól yfir vatninu…",
     written: "Skrifað",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Skrifaðu á einu tungumáli og vistaðu. Gervigreind þýðir textann svo á hin tungumálin. Texta sem þú hefur skrifað er aldrei breytt.",
+      badge: "AI",
+      autoTab: "Þýtt með gervigreind",
+      pendingTab: "Í þýðingu…",
+      note: "Þýtt með gervigreind, frummál: {from}. Lestu yfir: þegar þú breytir textanum verður hann þinn og honum er ekki skipt út.",
+      working: "Þýði á hin tungumálin… Þýðingarnar birtast hér jafnóðum og þær eru tilbúnar.",
+      done: "Þýðingarnar eru tilbúnar.",
+      failed: "Ekki tókst að þýða: {langs}.",
+      retry: "Reyna aftur",
+      fill: "Þýða á hin tungumálin með gervigreind",
+      error: "Ekki tókst að hefja þýðinguna. Reyndu aftur eftir smástund.",
+    },
   },
 
   photos: {

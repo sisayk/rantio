@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Rąstinis namelis prie savo kranto, su malkomis kūrenama pirtimi, irkline valtimi ir vakaro saule virš ežero…",
     written: "Parašyta",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Parašykite viena kalba ir išsaugokite. Tada DI išvers tekstą į kitas kalbas. Jūsų pačių parašyti tekstai niekada nekeičiami.",
+      badge: "DI",
+      autoTab: "Išversta DI",
+      pendingTab: "Verčiama…",
+      note: "Išversta DI, originalo kalba: {from}. Perskaitykite: kai jį pakeisite, jis bus jūsų ir nebebus pakeistas.",
+      working: "Verčiama į kitas kalbas… Vertimai atsiras čia, kai tik bus paruošti.",
+      done: "Vertimai paruošti.",
+      failed: "Nepavyko išversti: {langs}.",
+      retry: "Bandyti dar kartą",
+      fill: "Išversti į kitas kalbas su DI",
+      error: "Nepavyko pradėti vertimo. Bandykite dar kartą po akimirkos.",
+    },
   },
 
   photos: {

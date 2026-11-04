@@ -131,6 +131,19 @@ export const listings = {
     descriptionPlaceholder: "A log cottage on its own shore, with a wood-fired sauna, a rowing boat and an evening sun over the lake…",
     written: "Written",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Write it in one language and save. AI then translates it into the other languages. The ones you write yourself are never changed.",
+      badge: "AI",
+      autoTab: "Translated by AI",
+      pendingTab: "Translating…",
+      note: "Translated by AI from {from}. Read it through: once you change it, it's yours and won't be replaced.",
+      working: "Translating into the other languages… They appear here as they're ready.",
+      done: "The translations are ready.",
+      failed: "These couldn't be translated: {langs}.",
+      retry: "Try again",
+      fill: "Translate into the other languages with AI",
+      error: "The translation couldn't start. Try again in a moment.",
+    },
   },
 
   photos: {

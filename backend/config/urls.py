@@ -54,6 +54,7 @@ urlpatterns = [
     path("api/owner/cottages/<int:pk>/links/", listing_links.OwnerLinksView.as_view(), name="owner-links"),
     path("api/owner/links/<int:pk>/", listing_links.OwnerLinkView.as_view(), name="owner-link"),
     path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
+    path("api/owner/cottages/<int:pk>/translate/", listings.OwnerTranslateView.as_view(), name="owner-cottage-translate"),
     path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),
     path("api/owner/cottages/<int:pk>/preview/", listings.OwnerPreviewView.as_view(), name="owner-cottage-preview"),
     path("api/owner/cottages/<int:pk>/prices/", listings.OwnerPricesView.as_view(), name="owner-prices"),

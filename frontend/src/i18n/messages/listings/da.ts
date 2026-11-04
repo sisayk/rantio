@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "Et bjælkehus med egen strand, brændefyret sauna, robåd og aftensol over søen…",
     written: "Skrevet",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Skriv på ét sprog, og gem. Derefter oversætter AI teksten til de andre sprog. Det, du selv skriver, ændres aldrig.",
+      badge: "AI",
+      autoTab: "Oversat med AI",
+      pendingTab: "Oversættes…",
+      note: "Oversat med AI, originalsprog: {from}. Læs den igennem: når du ændrer den, er den din og bliver ikke erstattet.",
+      working: "Oversætter til de andre sprog … De vises her, efterhånden som de bliver klar.",
+      done: "Oversættelserne er klar.",
+      failed: "Disse kunne ikke oversættes: {langs}.",
+      retry: "Prøv igen",
+      fill: "Oversæt til de andre sprog med AI",
+      error: "Oversættelsen kunne ikke starte. Prøv igen om lidt.",
+    },
   },
 
   photos: {

@@ -127,6 +127,19 @@ export const listings: NonNullable<Translation["listings"]> = {
     descriptionPlaceholder: "En timmerstuga vid egen strand, med vedeldad bastu, roddbåt och kvällssol över sjön…",
     written: "Skrivet",
     chars: "{n} / {max}",
+    ai: {
+      lead: "Skriv på ett språk och spara. Sedan översätter AI texten till de andra språken. Det du skriver själv ändras aldrig.",
+      badge: "AI",
+      autoTab: "Översatt med AI",
+      pendingTab: "Översätts…",
+      note: "Översatt med AI, originalspråk: {from}. Läs igenom den: när du ändrar den blir den din och ersätts inte.",
+      working: "Översätter till de andra språken … De visas här allt eftersom de blir klara.",
+      done: "Översättningarna är klara.",
+      failed: "Följande kunde inte översättas: {langs}.",
+      retry: "Försök igen",
+      fill: "Översätt till de andra språken med AI",
+      error: "Översättningen kunde inte starta. Försök igen om en stund.",
+    },
   },
 
   photos: {

@@ -3,9 +3,11 @@
   GET    /api/owner/cottages/                          every cottage with status, completeness, channels, stays
   POST   /api/owner/cottages/                          {"name"} a new draft
   GET    /api/owner/cottages/<id>/                     everything the owner can edit, private fields included
-  PATCH  /api/owner/cottages/<id>/                     change any of it; descriptions merge per language
+  PATCH  /api/owner/cottages/<id>/                     change any of it; descriptions merge per language, and a
+                                                       language the owner writes is translated into the rest (translate.py)
   DELETE /api/owner/cottages/<id>/                     {"confirm": name} only with no bookings or messages
   POST   /api/owner/cottages/<id>/status/              {"action": publish|pause|relist|archive|restore}
+  POST   /api/owner/cottages/<id>/translate/           {"source"?} Claude fills the languages the owner hasn't written
   POST   /api/owner/cottages/<id>/duplicate/           a draft copy with the same details and photos
   GET    /api/owner/cottages/<id>/preview/             the listing as guests would see it (no private fields)
   POST   /api/owner/cottages/<id>/photos/              add a photo (multipart: "file", optional "kind", "caption")
@@ -31,9 +33,10 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import parsers, serializers, status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import calendar, pricing
+from . import calendar, pricing, translate
 from .calendar import FEED_CHANNELS
 from .listing_links import links_for, sync_nettimokki
 from .media_checks import IMAGE_MAX, image_type
@@ -219,6 +222,8 @@ def cottage_detail(c: Cottage) -> dict:
         "floors": c.floors,
         "host_languages": list(c.host_languages or []),
         "descriptions": descriptions_of(c),
+        "descriptions_auto": {k: v for k, v in (c.descriptions_auto or {}).items() if k in descriptions_of(c)},
+        "translation": {"enabled": translate.enabled(), **translate.state(c)},
         "address": c.address,
         "latitude": None if c.latitude is None else float(c.latitude),
         "longitude": None if c.longitude is None else float(c.longitude),
@@ -420,17 +425,36 @@ class CottageSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance: Cottage, validated_data):
+        self.translation_job = None
         if "descriptions" in validated_data:
             # Merge: only the languages sent change; an empty text removes that language.
             texts = descriptions_of(instance)
+            auto = {k: v for k, v in (instance.descriptions_auto or {}).items() if k in texts}
+            written, removed = [], []
             for lang, body in validated_data.pop("descriptions").items():
+                if body == texts.get(lang, ""):
+                    continue  # sent back as it was, a translation included: nothing changes
+                was_auto = auto.pop(lang, None) is not None  # an edited translation is the owner's from now on
                 if body:
                     texts[lang] = body
+                    if not was_auto:
+                        written.append(lang)
                 else:
                     texts.pop(lang, None)
-            instance.descriptions = texts
+                    if not was_auto:
+                        removed.append(lang)
+            own = translate.owner_languages(texts, auto)
+            if not own:
+                # Nothing of the owner's left to translate from: the translations go too.
+                texts = {k: v for k, v in texts.items() if k not in auto}
+                auto = {}
+            instance.descriptions, instance.descriptions_auto = texts, auto
             instance.description_en = texts.get("en", "")
             instance.description_fi = texts.get("fi", "")
+            # The owner wrote or rewrote a language: the rest follow it. Editing a translation changes only that one.
+            source = translate.preferred(written) or (translate.preferred(own) if removed and auto else None)
+            if source:
+                self.translation_job = translate.plan(instance, source)
         amenities = validated_data.get("amenities")
         if "pets_allowed" in validated_data:
             keys = list(amenities if amenities is not None else instance.amenities or [])
@@ -523,6 +547,9 @@ class OwnerCottageView(APIView):
         with transaction.atomic():
             data.save()
             log(cottage, request, "edit", sorted(data.validated_data))
+            if data.translation_job:
+                job = data.translation_job
+                transaction.on_commit(lambda: translate.start(cottage.pk, job))
         return Response(cottage_detail(own(request, pk)))
 
     def delete(self, request, pk):
@@ -537,6 +564,40 @@ class OwnerCottageView(APIView):
         with transaction.atomic():
             cottage.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TranslateSerializer(serializers.Serializer):
+    source = serializers.ChoiceField(choices=sorted(LANGS), required=False)
+
+
+class OwnerTranslateView(APIView):
+    """Fill every language the owner hasn't written with Claude's translation, again if need be:
+    for listings written before translating was automatic, and after a translation failed."""
+
+    permission_classes = [IsOwner]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "ai-draft"
+
+    def post(self, request, pk):
+        if not translate.enabled():
+            return Response({"detail": "ai_not_configured"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        data = TranslateSerializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        with transaction.atomic():
+            cottage = get_object_or_404(Cottage.objects.select_for_update(), pk=pk, owner=request.user.owner)
+            texts = descriptions_of(cottage)
+            auto = {k: v for k, v in (cottage.descriptions_auto or {}).items() if k in texts}
+            own_langs = translate.owner_languages(texts, auto)
+            source = data.validated_data.get("source")
+            source = source if source in own_langs else translate.preferred(own_langs)
+            if not source:
+                return Response({"detail": "no_description"}, status=status.HTTP_400_BAD_REQUEST)
+            cottage.descriptions, cottage.descriptions_auto = texts, auto
+            job = translate.plan(cottage, source)
+            cottage.save(update_fields=["descriptions", "descriptions_auto", "translating"])
+            if job:
+                transaction.on_commit(lambda: translate.start(cottage.pk, job))
+        return Response(cottage_detail(own(request, pk)))
 
 
 class StatusSerializer(serializers.Serializer):
