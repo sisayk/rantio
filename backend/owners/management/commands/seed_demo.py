@@ -18,7 +18,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from owners import alerts
-from owners.models import Booking, Conversation, Cottage, Country, Message, Owner, Region
+from owners.models import Booking, Conversation, Cottage, Country, Message, Owner
 
 DEMO_EMAIL = "demo@rantio.fi"
 # A Swedish owner, to see the dashboard in kronor.
@@ -26,9 +26,9 @@ DEMO_SE_EMAIL = "demo-se@rantio.fi"
 
 COTTAGES = [
     # name, municipality, region, guests, bedrooms, price, months listed (None = still setting up), rantio.fi page
-    ("Järvihuvila", "Savonlinna", Region.SAIMAA, 6, 3, 180, 9, "lakeside-villa"),
-    ("Rantasauna", "Lohja", Region.HELSINKI, 4, 2, 120, 5, "lohja-lake-cabin"),
-    ("Metsämökki", "Kuusamo", Region.OTHER, 5, 2, 140, None, ""),
+    ("Järvihuvila", "Savonlinna", "etela-savo", 6, 3, 180, 9, "lakeside-villa"),
+    ("Rantasauna", "Lohja", "uusimaa", 4, 2, 120, 5, "lohja-lake-cabin"),
+    ("Metsämökki", "Kuusamo", "pohjois-pohjanmaa", 5, 2, 140, None, ""),
 ]
 # What the demo cottages have, as on their rantio.fi pages (frontend/src/lib/listings.ts).
 AMENITIES = {
