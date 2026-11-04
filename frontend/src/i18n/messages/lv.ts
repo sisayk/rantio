@@ -483,9 +483,10 @@ export const lv: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki darbojas tāpat, tukšās nedēļas aizpildās",
+      title: "Esošās rezervācijas turpinās, tukšās nedēļas aizpildās",
       lead: "Kad rezervācija ienāk vienā kanālā, tie paši datumi tiek slēgti visur. Tā varētu izskatīties jūlijs kādā brīvdienu mājā pie Saimaa ezera.",
-      existing: "Nettimökki rezervācijas, kā līdz šim",
+      existing: "Rezervācijas no vietnēm, kuras jau izmantojat",
+      examples: "Piemēram, {sites}.",
       added: "Jaunas rezervācijas no ārvalstīm",
       photoAlt: "Šūpuļkrēsls pie brīvdienu mājas loga",
     },

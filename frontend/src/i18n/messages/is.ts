@@ -483,9 +483,10 @@ export const is: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki heldur áfram, tómu vikurnar fyllast",
+      title: "Bókanirnar þínar halda áfram, tómu vikurnar fyllast",
       lead: "Þegar bókun berst á einni rás lokast sömu dagar alls staðar. Svona gæti júlí litið út í bústað við Saimaa.",
-      existing: "Bókanir af Nettimökki, eins og áður",
+      existing: "Bókanir af síðunum sem þú notar nú þegar",
+      examples: "Til dæmis {sites}.",
       added: "Nýjar bókanir erlendis frá",
       photoAlt: "Ruggustóll við glugga í sumarbústað",
     },

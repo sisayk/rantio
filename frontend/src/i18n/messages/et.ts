@@ -483,9 +483,10 @@ export const et: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki jätkab, tühjad nädalad täituvad",
+      title: "Senised broneeringud jätkuvad, tühjad nädalad täituvad",
       lead: "Kui üks kanal saab broneeringu, suletakse samad kuupäevad kõikjal. Nii võiks välja näha juuli Saimaa puhkemajas.",
-      existing: "Nettimökki broneeringud nagu ennegi",
+      existing: "Broneeringud saitidelt, mida juba kasutad",
+      examples: "Näiteks {sites}.",
       added: "Uued broneeringud välismaalt",
       photoAlt: "Kiiktool puhkemaja akna all",
     },

@@ -495,9 +495,10 @@ export const en = {
       ],
     },
     calendar: {
-      title: "Nettimökki carries on, the empty weeks fill",
+      title: "Your bookings carry on, the empty weeks fill",
       lead: "When one channel books, the same dates close everywhere. This is how July could look at a Saimaa cottage.",
-      existing: "Nettimökki bookings, as before",
+      existing: "Bookings from the sites you already use",
+      examples: "For example {sites}.",
       added: "New bookings from abroad",
       photoAlt: "A rocking chair by a cottage window",
     },

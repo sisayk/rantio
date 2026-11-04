@@ -480,9 +480,10 @@ export const fi: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki jatkuu, tyhjät viikot täyttyvät",
+      title: "Nykyiset varauksesi jatkuvat, tyhjät viikot täyttyvät",
       lead: "Kun yhdestä kanavasta varataan, samat päivät suljetaan kaikkialta. Näin heinäkuu voisi näyttää Saimaan mökillä.",
-      existing: "Nettimökin varaukset, kuten ennenkin",
+      existing: "Varaukset sivustoilta, joita jo käytät",
+      examples: "Esimerkiksi {sites}.",
       added: "Uudet varaukset ulkomailta",
       photoAlt: "Keinutuoli mökin ikkunan ääressä",
     },

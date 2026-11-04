@@ -483,9 +483,10 @@ export const sv: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki fortsätter, de tomma veckorna fylls",
+      title: "Dina bokningar fortsätter, de tomma veckorna fylls",
       lead: "När en kanal får en bokning stängs samma datum överallt. Så här kunde juli se ut för en stuga vid Saimen.",
-      existing: "Bokningar via Nettimökki, som förut",
+      existing: "Bokningar via sajterna du redan använder",
+      examples: "Till exempel {sites}.",
       added: "Nya bokningar från utlandet",
       photoAlt: "En gungstol vid ett stugfönster",
     },

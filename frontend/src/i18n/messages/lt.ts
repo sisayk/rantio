@@ -488,9 +488,10 @@ export const lt: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki veikia kaip anksčiau, o tuščios savaitės užsipildo",
+      title: "Esami užsakymai tęsiasi, o tuščios savaitės užsipildo",
       lead: "Kai užsakymas gaunamas per vieną kanalą, tos pačios datos uždaromos visur. Taip galėtų atrodyti liepa namelyje prie Saimaa ežero.",
-      existing: "Nettimökki užsakymai, kaip anksčiau",
+      existing: "Užsakymai iš svetainių, kuriomis jau naudojatės",
+      examples: "Pavyzdžiui, {sites}.",
       added: "Nauji užsakymai iš užsienio",
       photoAlt: "Supamoji kėdė prie namelio lango",
     },

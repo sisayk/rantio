@@ -483,9 +483,10 @@ export const de: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki läuft weiter, die leeren Wochen füllen sich",
+      title: "Deine Buchungen laufen weiter, die leeren Wochen füllen sich",
       lead: "Wird über einen Kanal gebucht, sind dieselben Tage überall gesperrt. So könnte der Juli bei einem Ferienhaus am Saimaa aussehen.",
-      existing: "Buchungen über Nettimökki, wie bisher",
+      existing: "Buchungen über die Portale, die du schon nutzt",
+      examples: "Zum Beispiel {sites}.",
       added: "Neue Buchungen aus dem Ausland",
       photoAlt: "Ein Schaukelstuhl am Fenster eines Ferienhauses",
     },

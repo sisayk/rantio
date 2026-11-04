@@ -483,9 +483,10 @@ export const nb: Translation = {
       ],
     },
     calendar: {
-      title: "Nettimökki fortsetter, de tomme ukene fylles",
+      title: "Bookingene dine fortsetter, de tomme ukene fylles",
       lead: "Når én kanal får en booking, stenges de samme datoene overalt. Slik kan juli se ut for en hytte ved Saimaa.",
-      existing: "Bookinger fra Nettimökki, som før",
+      existing: "Bookinger fra nettstedene du allerede bruker",
+      examples: "For eksempel {sites}.",
       added: "Nye bookinger fra utlandet",
       photoAlt: "En gyngestol ved et hyttevindu",
     },

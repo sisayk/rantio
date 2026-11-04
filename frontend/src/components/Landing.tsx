@@ -4,7 +4,7 @@ import { countryName, fill, languageNamesIn, money } from "@/i18n/format";
 import { LANG_INFO, type Lang, LANGS } from "@/i18n/locales";
 import { TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
-import { CHANNELS } from "@/lib/catalog";
+import { type ChannelId, CHANNELS } from "@/lib/catalog";
 import { COMMISSION, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
 import { type Currency, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import { COUNTRIES } from "@/lib/listings";
@@ -21,9 +21,32 @@ import MonitorWaitlist from "./MonitorWaitlist";
 import monitorPhoto from "@/assets/mokki-monitor.jpg";
 import SiteFooter from "./SiteFooter";
 
-// July 2027 at an example Saimaa cottage: Nettimökki weeks stay, gaps fill from abroad.
+// July 2027 at an example Saimaa cottage: the weeks from the owner's current sites stay,
+// gaps fill from abroad.
 const JULY_OFFSET = 3; // 1 July 2027 is a Thursday
-const EXISTING = new Set([3, 4, 5, 6, 7, 8, 9, 24, 25, 26, 27, 28, 29, 30]);
+const EXISTING: Record<number, string> = {
+  3: "Nettimökki", 4: "Nettimökki", 5: "Nettimökki", 6: "Nettimökki", 7: "Nettimökki", 8: "Nettimökki", 9: "Nettimökki",
+  24: "Lomarengas", 25: "Lomarengas", 26: "Lomarengas", 27: "Lomarengas", 28: "Lomarengas", 29: "Lomarengas", 30: "Lomarengas",
+};
+const EXISTING_STARTS = new Set([3, 24]);
+
+// The local sites a visitor's country uses, as examples under the calendar.
+const LOCAL_SITES: Partial<Record<Lang, ChannelId[]>> = {
+  sv: ["stugsommar", "novasol"],
+  nb: ["finn", "inatur"],
+  nn: ["finn", "inatur"],
+  da: ["dancenter", "sologstrand"],
+};
+const FINNISH_SITES: ChannelId[] = ["nettimokki", "lomarengas", "mokkivuokra"];
+
+function siteList(lang: Lang): string {
+  const names = (LOCAL_SITES[lang] ?? FINNISH_SITES).map((id) => CHANNELS[id].name);
+  try {
+    return new Intl.ListFormat(LANG_INFO[lang].intl, { type: "conjunction" }).format(names);
+  } catch {
+    return names.join(", ");
+  }
+}
 const ADDED: Record<number, string> = {
   11: "Airbnb", 12: "Airbnb", 13: "Airbnb", 14: "Airbnb", 15: "Airbnb",
   17: "Booking.com", 18: "Booking.com", 19: "Booking.com", 20: "Booking.com", 21: "Booking.com",
@@ -195,7 +218,7 @@ export default function Landing({ lang }: { lang: Lang }) {
           <p className={styles.cardsNote}>{t.listings.note}</p>
         </section>
 
-        {/* Calendar: Nettimökki stays, the gaps fill */}
+        {/* Calendar: the owner's current sites stay, the gaps fill */}
         <section className={`${styles.wide} ${styles.split}`} aria-labelledby="calendar-title">
           <div className={styles.splitPhoto}>
             <img src={PHOTOS.interior.src} alt={t.calendar.photoAlt} width={1000} height={1200} loading="lazy" />
@@ -218,18 +241,19 @@ export default function Landing({ lang }: { lang: Lang }) {
                 ))}
                 {days.map((day) => {
                   const channel = ADDED[day];
-                  const kind = channel ? styles.dayAdded : EXISTING.has(day) ? styles.dayExisting : styles.dayFree;
+                  const local = EXISTING[day];
+                  const kind = channel ? styles.dayAdded : local ? styles.dayExisting : styles.dayFree;
                   const order = channel ? fillOrder++ : 0;
-                  const start = channel && RUN_STARTS.has(day);
+                  const start = (channel && RUN_STARTS.has(day)) || (local && EXISTING_STARTS.has(day));
                   return (
                     <span
                       key={day}
                       className={`${styles.day} ${kind} ${start ? styles.dayRunStart : ""}`}
                       style={channel ? ({ "--i": order } as React.CSSProperties) : undefined}
-                      title={channel ?? (EXISTING.has(day) ? "Nettimökki" : undefined)}
+                      title={channel ?? local}
                     >
                       {day}
-                      {start ? <em className={styles.dayChannel}>{channel}</em> : null}
+                      {start ? <em className={styles.dayChannel}>{channel ?? local}</em> : null}
                     </span>
                   );
                 })}
@@ -243,6 +267,7 @@ export default function Landing({ lang }: { lang: Lang }) {
                 <span className={styles.swatchAdded} /> {t.calendar.added}
               </li>
             </ul>
+            <p className={styles.legendNote}>{fill(lang, t.calendar.examples, { sites: siteList(lang) })}</p>
           </div>
         </section>
 
