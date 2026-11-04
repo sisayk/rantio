@@ -39,6 +39,7 @@ RADIUS_KM = 40
 MAX_EVENTS = 60
 PER_DAY = 6  # events shown for each day of the stay
 LONG_SHOWN = 8  # and running through it (exhibitions, festivals)
+LONGEST_DAYS = 400
 MAX_STAY_DAYS = 60
 CACHE_SECONDS = 6 * 3600
 LANGS = ("en", "fi", "sv")  # Linked Events has these; other site languages get English
@@ -127,7 +128,7 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
     # One ask per day of the stay for that day's events (at most a day long), so a busy day
     # doesn't crowd out the others, and one for longer ones such as exhibitions and festivals.
     days = [start + timedelta(days=i) for i in range(min((end - start).days + 1, LINKED_DAYS))]
-    asks = [{**base, "start": d.isoformat(), "end": d.isoformat(), "max_duration": "1d", "page_size": 25} for d in days]
+    asks = [{**base, "start": d.isoformat(), "end": d.isoformat(), "max_duration": "1d", "page_size": 50} for d in days]
     asks.append({**base, "start": start.isoformat(), "end": end.isoformat(), "min_duration": "2d", "page_size": 20})
     with ThreadPoolExecutor(max_workers=4) as pool:
         pages = list(pool.map(lambda q: _get(f"{LINKED_EVENTS}?{urllib.parse.urlencode(q)}"), asks))
@@ -136,6 +137,8 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
         # A series ("recurring") or a festival's frame ("umbrella") spans months; its own dates
         # come as separate events, which are what guests can go to.
         if e.get("event_status") in ("EventCancelled", "EventPostponed") or e.get("super_event_type") in ("umbrella", "recurring"):
+            continue
+        if e.get("is_virtualevent"):  # online only: nothing to go to near the cottage
             continue
         # Only events presented in the guest's language: guests reading in English get the
         # ones written for visitors, not every local club meeting.
@@ -234,7 +237,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events5:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events6:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
@@ -256,6 +259,8 @@ def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
         if not first or not e["name"] or not e["url"].startswith(("https://", "http://")):
             continue
         if last < start or first > end:  # only what happens during the stay
+            continue
+        if (last - first).days > LONGEST_DAYS:  # permanent collections and standing offers aren't events
             continue
         dist = km_between(lat, lng, float(e["lat"]), float(e["lng"]))
         if dist > RADIUS_KM:
