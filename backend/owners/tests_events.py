@@ -18,6 +18,12 @@ LINKED = {"meta": {"count": 3}, "data": [
     {"id": "helsinki:2", "name": {"en": "Jazz evening"}, "start_time": f"{D(3)}T17:00:00Z", "end_time": None,
      "info_url": {"en": "https://example.fi/jazz"}, "offers": [{"is_free": False, "price": {"en": "15 €"}}],
      "location": {"name": {"en": "Club"}, "position": {"coordinates": [24.93, 60.17]}}, "keywords": [{"name": {"en": "jazz"}}]},
+    {"id": "helsinki:4", "name": {"en": "Weekly board games"}, "super_event_type": "recurring", "start_time": f"{D(-60)}T14:00:00Z",
+     "end_time": f"{D(200)}T16:00:00Z", "info_url": {"en": "https://example.fi/games"},
+     "location": {"position": {"coordinates": [24.93, 60.17]}}},
+    {"id": "helsinki:5", "name": {"en": "Long exhibition"}, "start_time": f"{D(-30)}T08:00:00Z", "end_time": f"{D(90)}T16:00:00Z",
+     "info_url": {"en": "https://example.fi/expo"}, "location": {"position": {"coordinates": [24.93, 60.17]}},
+     "keywords": [{"name": {"en": "exhibitions"}}]},
     {"id": "helsinki:3", "name": {"en": "After the stay"}, "start_time": f"{D(20)}T17:00:00Z",
      "info_url": {"en": "https://example.fi/late"}, "location": {"position": {"coordinates": [24.93, 60.17]}}},
 ]}
@@ -51,9 +57,10 @@ class EventsTests(TestCase):
             self.get(**{"from": D(1), "to": D(5)})
         self.assertEqual(res.status_code, 200, res.content)
         body = res.json()
-        self.assertEqual([e["name"] for e in body["events"]], ["Christmas market", "Jazz evening", "HIFK – Tappara"])
+        # The series' frame is left out; the long exhibition comes after the dated events.
+        self.assertEqual([e["name"] for e in body["events"]], ["Christmas market", "Jazz evening", "HIFK – Tappara", "Long exhibition"])
         self.assertEqual(call.call_count, 2)  # both sources once; the second ask came from the cache
-        market, jazz, hockey = body["events"]
+        market, jazz, hockey, _ = body["events"]
         self.assertEqual((market["price"]["free"], market["interests"]), (True, ["market", "family"]))
         self.assertEqual(market["description"], "Crafts and glögi on the square.")
         self.assertEqual((jazz["price"]["free"], jazz["price"]["text"]), (False, "15 €"))
@@ -69,7 +76,7 @@ class EventsTests(TestCase):
         with mock.patch.object(events, "_get", side_effect=broken):
             body = self.get(**{"from": D(1), "to": D(5)}).json()
         self.assertEqual(body["sources"], ["Linked Events"])
-        self.assertEqual(len(body["events"]), 2)
+        self.assertEqual(len(body["events"]), 3)
 
     @override_settings(TICKETMASTER_API_KEY="")
     def test_outside_the_covered_areas(self):

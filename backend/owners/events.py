@@ -117,12 +117,14 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
     params = urllib.parse.urlencode({
         "bbox": f"{west:.4f},{south:.4f},{east:.4f},{north:.4f}",
         "start": start.isoformat(), "end": end.isoformat(),
-        "include": "location,keywords", "sort": "start_time", "page_size": 60,
+        "include": "location,keywords", "sort": "start_time", "page_size": 100,
     })
     data = _get(f"{LINKED_EVENTS}?{params}")
     out = []
     for e in data.get("data", []):
-        if e.get("event_status") in ("EventCancelled", "EventPostponed") or e.get("super_event_type") == "umbrella":
+        # A series ("recurring") or a festival's frame ("umbrella") spans months; its own dates
+        # come as separate events, which are what guests can go to.
+        if e.get("event_status") in ("EventCancelled", "EventPostponed") or e.get("super_event_type") in ("umbrella", "recurring"):
             continue
         loc = e.get("location") or {}
         coords = ((loc.get("position") or {}).get("coordinates")) or []
@@ -214,7 +216,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events2:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
@@ -244,8 +246,11 @@ def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
         if dedupe in seen:
             continue
         seen.add(dedupe)
-        events.append({**e, "km": round(dist, 1)})
-    events.sort(key=lambda e: (max(_day(e["start"]), start), e["km"]))
+        events.append({**e, "km": round(dist, 1), "_long": (last - first).days > 3})
+    # Events on given days first, by date and distance; long-running ones (exhibitions) after.
+    events.sort(key=lambda e: (e["_long"], max(_day(e["start"]), start), e["km"]))
+    for e in events:
+        del e["_long"]
     answer = {"events": events[:MAX_EVENTS], "sources": sources, "covered": bool(providers)}
     cache.set(key, answer, CACHE_SECONDS)
     return answer
