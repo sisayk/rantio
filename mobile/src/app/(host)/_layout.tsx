@@ -9,9 +9,11 @@ import { colors } from "@/theme";
 /** Hosting: today's stays and requests, the one calendar, guests' messages, earnings. */
 export default function HostTabs() {
   const { m } = useT();
-  const { signedIn } = useSession();
+  const { signedIn, owner } = useSession();
   const { unread } = useHost();
   if (!signedIn) return <Redirect href="/login" />;
+  // Signed in but not hosting yet: listing a cottage comes first.
+  if (owner && !owner.is_host) return <Redirect href="/list-cottage" />;
   const t = m.app.tabs;
   return (
     <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelStyle={{ selected: { color: colors.green } }}>

@@ -178,6 +178,22 @@ class EmailCheckTests(TestCase):
         me = APIClient().get("/api/owner/me/", HTTP_AUTHORIZATION=f"Bearer {key}")
         self.assertEqual(me.status_code, 200)
 
+    def test_a_signed_in_account_lists_without_a_code_and_becomes_a_host(self):
+        from . import login as owner_login
+
+        account = owner_login.new_account("matti@example.fi", lang="fi")
+        self.client.force_login(owner_login.user_for(account))
+        self.assertEqual(self.client.get("/api/owner/summary/").status_code, 403)
+        res = self.sign_up(email="someone.else@example.fi")  # the account's own address is used
+        self.assertEqual(res.status_code, 201, res.content)
+        self.assertTrue(res.json()["signed_in"])
+        account.refresh_from_db()
+        self.assertTrue(account.is_host)
+        self.assertEqual(account.name, "Matti Virtanen")
+        self.assertEqual(OwnerSignup.objects.get().email, "matti@example.fi")
+        self.assertEqual(account.cottages.count(), 1)
+        self.assertEqual(self.client.get("/api/owner/summary/").status_code, 200)
+
     def test_codes_are_limited(self):
         for _ in range(5):
             self.code_for()

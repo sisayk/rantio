@@ -14,7 +14,7 @@ from django.db.models import Sum
 from django.utils import timezone
 
 from . import sms
-from .models import LoginCode, Owner
+from .models import Language, LoginCode, Owner
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +112,19 @@ SMS_MESSAGES = {
 
 def _hash(owner: Owner, code: str) -> str:
     return hmac.new(settings.SECRET_KEY.encode(), f"{owner.pk}:{code}".encode(), hashlib.sha256).hexdigest()
+
+
+def new_account(email: str, name: str = "", lang: str = "en") -> Owner:
+    """An account for someone signing in for the first time, with an email address they've proven
+    (a code, or Google or Apple). Not a host until they list a cottage."""
+    email = email.strip()
+    existing = find_owner(email)
+    if existing:
+        return existing
+    return Owner.objects.create(
+        name=(name.strip() or email.split("@")[0])[:120], email=email, is_host=False,
+        language=lang if lang in Language.values else Language.ENGLISH,
+    )
 
 
 def find_owner(email: str) -> Owner | None:

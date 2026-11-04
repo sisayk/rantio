@@ -12,11 +12,12 @@ import { AboutRows, SettingsRows } from "@/ui/settings";
 export default function Profile() {
   const { m } = useT();
   const { setMode } = usePrefs();
-  const { signedIn, owner } = useSession();
+  const { signedIn, owner, signOut } = useSession();
   const router = useRouter();
 
   const toHosting = () => {
     if (!signedIn) return router.push("/login");
+    if (owner && !owner.is_host) return router.push("/list-cottage");
     setMode("hosting");
     router.replace("/today");
   };
@@ -32,6 +33,14 @@ export default function Profile() {
                 {owner?.name ?? ""}
               </Text>
               <Text v="small">{owner?.email ?? ""}</Text>
+              <Button
+                small
+                kind="ghost"
+                icon="log-out-outline"
+                label={m.dashboard.logout}
+                onPress={() => void signOut()}
+                style={{ marginTop: space.sm }}
+              />
             </>
           ) : (
             <>

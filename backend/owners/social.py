@@ -60,7 +60,7 @@ def _claims(provider: str, token: str) -> dict:
     return claims
 
 
-def owner_for(provider: str, token: str) -> Owner:
+def owner_for(provider: str, token: str, lang: str = "en") -> Owner:
     claims = _claims(provider, token)
     field = PROVIDERS[provider]["field"]
     owner = Owner.objects.filter(**{field: claims["sub"]}).first()
@@ -71,8 +71,10 @@ def owner_for(provider: str, token: str) -> Owner:
     if not email or str(claims.get("email_verified", "")).lower() != "true":
         raise SignInError("no_email")
     owner = Owner.objects.filter(email__iexact=email).first()
-    if not owner:
-        raise SignInError("no_owner")
+    if not owner:  # someone new: Google or Apple has checked the address, so it's their account
+        from .login import new_account
+
+        owner = new_account(email, name=str(claims.get("name") or ""), lang=lang)
     setattr(owner, field, claims["sub"])  # next time the account id finds them, even if the email changes
     owner.save(update_fields=[field])
     return owner

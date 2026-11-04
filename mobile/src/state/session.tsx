@@ -21,7 +21,8 @@ const SecureStore =
       }
     : Secure;
 
-type Owner = { name: string; email: string; language: string; is_pilot: boolean };
+/** Anyone signed in; is_host once they've listed a cottage (only hosts reach the hosting tabs). */
+type Owner = { name: string; email: string; language: string; is_pilot: boolean; is_host: boolean };
 
 type Session = {
   ready: boolean;
@@ -29,8 +30,11 @@ type Session = {
   /** Changes with each sign-in, so data from an earlier owner on this phone is never shown. */
   sessionId: string | null;
   owner: Owner | null;
-  signIn: (to: SignInTo, code: string) => Promise<void>;
-  signInWith: (provider: "apple" | "google", idToken: string) => Promise<void>;
+  /** Signs in (making an account for someone new) and says who it is. */
+  signIn: (to: SignInTo, code: string) => Promise<Owner | null>;
+  signInWith: (provider: "apple" | "google", idToken: string) => Promise<Owner | null>;
+  /** Asks again who is signed in (after listing a cottage, the account is a host). */
+  refresh: () => Promise<Owner | null>;
   /** Signed in by the sign-up form (its email was checked with a code). */
   signedUp: (key: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -49,6 +53,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     await SecureStore.setItemAsync(KEY, token);
     setApiKey(token);
     setKey(token);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    const me = await ownerApi.me().catch(() => null);
+    if (me) setOwner(me);
+    return me;
   }, []);
 
   const forget = useCallback(async () => {
@@ -94,18 +104,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signIn: async (to, code) => {
         const { token } = await ownerApi.verifyCode(to, code, deviceName(), Platform.OS === "ios" ? "ios" : "android");
         await keep(token);
+        return refresh();
       },
       signInWith: async (provider, idToken) => {
         const { token } = await ownerApi.social(provider, idToken, deviceName(), Platform.OS === "ios" ? "ios" : "android");
         await keep(token);
+        return refresh();
       },
+      refresh,
       signedUp: keep,
       signOut: async () => {
         await ownerApi.logout().catch(() => undefined);
         await forget();
       },
     }),
-    [ready, key, owner, forget, keep],
+    [ready, key, owner, forget, keep, refresh],
   );
 
   return <Ctx value={value}>{children}</Ctx>;

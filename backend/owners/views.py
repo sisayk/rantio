@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, parsers, permissions, views
+from rest_framework import authentication, generics, parsers, permissions, views
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
@@ -75,9 +75,20 @@ def become_owner(signup: OwnerSignup) -> Owner:
     if owner is None:
         owner = Owner.objects.create(name=signup.name, email=signup.email, phone=signup.phone,
                                      language=signup.language, signup=signup)
-    elif owner.signup_id is None:
-        owner.signup = signup
-        owner.save(update_fields=["signup"])
+    else:  # an account made by signing in (or an owner listing another cottage) becomes a host
+        changed = []
+        if owner.signup_id is None:
+            owner.signup = signup
+            changed.append("signup")
+        if not owner.is_host:
+            owner.is_host = True
+            owner.name = signup.name or owner.name
+            changed += ["is_host", "name"]
+        if signup.phone and not owner.phone:
+            owner.phone = signup.phone
+            changed.append("phone")
+        if changed:
+            owner.save(update_fields=changed)
     region = REGIONS.get(signup.country, {}).get(signup.region, "")
     cottage = Cottage.objects.create(
         owner=owner, name=(signup.place or region or signup.name)[:120], country=signup.country, region=signup.region,
@@ -103,7 +114,9 @@ class OwnerSignupCreateView(generics.CreateAPIView):
     queryset = OwnerSignup.objects.all()
     serializer_class = OwnerSignupSerializer
     permission_classes = [permissions.AllowAny]
-    authentication_classes = []  # public form: no session, so no CSRF check
+    # Public form; someone already signed in sends it with their session (and its CSRF token) or
+    # the app's key, and their checked address stands in for the email code.
+    authentication_classes = [authentication.SessionAuthentication, app_keys.AppKeyAuthentication]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "signup"
@@ -112,10 +125,13 @@ class OwnerSignupCreateView(generics.CreateAPIView):
         photos, error = signup_photos(request)
         if error:
             return error
+        account = request.user.owner if request.user.is_authenticated and hasattr(request.user, "owner") else None
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        checked = settings.SIGNUP_EMAIL_CHECK
-        if checked and not email_check.check(serializer.validated_data["email"], str(request.data.get("email_code", ""))):
+        checked = settings.SIGNUP_EMAIL_CHECK or account is not None
+        if account:
+            serializer.validated_data["email"] = account.email  # the address they signed in with
+        elif checked and not email_check.check(serializer.validated_data["email"], str(request.data.get("email_code", ""))):
             return Response({"email_code": ["wrong"]}, status=400)
         owner = None
         with transaction.atomic():
@@ -133,7 +149,9 @@ class OwnerSignupCreateView(generics.CreateAPIView):
         self.notify(signup, len(photos))
         answer = {**serializer.data, "token": signup.token, "checkout_url": checkout_url, "signed_in": False}
         # The email is checked: signed in straight away (the website by cookie, the app by key).
-        if owner:
+        if owner and account:
+            answer["signed_in"] = True  # already signed in, now as a host
+        elif owner:
             owner_login.user_for(owner)
             if wants_app(request):
                 platform = str(request.data.get("platform", ""))

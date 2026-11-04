@@ -484,9 +484,9 @@ export const ownerApi = {
   /** Which ways of signing in the server has switched on. */
   signInOptions: () => call<{ sms: boolean; google: boolean; apple: boolean }>("auth/options/"),
   /** Signs in with a Google or Apple ID token. */
-  social: (provider: "google" | "apple", idToken: string) =>
-    call<{ ok: boolean }>("auth/social/", { method: "POST", body: JSON.stringify({ provider, id_token: idToken }) }),
-  me: () => call<{ name: string; email: string }>("owner/me/"),
+  social: (provider: "google" | "apple", idToken: string, lang?: string) =>
+    call<{ ok: boolean }>("auth/social/", { method: "POST", body: JSON.stringify({ provider, id_token: idToken, ...(lang ? { lang } : {}) }) }),
+  me: () => call<{ name: string; email: string; is_host: boolean }>("owner/me/"),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
   monitor: () => call<{ joined: boolean }>("owner/monitor/"),
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { method: "POST" }),

@@ -97,17 +97,30 @@ export default function OwnerLogin({
     ownerApi.signInOptions().then(setOptions).catch(() => undefined);
   }, []);
 
-  function signedIn() {
+  // Hosts go to their dashboard; anyone else signed in goes to the listing form, filled in for them.
+  const listing = `${paths.hosts(lang)}#ilmoita`;
+  async function signedIn() {
     forgetOwnerSession();
-    window.location.assign(paths.hosting(lang));
+    const me = await ownerApi.me().catch(() => null);
+    window.location.assign(me && me.is_host === false ? listing : paths.hosting(lang));
   }
+
+  // Already signed in without hosting (sent here from a hosting page): straight to the listing form.
+  useEffect(() => {
+    ownerApi
+      .me()
+      .then((me) => {
+        if (me.is_host === false) window.location.replace(listing);
+      })
+      .catch(() => undefined);
+  }, [listing]);
 
   async function social(provider: "google" | "apple", idToken: string) {
     setBusy(true);
     setError("");
     try {
-      await ownerApi.social(provider, idToken);
-      signedIn();
+      await ownerApi.social(provider, idToken, lang);
+      await signedIn();
     } catch (err) {
       const detail = (err as { body?: { detail?: string } }).body?.detail;
       setError(detail === "no_owner" || detail === "no_email" ? l.noOwner : l.socialFailed);
@@ -181,7 +194,7 @@ export default function OwnerLogin({
     setError("");
     try {
       await ownerApi.verifyCode(to, code);
-      signedIn();
+      await signedIn();
     } catch (err) {
       const status = (err as { status?: number }).status;
       setError(status === 400 ? l.wrongCode : status === 429 ? l.tooMany : l.failed);

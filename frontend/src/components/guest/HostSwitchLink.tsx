@@ -20,6 +20,14 @@ export default function HostSwitchLink({
   signedOutHref?: string;
 }) {
   const owner = useOwnerSession();
+  // Signed in but not hosting yet: "Become a host" opens the listing form, filled in for them.
+  if (owner && !owner.isHost) {
+    return (
+      <a className={className} href={`${paths.hosts(lang)}#ilmoita`}>
+        {becomeHost}
+      </a>
+    );
+  }
   return owner ? (
     <a className={className} href={paths.hosting(lang)}>
       {switchToHosting}

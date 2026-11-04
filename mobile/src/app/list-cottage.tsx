@@ -36,7 +36,9 @@ export default function ListCottage() {
   const t = m.owner.form;
   const tr = TRIAL[lang];
   const router = useRouter();
-  const { signedUp } = useSession();
+  const { signedUp, signedIn, owner, refresh } = useSession();
+  // Someone already signed in lists with the address they signed in with: no email code.
+  const account = signedIn && owner ? owner : null;
   // rantio://list-cottage?signup=… (the welcome page sends the owner back here)
   const params = useLocalSearchParams<{ signup?: string }>();
   const [name, setName] = useState("");
@@ -62,7 +64,14 @@ export default function ListCottage() {
   const [codeFor, setCodeFor] = useState("");
   const [emailCode, setEmailCode] = useState("");
   const [isOwner, setIsOwner] = useState(false);
-  const codeStep = codeFor !== "" && codeFor === email.trim().toLowerCase();
+  const codeStep = !account && codeFor !== "" && codeFor === email.trim().toLowerCase();
+  const [filled, setFilled] = useState(false);
+  if (account && !filled) {
+    // Filled in once from the account (during render, so the fields start with it).
+    setFilled(true);
+    setEmail(account.email);
+    if (account.is_host || !account.email.startsWith(`${account.name}@`)) setName(account.name);
+  }
 
   const askNettimokki = country === "FI" && listed.includes("nettimokki");
   const toggleListed = (key: ListedOn) =>
@@ -194,8 +203,8 @@ export default function ListCottage() {
     setErrors(e);
     if (Object.keys(e).length) return;
     // First a code to the email address; the form goes through once it's typed in.
-    if (!codeStep) return sendCode();
-    if (emailCode.replace(/\D/g, "").length !== 6) return setErrors({ code: tr.code.wrong });
+    if (!account && !codeStep) return sendCode();
+    if (!account && emailCode.replace(/\D/g, "").length !== 6) return setErrors({ code: tr.code.wrong });
     setBusy(true);
     try {
       const res = await guestApi.listCottage({
@@ -220,6 +229,9 @@ export default function ListCottage() {
       }, photos);
       if (res.app_key) {
         await signedUp(res.app_key);
+        setIsOwner(true);
+      } else if (account && res.signed_in) {
+        await refresh(); // the account is a host now
         setIsOwner(true);
       }
       setToken(res.token);
@@ -313,6 +325,7 @@ export default function ListCottage() {
               label={t.email}
               value={email}
               onChangeText={setEmail}
+              editable={!account}
               autoComplete="email"
               textContentType="emailAddress"
               keyboardType="email-address"

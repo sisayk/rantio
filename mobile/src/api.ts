@@ -163,7 +163,7 @@ export const ownerApi = {
   /** Signs in with an Apple or Google ID token; the app gets its own key back. */
   social: (provider: "apple" | "google", idToken: string, device: string, platform: string) =>
     call<{ ok: boolean; token: string }>("auth/social/", json("POST", { provider, id_token: idToken, app: true, device, platform })),
-  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean }>("owner/me/", { owner: true }),
+  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean }>("owner/me/", { owner: true }),
   setLanguage: (language: string) =>
     call<{ language: string }>("owner/me/", { ...json("PATCH", { language }), owner: true }),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */

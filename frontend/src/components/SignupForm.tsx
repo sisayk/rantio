@@ -45,7 +45,19 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
   const [email, setEmail] = useState("");
   const [codeFor, setCodeFor] = useState("");
   const [signedIn, setSignedIn] = useState(false);
-  const codeStep = codeFor !== "" && codeFor === email.trim().toLowerCase();
+  // Someone already signed in lists with the address they signed in with: no code needed.
+  const [account, setAccount] = useState<{ name: string; email: string } | null>(null);
+  const codeStep = !account && codeFor !== "" && codeFor === email.trim().toLowerCase();
+  useEffect(() => {
+    fetch("/api/owner/me/", { credentials: "same-origin", headers: { Accept: "application/json" } })
+      .then((r) => (r.ok ? (r.json() as Promise<{ name: string; email: string }>) : null))
+      .then((me) => {
+        if (!me) return;
+        setAccount(me);
+        setEmail(me.email);
+      })
+      .catch(() => undefined);
+  }, []);
   // Where the cottage is listed now; "none" (not anywhere yet) and the sites exclude each other.
   const [listed, setListed] = useState<ListedOn[]>([]);
   const toggleListed = (key: ListedOn) =>
@@ -148,7 +160,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
     }
 
     // First the code to the email address; the form goes through once it's typed in.
-    if (!codeStep) {
+    if (!account && !codeStep) {
       setState("sending");
       if (await sendCode(String(data.get("name")).trim())) {
         setTimeout(() => form.querySelector<HTMLInputElement>('[name="email_code"]')?.focus(), 50);
@@ -157,7 +169,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       return;
     }
     const emailCode = String(data.get("email_code") ?? "").replace(/\D/g, "");
-    if (emailCode.length !== 6) {
+    if (!account && emailCode.length !== 6) {
       setErrors({ email_code: tr.code.wrong });
       form.querySelector<HTMLInputElement>('[name="email_code"]')?.focus();
       return;
@@ -190,7 +202,14 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
 
     setState("sending");
     try {
-      const response = await fetch("/api/signups/", { method: "POST", body: upload });
+      // Signed in: the session carries the account, so Django wants its CSRF token too.
+      const csrf = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/)?.[1] ?? "";
+      const response = await fetch("/api/signups/", {
+        method: "POST",
+        body: upload,
+        credentials: "same-origin",
+        headers: account && csrf ? { "X-CSRFToken": csrf } : undefined,
+      });
       if (response.status === 201) {
         const answer = (await response.json()) as { checkout_url?: string | null; signed_in?: boolean };
         setSignedIn(!!answer.signed_in);
@@ -253,7 +272,15 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
       <div className={styles.fieldGroup}>
         <label className={styles.groupField} data-invalid={!!errors.name}>
           <span>{f.name}</span>
-          <input name="name" autoComplete="name" required aria-invalid={!!errors.name} aria-describedby={described("name")} />
+          <input
+            key={account ? "account" : "new"}
+            name="name"
+            autoComplete="name"
+            required
+            defaultValue={account && !account.email.toLowerCase().startsWith(`${account.name.toLowerCase()}@`) ? account.name : ""}
+            aria-invalid={!!errors.name}
+            aria-describedby={described("name")}
+          />
         </label>
         <label className={styles.groupField} data-invalid={!!errors.email}>
           <span>{f.email}</span>
@@ -263,6 +290,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
             autoComplete="email"
             required
             value={email}
+            readOnly={!!account}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={!!errors.email}
             aria-describedby={described("email")}

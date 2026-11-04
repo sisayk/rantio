@@ -30,11 +30,22 @@ class LoginTests(TestCase):
     def verify(self, code, email="owner@example.com"):
         return self.client.post("/api/auth/verify-code/", {"email": email, "code": code}, content_type="application/json")
 
-    def test_unknown_email_gets_same_answer_and_no_mail(self):
-        res = self.request_code("nobody@example.com")
-        self.assertEqual(res.status_code, 200)
+    def test_someone_new_signs_in_with_an_emailed_code_and_gets_an_account(self):
+        res = self.request_code("Newcomer@example.com")
         self.assertEqual(res.json(), {"sent": True})
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 1)
+        code = re.search(r"\b(\d{6})\b", mail.outbox[-1].body).group(1)
+        self.assertEqual(self.verify("000000" if code != "000000" else "111111", "newcomer@example.com").status_code, 400)
+        self.assertFalse(Owner.objects.filter(email__iexact="newcomer@example.com").exists())
+        res = self.verify(code, "newcomer@example.com")
+        self.assertEqual(res.status_code, 200, res.content)
+        account = Owner.objects.get(email__iexact="newcomer@example.com")
+        self.assertFalse(account.is_host)
+        me = self.client.get("/api/owner/me/").json()
+        self.assertEqual((me["email"], me["is_host"]), ("newcomer@example.com", False))
+        # Hosting stays closed until they list a cottage.
+        self.assertEqual(self.client.get("/api/owner/summary/").status_code, 403)
+        self.assertEqual(self.client.get("/api/owner/cottages/").status_code, 403)
 
     def test_code_is_emailed_in_owner_language_and_email_is_case_insensitive(self):
         self.assertEqual(self.request_code("Owner@Example.com").json(), {"sent": True})

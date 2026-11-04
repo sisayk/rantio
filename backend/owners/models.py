@@ -210,7 +210,8 @@ class NewsletterSubscriber(models.Model):
 
 
 class Owner(models.Model):
-    """A cottage owner who has signed the service agreement."""
+    """Someone with a Rantio account. Anyone can have one (signing in creates it); a host
+    has listed a cottage through the sign-up form, and only hosts reach the hosting pages."""
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="owner", null=True, blank=True
@@ -223,6 +224,11 @@ class Owner(models.Model):
     # Set the first time the owner signs in with Google or Apple (owners/social.py).
     google_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
     apple_sub = models.CharField(max_length=255, blank=True, db_index=True, editable=False)
+    is_host = models.BooleanField(
+        default=True,
+        help_text="Has listed a cottage (the sign-up form with photos and a card). Accounts made by signing in "
+        "start without it and can't use the hosting pages until they list.",
+    )
 
     is_pilot = models.BooleanField(
         default=False, help_text="The old pilot deal (first year free, 10 %). New owners get the free trial instead."

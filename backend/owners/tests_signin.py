@@ -65,11 +65,19 @@ class SocialSignInTests(TestCase):
             ({"id_token": token(exp=int(time.time()) - 3600)}, "invalid_token"),
             ({"id_token": token(iss="https://evil.example")}, "invalid_token"),
             ({"id_token": token(verified=False)}, "no_email"),
-            ({"id_token": token(email="stranger@example.com", sub="g-999")}, "no_owner"),
         ]
         for body, why in cases:
             res = self.post(provider="google", **body)
             self.assertEqual((res.status_code, res.json()["detail"]), (400, why), why)
+
+    def test_someone_new_gets_an_account_that_is_not_a_host(self):
+        res = self.post(provider="google", id_token=token(email="stranger@example.com", sub="g-999"))
+        self.assertEqual(res.status_code, 200, res.content)
+        o = Owner.objects.get(email="stranger@example.com")
+        self.assertFalse(o.is_host)
+        self.assertEqual(o.google_sub, "g-999")
+        self.assertEqual(self.client.get("/api/owner/me/").json()["is_host"], False)
+        self.assertEqual(self.client.get("/api/owner/summary/").status_code, 403)
 
     @override_settings(GOOGLE_CLIENT_IDS=[])
     def test_not_switched_on(self):

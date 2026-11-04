@@ -77,7 +77,7 @@ def dashboard_callback(request, context):
     stays = Booking.objects.filter(cancelled=False).select_related("cottage", "cottage__owner")
 
     # ---- counts -------------------------------------------------------------
-    owners = Owner.objects.count()
+    owners = Owner.objects.filter(is_host=True).count()  # hosts, not everyone who has signed in
     # Owners with a cottage in its free trial (it replaced the pilot deal on 4 Nov 2026).
     on_trial = len({c.owner_id for c in Cottage.objects.exclude(listing_started_on=None)
                     if c.listing_started_on <= today < c.trial_ends_on})

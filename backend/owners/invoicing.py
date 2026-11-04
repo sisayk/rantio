@@ -112,4 +112,4 @@ def build(owner: Owner, month: date, rates: tuple[dict, str | None] | None = Non
 
 def build_all(month: date) -> list[Invoice]:
     rates = fx.current()
-    return [inv for owner in Owner.objects.all() if (inv := build(owner, month, rates))]
+    return [inv for owner in Owner.objects.filter(is_host=True) if (inv := build(owner, month, rates))]

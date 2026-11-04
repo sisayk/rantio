@@ -1,10 +1,10 @@
 "use client";
-// Whether this browser is signed in as a cottage owner, for the "Switch to hosting" /
+// Whether this browser is signed in to Rantio (and as a host or not), for the "Switch to hosting" /
 // "Switch to traveling" links. Asked once per page load; remembered for the tab so the
 // header doesn't change after it appears.
 import { useSyncExternalStore } from "react";
 
-export type OwnerSession = { name: string } | null; // null: not signed in
+export type OwnerSession = { name: string; isHost: boolean } | null; // null: not signed in
 
 const KEY = "stugora:owner";
 const listeners = new Set<() => void>();
@@ -36,7 +36,9 @@ function ask() {
   asked = true;
   fetch("/api/owner/me/", { credentials: "same-origin", headers: { Accept: "application/json" } })
     .then((r) => (r.ok ? r.json() : null))
-    .then((me: { name?: string } | null) => set(me?.name ? { name: me.name } : null))
+    .then((me: { name?: string; is_host?: boolean } | null) =>
+      set(me?.name ? { name: me.name, isHost: me.is_host !== false } : null),
+    )
     .catch(() => undefined);
 }
 

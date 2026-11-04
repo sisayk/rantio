@@ -74,10 +74,15 @@ export default function Login() {
   const explain = (e: unknown) =>
     e instanceof Offline ? m.app.common.offline : e instanceof ApiError && e.status === 429 ? t.tooMany : t.failed;
 
-  const done = () => {
+  // Hosts go to their hosting tabs; anyone else signed in stays on the travelling side.
+  const done = (me: { is_host: boolean } | null) => {
+    if (router.canDismiss()) router.dismissAll();
+    if (me && !me.is_host) {
+      router.replace("/profile");
+      return;
+    }
     setMode("hosting");
     registerForPush(true).catch(() => undefined);
-    if (router.canDismiss()) router.dismissAll();
     router.replace("/today");
   };
 
@@ -87,8 +92,7 @@ export default function Login() {
       const credential = await AppleAuthentication.signInAsync({ requestedScopes: [AppleAuthentication.AppleAuthenticationScope.EMAIL] });
       if (!credential.identityToken) return setProblem(t.socialFailed);
       setBusy(true);
-      await signInWith("apple", credential.identityToken);
-      done();
+      done(await signInWith("apple", credential.identityToken));
     } catch (e) {
       if ((e as { code?: string }).code === "ERR_REQUEST_CANCELED") return; // closed Apple's sheet
       const detail = e instanceof ApiError ? (e.body as { detail?: string } | undefined)?.detail : undefined;
@@ -104,8 +108,7 @@ export default function Login() {
       if (!isSuccessResponse(res)) return; // closed Google's sheet
       if (!res.data.idToken) return setProblem(t.socialFailed);
       setBusy(true);
-      await signInWith("google", res.data.idToken);
-      done();
+      done(await signInWith("google", res.data.idToken));
     } catch (e) {
       if (isErrorWithCode(e) && (e.code === statusCodes.SIGN_IN_CANCELLED || e.code === statusCodes.IN_PROGRESS)) return;
       const detail = e instanceof ApiError ? (e.body as { detail?: string } | undefined)?.detail : undefined;
@@ -137,8 +140,7 @@ export default function Login() {
     setBusy(true);
     setProblem(null);
     try {
-      await signIn(to, value.trim());
-      done();
+      done(await signIn(to, value.trim()));
     } catch (e) {
       setProblem(e instanceof ApiError && e.status === 400 ? t.wrongCode : explain(e));
       setBusy(false);

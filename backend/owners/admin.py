@@ -128,13 +128,14 @@ class CottageInline(TabularInline):
 
 @admin.register(Owner)
 class OwnerAdmin(ModelAdmin):
-    list_display = ["name", "email", "is_pilot", "commission_rate", "agreement_signed_on"]
-    list_filter = ["is_pilot", "language"]
+    list_display = ["name", "email", "is_host", "is_pilot", "commission_rate", "agreement_signed_on"]
+    list_filter = ["is_host", "is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
     readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with"]
     fieldsets = [
-        ("Owner", {"fields": ["name", "email", "phone", "language", "user", "signup", "signs_in_with"], "classes": ["st-grid-2"]}),
+        ("Owner", {"fields": ["name", "email", "phone", "language", "is_host", "user", "signup", "signs_in_with"],
+                   "classes": ["st-grid-2"]}),
         ("Agreement", {"fields": ["is_pilot", "commission_rate", "vat_registered", "agreement_signed_on", "created_at"],
                        "classes": ["st-grid-2"]}),
         ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id", "card"], "classes": ["st-grid-2"]}),

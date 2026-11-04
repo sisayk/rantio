@@ -14,16 +14,25 @@ from rest_framework.views import APIView
 
 from . import app
 from . import login as owner_login
-from . import messaging, social, sms
+from . import email_check, messaging, social, sms
 from .models import AppDevice, Language, MonitorInterest
 from .statements import booking_row, bookings_for, summary
 
 logger = logging.getLogger(__name__)
 
 
-class IsOwner(permissions.BasePermission):
+class IsAccount(permissions.BasePermission):
+    """Anyone signed in to Rantio."""
+
     def has_permission(self, request, view):
         return bool(request.user.is_authenticated and hasattr(request.user, "owner"))
+
+
+class IsOwner(IsAccount):
+    """A host: the hosting pages and their data."""
+
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and request.user.owner.is_host
 
 
 class EmailSerializer(serializers.Serializer):
@@ -53,6 +62,7 @@ class CodeSerializer(EmailSerializer):
 
 class SocialSerializer(serializers.Serializer):
     provider = serializers.ChoiceField(choices=list(social.PROVIDERS))
+    lang = serializers.ChoiceField(choices=Language.values, default=Language.ENGLISH)
     id_token = serializers.CharField(max_length=8000)
     app = serializers.BooleanField(default=False)
     device = serializers.CharField(max_length=80, required=False, allow_blank=True, default="")
@@ -102,7 +112,7 @@ class SocialView(APIView):
         if not social.enabled(provider):
             return Response({"detail": "not_enabled"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            owner = social.owner_for(provider, data.validated_data["id_token"])
+            owner = social.owner_for(provider, data.validated_data["id_token"], data.validated_data["lang"])
         except social.SignInError as error:
             return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)
         return _signed_in(request, owner, data.validated_data)
@@ -122,6 +132,17 @@ class RequestCodeView(APIView):
         body = {"sent": True}
         owner = _owner_for(data.validated_data)
         via = "sms" if data.validated_data["phone"] else "email"
+        email = data.validated_data["email"]
+        if not owner and email and email_check.can_send(email):
+            # Someone new: the code checks the address, and signing in with it makes their account.
+            # (Phone numbers only sign in existing accounts: texts cost money and invite abuse.)
+            try:
+                code = email_check.send(email, "", data.validated_data["lang"])
+                if settings.DEV_LOGIN_CODES:
+                    body["dev_code"] = code
+            except Exception:
+                logger.exception("Could not send a first sign-in code to a new address")
+                return Response({"detail": "email_failed"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         if owner and owner_login.can_send(owner):
             try:
                 code = owner_login.issue_code(owner, data.validated_data["lang"], via=via)
@@ -145,21 +166,28 @@ class VerifyCodeView(APIView):
     def post(self, request):
         data = CodeSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        owner = _owner_for(data.validated_data)
-        if not owner or not owner_login.check_code(owner, data.validated_data["code"]):
+        v = data.validated_data
+        owner = _owner_for(v)
+        if owner:
+            if not owner_login.check_code(owner, v["code"]):
+                return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
+        elif v["email"] and email_check.check(v["email"], v["code"]):
+            owner = owner_login.new_account(v["email"], lang=v["lang"])
+        else:
             return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
-        return _signed_in(request, owner, data.validated_data)
+        return _signed_in(request, owner, v)
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class MeView(APIView):
-    """Who is signed in; also hands the browser its CSRF cookie for later POSTs."""
+    """Who is signed in (a host or not); also hands the browser its CSRF cookie for later POSTs."""
 
-    permission_classes = [IsOwner]
+    permission_classes = [IsAccount]
 
     def get(self, request):
         o = request.user.owner
-        return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot})
+        return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot,
+                         "is_host": o.is_host})
 
     def patch(self, request):
         """The app's language setting also sets the language of the owner's emails."""
@@ -173,9 +201,9 @@ class MeView(APIView):
 
 
 class MonitorWaitlistView(APIView):
-    """The Mökki monitor waitlist for a signed-in owner: one tap, with the email they sign in with."""
+    """The Mökki monitor waitlist for anyone signed in: one tap, with the email they sign in with."""
 
-    permission_classes = [IsOwner]
+    permission_classes = [IsAccount]
 
     def get(self, request):
         return Response({"joined": MonitorInterest.objects.filter(email=request.user.owner.email.lower()).exists()})
