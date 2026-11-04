@@ -222,3 +222,7 @@
   font-weight: 600;
   text-decoration: none;
 }
+
+/* The owner's preview with example reviews */
+.preview { border: 2px dashed #cfd6d3; border-radius: 22px; padding: 4px; }
+.preview > .section { margin-top: 0; box-shadow: none; }

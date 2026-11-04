@@ -9,7 +9,8 @@ import { colors, radius, space } from "@/theme";
 import { Field } from "@/ui/form";
 import { SiteIcon } from "@/ui/host";
 import { Button, Card, Loading, Pill, Problem, Section, Text } from "@/ui/kit";
-import { ReviewCard, Stars, useScore } from "@/ui/ratings";
+import { previewRatings } from "@/lib/ratingsPreview";
+import { RatingsBlock, ReviewCard, Stars, useScore } from "@/ui/ratings";
 import { PageBar } from "@/ui/screen";
 
 function ratingError(t: ReviewsText, body: unknown): string {
@@ -74,6 +75,20 @@ export default function ListingReviews() {
               ))}
             </Section>
             <Elsewhere cottage={pk} data={data} onChange={setExternal} />
+            {data.count === 0 ? (
+              <View style={{ marginTop: space.xl }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+                  <Text v="h2">{t.owner.previewTitle}</Text>
+                  <Pill label={t.owner.example} tone="berry" />
+                </View>
+                <Text v="small" style={{ marginTop: space.xs }}>
+                  {t.owner.previewLead}
+                </Text>
+                <View style={styles.preview}>
+                  <RatingsBlock ratings={previewRatings(t, data.external)} host={t.owner.yourReply} />
+                </View>
+              </View>
+            ) : null}
           </ScrollView>
         </KeyboardAvoidingView>
       )}
@@ -196,6 +211,7 @@ function Elsewhere({ cottage, data, onChange }: { cottage: number; data: OwnerRe
 }
 
 const styles = StyleSheet.create({
+  preview: { marginTop: space.md, padding: space.lg, paddingTop: 0, borderRadius: radius.lg, borderWidth: 2, borderStyle: "dashed", borderColor: colors.line },
   external: {
     flexDirection: "row",
     alignItems: "center",

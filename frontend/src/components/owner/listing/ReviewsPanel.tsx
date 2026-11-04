@@ -5,7 +5,8 @@ import { fill, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { REVIEWS, type ReviewsText } from "@/i18n/messages/reviews";
 import { type ExternalRating, ownerApi, type OwnerReviews, type ReviewRow, SignedOut } from "@/lib/ownerApi";
-import { ReviewItem, score, Stars } from "../../Ratings";
+import { previewRatings } from "@/lib/ratingsPreview";
+import RatingsSection, { ReviewItem, score, Stars } from "../../Ratings";
 import r from "../../ratings.module.css";
 import SiteIcon from "../SiteIcon";
 import o from "../owner.module.css";
@@ -63,6 +64,17 @@ export default function ReviewsPanel({ lang, cottage, ownBooking, onSignedOut }:
         </ul>
       </div>
       <Elsewhere lang={lang} cottage={cottage} data={data} ownBooking={ownBooking} onChange={setExternal} onSignedOut={onSignedOut} />
+      {data.count === 0 ? (
+        <div className={s.group}>
+          <h3>
+            {t.owner.previewTitle} <span className={s.badge}>{t.owner.example}</span>
+          </h3>
+          <p className={s.hint}>{t.owner.previewLead}</p>
+          <div className={r.preview}>
+            <RatingsSection lang={lang} ratings={previewRatings(t, data.external)} host={t.owner.yourReply} />
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
