@@ -19,7 +19,12 @@ fi
 API_KEY="$(printf '%s' "$API_KEY" | tr -d '[:space:]')"
 case "$API_KEY" in
   sk_live_*|sk_test_*|rk_live_*|rk_test_*) ;;
-  *) echo "That isn't a Stripe secret key (they start with sk_live_ or sk_test_). Nothing was saved." >&2; exit 1 ;;
+  pk_live_*|pk_test_*)
+    echo "That's Stripe's publishable key (pk_…). Copy the Secret key instead (sk_…, under 'Reveal'). Nothing was saved." >&2; exit 1 ;;
+  "")
+    echo "The clipboard is empty. In Stripe, click 'Reveal test key' on the Secret key row, copy it, and run this again. Nothing was saved." >&2; exit 1 ;;
+  *)
+    echo "The clipboard has something else (${#API_KEY} characters, not a key starting with sk_). Copy the Secret key in Stripe again. Nothing was saved." >&2; exit 1 ;;
 esac
 echo "The key: ${API_KEY:0:8}… ending in ...${API_KEY: -4}"
 read -rp "Does that match the key in Stripe? [y/N] " OK
