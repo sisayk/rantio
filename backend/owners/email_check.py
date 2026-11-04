@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import re
 import secrets
 from datetime import timedelta
 
@@ -82,15 +83,26 @@ def can_send(email: str) -> bool:
     return EmailCheck.objects.filter(email=_norm(email), created_at__gte=since).count() < CODES_PER_HOUR
 
 
-def send(email: str, name: str, lang: str) -> str:
-    """A fresh code for the address (older ones stop working), sent by email."""
+def _greet(text: str) -> str:
+    """Without a name, "Hi ," and "Tere, !" read "Hi," and "Tere!"."""
+    return re.sub(r",\s*([,!])", r"\1", re.sub(r"\s+([,!])", r"\1", text))
+
+
+def send(email: str, name: str, lang: str, purpose: str = "signup") -> str:
+    """A fresh code for the address (older ones stop working), sent by email. purpose "signin":
+    someone signing in for the first time (the email reads as a sign-in code)."""
     email, code, now = _norm(email), f"{secrets.randbelow(1_000_000):06d}", timezone.now()
     EmailCheck.objects.filter(email=email, used_at__isnull=True).update(used_at=now)
     EmailCheck.objects.create(email=email, code_hash=_hash(email, code),
                               expires_at=now + timedelta(minutes=EmailCheck.LIFETIME_MINUTES))
-    subject, body = MESSAGES.get(lang) or MESSAGES["en"]
+    if purpose == "signin":
+        from .login import MESSAGES as SIGN_IN
+
+        subject, body = SIGN_IN.get(lang) or SIGN_IN["en"]
+    else:
+        subject, body = MESSAGES.get(lang) or MESSAGES["en"]
     values = {"code": code, "name": (name.split() or [""])[0], "minutes": EmailCheck.LIFETIME_MINUTES}
-    send_mail(subject.format(**values), body.format(**values), settings.DEFAULT_FROM_EMAIL, [email])
+    send_mail(subject.format(**values), _greet(body.format(**values)), settings.DEFAULT_FROM_EMAIL, [email])
     return code
 
 

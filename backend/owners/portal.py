@@ -137,7 +137,7 @@ class RequestCodeView(APIView):
             # Someone new: the code checks the address, and signing in with it makes their account.
             # (Phone numbers only sign in existing accounts: texts cost money and invite abuse.)
             try:
-                code = email_check.send(email, "", data.validated_data["lang"])
+                code = email_check.send(email, "", data.validated_data["lang"], purpose="signin")
                 if settings.DEV_LOGIN_CODES:
                     body["dev_code"] = code
             except Exception:
