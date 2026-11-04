@@ -43,6 +43,9 @@ class HeroAdminTests(TestCase):
         self.media = tempfile.mkdtemp()
         self.override = override_settings(MEDIA_ROOT=self.media)
         self.override.enable()
+        # Start from the original lake photo alone (migration 0028 adds the aurora video).
+        HeroSlide.objects.exclude(image_url__startswith="https://images.unsplash.com/").delete()
+        HeroSlide.objects.update(order=0)
         self.client.force_login(User.objects.create_superuser("admin", "", "pw-for-tests-only"))
 
     def tearDown(self):
