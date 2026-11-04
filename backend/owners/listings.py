@@ -35,6 +35,7 @@ from rest_framework.views import APIView
 
 from . import calendar, pricing
 from .calendar import FEED_CHANNELS
+from .listing_links import links_for, sync_nettimokki
 from .media_checks import IMAGE_MAX, image_type
 from .models import Booking, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, Language, NightPrice
 from .portal import IsOwner
@@ -257,6 +258,7 @@ def cottage_detail(c: Cottage) -> dict:
         "departure_instructions": c.departure_instructions,
         "access_details": c.access_details,
         "nettimokki_url": c.nettimokki_url,
+        "links": links_for(c),
         "booking_link_open": c.booking_requests_open,
         "forwarding_address": c.forwarding_address,
         "photos": [photo_row(p) for p in c.photos.all()],
@@ -459,7 +461,10 @@ class CottageSerializer(serializers.ModelSerializer):
                     rows.append({k: (str(v) if isinstance(v, Decimal) else v) for k, v in row.items()})
                 setattr(instance, name, rows)
         instance.updated_at = timezone.now()
-        return super().update(instance, validated_data)
+        cottage = super().update(instance, validated_data)
+        if validated_data.get("nettimokki_url"):
+            sync_nettimokki(cottage)
+        return cottage
 
 
 def log(cottage: Cottage, request, action: str, fields: list[str] | None = None) -> None:
@@ -471,7 +476,7 @@ def touch(cottage: Cottage) -> None:
 
 
 def detail_queryset():
-    return Cottage.objects.select_related("owner").prefetch_related("photos", "feeds", "bookings", "changes")
+    return Cottage.objects.select_related("owner").prefetch_related("photos", "feeds", "bookings", "changes", "links__feed")
 
 
 def own(request, pk) -> Cottage:

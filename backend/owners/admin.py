@@ -16,7 +16,7 @@ from django.contrib import messages
 
 from . import booking_emails, invoicing, stripe_api
 from .models import (
-    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, LoginCode,
+    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
     Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, SignupPhoto,
 )
 
@@ -165,6 +165,15 @@ class CottagePhotoInline(TabularInline):
         return format_html('<img src="{}" style="height:64px;border-radius:6px">', obj.image.url)
 
 
+class ListingLinkInline(TabularInline):
+    model = ListingLink
+    extra = 0
+    fields = ["site", "url", "feed"]
+    readonly_fields = ["feed"]
+    verbose_name = "listing on another site"
+    verbose_name_plural = "listings on other sites"
+
+
 class CottageChangeInline(TabularInline):
     """What the owner changed in Hosting → My listings (field names only)."""
 
@@ -179,7 +188,7 @@ class CottageChangeInline(TabularInline):
 
 @admin.register(Cottage)
 class CottageAdmin(ModelAdmin):
-    inlines = [CottagePhotoInline, CottageChangeInline]
+    inlines = [CottagePhotoInline, ListingLinkInline, CottageChangeInline]
     list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "currency", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality", "inbound_code"]

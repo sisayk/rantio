@@ -27,6 +27,7 @@ import { type Bounds, COUNTRY_BOUNDS, REGION_BOUNDS } from "@/lib/regionBounds";
 import HostingHeader from "../HostingHeader";
 import SiteIcon from "../SiteIcon";
 import o from "../owner.module.css";
+import OtherListings from "./OtherListings";
 import PhotoManager from "./PhotoManager";
 import { actionsFor, CHECK_SECTION, checklist, dateFormats, LANG_CODES, type Section, SECTIONS } from "./shared";
 import { ArrowLeft, Check, Dialog, fieldError, Trash, useToasts } from "./ui";
@@ -45,7 +46,6 @@ const FIELDS = [
   "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by", "self_check_in", "min_age",
   "pets_allowed", "smoking_allowed", "events_allowed", "quiet_hours", "house_rules", "waste_instructions",
   "sauna_instructions", "fireplace_instructions", "arrival_instructions", "departure_instructions", "access_details",
-  "nettimokki_url",
 ] as const satisfies readonly (keyof ListingFields)[];
 
 const FIELD_SECTION: Record<string, Section> = {
@@ -60,7 +60,6 @@ const FIELD_SECTION: Record<string, Section> = {
   arrival_instructions: "arrival", departure_instructions: "arrival", access_details: "arrival",
   country: "location", region: "location", municipality: "location", address: "location",
   latitude: "location", longitude: "location", show_exact_location: "location", nearby: "location",
-  nettimokki_url: "calendar",
 };
 
 const TYPES: PropertyType[] = ["cottage", "cabin", "villa", "holiday_home", "apartment", "farmhouse", "other"];
@@ -83,7 +82,7 @@ function pick(d: ListingDetail): ListingFields {
   const out = {} as Record<string, unknown>;
   for (const k of FIELDS) out[k] = d[k];
   // Times come as "16:00"; descriptions keep every language key so an emptied one is sent as "".
-  return { ...(out as ListingFields), descriptions: { ...d.descriptions }, nettimokki_url: d.nettimokki_url ?? "" };
+  return { ...(out as ListingFields), descriptions: { ...d.descriptions } };
 }
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -1045,7 +1044,8 @@ export default function ListingEditor({
         <h3>{l.calendar.sites}</h3>
         <p className={s.hint}>{l.calendar.sitesLead}</p>
         <ul className={s.siteRows}>
-          {detail.channels.map((c) => (
+          {/* Nettimökki is with the other listings below. */}
+          {detail.channels.filter((c) => c.channel !== "nettimokki").map((c) => (
             <li key={c.channel}>
               <span className={s.siteName}>
                 <SiteIcon channel={c.channel} label={c.channel} ownBooking={t.ownBooking} />
@@ -1067,13 +1067,21 @@ export default function ListingEditor({
             </li>
           ))}
         </ul>
-        {text("nettimokki_url", l.calendar.nettimokki, { max: 200, placeholder: "https://www.nettimokki.com/…" })}
         <div>
           <a className={s.button} href={paths.hostingCalendarFor(lang, id)}>
             {l.calendar.manage}
           </a>
         </div>
       </div>
+      <OtherListings
+        key={detail.id}
+        lang={lang}
+        cottage={detail.id}
+        initial={detail.links ?? []}
+        forwardingAddress={detail.forwarding_address}
+        ownBooking={t.ownBooking}
+        onSignedOut={signedOut}
+      />
     </section>
   );
 

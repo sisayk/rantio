@@ -74,9 +74,10 @@ def entries(cottages, start: date, end: date, *, requests: bool = True) -> list[
         cottage_id__in=ids, cancelled=False, check_in__lt=end, check_out__gt=start
     ).order_by("check_in"):
         out.append(Entry("booking", b.pk, b.cottage_id, b.check_in, b.check_out, b.channel, b.get_channel_display(), b.guests))
-    for k in CalendarBlock.objects.filter(cottage_id__in=ids, start__lt=end, end__gt=start).select_related("feed"):
+    blocks = CalendarBlock.objects.filter(cottage_id__in=ids, start__lt=end, end__gt=start).select_related("feed__link")
+    for k in blocks:
         if k.feed:
-            out.append(Entry("site", k.pk, k.cottage_id, k.start, k.end, k.feed.channel, k.feed.get_channel_display(), note=k.note))
+            out.append(Entry("site", k.pk, k.cottage_id, k.start, k.end, k.feed.site, k.feed.label, note=k.note))
         else:
             out.append(Entry("block", k.pk, k.cottage_id, k.start, k.end, "", "", note=k.note))
     if requests:

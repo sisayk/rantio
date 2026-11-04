@@ -3,6 +3,8 @@
 import Constants from "expo-constants";
 import { NativeModules, TurboModuleRegistry } from "react-native";
 
+import type { OtherListing } from "@/i18n/messages/otherListings";
+
 import type {
   BookingLinkInfo,
   BookingRequestForm,
@@ -187,6 +189,15 @@ export const ownerApi = {
   saveFeed: (cottage: number, channel: string, url: string) =>
     call<CalendarFeed>("owner/calendar/feeds/", { ...json("POST", { cottage, channel, url }), owner: true }),
   removeFeed: (id: number) => call<unknown>(`owner/calendar/feeds/${id}/`, { ...json("DELETE"), owner: true }),
+  otherListings: (cottage: number) => call<OtherListing[]>(`owner/cottages/${cottage}/links/`, { owner: true }),
+  addOtherListing: (cottage: number, url: string, calendarUrl: string) =>
+    call<OtherListing>(`owner/cottages/${cottage}/links/`, {
+      ...json("POST", calendarUrl ? { url, calendar_url: calendarUrl } : { url }),
+      owner: true,
+    }),
+  setOtherListingCalendar: (id: number, calendarUrl: string) =>
+    call<OtherListing>(`owner/links/${id}/`, { ...json("PATCH", { calendar_url: calendarUrl }), owner: true }),
+  removeOtherListing: (id: number) => call<unknown>(`owner/links/${id}/`, { ...json("DELETE"), owner: true }),
   setBookingLink: (cottage: number, open: boolean) =>
     call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { ...json("PATCH", { open }), owner: true }),
   renewBookingLink: (cottage: number) =>

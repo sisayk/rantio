@@ -17,6 +17,7 @@ from . import app as app_keys
 from . import email_check, stripe_api, trial
 from . import login as owner_login
 from .media_checks import IMAGE_MAX, image_type
+from .listing_links import sync_nettimokki
 from .models import Cottage, CottagePhoto, MonitorInterest, Owner, OwnerSignup, SignupPhoto
 from .regions import REGIONS
 from .serializers import MonitorInterestSerializer, OwnerSignupSerializer
@@ -81,8 +82,9 @@ def become_owner(signup: OwnerSignup) -> Owner:
     cottage = Cottage.objects.create(
         owner=owner, name=(signup.place or region or signup.name)[:120], country=signup.country, region=signup.region,
         municipality=signup.place[:80], max_guests=2, price_per_night=0, host_languages=[owner.language],
-        status=Cottage.Status.INTAKE,
+        status=Cottage.Status.INTAKE, nettimokki_url=signup.nettimokki_url,
     )
+    sync_nettimokki(cottage)
     for i, photo in enumerate(signup.photos.all()):
         with photo.image.open("rb") as f:
             data = f.read()

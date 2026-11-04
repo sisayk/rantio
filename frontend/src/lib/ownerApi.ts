@@ -1,5 +1,7 @@
 // The owner dashboard's calls to Django, made through this site's /api proxy.
 
+import type { OtherListing } from "@/i18n/messages/otherListings";
+
 export type Money = string; // "1234.50"
 
 export type BookingRow = {
@@ -380,7 +382,6 @@ export type ListingFields = {
   arrival_instructions: string;
   departure_instructions: string;
   access_details: string;
-  nettimokki_url: string;
 };
 
 export type ListingChange = { at: string; by: string; action: string; fields: string[] };
@@ -393,6 +394,7 @@ export type ListingDetail = ListingSummary &
     booking_link_open: boolean;
     forwarding_address: string;
     nettimokki_url: string;
+    links: OtherListing[];
   };
 
 /** The listing as guests see it: no address, codes or arrival notes; the location rounded unless shown exactly. */
@@ -507,6 +509,14 @@ export const ownerApi = {
   saveFeed: (cottage: number, channel: string, url: string) =>
     call<CalendarFeed>("owner/calendar/feeds/", { method: "POST", body: JSON.stringify({ cottage, channel, url }) }),
   removeFeed: (id: number) => call<unknown>(`owner/calendar/feeds/${id}/`, { method: "DELETE" }),
+  addOtherListing: (cottage: number, url: string, calendarUrl: string) =>
+    call<OtherListing>(`owner/cottages/${cottage}/links/`, {
+      method: "POST",
+      body: JSON.stringify(calendarUrl ? { url, calendar_url: calendarUrl } : { url }),
+    }),
+  setOtherListingCalendar: (id: number, calendarUrl: string) =>
+    call<OtherListing>(`owner/links/${id}/`, { method: "PATCH", body: JSON.stringify({ calendar_url: calendarUrl }) }),
+  removeOtherListing: (id: number) => call<unknown>(`owner/links/${id}/`, { method: "DELETE" }),
   setBookingLink: (cottage: number, open: boolean) =>
     call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "PATCH", body: JSON.stringify({ open }) }),
   renewBookingLink: (cottage: number) => call<CalendarCottage>(`owner/cottages/${cottage}/booking-link/`, { method: "POST" }),

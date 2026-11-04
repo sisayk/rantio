@@ -530,10 +530,11 @@ class Booking(models.Model):
         HOMETOGO = "hometogo", "HomeToGo"
         DIRECT = "direct", "Rantio direct"
         NETTIMOKKI = "nettimokki", "Nettimökki"
+        OTHER = "other", "Another listing site"
         OWNER = "owner", "Owner's own booking"
 
     # Sites the owner already used before Rantio: we sync their calendar but never charge.
-    UNCHARGED_CHANNELS = {Channel.NETTIMOKKI, Channel.OWNER}
+    UNCHARGED_CHANNELS = {Channel.NETTIMOKKI, Channel.OTHER, Channel.OWNER}
 
     cottage = models.ForeignKey(Cottage, on_delete=models.PROTECT, related_name="bookings")
     channel = models.CharField(max_length=12, choices=Channel.choices)
@@ -605,10 +606,55 @@ class CalendarFeed(models.Model):
 
     class Meta:
         ordering = ["cottage", "channel"]
-        constraints = [models.UniqueConstraint(fields=["cottage", "channel"], name="feed_one_per_channel")]
+        constraints = [
+            # One calendar per booking site; the owner's other listings (channel "other") can have several.
+            models.UniqueConstraint(
+                fields=["cottage", "channel"], condition=~models.Q(channel="other"), name="feed_one_per_channel"
+            )
+        ]
 
     def __str__(self) -> str:
-        return f"{self.cottage.name}: {self.get_channel_display()} calendar"
+        return f"{self.cottage.name}: {self.label} calendar"
+
+    @property
+    def label(self) -> str:
+        """The site's name: for another listing site, the one its link names."""
+        link = getattr(self, "link", None) if self.channel == Booking.Channel.OTHER else None
+        return link.name if link else self.get_channel_display()
+
+    @property
+    def site(self) -> str:
+        """The site's id for icons: the channel, or the other listing's site."""
+        link = getattr(self, "link", None) if self.channel == Booking.Channel.OTHER else None
+        return (link.site or "other") if link else self.channel
+
+
+class ListingLink(models.Model):
+    """A listing the owner already has on another site (Nettimökki, Lomarengas, Mökkivuokra…).
+    It shows with the cottage; with the site's calendar link (iCal), its bookings close the dates
+    everywhere Rantio lists the cottage."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="links")
+    site = models.CharField(max_length=20, blank=True, help_text="A known site's id, or empty for another site.")
+    url = models.URLField(max_length=500)
+    feed = models.OneToOneField(
+        CalendarFeed, on_delete=models.SET_NULL, null=True, blank=True, related_name="link",
+        help_text="The site's calendar, when the owner added its link.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+        constraints = [models.UniqueConstraint(fields=["cottage", "url"], name="link_once_per_cottage")]
+
+    def __str__(self) -> str:
+        return f"{self.cottage.name}: {self.name}"
+
+    @property
+    def name(self) -> str:
+        from .listing_links import site_name
+
+        return site_name(self.site, self.url)
 
 
 class NightPrice(models.Model):

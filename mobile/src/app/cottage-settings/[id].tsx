@@ -13,6 +13,7 @@ import { Field } from "@/ui/form";
 import { SiteIcon } from "@/ui/host";
 import { Button, Card, Loading, Problem, Section, Text } from "@/ui/kit";
 import { PageBar } from "@/ui/screen";
+import { OtherListings } from "@/ui/otherListings";
 
 const SITES = ["airbnb", "booking", "vrbo", "agoda"] as const;
 
@@ -20,7 +21,7 @@ const SITES = ["airbnb", "booking", "vrbo", "agoda"] as const;
 export default function CottageSettings() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const pk = Number(id);
-  const { m, lang, f } = useT();
+  const { m, lang } = useT();
   const c = m.dashboard.calendar;
   const [cottage, setCottage] = useState<CalendarCottage | null>(null);
   const [failed, setFailed] = useState(false);
@@ -133,14 +134,14 @@ export default function CottageSettings() {
                   lang={lang}
                 />
               ))}
-              <Card style={{ gap: space.sm }}>
-                <SiteIcon channel="nettimokki" label={CHANNELS.nettimokki.name} />
-                <Text v="small" color={colors.ink} selectable>
-                  {f(c.sites.nettimokki, { address: cottage.forwarding_address })}
-                </Text>
-                <Button small kind="secondary" icon="copy-outline" label={copied === "mail" ? c.link.copied : c.link.copy} onPress={() => copy(cottage.forwarding_address, "mail")} style={{ alignSelf: "flex-start" }} />
-              </Card>
             </Section>
+
+            <OtherListings
+              cottage={cottage.id}
+              forwardingAddress={cottage.forwarding_address}
+              copiedMail={copied === "mail"}
+              onCopyMail={() => copy(cottage.forwarding_address, "mail")}
+            />
           </ScrollView>
         </KeyboardAvoidingView>
       )}
