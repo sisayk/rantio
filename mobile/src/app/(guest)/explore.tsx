@@ -7,6 +7,7 @@ import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listing
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import { usePrefs } from "@/state/prefs";
+import { useSession } from "@/state/session";
 import { activeFilters, BEDROOM_CHOICES, COUNTRIES, type Filters, NO_FILTERS, search, type Sort } from "@/state/search";
 import { daysBetween, formatRange } from "@/text/dates";
 import { type T, useT } from "@/text/i18n";
@@ -48,7 +49,9 @@ function sections(t: T): Section[] {
 export default function Explore() {
   const t = useT();
   const { m, p, lang } = t;
-  const { rates, homeView, setHomeView } = usePrefs();
+  const { rates, homeView, setHomeView, setMode } = usePrefs();
+  const { signedIn, owner } = useSession();
+  const isHost = signedIn && !!owner?.is_host;
   const router = useRouter();
   const { width } = useWindowDimensions();
   const [f, setF] = useState<Filters>(NO_FILTERS);
@@ -186,8 +189,20 @@ export default function Explore() {
         </View>
       </Card>
       <View style={{ flexDirection: "row", justifyContent: "center", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
-        <Button small label={m.guest.hostBand.cta} onPress={() => router.push("/list-cottage")} />
-        <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
+        {isHost ? (
+          <Button
+            small
+            label={m.app.profile.switchToHosting}
+            onPress={() => {
+              setMode("hosting");
+              router.replace("/today");
+            }}
+          />
+        ) : (
+          <Button small label={m.guest.hostBand.cta} onPress={() => router.push("/list-cottage")} />
+        )}
+        {/* Signed in already: no Sign in button (it would ask again). */}
+        {signedIn ? null : <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />}
       </View>
       <Text v="tiny" style={{ textAlign: "center", paddingHorizontal: space.xl, marginTop: space.xl }}>
         {m.guest.examples}
