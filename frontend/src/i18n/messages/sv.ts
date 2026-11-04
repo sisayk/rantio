@@ -295,6 +295,14 @@ export const sv: Translation = {
       title: "Äger du en stuga?",
       body: "Vi lägger ut den på Airbnb, Booking.com och Vrbo och håller alla kalendrar i takt med de lokala sajter du redan använder, var som helst i Norden och Baltikum.",
       cta: "Bli värd",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Kommer snart",
+        title: "Mökki monitor",
+        body: "Larm om frost, läckor och strömavbrott i telefonen, även utan wifi.",
+        link: "Läs mer",
+        alt: "Mökki monitor med temperaturgivare, läckagesensor och dörrsensor",
+      },
     },
   },
 

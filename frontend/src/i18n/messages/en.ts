@@ -303,6 +303,14 @@ export const en = {
       title: "Own a cottage?",
       body: "We put it on Airbnb, Booking.com and Vrbo and keep every calendar in step with the local sites you already use, anywhere in the Nordics and the Baltics.",
       cta: "Become a host",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Coming soon",
+        title: "Mökki monitor",
+        body: "Frost, leak and power-cut alerts on your phone, even without Wi‑Fi.",
+        link: "Learn more",
+        alt: "The Mökki monitor with its temperature probes, leak sensor and door sensor",
+      },
     },
   },
 

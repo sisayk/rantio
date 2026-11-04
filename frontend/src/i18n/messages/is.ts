@@ -295,6 +295,14 @@ export const is: Translation = {
       title: "Áttu sumarbústað?",
       body: "Við setjum hann á Airbnb, Booking.com og Vrbo og höldum öllum dagatölum í takt við þær innlendu síður sem þú notar nú þegar, hvar sem er á Norðurlöndum og í Eystrasaltslöndunum.",
       cta: "Gerstu gestgjafi",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Væntanlegt",
+        title: "Mökki monitor",
+        body: "Viðvaranir um frost, leka og rafmagnsleysi í símann, líka án Wi-Fi.",
+        link: "Lesa meira",
+        alt: "Mökki monitor með hitanemum, lekaskynjara og hurðarskynjara",
+      },
     },
   },
 

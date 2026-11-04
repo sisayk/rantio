@@ -295,6 +295,14 @@ export const et: Translation = {
       title: "Kas sul on puhkemaja?",
       body: "Paneme selle üles Airbnb-sse, Booking.com-i ja Vrbo-sse ning hoiame kõik kalendrid kooskõlas kohalike saitidega, mida juba kasutad – kõikjal Põhjamaades ja Baltikumis.",
       cta: "Hakka majutajaks",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Peagi tulekul",
+        title: "Mökki monitor",
+        body: "Teated külma, lekke ja elektrikatkestuse kohta otse telefoni, ka ilma wifita.",
+        link: "Loe lähemalt",
+        alt: "Mökki monitor koos temperatuuriandurite, lekkeanduri ja ukseanduriga",
+      },
     },
   },
 

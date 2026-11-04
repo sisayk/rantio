@@ -295,6 +295,14 @@ export const nn: Translation = {
       title: "Har du ei hytte?",
       body: "Vi legg hytta di ut på Airbnb, Booking.com og Vrbo og held alle kalendrane i takt med dei lokale sidene du alt brukar, kvar som helst i Norden og Baltikum.",
       cta: "Bli vert",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Kjem snart",
+        title: "Mökki monitor",
+        body: "Varsel om frost, lekkasje og straumbrot på telefonen, òg utan wifi.",
+        link: "Les meir",
+        alt: "Mökki monitor med temperaturfølarar, lekkasjesensor og dørsensor",
+      },
     },
   },
 

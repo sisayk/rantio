@@ -295,6 +295,14 @@ export const lv: Translation = {
       title: "Jums pieder brīvdienu māja?",
       body: "Mēs to ievietojam Airbnb, Booking.com un Vrbo un saskaņojam visus kalendārus ar vietējām vietnēm, kuras jau izmantojat, jebkur Ziemeļvalstīs un Baltijā.",
       cta: "Kļūt par saimnieku",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Drīzumā",
+        title: "Mökki monitor",
+        body: "Brīdinājumi par salu, noplūdēm un elektrības pārtraukumiem tālrunī, arī bez Wi-Fi.",
+        link: "Uzzināt vairāk",
+        alt: "Mökki monitor ar temperatūras sensoriem, noplūdes sensoru un durvju sensoru",
+      },
     },
   },
 

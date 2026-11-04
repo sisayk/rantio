@@ -295,6 +295,14 @@ export const fi: Translation = {
       title: "Onko sinulla mökki?",
       body: "Viemme sen Airbnbhin, Booking.comiin ja Vrbo:hon ja pidämme kalenterit samassa tahdissa jo käyttämiesi sivustojen, kuten Nettimökin, kanssa. Pohjoismaissa ja Baltiassa.",
       cta: "Ilmoita mökkisi",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Tulossa",
+        title: "Mökki monitor",
+        body: "Hälytys pakkasesta, vuodosta ja sähkökatkosta puhelimeesi, myös ilman wifiä.",
+        link: "Lue lisää",
+        alt: "Mökki monitor ja sen lämpötila-anturit, vuotoanturi ja ovianturi",
+      },
     },
   },
 

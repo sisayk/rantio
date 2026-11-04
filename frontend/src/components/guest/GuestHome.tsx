@@ -53,6 +53,7 @@ import {
   Wordmark,
 } from "./icons";
 import styles from "./guest.module.css";
+import monitorCutout from "@/assets/mokki-monitor-cutout.webp";
 import SiteFooter from "../SiteFooter";
 
 // Leaflet needs the browser, so the map loads on the client only.
@@ -971,10 +972,32 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
         </p>
 
         <section className={styles.hostBand}>
-          <div>
+          <div className={styles.hostBandText}>
             <h2>{t.hostBand.title}</h2>
             <p>{t.hostBand.body}</p>
           </div>
+          {/* Mökki monitor teaser: the device render, a badge and one line, linking to the owners' page */}
+          <a className={styles.hostMonitor} href={`${paths.hosts(lang)}#monitor`}>
+            <img
+              className={styles.hostMonitorImg}
+              src={monitorCutout.src}
+              alt={t.hostBand.monitor.alt}
+              width={monitorCutout.width}
+              height={monitorCutout.height}
+              loading="lazy"
+            />
+            <span className={styles.hostMonitorText}>
+              <span className={styles.hostMonitorBadge}>{t.hostBand.monitor.badge}</span>
+              <strong>{t.hostBand.monitor.title}</strong>
+              <span className={styles.hostMonitorBody}>{t.hostBand.monitor.body}</span>
+              <span className={styles.hostMonitorLink}>
+                {t.hostBand.monitor.link}
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" />
+                </svg>
+              </span>
+            </span>
+          </a>
           <a className={styles.hostCta} href={paths.hosts(lang)}>
             {t.hostBand.cta}
           </a>

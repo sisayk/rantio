@@ -295,6 +295,14 @@ export const da: Translation = {
       title: "Har du et sommerhus?",
       body: "Vi lægger det på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sider, du allerede bruger – overalt i Norden og Baltikum.",
       cta: "Bliv udlejer",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Kommer snart",
+        title: "Mökki monitor",
+        body: "Advarsler om frost, lækager og strømsvigt på telefonen, også uden wifi.",
+        link: "Læs mere",
+        alt: "Mökki monitor med temperaturfølere, lækagesensor og dørsensor",
+      },
     },
   },
 

@@ -295,6 +295,14 @@ export const de: Translation = {
       title: "Du hast ein Ferienhaus?",
       body: "Wir bringen es auf Airbnb, Booking.com und Vrbo und halten alle Kalender im Einklang mit den lokalen Portalen, die du schon nutzt – überall im Norden und im Baltikum.",
       cta: "Gastgeber werden",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Demnächst",
+        title: "Mökki monitor",
+        body: "Warnungen bei Frost, Wasserschäden und Stromausfall aufs Handy, auch ohne WLAN.",
+        link: "Mehr erfahren",
+        alt: "Der Mökki monitor mit Temperaturfühlern, Wassersensor und Türsensor",
+      },
     },
   },
 

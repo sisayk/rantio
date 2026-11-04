@@ -295,6 +295,14 @@ export const nb: Translation = {
       title: "Har du en hytte?",
       body: "Vi legger den ut på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sidene du allerede bruker, uansett hvor i Norden eller Baltikum du er.",
       cta: "Bli utleier",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Kommer snart",
+        title: "Mökki monitor",
+        body: "Varsler om frost, lekkasje og strømbrudd på telefonen, også uten wifi.",
+        link: "Les mer",
+        alt: "Mökki monitor med temperaturfølere, lekkasjesensor og dørsensor",
+      },
     },
   },
 

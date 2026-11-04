@@ -295,6 +295,14 @@ export const lt: Translation = {
       title: "Turite poilsio namelį?",
       body: "Paskelbsime jį Airbnb, Booking.com ir Vrbo bei suderinsime visus kalendorius su vietinėmis svetainėmis, kuriomis jau naudojatės – bet kurioje Šiaurės ar Baltijos šalyje.",
       cta: "Tapkite šeimininku",
+      // The Mökki monitor teaser in the band; links to the owners' page.
+      monitor: {
+        badge: "Netrukus",
+        title: "Mökki monitor",
+        body: "Įspėjimai apie šaltį, nuotėkį ir elektros dingimą telefone, net be Wi-Fi.",
+        link: "Sužinoti daugiau",
+        alt: "Mökki monitor su temperatūros jutikliais, nuotėkio jutikliu ir durų jutikliu",
+      },
     },
   },
 
