@@ -297,8 +297,15 @@
 .composer textarea,
 .contactForm input,
 .contactForm textarea {
+  display: block;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  background: #fff;
+  color: var(--c-ink);
+  -webkit-appearance: none;
+  appearance: none;
   padding: 10px 12px;
   border: 1px solid #b9c2bf;
   border-radius: 12px;
@@ -472,8 +479,16 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding: 18px 24px 0;
+  overflow-x: hidden;
   overflow-y: auto;
 }
+
+.contactForm label > * { min-width: 0; }
+
+/* iPhone Safari draws date fields wider than their box and centres the date. */
+.contactForm input[type="date"] { line-height: 22px; }
+.contactForm input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.contactForm input[type="date"]::-webkit-calendar-picker-indicator { margin: 0; }
 
 .contactForm label {
   display: grid;
@@ -570,7 +585,14 @@
   .fieldRow,
   .fieldRow3 { grid-template-columns: minmax(0, 1fr); }
 
+  .fieldRow.pairRow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
   .contactForm { padding-inline: 16px; }
+
+  /* 16 px stops iPhones zooming the page in when a field is tapped. */
+  .composer textarea,
+  .contactForm input,
+  .contactForm textarea { font-size: 16px; }
 
   .guestMain { padding-inline: 12px; }
 

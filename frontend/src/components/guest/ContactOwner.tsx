@@ -154,23 +154,23 @@ function ContactDialog({
               </label>
             </div>
             <p className={chat.fieldHint}>{t.emailHint}</p>
-            <div className={chat.fieldRow}>
+            <div className={`${chat.fieldRow} ${chat.pairRow}`}>
               <label>
-                {t.checkIn} <span className={chat.optional}>({t.optional})</span>
+                <span>{t.checkIn} <span className={chat.optional}>({t.optional})</span></span>
                 <input name="check_in" type="date" disabled={busy} />
               </label>
               <label>
-                {t.checkOut} <span className={chat.optional}>({t.optional})</span>
+                <span>{t.checkOut} <span className={chat.optional}>({t.optional})</span></span>
                 <input name="check_out" type="date" disabled={busy} />
               </label>
             </div>
-            <div className={chat.fieldRow}>
+            <div className={`${chat.fieldRow} ${chat.pairRow}`}>
               <label>
-                {t.adults} <span className={chat.optional}>({t.optional})</span>
+                <span>{t.adults} <span className={chat.optional}>({t.optional})</span></span>
                 <input name="adults" type="number" min={1} max={maxGuests} inputMode="numeric" disabled={busy} />
               </label>
               <label>
-                {t.children} <span className={chat.optional}>({t.optional})</span>
+                <span>{t.children} <span className={chat.optional}>({t.optional})</span></span>
                 <input name="children" type="number" min={0} max={Math.max(0, maxGuests - 1)} inputMode="numeric" disabled={busy} />
               </label>
             </div>
