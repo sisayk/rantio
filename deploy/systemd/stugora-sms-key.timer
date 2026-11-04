@@ -1,0 +1,10 @@
+[Unit]
+Description=Check the Brevo SMS key every Monday at 07:40 Finnish time
+
+[Timer]
+OnCalendar=Mon *-*-* 07:40:00 Europe/Helsinki
+# If the server was off at that moment, run as soon as it is back.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

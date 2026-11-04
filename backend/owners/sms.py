@@ -7,6 +7,7 @@ credits bought in Brevo). Phone numbers are handled in international form (+3584
 import json
 import logging
 import re
+import urllib.error
 import urllib.request
 
 from django.conf import settings
@@ -48,3 +49,20 @@ def send(to: str, text: str) -> None:
     )
     with urllib.request.urlopen(req, timeout=10) as res:  # noqa: S310 (fixed https URL)
         res.read()
+
+
+STATS_URL = "https://api.brevo.com/v3/transactionalSMS/statistics/aggregatedReport?days=7"
+
+
+def check_key() -> tuple[bool, str]:
+    """Uses the key once (reading last week's SMS totals), which keeps it from expiring: Brevo
+    turns off keys unused for 90 days. (True, "") when Brevo accepts it, else (False, why)."""
+    req = urllib.request.Request(STATS_URL, headers={"api-key": settings.BREVO_API_KEY, "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as res:  # noqa: S310 (fixed https URL)
+            res.read()
+        return True, ""
+    except urllib.error.HTTPError as e:
+        return False, f"Brevo answered {e.code}"
+    except OSError as e:
+        return False, f"Brevo couldn't be reached ({e})"

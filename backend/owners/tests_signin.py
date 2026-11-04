@@ -116,3 +116,19 @@ class SmsSignInTests(TestCase):
         with mock.patch.object(sms, "send") as send:
             self.client.post("/api/auth/request-code/", {"phone": "+358401234567"}, content_type="application/json")
         send.assert_not_called()
+
+
+class SmsKeyCheckTests(TestCase):
+    @override_settings(BREVO_API_KEY="xkeysib-test", SIGNUP_NOTIFY_EMAILS=["info@rantio.fi"])
+    def test_a_refused_key_emails_the_team(self):
+        from io import StringIO
+
+        from django.core import mail
+        from django.core.management import call_command
+
+        with mock.patch.object(sms, "check_key", return_value=(True, "")):
+            call_command("check_sms_key", stdout=StringIO())
+        self.assertEqual(len(mail.outbox), 0)
+        with mock.patch.object(sms, "check_key", return_value=(False, "Brevo answered 401")):
+            call_command("check_sms_key", stdout=StringIO(), stderr=StringIO())
+        self.assertIn("SMS sign-in codes may have stopped", mail.outbox[0].subject)

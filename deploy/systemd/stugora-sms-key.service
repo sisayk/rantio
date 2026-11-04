@@ -1,0 +1,19 @@
+# Weekly use of the Brevo SMS key, so Brevo does not turn it off after 90 unused days.
+# Relies on the management command `check_sms_key` (backend/owners/management/commands/).
+# setup-server.sh / deploy.sh only enable the timer once that command exists.
+[Unit]
+Description=Rantio: check the Brevo SMS key (keeps it active)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py check_sms_key
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
