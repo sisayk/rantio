@@ -22,6 +22,8 @@ import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
 import { RangeCalendar } from "@/ui/range-calendar";
+import { RatingsBlock } from "@/ui/ratings";
+import { NO_RATINGS } from "@/lib/ratingsPreview";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
 const SEASON_TONE = { summer: "green", winter: "neutral", autumn: "berry", darkSeason: "neutral", allYear: "green" } as const;
@@ -262,6 +264,10 @@ export default function Cottage() {
               {m.guest.detail.source}
             </Text>
           ) : null}
+
+          <Divider />
+          {/* Reviews come only from stays booked through Rantio; none here yet. */}
+          <RatingsBlock ratings={NO_RATINGS} host="" />
 
           <Divider />
           <Text v="h2">{m.app.detail.know}</Text>

@@ -20,3 +20,6 @@ export function previewRatings(t: ReviewsText, external: ExternalRating[], today
     external,
   };
 }
+
+/** No reviews yet: the ratings box shows "New on Rantio". */
+export const NO_RATINGS: Ratings = { count: 0, average: null, categories: null, reviews: [], external: [] };

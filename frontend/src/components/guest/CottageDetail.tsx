@@ -19,6 +19,8 @@ import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
 import SiteFooter from "../SiteFooter";
+import RatingsSection from "../Ratings";
+import { NO_RATINGS } from "@/lib/ratingsPreview";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
   const m = getMessages(lang);
@@ -146,6 +148,9 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
                 ))}
               </div>
             </section>
+
+            {/* Reviews come only from stays booked through Rantio; none here yet. */}
+            <RatingsSection lang={lang} ratings={NO_RATINGS} host="" />
           </div>
 
           <aside className={styles.bookCard}>
