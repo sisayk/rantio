@@ -94,3 +94,19 @@ class EventsTests(TestCase):
         self.assertEqual(self.get(**{"from": D(5), "to": D(1)}).status_code, 400)
         self.assertEqual(self.get(**{"from": D(1), "to": D(90)}).status_code, 400)
         self.assertEqual(self.get(to=D(3)).status_code, 400)
+
+    def test_events_in_the_guests_language_and_spread_over_the_stay(self):
+        local = {"data": [
+            {"id": f"x:{d}:{i}", "name": {"fi": f"Kerho {d}-{i}"} if i % 2 else {"fi": f"Konsertti {d}-{i}", "en": f"Concert {d}-{i}"},
+             "start_time": f"{D(d)}T{10 + i:02d}:00:00Z", "end_time": f"{D(d)}T{11 + i:02d}:00:00Z",
+             "info_url": {"en": f"https://example.fi/{d}/{i}"}, "location": {"position": {"coordinates": [24.93, 60.17]}}}
+            for d in (1, 2) for i in range(20)
+        ]}
+        with override_settings(TICKETMASTER_API_KEY=""), mock.patch.object(events, "_get", return_value=local):
+            en = self.get(**{"from": D(1), "to": D(2)}).json()["events"]
+            cache.clear()
+            fi = self.get(lang="fi", **{"from": D(1), "to": D(2)}).json()["events"]
+        self.assertTrue(all(e["name"].startswith("Concert") for e in en))
+        days = [e["start"][:10] for e in en]
+        self.assertEqual((days.count(D(1)), days.count(D(2))), (events.PER_DAY, events.PER_DAY))
+        self.assertTrue(any(e["name"].startswith("Kerho") for e in fi))

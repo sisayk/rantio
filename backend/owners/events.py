@@ -36,7 +36,9 @@ from rest_framework.views import APIView
 logger = logging.getLogger(__name__)
 
 RADIUS_KM = 40
-MAX_EVENTS = 40
+MAX_EVENTS = 60
+PER_DAY = 6  # events shown for each day of the stay
+LONG_SHOWN = 8  # and running through it (exhibitions, festivals)
 MAX_STAY_DAYS = 60
 CACHE_SECONDS = 6 * 3600
 LANGS = ("en", "fi", "sv")  # Linked Events has these; other site languages get English
@@ -135,6 +137,11 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
         # come as separate events, which are what guests can go to.
         if e.get("event_status") in ("EventCancelled", "EventPostponed") or e.get("super_event_type") in ("umbrella", "recurring"):
             continue
+        # Only events presented in the guest's language: guests reading in English get the
+        # ones written for visitors, not every local club meeting.
+        names = e.get("name") or {}
+        if not (names.get(lang) if lang in ("fi", "sv") else names.get("en")):
+            continue
         loc = e.get("location") or {}
         coords = ((loc.get("position") or {}).get("coordinates")) or []
         if len(coords) != 2:
@@ -227,7 +234,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events4:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events5:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
@@ -258,11 +265,19 @@ def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
             continue
         seen.add(dedupe)
         events.append({**e, "km": round(dist, 1), "_long": (last - first).days > 3})
-    # Events on given days first, by date and distance; long-running ones (exhibitions) after.
+    # Each day of the stay gets its share (nearest first), then long-running ones such as
+    # exhibitions, so a busy first day doesn't push the rest of the stay off the list.
     events.sort(key=lambda e: (e["_long"], max(_day(e["start"]), start), e["km"]))
+    per_day: dict = {}
+    chosen = []
     for e in events:
+        group = "long" if e["_long"] else max(_day(e["start"]), start)
+        per_day[group] = per_day.get(group, 0) + 1
+        if per_day[group] <= (LONG_SHOWN if group == "long" else PER_DAY):
+            chosen.append(e)
+    for e in chosen:
         del e["_long"]
-    answer = {"events": events[:MAX_EVENTS], "sources": sources, "covered": bool(providers)}
+    answer = {"events": chosen[:MAX_EVENTS], "sources": sources, "covered": bool(providers)}
     cache.set(key, answer, CACHE_SECONDS)
     return answer
 
