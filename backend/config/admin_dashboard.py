@@ -78,7 +78,9 @@ def dashboard_callback(request, context):
 
     # ---- counts -------------------------------------------------------------
     owners = Owner.objects.count()
-    pilots = Owner.objects.filter(is_pilot=True).count()
+    # Owners with a cottage in its free trial (it replaced the pilot deal on 4 Nov 2026).
+    on_trial = len({c.owner_id for c in Cottage.objects.exclude(listing_started_on=None)
+                    if c.listing_started_on <= today < c.trial_ends_on})
     cottages = Cottage.objects.count()
     live = Cottage.objects.filter(status=Cottage.Status.LIVE).count()
     setup = badge_count("setup")
@@ -148,7 +150,7 @@ def dashboard_callback(request, context):
 
     b_dir, b_trend = trend(len(this_month), len(last_month))
     kpis = [
-        {"label": "Owners", "value": owners, "dir": "flat", "trend": f"{pilots} pilot{'s' if pilots != 1 else ''}",
+        {"label": "Owners", "value": owners, "dir": "flat", "trend": f"{on_trial} on free trial",
          "tone": "green", "icon": "person", "link": _url("owner")},
         {"label": "Live cottages", "value": live, "dir": "flat", "trend": f"{cottages} in all, {setup} in set-up",
          "tone": "blue", "icon": "cottage", "link": _url("cottage", "status__exact=live")},
@@ -228,7 +230,7 @@ def dashboard_callback(request, context):
         "st_panels": {
             "owners": [
                 ("Owners", owners, _url("owner")),
-                ("Pilot owners", pilots, _url("owner", "is_pilot__exact=1")),
+                ("On free trial", on_trial, _url("cottage", "status__exact=live")),
                 ("Sign-ups, all", signups_total, _url("ownersignup")),
                 ("Sign-ups to contact", signups_new, _url("ownersignup", BADGE_LINKS["signups"])),
                 ("Cottages live", live, _url("cottage", "status__exact=live")),

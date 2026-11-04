@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from config.admin_assets_view import admin_css
+from config.admin_assets_view import admin_asset
 from owners import calendar_views, events, geocode, inbound, inbox, listings, newsletter, portal, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
@@ -12,7 +12,7 @@ admin.site.site_header = "Rantio admin"
 admin.site.site_title = "Rantio"
 
 urlpatterns = [
-    path("admin/_assets/stugora-admin.css", admin_css, name="admin_css"),
+    path("admin/_assets/<str:name>", admin_asset, name="admin_asset"),
     path("admin/", admin.site.urls),
     path("api/events/", events.EventsView.as_view(), name="events"),
     path("api/signups/", OwnerSignupCreateView.as_view(), name="owner-signup"),

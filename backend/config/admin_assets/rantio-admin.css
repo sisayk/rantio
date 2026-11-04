@@ -1,6 +1,6 @@
 /* Rantio admin stylesheet — the same design as Bona's operations admin
    (django-unfold + this file), in Rantio's green.
-   Served by config/admin_assets_view.py at /admin/_assets/stugora-admin.css, so it
+   Served by config/admin_assets_view.py at /admin/_assets/rantio-admin.css, so it
    ships with the code and needs no collectstatic. */
 /* ---------- 0. Theme tokens — light defaults + dark overrides ----------- */
 /* Unfold toggles the `dark` class on <html>; every colour below flips with it. */

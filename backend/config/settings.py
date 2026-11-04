@@ -297,12 +297,27 @@ def _admin_css(request):
     return admin_css_url(request)
 
 
+def _admin_asset(name):
+    def url(request):
+        from config.admin_assets_view import asset_url
+
+        return asset_url(name)
+
+    return url
+
+
 UNFOLD = {
     "SITE_TITLE": "Rantio admin",
     "SITE_HEADER": "Rantio",
     "SITE_SUBHEADER": "Internal admin · rantio.fi",
     "SITE_URL": SITE_URL + "/",
-    "SITE_SYMBOL": "cottage",
+    # Rantio's mark (green square, R with a house, orange pin), as on the site and the app.
+    "SITE_ICON": _admin_asset("rantio-mark.svg"),
+    "SITE_FAVICONS": [
+        {"rel": "icon", "type": "image/svg+xml", "href": _admin_asset("rantio-mark.svg")},
+        {"rel": "icon", "type": "image/png", "sizes": "32x32", "href": _admin_asset("rantio-favicon-32.png")},
+        {"rel": "apple-touch-icon", "sizes": "180x180", "href": _admin_asset("rantio-apple-icon.png")},
+    ],
     "DASHBOARD_CALLBACK": "config.admin_dashboard.dashboard_callback",
     "STYLES": [_admin_css],
     "SHOW_HISTORY": True,
