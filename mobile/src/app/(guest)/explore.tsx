@@ -185,7 +185,7 @@ export default function Explore() {
           <Text v="small">{m.guest.hostBand.body}</Text>
         </View>
       </Card>
-      <View style={{ flexDirection: "row", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: space.sm, paddingHorizontal: space.xl, marginTop: space.md }}>
         <Button small label={m.guest.hostBand.cta} onPress={() => router.push("/list-cottage")} />
         <Button small kind="secondary" label={m.app.explore.logIn} onPress={() => router.push("/login")} />
       </View>
