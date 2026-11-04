@@ -117,7 +117,9 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
     params = urllib.parse.urlencode({
         "bbox": f"{west:.4f},{south:.4f},{east:.4f},{north:.4f}",
         "start": start.isoformat(), "end": end.isoformat(),
-        "include": "location,keywords", "sort": "start_time", "page_size": 100,
+        # Latest start first: what starts during the stay comes before exhibitions that opened
+        # months ago (which would otherwise fill the page).
+        "include": "location,keywords", "sort": "-start_time", "page_size": 100,
     })
     data = _get(f"{LINKED_EVENTS}?{params}")
     out = []
@@ -133,6 +135,8 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
         offers = e.get("offers") or []
         free = any(o.get("is_free") for o in offers) if offers else None
         price_text = next((_pick(o.get("price"), lang) for o in offers if _pick(o.get("price"), lang)), "")
+        if price_text.startswith(("http://", "https://")):  # a link where a price should be
+            price_text = ""
         url = _pick(e.get("info_url"), lang) or next((_pick(o.get("info_url"), lang) for o in offers if _pick(o.get("info_url"), lang)), "")
         if not url:
             url = f"https://tapahtumat.hel.fi/{'fi' if lang == 'fi' else 'en'}/events/{e.get('id', '')}"
@@ -216,7 +220,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events2:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events3:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
