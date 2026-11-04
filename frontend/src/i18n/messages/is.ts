@@ -299,7 +299,7 @@ export const is: Translation = {
       monitor: {
         badge: "Væntanlegt",
         title: "Mökki monitor",
-        body: "Viðvaranir um frost, leka og rafmagnsleysi í símann, líka án Wi-Fi.",
+        body: "Viðvaranir um frost, leka, rafmagnsleysi og gufubað sem gleymdist að slökkva á, líka án Wi-Fi.",
         link: "Lesa meira",
         alt: "Mökki monitor með hitanemum, lekaskynjara og hurðarskynjara",
       },
@@ -557,7 +557,7 @@ export const is: Translation = {
         {
           key: "probes",
           title: "Lagnir og gufubað",
-          body: "Nemar á vatnslögninni og í gufubaðinu sýna hitastigið í appinu.",
+          body: "Nemar á vatnslögninni og í gufubaðinu sýna hitastigið í appinu. Ef gleymist að slökkva á gufubaðinu færðu viðvörun.",
         },
       ],
       app: "Viðvaranirnar birtast í Rantio-appinu, við hliðina á bókunum og skilaboðum. Hentar öllum bústöðum, hvort sem þú leigir út eða ekki.",

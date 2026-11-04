@@ -299,7 +299,7 @@ export const et: Translation = {
       monitor: {
         badge: "Peagi tulekul",
         title: "Mökki monitor",
-        body: "Teated külma, lekke ja elektrikatkestuse kohta otse telefoni, ka ilma wifita.",
+        body: "Teated külma, lekke, elektrikatkestuse ja sisse unustatud sauna kohta, ka ilma wifita.",
         link: "Loe lähemalt",
         alt: "Mökki monitor koos temperatuuriandurite, lekkeanduri ja ukseanduriga",
       },
@@ -557,7 +557,7 @@ export const et: Translation = {
         {
           key: "probes",
           title: "Toru ja saun",
-          body: "Andurid veetorul ja saunas näitavad temperatuure rakenduses.",
+          body: "Andurid veetorul ja saunas näitavad temperatuure rakenduses. Kui saun jääb sisse, saad teate.",
         },
       ],
       app: "Hoiatused tulevad Rantio rakendusse, broneeringute ja sõnumite kõrvale. Sobib igale suvilale, olenemata sellest, kas annad seda üürile või mitte.",

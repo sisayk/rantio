@@ -307,7 +307,7 @@ export const en = {
       monitor: {
         badge: "Coming soon",
         title: "Mökki monitor",
-        body: "Frost, leak and power-cut alerts on your phone, even without Wi‑Fi.",
+        body: "Alerts for frost, leaks, power cuts and a sauna left on, even without Wi‑Fi.",
         link: "Learn more",
         alt: "The Mökki monitor with its temperature probes, leak sensor and door sensor",
       },
@@ -569,7 +569,7 @@ export const en = {
         {
           key: "probes",
           title: "Pipe and sauna",
-          body: "Probes on the water pipe and in the sauna show their temperatures in the app.",
+          body: "Probes on the water pipe and in the sauna show their temperatures in the app. If the sauna is left on, you get an alert.",
         },
       ],
       app: "Alerts arrive in the Rantio app, next to your bookings and messages. It suits any cottage, whether you rent it out or not.",

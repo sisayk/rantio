@@ -299,7 +299,7 @@ export const lv: Translation = {
       monitor: {
         badge: "Drīzumā",
         title: "Mökki monitor",
-        body: "Brīdinājumi par salu, noplūdēm un elektrības pārtraukumiem tālrunī, arī bez Wi-Fi.",
+        body: "Brīdinājumi par salu, noplūdēm, elektrības pārtraukumiem un pirti, kas palikusi ieslēgta, arī bez Wi-Fi.",
         link: "Uzzināt vairāk",
         alt: "Mökki monitor ar temperatūras sensoriem, noplūdes sensoru un durvju sensoru",
       },
@@ -557,7 +557,7 @@ export const lv: Translation = {
         {
           key: "probes",
           title: "Caurule un pirts",
-          body: "Sensori uz ūdens caurules un pirtī rāda temperatūru lietotnē.",
+          body: "Sensori uz ūdens caurules un pirtī rāda temperatūru lietotnē. Ja pirts paliek ieslēgta, saņemsi brīdinājumu.",
         },
       ],
       app: "Brīdinājumi parādās Rantio lietotnē blakus tavām rezervācijām un ziņām. Der jebkurai brīvdienu mājai, neatkarīgi no tā, vai tu to izīrē.",

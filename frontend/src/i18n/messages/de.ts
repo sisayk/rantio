@@ -299,7 +299,7 @@ export const de: Translation = {
       monitor: {
         badge: "Demnächst",
         title: "Mökki monitor",
-        body: "Warnungen bei Frost, Wasserschäden und Stromausfall aufs Handy, auch ohne WLAN.",
+        body: "Warnungen bei Frost, Wasserschäden, Stromausfall oder wenn die Sauna noch an ist, auch ohne WLAN.",
         link: "Mehr erfahren",
         alt: "Der Mökki monitor mit Temperaturfühlern, Wassersensor und Türsensor",
       },
@@ -557,7 +557,7 @@ export const de: Translation = {
         {
           key: "probes",
           title: "Leitung und Sauna",
-          body: "Fühler an der Wasserleitung und in der Sauna zeigen dir die Temperaturen in der App.",
+          body: "Fühler an der Wasserleitung und in der Sauna zeigen dir die Temperaturen in der App. Bleibt die Sauna an, bekommst du eine Warnung.",
         },
       ],
       app: "Die Warnungen kommen in der Rantio-App an, neben deinen Buchungen und Nachrichten. Passt zu jedem Ferienhaus, ob du es vermietest oder nicht.",

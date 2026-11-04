@@ -299,7 +299,7 @@ export const sv: Translation = {
       monitor: {
         badge: "Kommer snart",
         title: "Mökki monitor",
-        body: "Larm om frost, läckor och strömavbrott i telefonen, även utan wifi.",
+        body: "Larm om frost, läckor, strömavbrott och en bastu som lämnats på, även utan wifi.",
         link: "Läs mer",
         alt: "Mökki monitor med temperaturgivare, läckagesensor och dörrsensor",
       },
@@ -557,7 +557,7 @@ export const sv: Translation = {
         {
           key: "probes",
           title: "Rör och bastu",
-          body: "Givare på vattenröret och i bastun visar temperaturerna i appen.",
+          body: "Givare på vattenröret och i bastun visar temperaturerna i appen. Om bastun lämnas på får du ett larm.",
         },
       ],
       app: "Larmen kommer i Rantio-appen, bredvid dina bokningar och meddelanden. Passar alla stugor, oavsett om du hyr ut eller inte.",

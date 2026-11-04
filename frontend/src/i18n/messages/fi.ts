@@ -299,7 +299,7 @@ export const fi: Translation = {
       monitor: {
         badge: "Tulossa",
         title: "Mökki monitor",
-        body: "Hälytys pakkasesta, vuodosta ja sähkökatkosta puhelimeesi, myös ilman wifiä.",
+        body: "Hälytys pakkasesta, vuodosta, sähkökatkosta ja päälle unohtuneesta saunasta, myös ilman wifiä.",
         link: "Lue lisää",
         alt: "Mökki monitor ja sen lämpötila-anturit, vuotoanturi ja ovianturi",
       },
@@ -554,7 +554,7 @@ export const fi: Translation = {
         {
           key: "probes",
           title: "Putki ja sauna",
-          body: "Anturit vesiputkessa ja saunassa näyttävät lämpötilat sovelluksessa.",
+          body: "Anturit vesiputkessa ja saunassa näyttävät lämpötilat sovelluksessa. Jos sauna jää päälle, saat hälytyksen.",
         },
       ],
       app: "Hälytykset tulevat Rantio-sovellukseen varausten ja viestien rinnalle. Sopii mille tahansa mökille, vuokraatpa sitä tai et.",

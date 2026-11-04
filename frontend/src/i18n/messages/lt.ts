@@ -299,7 +299,7 @@ export const lt: Translation = {
       monitor: {
         badge: "Netrukus",
         title: "Mökki monitor",
-        body: "Įspėjimai apie šaltį, nuotėkį ir elektros dingimą telefone, net be Wi-Fi.",
+        body: "Įspėjimai apie šaltį, nuotėkį, elektros dingimą ir neišjungtą pirtį, net be Wi-Fi.",
         link: "Sužinoti daugiau",
         alt: "Mökki monitor su temperatūros jutikliais, nuotėkio jutikliu ir durų jutikliu",
       },
@@ -562,7 +562,7 @@ export const lt: Translation = {
         {
           key: "probes",
           title: "Vamzdis ir pirtis",
-          body: "Jutikliai ant vandens vamzdžio ir pirtyje rodo temperatūrą programėlėje.",
+          body: "Jutikliai ant vandens vamzdžio ir pirtyje rodo temperatūrą programėlėje. Jei pirtis lieka įjungta, gausite įspėjimą.",
         },
       ],
       app: "Įspėjimai ateina į Rantio programėlę šalia jūsų užsakymų ir žinučių. Tinka bet kuriai sodybai, nesvarbu, ar ją nuomojate.",

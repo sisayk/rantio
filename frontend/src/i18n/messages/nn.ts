@@ -299,7 +299,7 @@ export const nn: Translation = {
       monitor: {
         badge: "Kjem snart",
         title: "Mökki monitor",
-        body: "Varsel om frost, lekkasje og straumbrot på telefonen, òg utan wifi.",
+        body: "Varsel om frost, lekkasje, straumbrot og ei badstove som står på, òg utan wifi.",
         link: "Les meir",
         alt: "Mökki monitor med temperaturfølarar, lekkasjesensor og dørsensor",
       },
@@ -557,7 +557,7 @@ export const nn: Translation = {
         {
           key: "probes",
           title: "Røyr og badstove",
-          body: "Følarar på vassrøyret og i badstova viser temperaturane i appen.",
+          body: "Følarar på vassrøyret og i badstova viser temperaturane i appen. Står badstova på, får du eit varsel.",
         },
       ],
       app: "Varsla kjem i Rantio-appen, ved sida av bestillingane og meldingane dine. Passar for alle hytter, anten du leiger ut eller ikkje.",
