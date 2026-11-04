@@ -3,6 +3,7 @@
 import { isPlural } from "./format";
 import { DEFAULT_LANG, LANG_INFO, type Lang, LANGS } from "./locales";
 import { da } from "./messages/da";
+import { de } from "./messages/de";
 import { en, type Messages } from "./messages/en";
 import { et } from "./messages/et";
 import { fi } from "./messages/fi";
@@ -16,7 +17,7 @@ import type { Translation } from "./translation";
 
 export type { Messages };
 
-export const TRANSLATIONS: Record<Lang, Translation> = { en, fi, sv, nb, nn, da, is, et, lv, lt };
+export const TRANSLATIONS: Record<Lang, Translation> = { en, fi, sv, nb, nn, da, is, et, lv, lt, de };
 
 type Tree = Record<string, unknown>;
 const isTree = (v: unknown): v is Tree => typeof v === "object" && v !== null && !Array.isArray(v) && !isPlural(v);

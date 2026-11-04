@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Stripe Checkout's own languages; Icelandic isn't one of them.
 STRIPE_LOCALES = {"en": "en", "fi": "fi", "sv": "sv", "nb": "nb", "nn": "nb", "da": "da", "et": "et", "lv": "lv",
-                  "lt": "lt", "is": "auto"}
+                  "lt": "lt", "de": "de", "is": "auto"}
 
 # Shown above Stripe's "Save" button (at most 1,200 characters).
 TERMS = {
@@ -73,12 +73,17 @@ TERMS = {
           "metinis mokestis {fee} + PVM už kiekvieną sodybą. 12 % + PVM nuo Rantio atvestų užsakymų "
           "nuskaičiuojama kas mėnesį, taip pat ir nemokamais mėnesiais. Jei nutrauksite prieš baigiantis "
           "nemokamiems mėnesiams, metinio mokesčio nebus.",
+    "de": "{months} Monate kostenlos. Heute wird nichts abgebucht: Deine Karte wird für die Rechnungen von Rantio "
+          "hinterlegt. Die kostenlosen Monate beginnen, sobald das Inserat deines Ferienhauses online ist. Danach "
+          "wird die Jahresgebühr von {fee} + MwSt. pro Ferienhaus von dieser Karte abgebucht. 12 % + MwSt. der "
+          "Buchungen, die Rantio bringt, werden monatlich abgebucht, auch während der kostenlosen Monate. Hörst du "
+          "vor dem Ende der kostenlosen Monate auf, fällt keine Jahresgebühr an.",
 }
 
 
 def fee_text(currency: str, lang: str) -> str:
     amount = int(YEARLY_FEES.get(currency, YEARLY_FEES["EUR"]))
-    sep = "," if lang == "en" else " " if lang not in ("da", "is") else "."
+    sep = "," if lang == "en" else " " if lang not in ("da", "is", "de") else "."
     number = f"{amount:,}".replace(",", sep)
     if currency == "EUR":
         return f"€{number}" if lang == "en" else f"{number} €"

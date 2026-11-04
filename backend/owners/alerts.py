@@ -57,6 +57,9 @@ TEXTS = {
     "lt": ("Nauja rezervacija: {cottage}, {dates}", "Nauja rezervacija: {cottage}.", "Svetainė", "Atvykimas", "Išvykimas", "Svečiai",
            "Šias datas užblokuosime kitose Jūsų svetainėse.", "Užblokuokite šias datas ir Nettimökki.",
            "Dėmesio: datos sutampa su kita rezervacija ({other}). Patikrinkite prieš patvirtindami.", "Jūsų rezervacijos", "Rantio"),
+    "de": ("Neue Buchung: {cottage}, {dates}", "Eine neue Buchung für {cottage}.", "Seite", "Anreise", "Abreise", "Gäste",
+           "Wir sperren diese Daten auf deinen anderen Seiten.", "Bitte sperre diese Daten auch auf Nettimökki.",
+           "Achtung: Diese Daten überschneiden sich mit einer anderen Buchung ({other}). Prüfe das, bevor du sie annimmst.", "Deine Buchungen", "Rantio"),
 }
 DATE_FORMATS = {"en": "%-d %b %Y", "sv": "%Y-%m-%d", "lt": "%Y-%m-%d"}  # others: 12.7.2027
 

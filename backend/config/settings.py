@@ -113,6 +113,7 @@ LANGUAGE_CODE = "en"
 LANGUAGES = [
     ("en", "English"), ("fi", "Suomi"), ("sv", "Svenska"), ("nb", "Norsk bokmål"), ("nn", "Norsk nynorsk"),
     ("da", "Dansk"), ("is", "Íslenska"), ("et", "Eesti"), ("lv", "Latviešu"), ("lt", "Lietuvių"),
+    ("de", "Deutsch"),
 ]
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = True

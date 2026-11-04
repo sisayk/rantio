@@ -56,8 +56,49 @@ export const countryNamesAll = (code: string) => LANGS.map((lang) => countryName
 
 /** A region's name for the page: Finnish names on Finnish pages, the local name
  *  where the page's language is spoken there, otherwise the English name. */
+/** German names where they differ from the English ones (German Wikipedia's usage). */
+const GERMAN_REGIONS: Record<string, string> = {
+  "Southwest Finland": "Südwestfinnland",
+  "South Karelia": "Südkarelien",
+  "South Savo": "Südsavo",
+  "North Savo": "Nordsavo",
+  "North Karelia": "Nordkarelien",
+  "Central Finland": "Mittelfinnland",
+  "South Ostrobothnia": "Südösterbotten",
+  Ostrobothnia: "Österbotten",
+  "Central Ostrobothnia": "Mittelösterbotten",
+  "North Ostrobothnia": "Nordösterbotten",
+  Lapland: "Lappland",
+  "Capital Region": "Hauptstadtregion",
+  Zealand: "Seeland",
+  "Southern Denmark": "Süddänemark",
+  "Central Jutland": "Mitteljütland",
+  "North Jutland": "Nordjütland",
+  "Southern Peninsula": "Reykjanes-Halbinsel",
+  "West Iceland": "Westisland",
+  Westfjords: "Westfjorde",
+  "Northwest Iceland": "Nordwestisland",
+  "Northeast Iceland": "Nordostisland",
+  "East Iceland": "Ostisland",
+  "South Iceland": "Südisland",
+  "Riga and Jūrmala": "Riga und Jūrmala",
+  Kurzeme: "Kurland",
+  Zemgale: "Semgallen",
+  Latgale: "Lettgallen",
+};
+
+/** "Harju County" → "Kreis Harju", "Vilnius County" → "Bezirk Vilnius", "Kalmar County" → "Provinz Kalmar". */
+function germanRegion(name: string, country: string): string {
+  if (GERMAN_REGIONS[name]) return GERMAN_REGIONS[name];
+  const county = name.match(/^(.*) County$/);
+  if (!county) return name;
+  const word = country === "EE" ? "Kreis" : country === "LT" ? "Bezirk" : "Provinz";
+  return `${word} ${county[1]}`;
+}
+
 export function regionLabel(region: Pick<Region, "name">, country: string, lang: Lang): string {
   if (lang === "fi") return region.name.fi;
+  if (lang === "de") return germanRegion(region.name.en, country);
   if (country !== "FI" && COUNTRY_LANGS[country]?.includes(lang)) return region.name.local;
   return region.name.en;
 }

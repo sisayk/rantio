@@ -90,6 +90,12 @@ MESSAGES = {
         "Patvirtinkite čia:\n{link}\n\n"
         "Jei neužsiprenumeravote, šį laišką galite ignoruoti. Mes jums nieko nesiųsime.\n\nPagarbiai\nRantio",
     ),
+    "de": (
+        "Bestätige den Rantio-Newsletter",
+        "Hallo,\n\nbitte bestätige, dass du den Newsletter von Rantio möchtest: neue Ferienhäuser, Ideen für die Saison und Reisetipps aus dem Norden, etwa einmal im Monat.\n\n"
+        "Hier bestätigen:\n{link}\n\n"
+        "Wenn du dich nicht angemeldet hast, ignoriere diese E-Mail einfach. Du hörst dann nichts von uns.\n\nViele Grüße\nRantio",
+    ),
 }
 
 

@@ -30,6 +30,7 @@ GUEST_STARTED = {
     "et": ("Sinu sõnum: {cottage}", "Tere {name},\n\naitäh sõnumi eest ({cottage}). Omanik vastab tavaliselt ööpäeva jooksul. Vastust saad lugeda ja edasi kirjutada siin:\n\n{link}\n\nÄra jaga seda linki: see avab teie vestluse.\n\nRantio"),
     "lv": ("Jūsu ziņa par {cottage}", "Sveiki, {name}!\n\nPaldies par ziņu par {cottage}. Īpašnieks parasti atbild diennakts laikā. Atbildi varat izlasīt un rakstīt vēl šeit:\n\n{link}\n\nNedalieties ar šo saiti: tā atver jūsu sarunu.\n\nRantio"),
     "lt": ("Jūsų žinutė apie {cottage}", "Sveiki, {name},\n\načiū už žinutę apie {cottage}. Savininkas paprastai atsako per parą. Atsakymą galite perskaityti ir rašyti toliau čia:\n\n{link}\n\nNesidalykite šia nuoroda: ji atveria Jūsų pokalbį.\n\nRantio"),
+    "de": ("Deine Nachricht zu {cottage}", "Hallo {name},\n\ndanke für deine Nachricht zu {cottage}. Der Gastgeber antwortet meist innerhalb eines Tages. Hier kannst du die Antwort lesen und weiterschreiben:\n\n{link}\n\nBehalte diesen Link für dich: Er öffnet eure Unterhaltung.\n\nRantio"),
 }
 GUEST_REPLY = {
     "en": ("New reply about {cottage}", "Hi {name},\n\nthe owner of {cottage} has answered:\n\n“{text}”\n\nRead and reply here:\n{link}\n\nRantio"),
@@ -42,6 +43,7 @@ GUEST_REPLY = {
     "et": ("Uus vastus: {cottage}", "Tere {name},\n\n{cottage} omanik vastas:\n\n„{text}“\n\nLoe ja vasta siin:\n{link}\n\nRantio"),
     "lv": ("Jauna atbilde par {cottage}", "Sveiki, {name}!\n\n{cottage} īpašnieks atbildēja:\n\n“{text}”\n\nIzlasiet un atbildiet šeit:\n{link}\n\nRantio"),
     "lt": ("Naujas atsakymas apie {cottage}", "Sveiki, {name},\n\n{cottage} savininkas atsakė:\n\n„{text}“\n\nPerskaitykite ir atsakykite čia:\n{link}\n\nRantio"),
+    "de": ("Neue Antwort zu {cottage}", "Hallo {name},\n\nder Gastgeber von {cottage} hat geantwortet:\n\n„{text}“\n\nHier lesen und antworten:\n{link}\n\nRantio"),
 }
 OWNER_NEW = {
     "en": ("New message from {name} about {cottage}", "{name} wrote about {cottage}:\n\n“{text}”\n\nAnswer in your Rantio inbox:\n{link}"),
@@ -54,6 +56,7 @@ OWNER_NEW = {
     "et": ("Uus sõnum: {name}, {cottage}", "{name} kirjutas ({cottage}):\n\n„{text}“\n\nVasta Rantio postkastis:\n{link}"),
     "lv": ("Jauna ziņa no {name} par {cottage}", "{name} rakstīja par {cottage}:\n\n“{text}”\n\nAtbildiet savā Rantio iesūtnē:\n{link}"),
     "lt": ("Nauja žinutė nuo {name} apie {cottage}", "{name} parašė apie {cottage}:\n\n„{text}“\n\nAtsakykite savo Rantio pašto dėžutėje:\n{link}"),
+    "de": ("Neue Nachricht von {name} zu {cottage}", "{name} hat zu {cottage} geschrieben:\n\n„{text}“\n\nAntworte in deinem Rantio-Posteingang:\n{link}"),
 }
 
 

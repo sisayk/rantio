@@ -333,7 +333,7 @@ class CottageSerializer(serializers.ModelSerializer):
     beds = serializers.IntegerField(min_value=0, max_value=60, required=False)
     floor_area = serializers.IntegerField(min_value=1, max_value=5000, required=False, allow_null=True)
     floors = serializers.IntegerField(min_value=1, max_value=10, required=False)
-    host_languages = serializers.ListField(child=serializers.ChoiceField(choices=Language.values), max_length=10, required=False)
+    host_languages = serializers.ListField(child=serializers.ChoiceField(choices=Language.values), max_length=len(Language.values), required=False)
     descriptions = serializers.DictField(child=serializers.CharField(max_length=5000, allow_blank=True, trim_whitespace=True), required=False)
     nearby = NearbySerializer(many=True, required=False)
     amenities = serializers.ListField(child=serializers.CharField(max_length=40), max_length=120, required=False)

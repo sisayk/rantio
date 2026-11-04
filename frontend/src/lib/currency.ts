@@ -29,6 +29,7 @@ export const LANG_CURRENCY: Record<Lang, Currency> = {
   et: "EUR",
   lv: "EUR",
   lt: "EUR",
+  de: "EUR",
   sv: "SEK",
   nb: "NOK",
   nn: "NOK",

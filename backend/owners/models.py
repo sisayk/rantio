@@ -74,6 +74,7 @@ class Language(models.TextChoices):
     ESTONIAN = "et", "Eesti"
     LATVIAN = "lv", "Latviešu"
     LITHUANIAN = "lt", "Lietuvių"
+    GERMAN = "de", "Deutsch"
 
 
 class Country(models.TextChoices):

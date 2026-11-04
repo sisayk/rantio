@@ -49,6 +49,7 @@ const NUMBER_STYLE: Record<Lang, NumberStyle> = {
   et: { group: NBSP, decimal: ",", minGroup: 2, euro: "after" },
   lv: { group: NBSP, decimal: ",", minGroup: 2, euro: "after" },
   lt: { group: NBSP, decimal: ",", minGroup: 1, euro: "after" },
+  de: { group: ".", decimal: ",", minGroup: 1, euro: "after" },
 };
 
 /** 1 234,5 in Finnish, 1,234.5 in English; `fraction` fixes the decimals shown. */

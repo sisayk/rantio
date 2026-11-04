@@ -2,7 +2,7 @@
 // LANG_INFO and a messages file; routes, the picker, sitemaps and hreflang follow.
 // Nothing here depends on the rest of the app, so the proxy can import it too.
 
-export const LANGS = ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"] as const;
+export const LANGS = ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt", "de"] as const;
 export type Lang = (typeof LANGS)[number];
 
 /** International default and the fallback for any text a language is missing. */
@@ -34,6 +34,7 @@ export const LANG_INFO: Record<Lang, LangInfo> = {
   et: { native: "Eesti", intl: "et-EE", wiki: "et", og: "et_EE" },
   lv: { native: "Latviešu", intl: "lv-LV", wiki: "lv", og: "lv_LV" },
   lt: { native: "Lietuvių", intl: "lt-LT", wiki: "lt", og: "lt_LT" },
+  de: { native: "Deutsch", intl: "de-DE", wiki: "de", og: "de_DE" },
 };
 
 /** Languages people speak in each country Rantio covers, used for local place names. */

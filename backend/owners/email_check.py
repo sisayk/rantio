@@ -62,6 +62,10 @@ MESSAGES = {
            "Sveiki, {name},\n\njūsų el. pašto adreso patvirtinimo kodas:\n\n    {code}\n\n"
            "Įveskite jį registracijos formoje. Jis galioja {minutes} min. Jei nesiregistravote Rantio, "
            "šį laišką galite ignoruoti.\n\nPagarbiai\nRantio"),
+    "de": ("Dein Rantio-Code: {code}",
+           "Hallo {name},\n\ndein Code zur Bestätigung deiner E-Mail-Adresse lautet:\n\n    {code}\n\n"
+           "Gib ihn im Anmeldeformular ein. Er gilt {minutes} Minuten. Wenn du dich nicht bei Rantio angemeldet "
+           "hast, kannst du diese E-Mail ignorieren.\n\nViele Grüße\nRantio"),
 }
 
 

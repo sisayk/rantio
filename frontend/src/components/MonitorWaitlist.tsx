@@ -8,7 +8,7 @@ import styles from "./landing.module.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8100";
 // Where the cottage most likely is, from the page's language; Finland for English.
-const COUNTRY: Record<Lang, string> = { en: "FI", fi: "FI", sv: "SE", nb: "NO", nn: "NO", da: "DK", is: "IS", et: "EE", lv: "LV", lt: "LT" };
+const COUNTRY: Record<Lang, string> = { en: "FI", fi: "FI", sv: "SE", nb: "NO", nn: "NO", da: "DK", is: "IS", et: "EE", lv: "LV", lt: "LT", de: "FI" };
 const RENTS = ["yes", "not_yet", "no"] as const;
 
 /** "Tell me when it's ready" for the Mökki monitor: an email, whether they rent, consent. */

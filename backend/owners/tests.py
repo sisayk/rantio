@@ -81,14 +81,14 @@ class SignupApiTests(TestCase):
 
     def test_accepts_every_site_language(self):
         # The codes in frontend/src/i18n/locales.ts; the form sends the page's language.
-        for code in ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"]:
+        for code in ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt", "de"]:
             cache.clear()
             response = self.client.post(self.url, {**VALID, "email": f"{code}@example.com", "language": code}, format="json")
             self.assertEqual(response.status_code, 201, (code, response.data))
         self.assertEqual(OwnerSignup.objects.get(email="lt@example.com").get_language_display(), "Lietuvių")
 
     def test_rejects_unknown_language(self):
-        response = self.client.post(self.url, {**VALID, "language": "de"}, format="json")
+        response = self.client.post(self.url, {**VALID, "language": "fr"}, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertIn("language", response.data)
 

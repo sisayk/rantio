@@ -117,7 +117,7 @@ class ListingTests(TestCase):
         self.assertEqual(set(res.json()["descriptions"]), {"en", "sv"})
         self.c.refresh_from_db()
         self.assertEqual((self.c.description_en, self.c.description_fi), ("By the lake.", ""))
-        self.assertEqual(self.patch({"descriptions": {"de": "Am See."}}).status_code, 400)
+        self.assertEqual(self.patch({"descriptions": {"fr": "Au bord du lac."}}).status_code, 400)
 
     def test_saves_every_section_and_reads_it_back(self):
         data = {

@@ -21,7 +21,8 @@ export const NAMES = {
       "is": "Icelandic",
       "et": "Estonian",
       "lv": "Latvian",
-      "lt": "Lithuanian"
+      "lt": "Lithuanian",
+      "de": "German"
     },
     "currency": {
       "EUR": "Euro",
@@ -52,7 +53,8 @@ export const NAMES = {
       "is": "islanti",
       "et": "viro",
       "lv": "latvia",
-      "lt": "liettua"
+      "lt": "liettua",
+      "de": "saksa"
     },
     "currency": {
       "EUR": "Euro",
@@ -83,7 +85,8 @@ export const NAMES = {
       "is": "isländska",
       "et": "estniska",
       "lv": "lettiska",
-      "lt": "litauiska"
+      "lt": "litauiska",
+      "de": "tyska"
     },
     "currency": {
       "EUR": "Euro",
@@ -114,7 +117,8 @@ export const NAMES = {
       "is": "islandsk",
       "et": "estisk",
       "lv": "latvisk",
-      "lt": "litauisk"
+      "lt": "litauisk",
+      "de": "tysk"
     },
     "currency": {
       "EUR": "Euro",
@@ -145,7 +149,8 @@ export const NAMES = {
       "is": "islandsk",
       "et": "estisk",
       "lv": "latvisk",
-      "lt": "litauisk"
+      "lt": "litauisk",
+      "de": "tysk"
     },
     "currency": {
       "EUR": "Euro",
@@ -176,7 +181,8 @@ export const NAMES = {
       "is": "islandsk",
       "et": "estisk",
       "lv": "lettisk",
-      "lt": "litauisk"
+      "lt": "litauisk",
+      "de": "tysk"
     },
     "currency": {
       "EUR": "Euro",
@@ -207,7 +213,8 @@ export const NAMES = {
       "is": "íslenska",
       "et": "eistneska",
       "lv": "lettneska",
-      "lt": "litháíska"
+      "lt": "litháíska",
+      "de": "þýska"
     },
     "currency": {
       "EUR": "Evra",
@@ -238,7 +245,8 @@ export const NAMES = {
       "is": "islandi",
       "et": "eesti",
       "lv": "läti",
-      "lt": "leedu"
+      "lt": "leedu",
+      "de": "saksa"
     },
     "currency": {
       "EUR": "Euro",
@@ -269,7 +277,8 @@ export const NAMES = {
       "is": "islandiešu",
       "et": "igauņu",
       "lv": "latviešu",
-      "lt": "lietuviešu"
+      "lt": "lietuviešu",
+      "de": "vācu"
     },
     "currency": {
       "EUR": "Eiro",
@@ -300,7 +309,8 @@ export const NAMES = {
       "is": "islandų",
       "et": "estų",
       "lv": "latvių",
-      "lt": "lietuvių"
+      "lt": "lietuvių",
+      "de": "vokiečių"
     },
     "currency": {
       "EUR": "Euras",
@@ -308,6 +318,38 @@ export const NAMES = {
       "NOK": "Norvegijos krona",
       "DKK": "Danijos krona",
       "ISK": "Islandijos krona"
+    }
+  },
+  "de": {
+    "country": {
+      "FI": "Finnland",
+      "SE": "Schweden",
+      "NO": "Norwegen",
+      "DK": "Dänemark",
+      "IS": "Island",
+      "EE": "Estland",
+      "LV": "Lettland",
+      "LT": "Litauen"
+    },
+    "language": {
+      "en": "Englisch",
+      "fi": "Finnisch",
+      "sv": "Schwedisch",
+      "nb": "Norwegisch (Bokmål)",
+      "nn": "Norwegisch (Nynorsk)",
+      "da": "Dänisch",
+      "is": "Isländisch",
+      "et": "Estnisch",
+      "lv": "Lettisch",
+      "lt": "Litauisch",
+      "de": "Deutsch"
+    },
+    "currency": {
+      "EUR": "Euro",
+      "SEK": "Schwedische Krone",
+      "NOK": "Norwegische Krone",
+      "DKK": "Dänische Krone",
+      "ISK": "Isländische Krone"
     }
   }
 } as const;

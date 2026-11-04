@@ -48,6 +48,7 @@ OWNER_REQUESTED = {
     "et": ("Broneerimissoov: {name}, {dates}", "{name} soovib broneerida: {cottage}.\n\nKuupäevad: {dates}\nKülalisi: {guests}\n\n„{text}“\n\nKinnita või keeldu Rantios. Kuupäevad on vabad, kuni sa kinnitad:\n{link}"),
     "lv": ("Rezervācijas pieprasījums: {name}, {dates}", "{name} vēlas rezervēt {cottage}.\n\nDatumi: {dates}\nViesi: {guests}\n\n“{text}”\n\nApstipriniet vai noraidiet Rantio. Datumi paliek brīvi, līdz jūs apstiprināt:\n{link}"),
     "lt": ("Rezervacijos užklausa: {name}, {dates}", "{name} nori rezervuoti {cottage}.\n\nDatos: {dates}\nSvečiai: {guests}\n\n„{text}“\n\nPatvirtinkite arba atmeskite Rantio. Datos lieka laisvos, kol patvirtinsite:\n{link}"),
+    "de": ("Buchungsanfrage: {name}, {dates}", "{name} möchte {cottage} buchen.\n\nDaten: {dates}\nGäste: {guests}\n\n„{text}“\n\nNimm die Anfrage in Rantio an oder lehne sie ab. Die Daten bleiben frei, bis du annimmst:\n{link}"),
 }
 GUEST_REQUESTED = {
     "en": ("Your booking request: {cottage}", "Hi {name},\n\nwe've sent your request for {cottage}, {dates}, to the owner. Nothing is booked or paid yet: the owner confirms and tells you how to pay.\n\nYour request and the owner's answer:\n{link}\n\nRantio"),
@@ -60,6 +61,7 @@ GUEST_REQUESTED = {
     "et": ("Sinu broneerimissoov: {cottage}", "Tere {name},\n\nsaatsime sinu soovi ({cottage}, {dates}) omanikule. Midagi pole veel broneeritud ega makstud: omanik kinnitab ja ütleb, kuidas maksta.\n\nSinu soov ja omaniku vastus:\n{link}\n\nRantio"),
     "lv": ("Jūsu rezervācijas pieprasījums: {cottage}", "Sveiki, {name}!\n\nMēs nosūtījām jūsu pieprasījumu par {cottage}, {dates}, īpašniekam. Nekas vēl nav rezervēts vai samaksāts: īpašnieks apstiprinās un pateiks, kā maksāt.\n\nJūsu pieprasījums un īpašnieka atbilde:\n{link}\n\nRantio"),
     "lt": ("Jūsų rezervacijos užklausa: {cottage}", "Sveiki, {name},\n\nJūsų užklausą dėl {cottage}, {dates}, išsiuntėme savininkui. Kol kas niekas nerezervuota ir nesumokėta: savininkas patvirtins ir praneš, kaip sumokėti.\n\nJūsų užklausa ir savininko atsakymas:\n{link}\n\nRantio"),
+    "de": ("Deine Buchungsanfrage: {cottage}", "Hallo {name},\n\nwir haben deine Anfrage für {cottage}, {dates}, an den Gastgeber geschickt. Noch ist nichts gebucht oder bezahlt: Der Gastgeber bestätigt und sagt dir, wie du bezahlst.\n\nDeine Anfrage und die Antwort des Gastgebers:\n{link}\n\nRantio"),
 }
 GUEST_ACCEPTED = {
     "en": ("Confirmed: {cottage}, {dates}", "Hi {name},\n\ngood news: the owner of {cottage} has accepted your request for {dates}. The dates are yours. The owner will tell you how to pay; you can write to them here:\n{link}\n\nRantio"),
@@ -72,6 +74,7 @@ GUEST_ACCEPTED = {
     "et": ("Kinnitatud: {cottage}, {dates}", "Tere {name},\n\nhead uudised: {cottage} omanik kinnitas sinu soovi ({dates}). Kuupäevad on sinu omad. Omanik ütleb, kuidas maksta; talle saad kirjutada siin:\n{link}\n\nRantio"),
     "lv": ("Apstiprināts: {cottage}, {dates}", "Sveiki, {name}!\n\nLabas ziņas: {cottage} īpašnieks apstiprināja jūsu pieprasījumu par {dates}. Datumi ir jūsu. Īpašnieks pateiks, kā maksāt; viņam varat rakstīt šeit:\n{link}\n\nRantio"),
     "lt": ("Patvirtinta: {cottage}, {dates}", "Sveiki, {name},\n\ngeros žinios: {cottage} savininkas patvirtino Jūsų užklausą {dates}. Datos Jūsų. Savininkas praneš, kaip sumokėti; jam galite parašyti čia:\n{link}\n\nRantio"),
+    "de": ("Bestätigt: {cottage}, {dates}", "Hallo {name},\n\ngute Nachrichten: Der Gastgeber von {cottage} hat deine Anfrage für {dates} angenommen. Die Daten gehören dir. Der Gastgeber sagt dir, wie du bezahlst; hier kannst du ihm schreiben:\n{link}\n\nRantio"),
 }
 GUEST_DECLINED = {
     "en": ("{cottage}: dates not available", "Hi {name},\n\nunfortunately the owner of {cottage} can't take your request for {dates}. You can write to them here to ask about other dates:\n{link}\n\nRantio"),
@@ -84,6 +87,7 @@ GUEST_DECLINED = {
     "et": ("{cottage}: kuupäevad pole vabad", "Tere {name},\n\nkahjuks ei saa {cottage} omanik sinu soovi ({dates}) vastu võtta. Teiste kuupäevade kohta saad küsida siin:\n{link}\n\nRantio"),
     "lv": ("{cottage}: datumi nav pieejami", "Sveiki, {name}!\n\nDiemžēl {cottage} īpašnieks nevar pieņemt jūsu pieprasījumu par {dates}. Par citiem datumiem varat jautāt šeit:\n{link}\n\nRantio"),
     "lt": ("{cottage}: datos neprieinamos", "Sveiki, {name},\n\ndeja, {cottage} savininkas negali priimti Jūsų užklausos {dates}. Apie kitas datas galite paklausti čia:\n{link}\n\nRantio"),
+    "de": ("{cottage}: Daten nicht verfügbar", "Hallo {name},\n\nleider kann der Gastgeber von {cottage} deine Anfrage für {dates} nicht annehmen. Hier kannst du ihm schreiben und nach anderen Daten fragen:\n{link}\n\nRantio"),
 }
 
 

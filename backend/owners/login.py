@@ -85,6 +85,12 @@ MESSAGES = {
         "Jis galioja {minutes} min. Jei nebandėte prisijungti, šį laišką galite ignoruoti.\n\n"
         "Pagarbiai\nRantio",
     ),
+    "de": (
+        "Dein Anmeldecode für Rantio: {code}",
+        "Hallo {name},\n\ndein Code für die Anmeldung bei Rantio lautet:\n\n    {code}\n\n"
+        "Er gilt {minutes} Minuten. Wenn du dich nicht anmelden wolltest, kannst du diese E-Mail ignorieren.\n\n"
+        "Viele Grüße\nRantio",
+    ),
 }
 
 
@@ -100,6 +106,7 @@ SMS_MESSAGES = {
     "et": "Sinu Rantio sisselogimiskood on {code}. See kehtib {minutes} minutit.",
     "lv": "Tavs Rantio pieteikšanās kods ir {code}. Tas derīgs {minutes} minūtes.",
     "lt": "Jūsų Rantio prisijungimo kodas yra {code}. Jis galioja {minutes} min.",
+    "de": "Dein Rantio-Anmeldecode ist {code}. Er gilt {minutes} Minuten.",
 }
 
 
