@@ -101,6 +101,20 @@ class SmsSignInTests(TestCase):
         res = self.client.post("/api/auth/verify-code/", {"phone": "+358401234567", "code": code}, content_type="application/json")
         self.assertEqual(res.status_code, 200, res.content)
 
+    def test_slow_brevo_still_lets_the_owner_type_the_code(self):
+        with mock.patch.object(sms._brevo, "open", side_effect=TimeoutError("timed out")):
+            res = self.client.post("/api/auth/request-code/", {"phone": "+358401234567"}, content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+
+    def test_refused_sms_is_an_error(self):
+        import urllib.error
+        from io import BytesIO
+
+        refused = urllib.error.HTTPError(sms.BREVO_SMS_URL, 400, "Bad", {}, BytesIO(b'{"message":"sender"}'))
+        with mock.patch.object(sms._brevo, "open", side_effect=refused):
+            res = self.client.post("/api/auth/request-code/", {"phone": "+358401234567"}, content_type="application/json")
+        self.assertEqual(res.status_code, 503)
+
     def test_unknown_number_gets_the_same_answer(self):
         with mock.patch.object(sms, "send") as send:
             res = self.client.post("/api/auth/request-code/", {"phone": "+46701234567"}, content_type="application/json")

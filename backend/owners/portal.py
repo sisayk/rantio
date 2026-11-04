@@ -127,6 +127,9 @@ class RequestCodeView(APIView):
                 code = owner_login.issue_code(owner, data.validated_data["lang"], via=via)
                 if settings.DEV_LOGIN_CODES:
                     body["dev_code"] = code  # local development only: no real email is sent
+            except sms.MaybeSent as e:
+                # The text usually still arrives: let the owner type the code (or ask for a new one).
+                logger.warning("Login code SMS to owner %s: %s", owner.pk, e)
             except Exception:
                 logger.exception("Could not send a login code (%s) to owner %s", via, owner.pk)
                 return Response({"detail": f"{via}_failed"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
