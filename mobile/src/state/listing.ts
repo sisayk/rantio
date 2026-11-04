@@ -55,7 +55,7 @@ export function useListing(id: number) {
  * changes something), field errors, and saving only what changed.
  */
 export function useEditor<D extends object>(id: number, from: (l: ListingDetail) => D, toFields: (d: D) => Partial<ListingFields>) {
-  const { listing, failed, load, save } = useListing(id);
+  const { listing, setListing, failed, load, save } = useListing(id);
   const [draft, setDraft] = useState<D | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [saving, setSaving] = useState(false);
@@ -87,7 +87,40 @@ export function useEditor<D extends object>(id: number, from: (l: ListingDetail)
     }
   };
 
-  return { listing, failed, load, form, set, dirty, saving, errors, problem, submit };
+  /** A newer copy of the listing (AI translations arriving): the owner's unsaved changes stay. */
+  const refresh = (next: ListingDetail) => {
+    const before = listing ? from(listing) : null;
+    const after = from(next);
+    setDraft((d) => (d && before ? keepChanges(d, before, after) : d));
+    setListing(next);
+  };
+
+  return { listing, failed, load, form, set, dirty, saving, errors, problem, submit, refresh };
+}
+
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** The draft on top of a newer saved copy: what the owner changed wins, the rest is the newer copy.
+ *  Objects such as the descriptions are merged key by key, so one edited language keeps the others' updates. */
+function keepChanges<D extends object>(draft: D, before: D, after: D): D {
+  const out = { ...after } as Record<string, unknown>;
+  const d = draft as Record<string, unknown>;
+  const b = before as Record<string, unknown>;
+  for (const k of Object.keys(d)) {
+    if (same(d[k], b[k])) continue;
+    const dk = d[k];
+    const bk = b[k];
+    const ak = out[k];
+    if (isRecord(dk) && isRecord(bk) && isRecord(ak)) {
+      const merged: Record<string, unknown> = { ...ak };
+      for (const [sub, v] of Object.entries(dk)) if (!same(v, bk[sub] ?? "")) merged[sub] = v;
+      out[k] = merged;
+    } else {
+      out[k] = dk;
+    }
+  }
+  return out as D;
 }
 
 /** A number field's text for the server: "" → null, "12,5" → 12.5; anything else is sent as typed so the server names the field. */

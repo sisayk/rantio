@@ -213,6 +213,9 @@ export const ownerApi = {
   createListing: (name: string) => call<ListingDetail>("owner/cottages/", { ...json("POST", { name }), owner: true }),
   saveListing: (id: number, fields: Partial<ListingFields>) =>
     call<ListingDetail>(`owner/cottages/${id}/`, { ...json("PATCH", fields), owner: true }),
+  /** AI fills the description in every language the owner hasn't written (see the backend's owners/translate.py). */
+  translateListing: (id: number, source?: string) =>
+    call<ListingDetail>(`owner/cottages/${id}/translate/`, { ...json("POST", source ? { source } : {}), owner: true }),
   setListingStatus: (id: number, action: StatusAction) =>
     call<ListingDetail>(`owner/cottages/${id}/status/`, { ...json("POST", { action }), owner: true }),
   /** A photo from the phone: `uri` is a local file (already resized). */

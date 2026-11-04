@@ -1,17 +1,17 @@
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 
-import type { ListingDetail } from "@/api";
+import { type ListingDetail, ownerApi } from "@/api";
 import type { PropertyType } from "@/lib/ownerApi";
 import { LANG_INFO, LANGS, type Lang } from "@/i18n/locales";
 import { num, numText, useEditor } from "@/state/listing";
 import { useT } from "@/text/i18n";
-import { colors, space } from "@/theme";
+import { colors, radius, space } from "@/theme";
 import { Chip } from "@/ui/controls";
 import { EditorShell, Group, InlineField } from "@/ui/editor";
 import { Field } from "@/ui/form";
-import { Text } from "@/ui/kit";
+import { Button, Icon, Text } from "@/ui/kit";
 
 const TYPES: PropertyType[] = ["cottage", "cabin", "villa", "holiday_home", "apartment", "farmhouse", "other"];
 const COUNTRIES = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT"];
@@ -50,9 +50,64 @@ export default function ListingBasics() {
   const l = m.listings;
   const b = l.basics;
   const editor = useEditor(Number(id), from, toFields);
-  const { form, set, errors } = editor;
+  const { form, set, errors, listing, refresh } = editor;
   const [descLang, setDescLang] = useState<Lang>(lang);
+  const [starting, setStarting] = useState(false);
+  const [startFailed, setStartFailed] = useState(false);
   const bad = (k: string) => (errors[k] ? l.invalid : null);
+
+  // AI translates the description after a save: fetch the listing until every language is in.
+  const tr = listing?.translation;
+  const translating = (tr?.pending.length ?? 0) > 0;
+  const refreshRef = useRef(refresh);
+  useEffect(() => {
+    refreshRef.current = refresh;
+  });
+  useEffect(() => {
+    if (!translating) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      try {
+        const next = await ownerApi.listing(Number(id));
+        if (stopped) return;
+        refreshRef.current(next);
+        if (!next.translation.pending.length) return;
+      } catch {
+        /* offline for a moment: try again */
+      }
+      if (!stopped) timer = setTimeout(poll, 2500);
+    };
+    timer = setTimeout(poll, 2500);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [translating, id]);
+
+  const auto = listing?.descriptions_auto ?? {};
+  const kept = listing?.descriptions ?? {};
+  const pending = new Set(tr?.pending ?? []);
+  const failed = tr?.failed ?? [];
+  // A language counts as AI-translated while it still holds the translation as saved.
+  const isAuto = (code: string) => Boolean(auto[code]) && (form?.descriptions[code] ?? "") === (kept[code] ?? "");
+  const own = LANGS.filter((c) => kept[c]?.trim() && !auto[c]);
+  const descriptionsChanged = Boolean(form) && JSON.stringify(form?.descriptions) !== JSON.stringify(kept);
+  const canStart = Boolean(tr?.enabled) && own.length > 0 && !descriptionsChanged;
+  const missing = LANGS.some((c) => !kept[c]?.trim());
+  const langName = (c: string) => LANG_INFO[c as Lang]?.native ?? c;
+
+  const translateNow = async () => {
+    setStarting(true);
+    setStartFailed(false);
+    try {
+      refresh(await ownerApi.translateListing(Number(id), own.includes(descLang) ? descLang : undefined));
+    } catch {
+      setStartFailed(true);
+    } finally {
+      setStarting(false);
+    }
+  };
 
   return (
     <EditorShell title={b.title} editor={editor}>
@@ -103,17 +158,49 @@ export default function ListingBasics() {
             </View>
           </Group>
 
-          <Group title={b.descriptions} lead={b.descriptionsLead}>
+          <Group title={b.descriptions} lead={tr?.enabled ? b.ai.lead : b.descriptionsLead}>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-              {LANGS.map((code) => (
-                <Chip
-                  key={code}
-                  label={`${LANG_INFO[code].native}${form.descriptions[code]?.trim() ? " ✓" : ""}`}
-                  on={descLang === code}
-                  onPress={() => setDescLang(code)}
-                />
-              ))}
+              {LANGS.map((code) => {
+                const mark = pending.has(code) ? " …" : isAuto(code) ? ` · ${b.ai.badge}` : form.descriptions[code]?.trim() ? " ✓" : "";
+                return <Chip key={code} label={`${LANG_INFO[code].native}${mark}`} on={descLang === code} onPress={() => setDescLang(code)} />;
+              })}
             </View>
+            {translating ? (
+              <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }} accessibilityLiveRegion="polite">
+                <ActivityIndicator size="small" color={colors.berry} />
+                <Text v="small" style={{ flex: 1 }}>
+                  {b.ai.working}
+                </Text>
+              </View>
+            ) : failed.length ? (
+              <View style={{ gap: space.sm }}>
+                <Text v="small">{fill(b.ai.failed, { langs: failed.map(langName).join(", ") })}</Text>
+                {canStart ? <Button kind="secondary" small icon="refresh" label={b.ai.retry} busy={starting} onPress={() => void translateNow()} style={{ alignSelf: "flex-start" }} /> : null}
+              </View>
+            ) : canStart && missing ? (
+              <Button kind="secondary" small icon="sparkles" label={b.ai.fill} busy={starting} onPress={() => void translateNow()} style={{ alignSelf: "flex-start" }} />
+            ) : null}
+            {startFailed ? (
+              <Text v="small" color={colors.error}>
+                {b.ai.error}
+              </Text>
+            ) : null}
+            {isAuto(descLang) ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: space.sm,
+                  padding: space.md,
+                  borderRadius: radius.sm,
+                  backgroundColor: colors.berryTint,
+                }}
+              >
+                <Icon name="sparkles" size={16} color={colors.berry} />
+                <Text v="small" color={colors.ink} style={{ flex: 1 }}>
+                  {fill(b.ai.note, { from: langName(auto[descLang]) })}
+                </Text>
+              </View>
+            ) : null}
             <Field
               label={fill(m.app.listing.descriptionIn, { language: LANG_INFO[descLang].native })}
               multiline
