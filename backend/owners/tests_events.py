@@ -59,7 +59,12 @@ class EventsTests(TestCase):
         body = res.json()
         # The series' frame is left out; the long exhibition comes after the dated events.
         self.assertEqual([e["name"] for e in body["events"]], ["Christmas market", "Jazz evening", "HIFK – Tappara", "Long exhibition"])
-        self.assertEqual(call.call_count, 2)  # both sources once; the second ask came from the cache
+        # Linked Events once per day of the stay (5) and once for long events, Ticketmaster once;
+        # the second look came from the cache.
+        self.assertEqual(call.call_count, 7)
+        urls = [c.args[0] for c in call.call_args_list]
+        self.assertEqual(sum("max_duration=1d" in u for u in urls), 5)
+        self.assertEqual(sum("min_duration=2d" in u for u in urls), 1)
         market, jazz, hockey, _ = body["events"]
         self.assertEqual((market["price"]["free"], market["interests"]), (True, ["market", "family"]))
         self.assertEqual(market["description"], "Crafts and glögi on the square.")

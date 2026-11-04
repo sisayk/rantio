@@ -21,7 +21,9 @@ import json
 import logging
 import math
 import urllib.parse
+import re
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta
 
 from django.conf import settings
@@ -40,6 +42,7 @@ CACHE_SECONDS = 6 * 3600
 LANGS = ("en", "fi", "sv")  # Linked Events has these; other site languages get English
 
 LINKED_EVENTS = "https://api.hel.fi/linkedevents/v1/event/"
+LINKED_DAYS = 10  # days of a stay asked one by one; a longer stay shows its first ten
 # The Helsinki region Linked Events covers: Helsinki, Espoo, Vantaa, Kauniainen and nearby.
 LINKED_AREA = (59.8, 23.8, 60.7, 26.0)  # south, west, north, east: within reach of its events
 TICKETMASTER = "https://app.ticketmaster.com/discovery/v2/events.json"
@@ -83,8 +86,14 @@ def inside(lat: float, lng: float, area: tuple[float, float, float, float]) -> b
 
 
 def interests_of(words: list[str]) -> list[str]:
+    """Interests whose words begin a word in the source's categories ("ski" isn't "skills")."""
     text = " ".join(w.lower() for w in words if w)
-    found = [k for k, words_ in KEYWORDS.items() if any(w in text for w in words_)]
+    def says(stem: str) -> bool:
+        # A short word only on its own or with an ending (ski, skiing); a longer one begins a word.
+        tail = r"(?:s|es|ing|er|ers)?(?!\w)" if len(stem) <= 4 else ""
+        return re.search(rf"(?<!\w){re.escape(stem)}{tail}", text) is not None
+
+    found = [k for k, stems in KEYWORDS.items() if any(says(st) for st in stems)]
     return found or ["other"]
 
 
@@ -105,8 +114,6 @@ def _pick(texts: dict | None, lang: str) -> str:
 
 
 def _strip(html: str, limit: int = 240) -> str:
-    import re
-
     text = re.sub(r"<[^>]+>", " ", html or "")
     text = re.sub(r"\s+", " ", text).strip()
     return text if len(text) <= limit else text[: limit - 1].rsplit(" ", 1)[0] + "…"
@@ -114,16 +121,16 @@ def _strip(html: str, limit: int = 240) -> str:
 
 def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str) -> list[dict]:
     south, west, north, east = box(lat, lng, RADIUS_KM)
-    params = urllib.parse.urlencode({
-        "bbox": f"{west:.4f},{south:.4f},{east:.4f},{north:.4f}",
-        "start": start.isoformat(), "end": end.isoformat(),
-        # Latest start first: what starts during the stay comes before exhibitions that opened
-        # months ago (which would otherwise fill the page).
-        "include": "location,keywords", "sort": "-start_time", "page_size": 100,
-    })
-    data = _get(f"{LINKED_EVENTS}?{params}")
+    base = {"bbox": f"{west:.4f},{south:.4f},{east:.4f},{north:.4f}", "include": "location,keywords", "sort": "start_time"}
+    # One ask per day of the stay for that day's events (at most a day long), so a busy day
+    # doesn't crowd out the others, and one for longer ones such as exhibitions and festivals.
+    days = [start + timedelta(days=i) for i in range(min((end - start).days + 1, LINKED_DAYS))]
+    asks = [{**base, "start": d.isoformat(), "end": d.isoformat(), "max_duration": "1d", "page_size": 25} for d in days]
+    asks.append({**base, "start": start.isoformat(), "end": end.isoformat(), "min_duration": "2d", "page_size": 20})
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        pages = list(pool.map(lambda q: _get(f"{LINKED_EVENTS}?{urllib.parse.urlencode(q)}"), asks))
     out = []
-    for e in data.get("data", []):
+    for e in (row for page in pages for row in page.get("data", [])):
         # A series ("recurring") or a festival's frame ("umbrella") spans months; its own dates
         # come as separate events, which are what guests can go to.
         if e.get("event_status") in ("EventCancelled", "EventPostponed") or e.get("super_event_type") in ("umbrella", "recurring"):
@@ -220,7 +227,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events3:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events4:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
