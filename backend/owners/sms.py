@@ -67,8 +67,11 @@ def send(to: str, text: str) -> None:
         ).encode(),
         headers={"api-key": settings.BREVO_API_KEY, "Content-Type": "application/json", "Accept": "application/json"},
     )
-    with _brevo.open(req, timeout=10) as res:
-        res.read()
+    try:
+        with _brevo.open(req, timeout=10) as res:
+            res.read()
+    except urllib.error.HTTPError as e:  # Brevo's own reason, for the server log
+        raise RuntimeError(f"Brevo refused the SMS: {e.code} {e.read()[:300]!r}") from e
 
 
 # Any of these reads uses the key (Brevo's statistics endpoints differ in what they accept).
