@@ -103,6 +103,9 @@ export type Thread = ConversationRow & {
   viewer: "guest" | "host";
   /** For the owner, while a booking request waits for an answer. */
   request?: BookingRequestRow | null;
+  /** The guest's view: the stay has ended and can be rated / has been. */
+  can_review?: boolean;
+  reviewed?: boolean;
 };
 
 export type CalendarEntry = {
@@ -229,7 +232,58 @@ export type BookingLinkInfo = {
   open: boolean;
   today: string;
   busy: [string, string][];
+  ratings: Ratings;
 };
+
+export type ReviewRow = {
+  id: number;
+  name: string;
+  rating: number;
+  cleanliness: number | null;
+  location: number | null;
+  value: number | null;
+  comment: string;
+  language: string;
+  /** "YYYY-MM": the month of the stay. */
+  stayed: string;
+  reply: string;
+  created_at: string;
+  /** The owner's view only. */
+  hidden?: boolean;
+};
+
+export type ExternalRating = { id: number; site: string; name: string; score: number; scale: number; count: number; url: string };
+
+/** A cottage's ratings: reviews from stays booked through Rantio, and its scores on other sites. */
+export type Ratings = {
+  count: number;
+  average: number | null;
+  categories: Record<"cleanliness" | "location" | "value", number | null> | null;
+  reviews: ReviewRow[];
+  external: ExternalRating[];
+};
+
+export type OwnerReviews = {
+  count: number;
+  average: number | null;
+  reviews: ReviewRow[];
+  external: ExternalRating[];
+  sites: { site: string; name: string; scale: number }[];
+};
+
+/** The guest's review page. reason: why they can't (yet) when can_review is false. */
+export type ReviewPage = {
+  cottage: string;
+  host: string;
+  name: string;
+  check_in: string | null;
+  check_out: string | null;
+  can_review: boolean;
+  reason: "not_stayed" | "too_late" | null;
+  review: ReviewRow | null;
+};
+
+export type ReviewForm = { rating: number; cleanliness?: number | null; location?: number | null; value?: number | null; comment?: string };
 
 export type BookingRequestForm = {
   name: string;
@@ -541,6 +595,11 @@ export const ownerApi = {
   acceptRequest: (id: number, payout: string) =>
     call<ConversationRow>(`owner/conversations/${id}/accept/`, { method: "POST", body: JSON.stringify({ payout }) }),
   declineRequest: (id: number) => call<ConversationRow>(`owner/conversations/${id}/decline/`, { method: "POST" }),
+  reviews: (cottage: number) => call<OwnerReviews>(`owner/cottages/${cottage}/reviews/`),
+  replyToReview: (id: number, reply: string) => call<ReviewRow>(`owner/reviews/${id}/`, { method: "PATCH", body: JSON.stringify({ reply }) }),
+  addRating: (cottage: number, url: string, score: string, count: number) =>
+    call<ExternalRating>(`owner/cottages/${cottage}/ratings/`, { method: "POST", body: JSON.stringify({ url, score, count }) }),
+  removeRating: (id: number) => call<unknown>(`owner/ratings/${id}/`, { method: "DELETE" }),
 };
 
 /** The guest's side: no account, the conversation's token is the key. */
@@ -555,5 +614,8 @@ export const guestApi = {
     call<StayQuote>(`book/${encodeURIComponent(token)}/quote/?check_in=${checkIn}&check_out=${checkOut}`),
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify(form) }),
+  reviewPage: (token: string) => call<ReviewPage>(`reviews/${encodeURIComponent(token)}/`),
+  sendReview: (token: string, form: ReviewForm) =>
+    call<ReviewPage>(`reviews/${encodeURIComponent(token)}/`, { method: "POST", body: JSON.stringify(form) }),
 };
 

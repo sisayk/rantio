@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path
 
 from config.admin_assets_view import admin_asset
-from owners import calendar_views, events, geocode, inbound, inbox, listing_links, listings, newsletter, portal, site_icons
+from owners import calendar_views, events, geocode, inbound, inbox, listing_links, listings, newsletter, portal, reviews, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
 
@@ -53,6 +53,11 @@ urlpatterns = [
     path("api/owner/cottages/<int:pk>/", listings.OwnerCottageView.as_view(), name="owner-cottage"),
     path("api/owner/cottages/<int:pk>/links/", listing_links.OwnerLinksView.as_view(), name="owner-links"),
     path("api/owner/links/<int:pk>/", listing_links.OwnerLinkView.as_view(), name="owner-link"),
+    path("api/owner/cottages/<int:pk>/reviews/", reviews.OwnerReviewsView.as_view(), name="owner-reviews"),
+    path("api/owner/reviews/<int:pk>/", reviews.OwnerReplyView.as_view(), name="owner-review"),
+    path("api/owner/cottages/<int:pk>/ratings/", reviews.OwnerRatingsView.as_view(), name="owner-ratings"),
+    path("api/owner/ratings/<int:pk>/", reviews.OwnerRatingView.as_view(), name="owner-rating"),
+    path("api/reviews/<str:token>/", reviews.GuestReviewView.as_view(), name="guest-review"),
     path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
     path("api/owner/cottages/<int:pk>/translate/", listings.OwnerTranslateView.as_view(), name="owner-cottage-translate"),
     path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),

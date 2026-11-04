@@ -7,10 +7,12 @@ import { fill } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { getListing, listingName, unsplash } from "@/lib/listings";
+import { REVIEWS } from "@/i18n/messages/reviews";
 import { guestApi, type Thread } from "@/lib/ownerApi";
 import ChatThread from "./ChatThread";
 import { Wordmark } from "./guest/icons";
 import styles from "./chat.module.css";
+import rating from "./ratings.module.css";
 
 const POLL_MS = 20_000;
 
@@ -102,6 +104,12 @@ export default function GuestChat({
           <p className={styles.requestDone} data-status={th.request_status} role="status">
             {requestWords[th.request_status]}
           </p>
+        ) : null}
+        {th.can_review ? (
+          <div className={rating.prompt}>
+            <strong>{REVIEWS[lang].prompt.title}</strong>
+            <a href={paths.review(lang, token)}>{REVIEWS[lang].prompt.action}</a>
+          </div>
         ) : null}
         <p className={styles.keepLink}>{t.keepLink}</p>
         <div className={styles.guestThread}>

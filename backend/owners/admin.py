@@ -16,8 +16,8 @@ from django.contrib import messages
 
 from . import booking_emails, invoicing, stripe_api
 from .models import (
-    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
-    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, SignupPhoto,
+    AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, ExternalRating, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
+    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Review, SignupPhoto,
 )
 
 
@@ -175,6 +175,15 @@ class ListingLinkInline(TabularInline):
     verbose_name_plural = "listings on other sites"
 
 
+class ExternalRatingInline(TabularInline):
+    model = ExternalRating
+    extra = 0
+    fields = ["site", "score", "scale", "count", "url", "updated_at"]
+    readonly_fields = ["updated_at"]
+    verbose_name = "score on another site"
+    verbose_name_plural = "scores on other sites"
+
+
 class CottageChangeInline(TabularInline):
     """What the owner changed in Hosting → My listings (field names only)."""
 
@@ -189,7 +198,7 @@ class CottageChangeInline(TabularInline):
 
 @admin.register(Cottage)
 class CottageAdmin(ModelAdmin):
-    inlines = [CottagePhotoInline, ListingLinkInline, CottageChangeInline]
+    inlines = [CottagePhotoInline, ListingLinkInline, ExternalRatingInline, CottageChangeInline]
     list_display = ["name", "owner", "country", "region", "max_guests", "price_per_night", "currency", "status", "listing_started_on", "listing_slug"]
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality", "inbound_code"]
@@ -486,3 +495,18 @@ class CalendarBlockAdmin(ModelAdmin):
     list_filter = ["feed__channel"]
     search_fields = ["cottage__name", "note"]
     date_hierarchy = "start"
+
+
+@admin.register(Review)
+class ReviewAdmin(ModelAdmin):
+    """Guests' reviews of stays booked through a booking link. Tick "hidden" to take one off the page."""
+
+    list_display = ["cottage", "guest", "rating", "created_at", "hidden"]
+    list_filter = ["hidden", "rating"]
+    list_editable = ["hidden"]
+    search_fields = ["cottage__name", "conversation__guest_name", "comment"]
+    readonly_fields = ["conversation", "cottage", "rating", "cleanliness", "location", "value", "comment", "language", "owner_reply", "replied_at", "created_at"]
+
+    @display(description="guest")
+    def guest(self, obj):
+        return obj.conversation.guest_name

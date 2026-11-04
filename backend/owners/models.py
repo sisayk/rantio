@@ -4,7 +4,7 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -819,6 +819,7 @@ class Conversation(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     last_message_at = models.DateTimeField(null=True, blank=True)
+    review_asked_at = models.DateTimeField(null=True, blank=True, help_text="When the guest was asked to rate the stay.")
 
     class Meta:
         ordering = ["-last_message_at"]
@@ -983,3 +984,50 @@ class Invoice(models.Model):
 
     def __str__(self) -> str:
         return f"{self.number} · {self.owner} · {self.month:%m/%Y}"
+
+
+class Review(models.Model):
+    """A guest's rating of a stay booked through Rantio's booking link.
+
+    Only a guest whose request the owner accepted, and whose stay has ended, can write one:
+    it is opened with the conversation's private link, so every review comes from a real stay.
+    """
+
+    conversation = models.OneToOneField(Conversation, on_delete=models.CASCADE, related_name="review")
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    cleanliness = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    location = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    value = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(max_length=2000, blank=True)
+    language = models.CharField(max_length=2, choices=Language.choices, default=Language.ENGLISH)
+    owner_reply = models.TextField(max_length=1000, blank=True)
+    replied_at = models.DateTimeField(null=True, blank=True)
+    hidden = models.BooleanField(default=False, help_text="Hidden by Rantio (e.g. abusive or not about the stay).")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.rating}★ {self.cottage.name} – {self.conversation.guest_name}"
+
+
+class ExternalRating(models.Model):
+    """The cottage's score on another site (Airbnb, Booking.com…), as the owner gives it, with a link
+    to the listing so guests can check it. Only the score is shown, never the site's reviews."""
+
+    cottage = models.ForeignKey(Cottage, on_delete=models.CASCADE, related_name="external_ratings")
+    site = models.CharField(max_length=20)
+    score = models.DecimalField(max_digits=3, decimal_places=1)
+    scale = models.PositiveSmallIntegerField(default=5, help_text="Booking.com scores out of 10, the others out of 5.")
+    count = models.PositiveIntegerField()
+    url = models.URLField(max_length=500)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["site"]
+        constraints = [models.UniqueConstraint(fields=["cottage", "site"], name="one_rating_per_site")]
+
+    def __str__(self) -> str:
+        return f"{self.cottage.name}: {self.score}/{self.scale} on {self.site}"

@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import assistant, messaging
+from . import assistant, messaging, reviews
 from .calendar_views import request_row
 from .models import Conversation, Language, Message, RequestStatus
 from .portal import IsOwner
@@ -148,7 +148,8 @@ class GuestThreadView(APIView):
     def get(self, request, token):
         c = self.get_conversation(token)
         Conversation.objects.filter(pk=c.pk).update(guest_read_at=timezone.now())
-        return Response(thread(c, "guest"))
+        # After the stay: the page offers the review form (owners/reviews.py).
+        return Response({**thread(c, "guest"), "can_review": reviews.can_review(c), "reviewed": hasattr(c, "review")})
 
     def post(self, request, token):
         c = self.get_conversation(token)

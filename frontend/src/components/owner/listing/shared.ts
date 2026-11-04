@@ -3,7 +3,7 @@ import type { Lang } from "@/i18n/locales";
 import { LANG_INFO } from "@/i18n/locales";
 import type { ChecklistKey, ListingFields, ListingPhoto, ListingStatus } from "@/lib/ownerApi";
 
-export const SECTIONS = ["overview", "basics", "photos", "amenities", "pricing", "rules", "arrival", "location", "calendar", "status"] as const;
+export const SECTIONS = ["overview", "basics", "photos", "amenities", "pricing", "rules", "arrival", "location", "calendar", "reviews", "status"] as const;
 export type Section = (typeof SECTIONS)[number];
 
 /** Where in the editor each checklist item is done. */

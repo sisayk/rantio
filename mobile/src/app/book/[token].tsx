@@ -2,7 +2,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from "react-native";
 
-import { ApiError, type BookingLinkInfo, guestApi, Offline, type StayQuote } from "@/api";
+import { ApiError, type BookingLinkInfo, guestApi, Offline, type Ratings, type StayQuote } from "@/api";
+import { REVIEWS } from "@/i18n/messages/reviews";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { usePrefs } from "@/state/prefs";
 import { daysBetween, formatRange } from "@/text/dates";
@@ -10,7 +11,8 @@ import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { Stepper } from "@/ui/controls";
 import { Field } from "@/ui/form";
-import { Button, Card, Empty, Loading, Problem, Section, Text } from "@/ui/kit";
+import { Button, Card, Empty, Loading, Pill, Problem, Section, Text } from "@/ui/kit";
+import { RatingsBlock, STAR, useScore } from "@/ui/ratings";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { PageBar } from "@/ui/screen";
 import { SenderCard, useSender } from "@/ui/sender";
@@ -144,6 +146,7 @@ export default function BookingRequest() {
           <Text v="bodyMedium" style={{ marginTop: space.sm }}>
             {f(b.host, { name: info.host })} · {f(b.perNight, { price: price(Number(info.price_per_night)) })}
           </Text>
+          {info.ratings ? <RatingLine ratings={info.ratings} /> : null}
 
           <Section title={b.dates}>
             <Text v="small" style={{ marginBottom: space.md }}>
@@ -219,9 +222,23 @@ export default function BookingRequest() {
               <Button label={busy ? b.form.sending : b.form.send} busy={busy} onPress={send} />
             </View>
           </Section>
+          {info.ratings ? <RatingsBlock ratings={info.ratings} host={info.host} /> : null}
         </ScrollView>
       </KeyboardAvoidingView>
     </Frame>
+  );
+}
+
+/** "★ 4.8 · 12 reviews" under the name, or "New on Rantio". */
+function RatingLine({ ratings }: { ratings: Ratings }) {
+  const { lang, p } = useT();
+  const score = useScore();
+  const t = REVIEWS[lang];
+  if (!ratings.count || ratings.average === null) return <Pill label={t.newOnRantio} tone="green" style={{ marginTop: space.sm }} />;
+  return (
+    <Text v="smallMedium" style={{ marginTop: space.xs }}>
+      <Text style={{ color: STAR }}>★</Text> {score(ratings.average)} · {p(t.count, ratings.count)}
+    </Text>
   );
 }
 

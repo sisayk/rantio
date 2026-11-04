@@ -11,6 +11,8 @@ import { colors, space } from "@/theme";
 import { ChatFrame, Composer, Messages } from "@/ui/chat";
 import { Button, Card, Empty, Loading, Pill, Problem, Text } from "@/ui/kit";
 import { PageBar } from "@/ui/screen";
+import { openSite } from "@/ui/settings";
+import { REVIEWS } from "@/i18n/messages/reviews";
 
 /** The guest's side of a conversation, opened by its private token. */
 export default function GuestChat() {
@@ -97,6 +99,15 @@ export default function GuestChat() {
                     style={{ marginTop: 6 }}
                     tone={thread.request_status === "accepted" ? "green" : thread.request_status === "declined" ? "error" : "berry"}
                     label={m.book.status[thread.request_status]}
+                  />
+                ) : null}
+                {thread.can_review ? (
+                  <Button
+                    small
+                    icon="star-outline"
+                    label={REVIEWS[lang].prompt.action}
+                    onPress={() => openSite(`/${lang}/review/${token}`)}
+                    style={{ alignSelf: "flex-start", marginTop: space.sm }}
                   />
                 ) : null}
               </Card>

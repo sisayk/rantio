@@ -28,6 +28,8 @@ import HostingHeader from "../HostingHeader";
 import SiteIcon from "../SiteIcon";
 import o from "../owner.module.css";
 import OtherListings from "./OtherListings";
+import ReviewsPanel from "./ReviewsPanel";
+import { REVIEWS } from "@/i18n/messages/reviews";
 import PhotoManager from "./PhotoManager";
 import { actionsFor, CHECK_SECTION, checklist, dateFormats, LANG_CODES, type Section, SECTIONS } from "./shared";
 import { ArrowLeft, Check, Dialog, fieldError, Trash, useToasts } from "./ui";
@@ -142,6 +144,7 @@ export default function ListingEditor({
   const lookupSeq = useRef(0);
 
   const signedOut = useCallback(() => window.location.replace(paths.hostingLogin(lang)), [lang]);
+  const navName = (x: Section) => (x === "reviews" ? REVIEWS[lang].owner.title : l.nav[x]);
 
   const accept = useCallback((d: ListingDetail, keepForm: boolean) => {
     const fields = pick(d);
@@ -1220,7 +1223,7 @@ export default function ListingEditor({
 
   // History lists which parts of the listing an edit touched, by the editor's own section names.
   const fieldNames = (fields: string[]) =>
-    [...new Set(fields.map((x) => FIELD_SECTION[x] ?? "basics"))].map((sec) => l.nav[sec]).join(", ");
+    [...new Set(fields.map((x) => FIELD_SECTION[x] ?? "basics"))].map((sec) => navName(sec)).join(", ");
 
   const statusSection = (
     <section className={s.panel} aria-labelledby="sec-status">
@@ -1289,8 +1292,16 @@ export default function ListingEditor({
     </section>
   );
 
+  const reviewsSection = (
+    <section className={s.panel} aria-labelledby="sec-reviews">
+      <h2 id="sec-reviews">{REVIEWS[lang].owner.title}</h2>
+      <ReviewsPanel key={detail.id} lang={lang} cottage={detail.id} ownBooking={t.ownBooking} onSignedOut={signedOut} />
+    </section>
+  );
+
   const views: Record<Section, React.ReactNode> = {
-    overview, basics, photos: photosSection, amenities, pricing, rules, arrival, location, calendar: calendarSection, status: statusSection,
+    overview, basics, photos: photosSection, amenities, pricing, rules, arrival, location, calendar: calendarSection,
+    reviews: reviewsSection, status: statusSection,
   };
 
   return (
@@ -1348,7 +1359,7 @@ export default function ListingEditor({
             <nav ref={navRef} className={s.sideNav} aria-label={l.sections}>
               {SECTIONS.map((x) => (
                 <button key={x} type="button" className={s.navItem} aria-current={section === x} onClick={() => go(x)}>
-                  {l.nav[x]}
+                  {navName(x)}
                   {todoSections.has(x) ? <span className={s.navTodo} aria-label={l.checklist.needed} /> : null}
                 </button>
               ))}
@@ -1366,7 +1377,7 @@ export default function ListingEditor({
             {SECTIONS.indexOf(section) < SECTIONS.length - 1 ? (
               <div className={s.nextRow}>
                 <button type="button" className={s.nextButton} onClick={() => go(SECTIONS[SECTIONS.indexOf(section) + 1])}>
-                  {fill(lang, LOCATION[lang].next, { section: l.nav[SECTIONS[SECTIONS.indexOf(section) + 1]] })}
+                  {fill(lang, LOCATION[lang].next, { section: navName(SECTIONS[SECTIONS.indexOf(section) + 1]) })}
                   <span aria-hidden="true">→</span>
                 </button>
               </div>
@@ -1392,7 +1403,7 @@ export default function ListingEditor({
           {SECTIONS.map((x) => (
             <li key={x}>
               <button type="button" aria-current={section === x} onClick={() => go(x)}>
-                <span>{l.nav[x]}</span>
+                <span>{navName(x)}</span>
                 {todoSections.has(x) ? <span className={s.need}>{l.checklist.needed}</span> : null}
               </button>
             </li>

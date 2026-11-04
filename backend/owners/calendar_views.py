@@ -25,7 +25,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import booking_requests, calendar, messaging, pricing
+from . import booking_requests, calendar, messaging, pricing, reviews
 from .booking_requests import RequestError
 from .calendar import FEED_CHANNELS, FeedError
 from .models import Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, Language, RequestStatus, new_link_token
@@ -93,6 +93,7 @@ def public_cottage(cottage: Cottage) -> dict:
         "open": cottage.booking_requests_open and cottage.status not in (Cottage.Status.PAUSED, Cottage.Status.ARCHIVED),
         "today": today.isoformat(),
         "busy": [[s.isoformat(), e.isoformat()] for s, e in busy],
+        "ratings": reviews.summary(cottage),
     }
 
 

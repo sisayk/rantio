@@ -5,6 +5,7 @@ import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, mediaUrl, ownerApi, type StatusAction } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
+import { REVIEWS } from "@/i18n/messages/reviews";
 import { useListing } from "@/state/listing";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
@@ -119,6 +120,7 @@ export default function ListingHub() {
             <Row icon="calendar-outline" label={m.app.listing.calendarPrices} detail={l.nightPrices.lead} onPress={() => router.push({ pathname: "/calendar", params: { cottage: String(pk) } })} />
             <Row icon="home-outline" label={l.nav.rules} onPress={() => go("rules")} />
             <Row icon="key-outline" label={l.nav.arrival} detail={l.arrival.private} onPress={() => go("arrival")} />
+            <Row icon="star-outline" label={REVIEWS[lang].owner.title} onPress={() => go("reviews")} />
             <Row icon="link-outline" label={m.app.menu.settings} onPress={() => router.push(`/cottage-settings/${pk}`)} />
             <Row icon="globe-outline" label={m.app.listing.onWeb} detail={m.app.listing.onWebLead} onPress={() => openSite(`/${lang}/hosting/listings/${pk}`)} last />
           </Section>

@@ -1,0 +1,19 @@
+# Daily: email guests whose stay ended, asking them to rate it.
+# Relies on the management command `send_review_requests` (backend/owners/management/commands/).
+# setup-server.sh / deploy.sh only enable the timer once that command exists.
+[Unit]
+Description=Rantio: ask guests to rate their stay
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py send_review_requests
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

@@ -11,6 +11,7 @@ import { formatPrice, isCurrency } from "@/lib/currency";
 import { type BookingLinkInfo, guestApi, type StayQuote } from "@/lib/ownerApi";
 import { CALENDAR_LOCALES } from "./guest/Pickers";
 import { Wordmark } from "./guest/icons";
+import RatingsSection, { RatingBadge } from "./Ratings";
 import chat from "./chat.module.css";
 import styles from "./book.module.css";
 
@@ -250,6 +251,11 @@ export default function BookingRequest({
           <p>
             {[place, info.host ? fill(lang, t.host, { name: info.host }) : ""].filter(Boolean).join(" · ")}
           </p>
+          {info.ratings ? (
+            <p>
+              <RatingBadge lang={lang} ratings={info.ratings} />
+            </p>
+          ) : null}
         </div>
 
         {sentToken ? (
@@ -381,6 +387,7 @@ export default function BookingRequest({
             </aside>
           </form>
         )}
+        {info.ratings ? <RatingsSection lang={lang} ratings={info.ratings} host={info.host} /> : null}
       </main>
     </div>
   );

@@ -1,0 +1,224 @@
+/* Ratings: the badge by a cottage's name, its reviews, its scores on other sites, and the review form. */
+
+.star { color: #e39a2f; }
+
+.stars { letter-spacing: 1px; line-height: 1; }
+.stars .on { color: #e39a2f; }
+.stars .off { color: #d5dbd8; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1d2a2e;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.newBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e4efe9;
+  color: #1d4c3c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(29, 42, 46, 0.05), 0 6px 18px rgba(29, 42, 46, 0.06);
+}
+
+.section h2 { margin: 0 0 14px; font-size: 22px; }
+.section h3 { margin: 22px 0 10px; font-size: 16px; }
+
+.newLine { margin: 0; color: #5d6a6e; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px 28px;
+  margin: 0 0 8px;
+}
+
+.categories div { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.categories dt { color: #1d2a2e; }
+.categories dd { margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+
+.bar { display: inline-block; width: 90px; height: 4px; border-radius: 2px; background: #e3e7e5; overflow: hidden; }
+.bar span { display: block; height: 100%; background: #1d2a2e; }
+
+.reviews {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px 32px;
+}
+
+.review { min-width: 0; }
+.reviewHead { display: flex; align-items: center; gap: 10px; }
+.reviewHead div { display: grid; }
+.reviewHead small { color: #5d6a6e; font-size: 13px; }
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #1d4c3c;
+  color: #fff;
+  font-weight: 700;
+}
+
+.reviewStars { margin: 8px 0 4px; }
+.comment { margin: 0; line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
+
+.reply {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f6f7f6;
+  font-size: 14px;
+}
+
+.reply p { margin: 4px 0 0; white-space: pre-line; }
+
+.more,
+.linkBtn {
+  margin-top: 18px;
+  padding: 10px 16px;
+  border: 1px solid #1d2a2e;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2a2e;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.external { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.external li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f6f7f6;
+}
+
+.external a { margin-left: auto; color: #1d4c3c; font-weight: 600; font-size: 14px; }
+
+.siteIcon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #fff;
+  color: #1d4c3c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.extName { font-weight: 600; }
+.extScore { color: #5d6a6e; font-size: 14px; }
+
+.small { margin: 18px 0 0; color: #5d6a6e; font-size: 13px; }
+
+/* The review form */
+
+.formPage { max-width: 620px; margin: 0 auto; padding: 24px 20px 64px; color: #1d2a2e; }
+.formPage h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); letter-spacing: -0.02em; }
+.formPage > p { margin: 6px 0 0; color: #5d6a6e; }
+
+.card {
+  margin-top: 22px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(29, 42, 46, 0.05), 0 6px 18px rgba(29, 42, 46, 0.06);
+  display: grid;
+  gap: 18px;
+}
+
+.card h2 { margin: 0; font-size: 18px; }
+
+.picker { display: flex; gap: 4px; border: 0; margin: 0; padding: 0; }
+
+.picker button {
+  border: 0;
+  background: none;
+  padding: 2px;
+  font-size: 36px;
+  line-height: 1;
+  color: #d5dbd8;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.picker button.on { color: #e39a2f; }
+.picker button:hover { transform: scale(1.08); }
+.picker.small button { font-size: 24px; }
+
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; }
+.row small { display: block; }
+
+.field { display: grid; gap: 6px; }
+.field span { font-weight: 600; }
+.field small { color: #5d6a6e; }
+
+.field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cfd6d3;
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
+.send {
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #1d4c3c;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.send:disabled { opacity: 0.6; cursor: default; }
+.error { margin: 0; color: #b42318; }
+
+.prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fbefdc;
+}
+
+.prompt strong { font-size: 16px; }
+
+.prompt a {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #1d4c3c;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
