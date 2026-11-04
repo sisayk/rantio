@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { CONTACT_EMAIL } from "@/lib/content";
@@ -13,8 +13,8 @@ import { deviceName, useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
 import { Field } from "@/ui/form";
-import { Button, Icon, Problem, Row, Text } from "@/ui/kit";
-import { ModalFoot, SheetBar } from "@/ui/screen";
+import { Button, Icon, Problem, Text } from "@/ui/kit";
+import { SheetBar } from "@/ui/screen";
 import { openSite } from "@/ui/settings";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,7 +52,6 @@ export default function ListCottage() {
   const [listed, setListed] = useState<ListedOn[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [preparing, setPreparing] = useState(false);
-  const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [step, setStep] = useState<Step>(params.signup ? "checking" : "form");
@@ -348,17 +347,31 @@ export default function ListCottage() {
             {errors.country ? <Text v="small" color={colors.error}>{errors.country}</Text> : null}
 
             <Text v="smallMedium">{t.regionLabel}</Text>
-            <Pressable
-              onPress={() => country && setPicking(true)}
-              style={[styles.select, !country && { backgroundColor: colors.ground }, errors.region ? { borderColor: colors.error } : null]}
-              accessibilityRole="button"
-              accessibilityLabel={t.regionLabel}
-            >
-              <Text v="body" color={chosen ? colors.ink : colors.faint} style={{ flex: 1 }}>
-                {chosen && country ? regionLabel(chosen, country, lang) : country ? t.regionPlaceholder : t.regionFirst}
+            {/* The country's regions right here in the form, like the countries above. */}
+            {country ? (
+              <View style={styles.chips} accessibilityRole="radiogroup" accessibilityLabel={t.regionLabel}>
+                {regions.map((r) => (
+                  <Pressable
+                    key={r.id}
+                    onPress={() => {
+                      setRegion(r.id);
+                      setPlace("");
+                    }}
+                    style={[styles.chip, region === r.id && styles.chipOn, errors.region && !region ? { borderColor: colors.error } : null]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: region === r.id }}
+                  >
+                    <Text v="smallMedium" color={region === r.id ? "#fff" : colors.ink}>
+                      {regionLabel(r, country, lang)}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : (
+              <Text v="small" color={colors.faint}>
+                {t.regionFirst}
               </Text>
-              <Icon name="chevron-down" size={18} color={colors.faint} />
-            </Pressable>
+            )}
             {errors.region ? <Text v="small" color={colors.error}>{errors.region}</Text> : null}
 
             {region ? (
@@ -493,29 +506,6 @@ export default function ListCottage() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Modal visible={picking} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setPicking(false)}>
-        <View style={{ flex: 1, backgroundColor: colors.page }}>
-          <SheetBar title={t.regionLabel} onClose={() => setPicking(false)} />
-          <ScrollView>
-            {regions.map((r, i) => (
-              <Row
-                key={r.id}
-                label={regionLabel(r, country as Country, lang)}
-                right={region === r.id ? <Icon name="checkmark" size={20} color={colors.green} /> : undefined}
-                onPress={() => {
-                  setRegion(r.id);
-                  setPlace("");
-                  setPicking(false);
-                }}
-                last={i === regions.length - 1}
-              />
-            ))}
-          </ScrollView>
-          <ModalFoot>
-            <Button kind="ghost" label={m.app.common.cancel} onPress={() => setPicking(false)} />
-          </ModalFoot>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -527,16 +517,6 @@ const styles = StyleSheet.create({
   chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.line },
   countChip: { minWidth: 48, alignItems: "center" },
   chipOn: { backgroundColor: colors.green, borderColor: colors.green },
-  select: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space.sm,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radius.sm,
-    paddingHorizontal: space.md,
-    paddingVertical: 14,
-  },
   consent: { flexDirection: "row", gap: space.sm, alignItems: "center" },
   photoGrid: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
   photo: { width: 92, height: 92, borderRadius: radius.sm, overflow: "hidden", backgroundColor: colors.ground },
