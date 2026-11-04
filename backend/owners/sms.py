@@ -63,6 +63,10 @@ def check_key() -> tuple[bool, str]:
             res.read()
         return True, ""
     except urllib.error.HTTPError as e:
-        return False, f"Brevo answered {e.code}"
+        try:
+            message = json.loads(e.read()).get("message", "")
+        except (ValueError, AttributeError):
+            message = ""
+        return False, f"Brevo answered {e.code}" + (f": {message}" if message else "")
     except OSError as e:
         return False, f"Brevo couldn't be reached ({e})"
