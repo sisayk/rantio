@@ -194,6 +194,20 @@ class EmailCheckTests(TestCase):
         self.assertEqual(account.cottages.count(), 1)
         self.assertEqual(self.client.get("/api/owner/summary/").status_code, 200)
 
+    def test_a_session_without_its_csrf_token_counts_as_signed_out(self):
+        from . import login as owner_login
+
+        account = owner_login.new_account("matti@example.fi", lang="fi")
+        self.client = APIClient(enforce_csrf_checks=True)
+        self.client.force_login(owner_login.user_for(account))
+        res = self.sign_up(email="matti@example.fi")
+        self.assertEqual(res.status_code, 400)  # not refused as forbidden: asked for the email code
+        self.assertEqual(res.json(), {"email_code": ["wrong"]})
+        res = self.sign_up(email="matti@example.fi", email_code=self.code_for("matti@example.fi"))
+        self.assertEqual(res.status_code, 201, res.content)
+        account.refresh_from_db()
+        self.assertTrue(account.is_host)
+
     def test_codes_are_limited(self):
         for _ in range(5):
             self.code_for()

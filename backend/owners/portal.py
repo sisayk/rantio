@@ -29,7 +29,10 @@ class IsAccount(permissions.BasePermission):
 
 
 class IsOwner(IsAccount):
-    """A host: the hosting pages and their data."""
+    """A host: the hosting pages and their data. Anyone else signed in gets "not_host" (and stays
+    signed in; the app and the site only sign out on "not signed in")."""
+
+    message = "not_host"
 
     def has_permission(self, request, view):
         return super().has_permission(request, view) and request.user.owner.is_host
@@ -237,7 +240,7 @@ class DeviceSerializer(serializers.Serializer):
 class DeviceView(APIView):
     """The app tells us where to push (or, with an empty token, that notifications are off)."""
 
-    permission_classes = [IsOwner]
+    permission_classes = [IsAccount]
 
     def post(self, request):
         if not isinstance(request.auth, AppDevice):

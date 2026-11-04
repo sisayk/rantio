@@ -77,7 +77,8 @@ class SocialSignInTests(TestCase):
         self.assertFalse(o.is_host)
         self.assertEqual(o.google_sub, "g-999")
         self.assertEqual(self.client.get("/api/owner/me/").json()["is_host"], False)
-        self.assertEqual(self.client.get("/api/owner/summary/").status_code, 403)
+        res = self.client.get("/api/owner/summary/")
+        self.assertEqual((res.status_code, res.json()["detail"]), (403, "not_host"))
 
     @override_settings(GOOGLE_CLIENT_IDS=[])
     def test_not_switched_on(self):

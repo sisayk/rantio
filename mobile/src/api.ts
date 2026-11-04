@@ -116,11 +116,12 @@ async function call<T>(path: string, init: RequestInit & { owner?: boolean } = {
   } catch {
     throw new Offline("offline");
   }
-  if (owner && (res.status === 401 || res.status === 403)) {
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  // 403 "not_host": signed in, just not hosting yet. Anything else 401/403 means signed out.
+  if (owner && (res.status === 401 || res.status === 403) && body.detail !== "not_host") {
     onSignedOut?.();
     throw new SignedOut();
   }
-  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) throw new ApiError(String(body.detail ?? `HTTP ${res.status}`), res.status, body);
   return body as T;
 }
@@ -136,11 +137,11 @@ async function upload<T>(path: string, form: FormData): Promise<T> {
     if (__DEV__) console.warn("[upload]", path, e); // what failed, in Metro's terminal
     throw new Offline("offline");
   }
-  if (res.status === 401 || res.status === 403) {
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if ((res.status === 401 || res.status === 403) && body.detail !== "not_host") {
     onSignedOut?.();
     throw new SignedOut();
   }
-  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) throw new ApiError(String(body.detail ?? `HTTP ${res.status}`), res.status, body);
   return body as T;
 }

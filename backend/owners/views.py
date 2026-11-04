@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import authentication, generics, parsers, permissions, views
+from rest_framework import authentication, exceptions, generics, parsers, permissions, views
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
@@ -104,6 +104,17 @@ def become_owner(signup: OwnerSignup) -> Owner:
     return owner
 
 
+class SessionIfCsrf(authentication.SessionAuthentication):
+    """The session, when the request carries its CSRF token; without one the form is treated as
+    sent by someone signed out (who then confirms the email with a code), instead of refused."""
+
+    def authenticate(self, request):
+        try:
+            return super().authenticate(request)
+        except exceptions.PermissionDenied:
+            return None
+
+
 class OwnerSignupCreateView(generics.CreateAPIView):
     """Public endpoint behind the sign-up form (rantio.fi/hosts and the app), with its photos.
 
@@ -116,7 +127,7 @@ class OwnerSignupCreateView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     # Public form; someone already signed in sends it with their session (and its CSRF token) or
     # the app's key, and their checked address stands in for the email code.
-    authentication_classes = [authentication.SessionAuthentication, app_keys.AppKeyAuthentication]
+    authentication_classes = [SessionIfCsrf, app_keys.AppKeyAuthentication]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "signup"

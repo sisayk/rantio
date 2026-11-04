@@ -26,7 +26,9 @@ const EMPTY: Data = { session: null, summary: null, conversations: null, error: 
 const Ctx = createContext<Host | null>(null);
 
 export function HostProvider({ children }: { children: ReactNode }) {
-  const { sessionId } = useSession();
+  const { sessionId: signedInAs, owner } = useSession();
+  // Hosting figures are for hosts; someone signed in who hasn't listed yet has none to load.
+  const sessionId = owner?.is_host ? signedInAs : null;
   const [data, setData] = useState<Data>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [year, setYear] = useState<number | null>(null);
