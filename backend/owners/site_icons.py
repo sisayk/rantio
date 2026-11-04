@@ -25,6 +25,7 @@ SITES = {
     "hometogo": "hometogo.com",
     "nettimokki": "nettimokki.com",
     "lomarengas": "lomarengas.fi",
+    "mokkivuokra": "mokkivuokra.fi",
     "novasol": "novasol.com",
     "stugsommar": "stugsommar.se",
     "finn": "finn.no",

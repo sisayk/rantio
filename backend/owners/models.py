@@ -114,7 +114,7 @@ class OwnerSignup(models.Model):
     nettimokki_url = models.URLField(blank=True)
     listed_on = models.CharField(
         max_length=80, blank=True,
-        help_text="Where the cottage is listed now, from the form: nettimokki, airbnb, booking, vrbo, other or none.",
+        help_text="Where the cottage is listed now, from the form: nettimokki, mokkivuokra, lomarengas, airbnb, booking, vrbo, other or none.",
     )
     message = models.TextField(blank=True, max_length=2000)
     privacy_consent = models.BooleanField(default=False)
@@ -142,7 +142,7 @@ class OwnerSignup(models.Model):
             self.token = secrets.token_urlsafe(18)
         super().save(*args, **kwargs)
 
-    LISTED_ON = {"nettimokki": "Nettimökki", "airbnb": "Airbnb", "booking": "Booking.com", "vrbo": "Vrbo",
+    LISTED_ON = {"nettimokki": "Nettimökki", "mokkivuokra": "Mökkivuokra", "lomarengas": "Lomarengas", "airbnb": "Airbnb", "booking": "Booking.com", "vrbo": "Vrbo",
                  "other": "somewhere else", "none": "nowhere yet"}
 
     @property

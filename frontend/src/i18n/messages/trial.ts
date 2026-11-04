@@ -39,7 +39,11 @@ export type TrialText = {
   scratchPoints: string[];
 };
 
-export const LISTED_ON = ["nettimokki", "airbnb", "booking", "vrbo", "other", "none"] as const;
+export const LISTED_ON = ["nettimokki", "mokkivuokra", "lomarengas", "airbnb", "booking", "vrbo", "other", "none"] as const;
+// Finnish sites: offered when the cottage is in Finland (or no country is picked yet).
+export const FINNISH_SITES: readonly string[] = ["nettimokki", "mokkivuokra", "lomarengas"];
+export const listedChoices = (country: string) =>
+  LISTED_ON.filter((key) => !FINNISH_SITES.includes(key) || !country || country === "FI");
 export type ListedOn = (typeof LISTED_ON)[number];
 
 export const TRIAL_MONTHS = 3;
@@ -83,7 +87,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Where is your cottage listed now?",
     listedHint: "Not listed anywhere yet? That's fine: we make the listings for you.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Somewhere else", none: "Nowhere yet" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Somewhere else", none: "Nowhere yet" },
     scratchTitle: "Not listed anywhere yet? We start from scratch",
     scratchBody: "Many cottages have never been rented out online. Send us photos and a few details and we do the rest: we write the listings, set the prices with you and put your cottage on Airbnb, Booking.com and Vrbo.",
     scratchPoints: ["Listings written for you", "Prices set together with you", "One calendar for every site"],
@@ -125,7 +129,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Missä mökkisi on nyt ilmoitettuna?",
     listedHint: "Eikö vielä missään? Ei haittaa: teemme ilmoitukset puolestasi.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Muualla", none: "Ei vielä missään" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Muualla", none: "Ei vielä missään" },
     scratchTitle: "Eikö mökkisi ole vielä missään? Aloitetaan alusta",
     scratchBody: "Moni mökki ei ole koskaan ollut vuokralla verkossa. Lähetä meille kuvat ja muutama tieto, niin hoidamme loput: kirjoitamme ilmoitukset, sovimme hinnat kanssasi ja viemme mökkisi Airbnb:hen, Booking.comiin ja Vrboon.",
     scratchPoints: ["Ilmoitukset kirjoitetaan puolestasi", "Hinnat sovitaan yhdessä", "Yksi kalenteri kaikille sivustoille"],
@@ -167,7 +171,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Var finns din stuga annonserad nu?",
     listedHint: "Inte annonserad någonstans än? Inga problem: vi gör annonserna åt dig.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Någon annanstans", none: "Ingenstans än" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Någon annanstans", none: "Ingenstans än" },
     scratchTitle: "Inte annonserad någonstans än? Vi börjar från början",
     scratchBody: "Många stugor har aldrig hyrts ut på nätet. Skicka bilder och några uppgifter så gör vi resten: vi skriver annonserna, sätter priserna tillsammans med dig och lägger ut stugan på Airbnb, Booking.com och Vrbo.",
     scratchPoints: ["Annonserna skrivs åt dig", "Priserna sätts tillsammans med dig", "En kalender för alla sajter"],
@@ -209,7 +213,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Hvor er hytta di annonsert nå?",
     listedHint: "Ikke annonsert noe sted ennå? Helt greit: vi lager annonsene for deg.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Et annet sted", none: "Ingen steder ennå" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Et annet sted", none: "Ingen steder ennå" },
     scratchTitle: "Ikke annonsert noe sted ennå? Vi starter fra bunnen",
     scratchBody: "Mange hytter har aldri vært leid ut på nett. Send oss bilder og noen opplysninger, så gjør vi resten: vi skriver annonsene, setter prisene sammen med deg og legger ut hytta på Airbnb, Booking.com og Vrbo.",
     scratchPoints: ["Annonsene skrives for deg", "Prisene settes sammen med deg", "Én kalender for alle nettsteder"],
@@ -251,7 +255,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Kvar er hytta di annonsert no?",
     listedHint: "Ikkje annonsert nokon stad enno? Heilt greitt: vi lagar annonsane for deg.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Ein annan stad", none: "Ingen stad enno" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Ein annan stad", none: "Ingen stad enno" },
     scratchTitle: "Ikkje annonsert nokon stad enno? Vi byrjar frå botnen",
     scratchBody: "Mange hytter har aldri vore leigde ut på nett. Send oss bilete og nokre opplysningar, så gjer vi resten: vi skriv annonsane, set prisane saman med deg og legg ut hytta på Airbnb, Booking.com og Vrbo.",
     scratchPoints: ["Annonsane blir skrivne for deg", "Prisane blir sette saman med deg", "Éin kalender for alle nettstader"],
@@ -293,7 +297,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Hvor er dit sommerhus annonceret nu?",
     listedHint: "Ikke annonceret nogen steder endnu? Helt fint: vi laver annoncerne for dig.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Et andet sted", none: "Ingen steder endnu" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Et andet sted", none: "Ingen steder endnu" },
     scratchTitle: "Ikke annonceret nogen steder endnu? Vi starter fra bunden",
     scratchBody: "Mange sommerhuse har aldrig været lejet ud online. Send os billeder og et par oplysninger, så klarer vi resten: vi skriver annoncerne, fastsætter priserne sammen med dig og lægger sommerhuset på Airbnb, Booking.com og Vrbo.",
     scratchPoints: ["Annoncerne skrives for dig", "Priserne fastsættes sammen med dig", "Én kalender til alle sider"],
@@ -335,7 +339,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Hvar er bústaðurinn auglýstur núna?",
     listedHint: "Ekki auglýstur neins staðar enn? Ekkert mál: við gerum auglýsingarnar fyrir þig.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Annars staðar", none: "Hvergi enn" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Annars staðar", none: "Hvergi enn" },
     scratchTitle: "Ekki auglýstur neins staðar enn? Við byrjum frá grunni",
     scratchBody: "Margir bústaðir hafa aldrei verið leigðir út á netinu. Sendu okkur myndir og nokkrar upplýsingar og við sjáum um restina: við skrifum auglýsingarnar, ákveðum verðin með þér og setjum bústaðinn á Airbnb, Booking.com og Vrbo.",
     scratchPoints: ["Auglýsingarnar skrifaðar fyrir þig", "Verðin ákveðin með þér", "Eitt dagatal fyrir allar síður"],
@@ -377,7 +381,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Kus on sinu suvemaja praegu kuulutatud?",
     listedHint: "Pole veel kusagil? Pole hullu: teeme kuulutused sinu eest.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Mujal", none: "Veel mitte kusagil" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Mujal", none: "Veel mitte kusagil" },
     scratchTitle: "Pole veel kusagil kuulutatud? Alustame algusest",
     scratchBody: "Paljusid suvemaju pole kunagi internetis välja üüritud. Saada meile pildid ja mõned andmed ning ülejäänu teeme meie: kirjutame kuulutused, lepime sinuga hinnad kokku ja paneme suvemaja Airbnb-sse, Booking.com-i ja Vrbo-sse.",
     scratchPoints: ["Kuulutused kirjutatakse sinu eest", "Hinnad lepitakse kokku koos sinuga", "Üks kalender kõigile saitidele"],
@@ -419,7 +423,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Kur jūsu māja pašlaik ir izsludināta?",
     listedHint: "Vēl nekur nav izsludināta? Nekas: sludinājumus izveidosim mēs.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Citur", none: "Vēl nekur" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Citur", none: "Vēl nekur" },
     scratchTitle: "Vēl nekur nav izsludināta? Sāksim no nulles",
     scratchBody: "Daudzas mājas nekad nav izīrētas tiešsaistē. Atsūtiet mums fotoattēlus un dažas ziņas, un pārējo paveiksim mēs: uzrakstīsim sludinājumus, kopā ar jums noteiksim cenas un ievietosim māju Airbnb, Booking.com un Vrbo.",
     scratchPoints: ["Sludinājumus uzrakstām mēs", "Cenas nosakām kopā ar jums", "Viens kalendārs visām vietnēm"],
@@ -461,7 +465,7 @@ export const TRIAL: Record<Lang, TrialText> = {
     },
     listedOn: "Kur jūsų sodyba dabar paskelbta?",
     listedHint: "Dar niekur nepaskelbta? Nieko tokio: skelbimus parengsime mes.",
-    listedOptions: { nettimokki: "Nettimökki", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Kitur", none: "Dar niekur" },
+    listedOptions: { nettimokki: "Nettimökki", mokkivuokra: "Mökkivuokra", lomarengas: "Lomarengas", airbnb: "Airbnb", booking: "Booking.com", vrbo: "Vrbo", other: "Kitur", none: "Dar niekur" },
     scratchTitle: "Dar niekur nepaskelbta? Pradėsime nuo nulio",
     scratchBody: "Daugelis sodybų niekada nebuvo nuomojamos internetu. Atsiųskite nuotraukų ir kelias žinias, o likusį darbą atliksime mes: parašysime skelbimus, kartu su jumis nustatysime kainas ir paskelbsime sodybą Airbnb, Booking.com ir Vrbo.",
     scratchPoints: ["Skelbimus parašome mes", "Kainas nustatome kartu su jumis", "Vienas kalendorius visoms svetainėms"],

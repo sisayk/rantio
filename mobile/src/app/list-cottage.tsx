@@ -7,7 +7,7 @@ import { ApiError, guestApi, Offline } from "@/api";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
-import { LISTED_ON, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
+import { listedChoices, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
 import { PLACES } from "@/lib/places";
 import { deviceName, useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
@@ -403,7 +403,7 @@ export default function ListCottage() {
             <Text v="smallMedium">{tr.listedOn}</Text>
             <Text v="small">{tr.listedHint}</Text>
             <View style={styles.chips}>
-              {LISTED_ON.map((key) => (
+              {listedChoices(country).map((key) => (
                 <Pressable
                   key={key}
                   onPress={() => toggleListed(key)}

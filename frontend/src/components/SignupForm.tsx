@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
-import { LISTED_ON, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
+import { listedChoices, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { ACCEPTED, preparePhoto } from "@/lib/imagePrep";
@@ -357,7 +357,7 @@ export default function SignupForm({ lang, f: words, countries }: Props) {
         <legend>{tr.listedOn}</legend>
         <p className={styles.photoHint}>{tr.listedHint}</p>
         <div className={styles.listedChips}>
-          {LISTED_ON.map((key) => (
+          {listedChoices(country).map((key) => (
             <label key={key} className={styles.listedChip}>
               <input type="checkbox" checked={listed.includes(key)} onChange={() => toggleListed(key)} />
               <span>{tr.listedOptions[key]}</span>
