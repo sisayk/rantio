@@ -4,9 +4,12 @@ Off until BREVO_API_KEY is set (an API key from Brevo → SMTP & API → API key
 credits bought in Brevo). Phone numbers are handled in international form (+358401234567).
 """
 
+import http.client
 import json
 import logging
 import re
+import socket
+import ssl
 import urllib.error
 import urllib.request
 
@@ -38,6 +41,23 @@ def normalize(raw: str, country: str = "FI") -> str:
     return s if re.fullmatch(r"\+[1-9]\d{6,14}", s) else ""
 
 
+class _IPv4Connection(http.client.HTTPSConnection):
+    """Brevo only accepts our key from approved addresses; the server's IPv4 address is the one
+    approved, so these calls never go out over IPv6."""
+
+    def connect(self):
+        host_port = socket.getaddrinfo(self.host, self.port, socket.AF_INET, socket.SOCK_STREAM)[0][4]
+        self.sock = self._context.wrap_socket(socket.create_connection(host_port, self.timeout), server_hostname=self.host)
+
+
+class _IPv4Handler(urllib.request.HTTPSHandler):
+    def https_open(self, req):
+        return self.do_open(_IPv4Connection, req, context=self._context)
+
+
+_brevo = urllib.request.build_opener(_IPv4Handler(context=ssl.create_default_context()))
+
+
 def send(to: str, text: str) -> None:
     """Sends one SMS; raises if Brevo refuses it (the caller decides what the visitor sees)."""
     req = urllib.request.Request(
@@ -47,7 +67,7 @@ def send(to: str, text: str) -> None:
         ).encode(),
         headers={"api-key": settings.BREVO_API_KEY, "Content-Type": "application/json", "Accept": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=10) as res:  # noqa: S310 (fixed https URL)
+    with _brevo.open(req, timeout=10) as res:
         res.read()
 
 
@@ -59,7 +79,7 @@ def check_key() -> tuple[bool, str]:
     turns off keys unused for 90 days. (True, "") when Brevo accepts it, else (False, why)."""
     req = urllib.request.Request(STATS_URL, headers={"api-key": settings.BREVO_API_KEY, "Accept": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=15) as res:  # noqa: S310 (fixed https URL)
+        with _brevo.open(req, timeout=15) as res:
             res.read()
         return True, ""
     except urllib.error.HTTPError as e:
