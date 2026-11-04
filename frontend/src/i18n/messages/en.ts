@@ -1083,6 +1083,7 @@ export const en = {
     common: {
       cancel: "Cancel",
       done: "Done",
+      next: "Next",
       back: "Back",
       share: "Share",
       offline: "No connection. Check your internet and try again.",

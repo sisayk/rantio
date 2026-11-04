@@ -1071,6 +1071,7 @@ export const et: Translation = {
     common: {
       cancel: "Tühista",
       done: "Valmis",
+      next: "Edasi",
       back: "Tagasi",
       share: "Jaga",
       offline: "Ühendus puudub. Kontrolli internetti ja proovi uuesti.",

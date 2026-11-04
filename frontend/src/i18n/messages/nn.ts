@@ -1071,6 +1071,7 @@ export const nn: Translation = {
     common: {
       cancel: "Avbryt",
       done: "Ferdig",
+      next: "Neste",
       back: "Tilbake",
       share: "Del",
       offline: "Inga tilkopling. Sjekk internett og prøv igjen.",

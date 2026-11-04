@@ -1068,6 +1068,7 @@ export const fi: Translation = {
     common: {
       cancel: "Peruuta",
       done: "Valmis",
+      next: "Seuraava",
       back: "Takaisin",
       share: "Jaa",
       offline: "Ei yhteyttä. Tarkista nettiyhteys ja yritä uudelleen.",

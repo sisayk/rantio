@@ -1071,6 +1071,7 @@ export const lv: Translation = {
     common: {
       cancel: "Atcelt",
       done: "Gatavs",
+      next: "Tālāk",
       back: "Atpakaļ",
       share: "Kopīgot",
       offline: "Nav savienojuma. Pārbaudiet internetu un mēģiniet vēlreiz.",

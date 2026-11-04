@@ -1071,6 +1071,7 @@ export const sv: Translation = {
     common: {
       cancel: "Avbryt",
       done: "Klar",
+      next: "Nästa",
       back: "Tillbaka",
       share: "Dela",
       offline: "Ingen anslutning. Kontrollera internet och försök igen.",

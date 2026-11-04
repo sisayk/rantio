@@ -1076,6 +1076,7 @@ export const lt: Translation = {
     common: {
       cancel: "Atšaukti",
       done: "Atlikta",
+      next: "Toliau",
       back: "Atgal",
       share: "Bendrinti",
       offline: "Nėra ryšio. Patikrinkite internetą ir bandykite dar kartą.",

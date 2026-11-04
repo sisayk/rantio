@@ -1071,6 +1071,7 @@ export const is: Translation = {
     common: {
       cancel: "Hætta við",
       done: "Lokið",
+      next: "Áfram",
       back: "Til baka",
       share: "Deila",
       offline: "Engin tenging. Athugaðu netið og reyndu aftur.",

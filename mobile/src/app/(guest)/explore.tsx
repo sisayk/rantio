@@ -382,11 +382,26 @@ function SearchSheet({
           {step === "when" ? (
             <View style={[styles.sheetCard, shadowFloat]}>
               <Text v="title">{m.guest.datePicker.title}</Text>
-              <RangeCalendar lang={lang} start={stay.start} end={stay.end} onChange={(a, b) => setStay((s) => ({ ...s, start: a, end: b }))} months={12} />
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Button small kind="ghost" label={m.guest.datePicker.clear} onPress={() => setStay((s) => ({ ...s, start: null, end: null }))} />
-                <Button small label={m.guest.datePicker.done} onPress={() => setStep("who")} />
-              </View>
+              {stay.start ? (
+                <Button
+                  small
+                  kind="ghost"
+                  label={m.guest.datePicker.clear}
+                  onPress={() => setStay((s) => ({ ...s, start: null, end: null }))}
+                  style={{ alignSelf: "flex-start", paddingHorizontal: 0 }}
+                />
+              ) : null}
+              <RangeCalendar
+                lang={lang}
+                start={stay.start}
+                end={stay.end}
+                onChange={(a, b) => {
+                  setStay((s) => ({ ...s, start: a, end: b }));
+                  // Both dates picked: on to the guests, as in Airbnb's search.
+                  if (a && b) setTimeout(() => setStep("who"), 350);
+                }}
+                months={12}
+              />
             </View>
           ) : (
             <Collapsed label={e.when} value={dates} onPress={() => setStep("when")} />
@@ -418,7 +433,12 @@ function SearchSheet({
               setStep("where");
             }}
           />
-          <Button icon="search" label={m.guest.search.button} onPress={() => onSearch(query.trim(), stay)} />
+          {/* Where → When → Who, then Search: the guests are asked before the cottages are listed. */}
+          {step === "who" ? (
+            <Button icon="search" label={m.guest.search.button} onPress={() => onSearch(query.trim(), stay)} />
+          ) : (
+            <Button label={m.app.common.next} onPress={() => setStep(step === "where" ? "when" : "who")} />
+          )}
         </View>
       </View>
     </Modal>

@@ -1071,6 +1071,7 @@ export const de: Translation = {
     common: {
       cancel: "Abbrechen",
       done: "Fertig",
+      next: "Weiter",
       back: "Zurück",
       share: "Teilen",
       offline: "Keine Verbindung. Prüf deine Internetverbindung und versuch es noch einmal.",
