@@ -112,7 +112,7 @@
       "eas": {
         "projectId": "de9fff25-8c81-4b4f-8949-003b7f0b0ec9"
       },
-      "googleSignInAndroid": false
+      "googleSignInAndroid": true
     }
   }
 }
