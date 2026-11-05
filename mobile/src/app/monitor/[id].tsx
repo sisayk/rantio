@@ -123,7 +123,7 @@ export default function MonitorScreen() {
         <Section title={t.last48}>
           {temps.length ? (
             <View style={styles.chart} accessibilityLabel={t.last48}>
-              {d.history.map((h) => (
+              {slots(d.history).map((h) => (
                 <View key={h.at} style={styles.barSlot}>
                   {h.temp != null ? (
                     <View
@@ -200,6 +200,17 @@ export default function MonitorScreen() {
       </ScrollView>
     </View>
   );
+}
+
+/** The last 48 hours, one slot per hour (oldest first), so a reading sits in its own hour. */
+function slots(history: { at: string; temp: number | null }[]) {
+  const byHour = new Map(history.map((h) => [new Date(h.at).setMinutes(0, 0, 0), h.temp]));
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  return Array.from({ length: 48 }, (_, i) => {
+    const at = now.getTime() - (47 - i) * 3600_000;
+    return { at: String(at), temp: byHour.get(at) ?? null };
+  });
 }
 
 function SettingRow({ label, value, children }: { label: string; value: string; children: React.ReactNode }) {

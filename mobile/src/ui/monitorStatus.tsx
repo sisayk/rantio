@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
   card: { marginTop: space.xl, gap: space.sm, padding: space.lg, borderRadius: radius.md, backgroundColor: colors.page },
   line: { flexDirection: "row", alignItems: "center", gap: space.md },
-  tile: { width: "31.5%", minWidth: 96, flexGrow: 1, gap: 2, padding: space.md, borderRadius: radius.md, backgroundColor: colors.ground },
+  tile: { width: "31.5%", minWidth: 96, gap: 2, padding: space.md, borderRadius: radius.md, backgroundColor: colors.ground },
 });
 
 /** Today: one line per box, so the host sees at a glance that the cottages are fine. */
