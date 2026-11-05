@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { type ReactNode, useCallback, useState } from "react";
 import { Alert as Ask, Pressable, StyleSheet, View } from "react-native";
 
-import { type ListingSummary, mediaUrl, ownerApi, SignedOut } from "@/api";
+import { type ListingSummary, mediaUrl, type MonitorRow, ownerApi, SignedOut } from "@/api";
 import { HOST_TODAY } from "@/i18n/messages/hostToday";
 import type { Currency } from "@/lib/currency";
 import { formatPrice } from "@/lib/currency";
@@ -15,6 +15,7 @@ import { colors, radius, shadow, space } from "@/theme";
 import { Avatar, Card, Icon, type IconName, Loading, Pill, Problem, Text, Wordmark } from "@/ui/kit";
 import { StayRow } from "@/ui/host";
 import { MONITOR_PHOTO } from "@/ui/monitor";
+import { MonitorStatusCard } from "@/ui/monitorStatus";
 import { TabScreen } from "@/ui/screen";
 
 const STATUS_TONE = { intake: "berry", listing: "berry", live: "green", paused: "neutral", archived: "neutral" } as const;
@@ -27,6 +28,7 @@ export default function Today() {
   const { owner } = useSession();
   const router = useRouter();
   const [listings, setListings] = useState<ListingSummary[] | null>(null);
+  const [monitors, setMonitors] = useState<MonitorRow[]>([]);
   const pending = (conversations ?? []).filter((c) => c.request_status === "pending" && !c.archived);
   const unread = (conversations ?? []).filter((c) => c.unread && !c.archived && c.request_status !== "pending").length;
 
@@ -36,6 +38,10 @@ export default function Today() {
       ownerApi
         .listings()
         .then((r) => setListings(r.cottages))
+        .catch(() => undefined);
+      ownerApi
+        .monitors()
+        .then(setMonitors)
         .catch(() => undefined);
     }, []),
   );
@@ -203,6 +209,9 @@ export default function Today() {
         })}
       </View>
 
+      {monitors.length ? <MonitorStatusCard monitors={monitors} /> : null}
+
+      {monitors.length ? null : (
       <Pressable onPress={() => router.push("/monitor")} accessibilityRole="button" style={({ pressed }) => [styles.monitor, shadow, pressed && { opacity: 0.9 }]}>
         <View style={{ flex: 1, padding: space.lg, gap: space.sm }}>
           <Pill label={m.guest.hostBand.monitor.badge} tone="green" />
@@ -216,6 +225,7 @@ export default function Today() {
         </View>
         <Image source={MONITOR_PHOTO} style={styles.monitorPhoto} contentFit="cover" accessibilityElementsHidden />
       </Pressable>
+      )}
     </TabScreen>
   );
 }

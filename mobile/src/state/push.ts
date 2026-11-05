@@ -79,5 +79,6 @@ export function routeFor(data: Record<string, unknown> | undefined): string | nu
     return `/thread/${data.conversation}`;
   if (data.type === "booking") return "/calendar";
   if (data.type === "guest-message" && typeof data.token === "string") return `/chat/${data.token}`;
+  if (data.type === "monitor" && typeof data.id === "number") return `/monitor/${data.id}`;
   return null;
 }

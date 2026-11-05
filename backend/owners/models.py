@@ -1093,3 +1093,76 @@ class ExternalRating(models.Model):
 
     def __str__(self) -> str:
         return f"{self.cottage.name}: {self.score}/{self.scale} on {self.site}"
+
+
+class MonitorDevice(models.Model):
+    """A Mökki monitor box. Made with a serial, a claim code (on the box's sticker, for the host to
+    connect it in the app) and a secret (flashed into the firmware, sent with every reading).
+    Only hashes of the code and the secret are kept."""
+
+    serial = models.CharField(max_length=16, unique=True)
+    claim_code_hash = models.CharField(max_length=64)
+    secret_hash = models.CharField(max_length=64)
+    owner = models.ForeignKey(Owner, on_delete=models.SET_NULL, null=True, blank=True, related_name="monitors")
+    cottage = models.ForeignKey(Cottage, on_delete=models.SET_NULL, null=True, blank=True, related_name="monitors")
+    name = models.CharField(max_length=60, blank=True)
+    frost_limit = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("5.0"), help_text="°C inside; colder alerts.")
+    arrival_temp = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("18.0"), help_text="°C guests should find on arrival.")
+    sauna_hours = models.PositiveSmallIntegerField(default=4, help_text="A hot sauna for longer than this alerts.")
+    firmware = models.CharField(max_length=30, blank=True)
+    last_seen_at = models.DateTimeField(null=True, blank=True)
+    last = models.JSONField(default=dict, blank=True, help_text="The latest reading, for a quick look.")
+    claimed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["serial"]
+        verbose_name = "Mökki monitor"
+
+    def __str__(self) -> str:
+        return self.serial
+
+
+class MonitorReading(models.Model):
+    """What the box measured at one moment. Anything it lacks a sensor for stays empty."""
+
+    device = models.ForeignKey(MonitorDevice, on_delete=models.CASCADE, related_name="readings")
+    at = models.DateTimeField()
+    temp_inside = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    temp_sauna = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    humidity = models.PositiveSmallIntegerField(null=True, blank=True)
+    leak = models.BooleanField(null=True, blank=True)
+    door_open = models.BooleanField(null=True, blank=True)
+    mains = models.BooleanField(null=True, blank=True, help_text="Mains power present; false: on battery.")
+    battery = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Percent.")
+    signal = models.SmallIntegerField(null=True, blank=True, help_text="Mobile signal, dBm (RSRP).")
+
+    class Meta:
+        ordering = ["-at"]
+        indexes = [models.Index(fields=["device", "-at"])]
+
+
+class MonitorAlert(models.Model):
+    """Something the host was told about. Open while ended_at is empty."""
+
+    class Kind(models.TextChoices):
+        FROST = "frost", "Frost risk"
+        LEAK = "leak", "Water leak"
+        POWER = "power", "Power cut"
+        SAUNA = "sauna", "Sauna left on"
+        DOOR = "door", "Door opened while empty"
+        BATTERY = "battery", "Battery low"
+        OFFLINE = "offline", "Not heard from"
+        ARRIVAL = "arrival", "Cold before guests arrive"
+
+    device = models.ForeignKey(MonitorDevice, on_delete=models.CASCADE, related_name="alerts")
+    kind = models.CharField(max_length=10, choices=Kind.choices)
+    started_at = models.DateTimeField(default=timezone.now)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    value = models.CharField(max_length=60, blank=True, help_text="The reading that set it off, e.g. 3.5 °C; for arrival, the stay.")
+
+    class Meta:
+        ordering = ["-started_at"]
+
+    def __str__(self) -> str:
+        return f"{self.device} {self.kind} {self.started_at:%Y-%m-%d %H:%M}"

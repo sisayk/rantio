@@ -165,6 +165,35 @@ const json = (method: string, data?: unknown): RequestInit => ({
 
 export type SignInTo = { email?: string; phone?: string };
 
+export type MonitorKind = "frost" | "leak" | "power" | "sauna" | "door" | "battery" | "offline" | "arrival";
+export type MonitorAlert = { id: number; kind: MonitorKind; started_at: string; ended_at: string | null; value: string };
+export type MonitorSettings = { frost_limit: number; arrival_temp: number; sauna_hours: number };
+export type MonitorLast = {
+  at?: string;
+  temp?: number | null;
+  sauna?: number | null;
+  humidity?: number | null;
+  leak?: boolean | null;
+  door?: boolean | null;
+  mains?: boolean | null;
+  battery?: number | null;
+  signal?: number | null;
+};
+export type MonitorRow = {
+  id: number;
+  serial: string;
+  name: string;
+  cottage: { id: number; name: string } | null;
+  online: boolean;
+  last_seen_at: string | null;
+  last: MonitorLast;
+  firmware: string;
+  occupied: boolean;
+  alerts: MonitorAlert[];
+  settings: MonitorSettings;
+};
+export type MonitorDetail = MonitorRow & { history: { at: string; temp: number | null; sauna: number | null }[]; recent_alerts: MonitorAlert[] };
+
 export const ownerApi = {
   /** A code by email ({ email }) or by SMS ({ phone: "+358…" }). */
   requestCode: (to: SignInTo, lang: string) =>
@@ -182,6 +211,14 @@ export const ownerApi = {
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
   monitor: () => call<{ joined: boolean }>("owner/monitor/", { owner: true }),
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { ...json("POST"), owner: true }),
+  /** The host's Mökki monitor boxes (backend/owners/monitor.py). */
+  monitors: () => call<MonitorRow[]>("owner/monitors/", { owner: true }),
+  monitorDevice: (id: number) => call<MonitorDetail>(`owner/monitors/${id}/`, { owner: true }),
+  claimMonitor: (serial: string, code: string, cottage: number | null) =>
+    call<MonitorRow>("owner/monitors/", { ...json("POST", { serial, code, cottage }), owner: true }),
+  updateMonitor: (id: number, fields: Partial<MonitorSettings> & { name?: string; cottage?: number | null }) =>
+    call<MonitorRow>(`owner/monitors/${id}/`, { ...json("PATCH", fields), owner: true }),
+  removeMonitor: (id: number) => call<Record<string, never>>(`owner/monitors/${id}/`, { ...json("DELETE"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
   updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>

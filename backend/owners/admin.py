@@ -17,7 +17,7 @@ from django.contrib import messages
 from . import booking_emails, invoicing, stripe_api
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, ExternalRating, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
-    Message, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Review, SignupPhoto,
+    Message, MonitorAlert, MonitorDevice, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Review, SignupPhoto,
 )
 
 
@@ -549,3 +549,28 @@ class ReviewAdmin(ModelAdmin):
     @display(description="guest")
     def guest(self, obj):
         return obj.conversation.guest_name
+
+
+class MonitorAlertInline(TabularInline):
+    model = MonitorAlert
+    extra = 0
+    fields = ["kind", "started_at", "ended_at", "value"]
+    readonly_fields = fields
+    can_delete = False
+    max_num = 0
+    ordering = ["-started_at"]
+
+
+@admin.register(MonitorDevice)
+class MonitorDeviceAdmin(ModelAdmin):
+    """Boxes are made with manage.py monitor new (it prints the claim code and secret once)."""
+
+    list_display = ["serial", "owner", "cottage", "last_seen_at", "firmware"]
+    search_fields = ["serial", "owner__name", "owner__email", "cottage__name"]
+    readonly_fields = ["serial", "last_seen_at", "last", "firmware", "claimed_at", "created_at"]
+    exclude = ["claim_code_hash", "secret_hash"]
+    autocomplete_fields = ["owner", "cottage"]
+    inlines = [MonitorAlertInline]
+
+    def has_add_permission(self, request):
+        return False

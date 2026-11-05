@@ -1,0 +1,18 @@
+# Every 15 minutes: Mökki monitors gone quiet, and cold cottages before guests arrive.
+# Relies on the management command `monitor` (backend/owners/management/commands/).
+[Unit]
+Description=Rantio: Mökki monitor check
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py monitor check
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path
 
 from config.admin_assets_view import admin_asset
-from owners import calendar_views, events, geocode, inbound, inbox, listing_links, listings, newsletter, portal, profile, reviews, site_icons
+from owners import calendar_views, events, monitor, geocode, inbound, inbox, listing_links, listings, newsletter, portal, profile, reviews, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
 
@@ -19,6 +19,9 @@ urlpatterns = [
     path("api/signups/email-code/", EmailCodeView.as_view(), name="owner-signup-email-code"),
     path("api/signups/<str:token>/card/", SignupCardView.as_view(), name="owner-signup-card"),
     path("api/monitor-waitlist/", MonitorInterestCreateView.as_view(), name="monitor-waitlist"),
+    path("api/monitor/readings/", monitor.ReadingsView.as_view(), name="monitor-readings"),
+    path("api/owner/monitors/", monitor.MonitorsView.as_view(), name="owner-monitors"),
+    path("api/owner/monitors/<int:pk>/", monitor.MonitorView.as_view(), name="owner-monitor"),
     path("api/newsletter/", newsletter.SubscribeView.as_view(), name="newsletter-subscribe"),
     path("api/newsletter/confirm/", newsletter.ConfirmView.as_view(), name="newsletter-confirm"),
     path("api/newsletter/unsubscribe/", newsletter.UnsubscribeView.as_view(), name="newsletter-unsubscribe"),
