@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { type ComponentRef, useEffect, useRef, useState } from "react";
 import { FlatList, Linking, Modal, Platform, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,7 +22,8 @@ import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
 import { RangeCalendar } from "@/ui/range-calendar";
-import { RatingsBlock } from "@/ui/ratings";
+import { RatingsBlock, STAR, useScore } from "@/ui/ratings";
+import { REVIEWS } from "@/i18n/messages/reviews";
 import { NO_RATINGS } from "@/lib/ratingsPreview";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
@@ -37,6 +38,9 @@ export default function Cottage() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [photo, setPhoto] = useState(0);
+  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const [ratingsY, setRatingsY] = useState(0);
+  const score = useScore();
   const [nearby, setNearby] = useState<NearbyPlace[] | null | "error">(null);
   const [showAll, setShowAll] = useState(false);
   const [booking, setBooking] = useState(false);
@@ -83,7 +87,7 @@ export default function Cottage() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.page }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
+      <ScrollView ref={scrollRef} contentContainerStyle={{ paddingBottom: 140 }}>
         <View>
           <FlatList
             data={photos}
@@ -131,16 +135,23 @@ export default function Cottage() {
           <Text v="small" style={{ marginTop: 4 }}>
             {[l.city, region ? regionLabel(region, l.country, lang) : null, country(l.country)].filter(Boolean).join(", ")}
           </Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm, marginTop: space.sm }}>
-            {l.rating ? (
+          {/* ★ and the score (or "New on Rantio"); tapping goes down to the Ratings box. */}
+          <Pressable
+            onPress={() => scrollRef.current?.scrollTo({ y: Math.max(0, ratingsY - space.lg), animated: true })}
+            accessibilityRole="link"
+            style={({ pressed }) => [styles.ratingLine, pressed && { opacity: 0.6 }]}
+          >
+            <Icon name="star" size={22} color={STAR} />
+            <Text v="h2">{NO_RATINGS.count ? score(NO_RATINGS.average ?? 0) : REVIEWS[lang].newOnRantio}</Text>
+            {NO_RATINGS.count ? (
               <>
-                <Icon name="star" size={14} />
-                <Text v="smallMedium">{l.rating.toFixed(1)}</Text>
+                <Text v="h2">·</Text>
+                <Text v="bodyMedium" style={{ textDecorationLine: "underline" }}>
+                  {p(REVIEWS[lang].count, NO_RATINGS.count)}
+                </Text>
               </>
-            ) : (
-              <Pill label={m.guest.card.isNew} tone="green" />
-            )}
-          </View>
+            ) : null}
+          </Pressable>
 
           <View style={styles.facts}>
             <Fact icon="people-outline" text={p(m.guest.units.guests, l.guests)} />
@@ -267,7 +278,9 @@ export default function Cottage() {
 
           <Divider />
           {/* Reviews come only from stays booked through Rantio; none here yet. */}
-          <RatingsBlock ratings={NO_RATINGS} host="" />
+          <View onLayout={(e) => setRatingsY(e.nativeEvent.layout.y)}>
+            <RatingsBlock ratings={NO_RATINGS} host="" />
+          </View>
 
           <Divider />
           <Text v="h2">{m.app.detail.know}</Text>
@@ -450,6 +463,7 @@ function Fact({ icon, text }: { icon: Parameters<typeof Icon>[0]["name"]; text: 
 const Divider = () => <View style={styles.divider} />;
 
 const styles = StyleSheet.create({
+  ratingLine: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: space.md, alignSelf: "flex-start" },
   topButtons: { position: "absolute", left: space.lg, right: space.lg, flexDirection: "row", justifyContent: "space-between" },
   heartWrap: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.94)", alignItems: "center", justifyContent: "center" },
   availability: { flexDirection: "row", alignItems: "center", gap: space.md },

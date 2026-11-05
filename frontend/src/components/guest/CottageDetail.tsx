@@ -21,6 +21,7 @@ import styles from "./guest.module.css";
 import SiteFooter from "../SiteFooter";
 import RatingsSection from "../Ratings";
 import { NO_RATINGS } from "@/lib/ratingsPreview";
+import { REVIEWS } from "@/i18n/messages/reviews";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
   const m = getMessages(lang);
@@ -75,14 +76,11 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
           <p>
             {l.place}, {country}
             <span aria-hidden="true"> · </span>
-            {l.rating ? (
-              <span className={styles.rating}>
-                <Star className={styles.icon16} />
-                {number(lang, l.rating, { min: 1, max: 1 })}
-              </span>
-            ) : (
-              <span className={styles.newTag}>{t.card.isNew}</span>
-            )}
+            {/* Only real review averages; before the first one, "New on Rantio". Goes to the Ratings box. */}
+            <a className={styles.rating} href="#ratings">
+              <Star className={styles.icon16} />
+              {l.rating ? number(lang, l.rating, { min: 1, max: 1 }) : REVIEWS[lang].newOnRantio}
+            </a>
           </p>
         </div>
 

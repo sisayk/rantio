@@ -1164,6 +1164,8 @@
   color: #f2a51a;
 }
 
+a.rating { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
 .newTag {
   flex: none;
   padding: 2px 9px;
