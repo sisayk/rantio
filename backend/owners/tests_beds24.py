@@ -51,6 +51,7 @@ class Beds24Tests(TestCase):
         sent = post[2][0]
         self.assertEqual((sent["name"], sent["currency"], sent["roomTypes"][0]["maxPeople"]), (self.c.name, "EUR", self.c.max_guests))
         self.assertNotIn("id", sent)
+        self.assertEqual((sent["propertyType"], sent["roomTypes"][0]["roomType"], sent["country"]), ("cottage", "holidayHome", "FI"))
         prices = next(s for s in fake.sent if s[1] == "/inventory/rooms/calendar")[2][0]
         self.assertEqual(prices["roomId"], 9001)
         self.assertEqual({r["price1"] for r in prices["calendar"]} >= {120.0, 150.0}, True)

@@ -374,7 +374,7 @@ BOOKING_ALERTS = env_bool("BOOKING_ALERTS", True)
 # nothing is sent.
 BEDS24_API = os.environ.get("BEDS24_API", "https://beds24.com/api/v2").rstrip("/")
 BEDS24_REFRESH_TOKEN = os.environ.get("BEDS24_REFRESH_TOKEN", "")
-BEDS24_PROPERTY_TYPE = os.environ.get("BEDS24_PROPERTY_TYPE", "")  # Beds24's own word for a holiday home, once known
+BEDS24_PROPERTY_TYPE = os.environ.get("BEDS24_PROPERTY_TYPE", "")  # empty: "cottage" (Beds24's list has it)
 
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_TAX_RATE_ID = os.environ.get("STRIPE_TAX_RATE_ID", "")

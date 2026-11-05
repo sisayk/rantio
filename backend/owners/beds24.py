@@ -98,20 +98,61 @@ def _failed(item) -> str:
 
 # ---------- what is sent ----------
 
+# Rantio's languages in Beds24's codes (Beds24 has one Norwegian, no Latvian).
+TEXT_LANGS = {"en": "en", "fi": "fi", "sv": "sv", "nb": "no", "da": "da", "is": "is", "et": "et", "lt": "lt", "de": "de"}
+
+
+def _quarter(t) -> str | None:
+    """A time as Beds24 takes it: HH:MM on a quarter hour."""
+    if not t:
+        return None
+    minutes = (t.hour * 60 + t.minute) // 15 * 15
+    return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+
 def property_payload(c: Cottage) -> dict:
-    room = {"name": c.name[:60], "qty": 1, "maxPeople": c.max_guests, "minStay": max(1, c.min_nights)}
+    """The cottage as one Beds24 property with one room (the whole cottage, let as one unit)."""
+    from .listings import descriptions_of
+
+    room = {
+        "name": c.name[:60],
+        "roomType": "holidayHome",
+        "qty": 1,
+        "maxPeople": c.max_guests,
+        "minStay": max(1, c.min_nights),
+        "rackRate": float(c.price_per_night),
+        "cleaningFee": float(c.cleaning_fee or 0),
+        "securityDeposit": float(c.security_deposit or 0),
+    }
+    if c.max_nights:
+        room["maxStay"] = c.max_nights
+    if c.floor_area:
+        room["roomSize"] = c.floor_area
     if c.beds24_room_id:
         room["id"] = c.beds24_room_id
     p = {
         "name": c.name,
+        "propertyType": settings.BEDS24_PROPERTY_TYPE or "cottage",
         "currency": c.currency,
         "address": c.address,
         "city": c.municipality,
         "country": c.country,
         "roomTypes": [room],
     }
-    if settings.BEDS24_PROPERTY_TYPE:
-        p["propertyType"] = settings.BEDS24_PROPERTY_TYPE
+    if c.latitude is not None and c.longitude is not None:
+        p["latitude"], p["longitude"] = float(c.latitude), float(c.longitude)
+    for key, value in (("checkInStart", _quarter(c.check_in_from)), ("checkInEnd", _quarter(c.check_in_until)), ("checkOutEnd", _quarter(c.check_out_by))):
+        if value:
+            p[key] = value
+    texts = []
+    for lang, text in descriptions_of(c).items():
+        if lang in TEXT_LANGS:
+            entry = {"language": TEXT_LANGS[lang], "propertyDescription": text}
+            if lang == "en" and c.house_rules:
+                entry["houseRules"] = c.house_rules
+            texts.append(entry)
+    if texts:
+        p["texts"] = texts
     if c.beds24_property_id:
         p["id"] = c.beds24_property_id
     return p
