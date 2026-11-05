@@ -151,10 +151,11 @@ export const ListingCard = memo(function ListingCard({ listing, width, compact =
           <Text v="h3" numberOfLines={1} style={{ flex: 1, fontSize: compact ? 15 : 16 }}>
             {listingName(m.listingNames, listing)}
           </Text>
-          {!compact && listing.rating ? (
+          {/* ★ and the real review average; "★ New" before the first review, as in Airbnb's app. */}
+          {!compact ? (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
               <Icon name="star" size={13} />
-              <Text v="smallMedium">{listing.rating.toFixed(1)}</Text>
+              <Text v="smallMedium">{listing.rating ? listing.rating.toFixed(1) : m.guest.card.isNew}</Text>
             </View>
           ) : null}
         </View>
@@ -176,7 +177,7 @@ export const ListingCard = memo(function ListingCard({ listing, width, compact =
               <Text v="smallMedium">{priceText}</Text> {m.guest.card.night}
             </>
           )}
-          {compact && listing.rating ? ` · ★ ${listing.rating.toFixed(1)}` : ""}
+          {compact ? ` · ★ ${listing.rating ? listing.rating.toFixed(1) : m.guest.card.isNew}` : ""}
         </Text>
       </Pressable>
     </View>

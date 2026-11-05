@@ -521,14 +521,11 @@ export default function GuestHome({ lang, t, catalog, names, common, countries, 
                 {listingName(names, l)}
               </a>
             </h3>
-            {l.rating ? (
-              <span className={styles.rating}>
-                <Star className={styles.icon16} />
-                {number(lang, l.rating, { min: 1, max: 1 })}
-              </span>
-            ) : (
-              <span className={styles.newTag}>{t.card.isNew}</span>
-            )}
+            {/* ★ and the real review average; "★ New" before the first review. */}
+            <span className={styles.rating}>
+              <Star className={styles.icon16} />
+              {l.rating ? number(lang, l.rating, { min: 1, max: 1 }) : t.card.isNew}
+            </span>
           </div>
           <p className={styles.cardPlace}>{placeLabel(l)}</p>
           <p className={styles.cardFacts}>
