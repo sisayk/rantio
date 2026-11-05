@@ -1,25 +1,48 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
+import { Alert, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listings";
+import { priceHint } from "@/lib/priceHints";
+import { WHEN } from "@/i18n/messages/when";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import { usePrefs } from "@/state/prefs";
 import { useSession } from "@/state/session";
 import { activeFilters, BEDROOM_CHOICES, COUNTRIES, type Filters, NO_FILTERS, search, type Sort } from "@/state/search";
-import { daysBetween, formatRange } from "@/text/dates";
-import { type T, useT } from "@/text/i18n";
+import { addMonths, daysBetween, formatDate, formatRange, todayISO } from "@/text/dates";
+import { type Lang, type T, useT } from "@/text/i18n";
 import { colors, fonts, radius, shadow, shadowFloat, space, textSize } from "@/theme";
-import { Chip, Stepper } from "@/ui/controls";
+import { Chip, Segmented, Stepper } from "@/ui/controls";
 import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
 import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
-type Stay = { start: string | null; end: string | null; adults: number; children: number };
-const NO_STAY: Stay = { start: null, end: null, adults: 0, children: 0 };
+type Length = "weekend" | "week" | "month";
+/** Exact dates (with a few days either way), or a flexible stay: a length in some months. */
+type Stay = {
+  start: string | null;
+  end: string | null;
+  adults: number;
+  children: number;
+  flexDays: number;
+  flex: { length: Length; months: string[] } | null;
+};
+const NO_STAY: Stay = { start: null, end: null, adults: 0, children: 0, flexDays: 0, flex: null };
+const FLEX_DAYS = [0, 1, 2, 3, 7];
+
+/** "12 – 14 Nov ± 2", "Week · Nov, Dec", or nothing chosen yet. */
+function whenLabel(lang: Lang, stay: Stay): string | null {
+  const w = WHEN[lang];
+  if (stay.flex) {
+    const months = stay.flex.months.map((mo) => formatDate(lang, `${mo}-01`, { month: "short" }));
+    return `${w.lengths[stay.flex.length]} · ${months.length ? months.join(", ") : w.anyTime}`;
+  }
+  if (stay.start && stay.end) return `${formatRange(lang, stay.start, stay.end)}${stay.flexDays ? ` ± ${stay.flexDays}` : ""}`;
+  return null;
+}
 
 type Section = { key: string; title: string; listings: Listing[]; query: string };
 
@@ -71,7 +94,7 @@ export default function Explore() {
 
   const summary = [
     f.query || null,
-    stay.start && stay.end ? formatRange(lang, stay.start, stay.end) : null,
+    whenLabel(lang, stay),
     f.guests ? p(m.guest.units.guests, f.guests) : null,
   ].filter(Boolean);
 
@@ -286,7 +309,7 @@ function SearchSheet({
   onSearch: (query: string, stay: Stay) => void;
 }) {
   const t = useT();
-  const { m, p, lang, country } = t;
+  const { m, p, f, lang, country } = t;
   const e = m.app.explore;
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<"where" | "when" | "who">("where");
@@ -310,7 +333,11 @@ function SearchSheet({
   }, [lang, country, query]);
 
   const guests = stay.adults + stay.children;
-  const dates = stay.start && stay.end ? formatRange(lang, stay.start, stay.end) : m.guest.datePicker.addDates;
+  const dates = whenLabel(lang, stay) ?? m.guest.datePicker.addDates;
+  const w = WHEN[lang];
+  const [mode, setMode] = useState<"dates" | "flexible">(value.stay.flex ? "flexible" : "dates");
+  const [legend, setLegend] = useState(false);
+  const nextMonths = useMemo(() => Array.from({ length: 12 }, (_, i) => addMonths(todayISO(), i).slice(0, 7)), []);
 
   return (
     <Modal
@@ -320,6 +347,8 @@ function SearchSheet({
       onShow={() => {
         setQuery(value.query);
         setStay(value.stay);
+        setMode(value.stay.flex ? "flexible" : "dates");
+        setLegend(false);
         setStep("where");
       }}
       onRequestClose={onClose}
@@ -381,27 +410,132 @@ function SearchSheet({
 
           {step === "when" ? (
             <View style={[styles.sheetCard, shadowFloat]}>
-              <Text v="title">{m.guest.datePicker.title}</Text>
-              {stay.start ? (
-                <Button
-                  small
-                  kind="ghost"
-                  label={m.guest.datePicker.clear}
-                  onPress={() => setStay((s) => ({ ...s, start: null, end: null }))}
-                  style={{ alignSelf: "flex-start", paddingHorizontal: 0 }}
-                />
-              ) : null}
-              <RangeCalendar
-                lang={lang}
-                start={stay.start}
-                end={stay.end}
-                onChange={(a, b) => {
-                  setStay((s) => ({ ...s, start: a, end: b }));
-                  // Both dates picked: on to the guests, as in Airbnb's search.
-                  if (a && b) setTimeout(() => setStep("who"), 350);
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text v="title" style={{ flex: 1 }}>
+                  {w.title}
+                </Text>
+                {mode === "dates" ? (
+                  <IconButton name="information-circle-outline" filled={false} label={w.howItWorks} onPress={() => setLegend((v) => !v)} />
+                ) : null}
+              </View>
+              <Segmented
+                value={mode}
+                options={[
+                  { value: "dates", label: w.dates },
+                  { value: "flexible", label: w.flexible },
+                ]}
+                onChange={(v) => {
+                  setMode(v);
+                  setLegend(false);
+                  setStay((s) =>
+                    v === "flexible"
+                      ? { ...s, start: null, end: null, flexDays: 0, flex: s.flex ?? { length: "weekend", months: [] } }
+                      : { ...s, flex: null },
+                  );
                 }}
-                months={12}
               />
+              {legend && mode === "dates" ? (
+                <View style={styles.legend}>
+                  <View style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: "#1e7a3c" }]} />
+                    <Text v="body" style={{ flex: 1 }}>
+                      {w.lower}
+                    </Text>
+                    <Pressable onPress={() => setLegend(false)} hitSlop={10} accessibilityRole="button" accessibilityLabel={m.guest.contact.close}>
+                      <Icon name="close" size={20} />
+                    </Pressable>
+                  </View>
+                  <View style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: colors.error }]} />
+                    <Text v="body">{w.higher}</Text>
+                  </View>
+                  <Pressable onPress={() => Alert.alert(w.howItWorks, w.howItWorksBody)} accessibilityRole="link">
+                    <Text v="small" style={{ textDecorationLine: "underline" }}>
+                      {w.howItWorks}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null}
+              {mode === "dates" ? (
+                <>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+                    {FLEX_DAYS.map((n) => (
+                      <Chip
+                        key={n}
+                        label={n === 0 ? w.exact : n === 1 ? w.plusMinus1 : f(w.plusMinus, { n })}
+                        on={stay.flexDays === n}
+                        onPress={() => setStay((s) => ({ ...s, flexDays: n }))}
+                      />
+                    ))}
+                  </ScrollView>
+                  {stay.start ? (
+                    <Button
+                      small
+                      kind="ghost"
+                      label={m.guest.datePicker.clear}
+                      onPress={() => setStay((s) => ({ ...s, start: null, end: null }))}
+                      style={{ alignSelf: "flex-start", paddingHorizontal: 0 }}
+                    />
+                  ) : null}
+                  <RangeCalendar
+                    lang={lang}
+                    start={stay.start}
+                    end={stay.end}
+                    hint={priceHint}
+                    onChange={(a, b) => {
+                      setStay((s) => ({ ...s, start: a, end: b }));
+                      // Both dates picked: on to the guests, as in Airbnb's search.
+                      if (a && b) setTimeout(() => setStep("who"), 350);
+                    }}
+                    months={12}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text v="h3" style={{ marginTop: space.sm }}>
+                    {w.howLong}
+                  </Text>
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+                    {(["weekend", "week", "month"] as const).map((len) => (
+                      <Chip
+                        key={len}
+                        label={w.lengths[len]}
+                        on={stay.flex?.length === len}
+                        onPress={() => setStay((s) => ({ ...s, flex: { length: len, months: s.flex?.months ?? [] } }))}
+                      />
+                    ))}
+                  </View>
+                  <View style={styles.flexRule} />
+                  <Text v="h3">{stay.flex?.months.length ? w.goIn : w.goAnytime}</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingRight: space.md }}>
+                    {nextMonths.map((mo) => {
+                      const on = !!stay.flex?.months.includes(mo);
+                      return (
+                        <Pressable
+                          key={mo}
+                          onPress={() => {
+                            tap();
+                            setStay((s) => {
+                              const months = s.flex?.months ?? [];
+                              const next = on ? months.filter((x) => x !== mo) : [...months, mo].sort();
+                              return { ...s, flex: { length: s.flex?.length ?? "weekend", months: next } };
+                            });
+                          }}
+                          style={[styles.monthCard, on && styles.monthCardOn]}
+                          accessibilityRole="checkbox"
+                          accessibilityState={{ checked: on }}
+                        >
+                          <Icon name="calendar-outline" size={34} color={on ? colors.ink : colors.soft} />
+                          <Text v="h3" style={{ textTransform: "capitalize" }}>
+                            {formatDate(lang, `${mo}-01`, { month: "long" })}
+                          </Text>
+                          <Text v="small">{mo.slice(0, 4)}</Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </>
+              )}
             </View>
           ) : (
             <Collapsed label={e.when} value={dates} onPress={() => setStep("when")} />
@@ -584,6 +718,26 @@ const styles = StyleSheet.create({
   sectionHead: { flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.xl, marginBottom: space.md },
   hostBand: { flexDirection: "row", gap: space.lg, alignItems: "center", marginHorizontal: space.xl, marginTop: space.xxl },
   sheetCard: { backgroundColor: "#fff", borderRadius: 28, padding: space.xl, gap: space.md },
+  legend: {
+    position: "absolute",
+    top: 64,
+    right: space.lg,
+    zIndex: 5,
+    gap: space.sm,
+    padding: space.lg,
+    borderRadius: radius.lg,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.16,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  legendRow: { flexDirection: "row", alignItems: "center", gap: space.sm, minWidth: 170 },
+  legendDot: { width: 10, height: 10, borderRadius: 5 },
+  flexRule: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line, marginVertical: space.sm },
+  monthCard: { width: 128, alignItems: "center", gap: 4, paddingVertical: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.line, backgroundColor: "#fff" },
+  monthCardOn: { borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.ground },
   destInput: {
     flexDirection: "row",
     alignItems: "center",

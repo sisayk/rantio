@@ -17,6 +17,8 @@ type Props = {
   takenNight?: (day: string) => boolean;
   months?: number;
   firstMonth?: string;
+  /** Usually cheaper or pricier nights, tinted green and red as on Airbnb (lib/priceHints). */
+  hint?: (day: string) => "low" | "high" | null;
 };
 
 export function monthDays(month: string): (string | null)[] {
@@ -32,7 +34,7 @@ export function monthDays(month: string): (string | null)[] {
   return days;
 }
 
-export function RangeCalendar({ lang, start, end, onChange, takenNight = () => false, months = 12, firstMonth }: Props) {
+export function RangeCalendar({ lang, start, end, onChange, takenNight = () => false, months = 12, firstMonth, hint }: Props) {
   const today = todayISO();
   const from = monthStart(firstMonth ?? today);
   const weekdays = useMemo(() => weekdayNames(lang), [lang]);
@@ -77,6 +79,7 @@ export function RangeCalendar({ lang, start, end, onChange, takenNight = () => f
           end={end}
           lastDeparture={lastDeparture}
           takenNight={takenNight}
+          hint={hint}
           onPick={pick}
         />
       ))}
@@ -92,6 +95,7 @@ const Month = memo(function Month({
   end,
   lastDeparture,
   takenNight,
+  hint,
   onPick,
 }: {
   lang: Lang;
@@ -101,6 +105,7 @@ const Month = memo(function Month({
   end: string | null;
   lastDeparture: string | null;
   takenNight: (d: string) => boolean;
+  hint?: (d: string) => "low" | "high" | null;
   onPick: (d: string) => void;
 }) {
   const days = monthDays(month);
@@ -118,6 +123,7 @@ const Month = memo(function Month({
           const isStart = day === start;
           const isEnd = day === end;
           const inside = !!start && !!end && day > start && day < end;
+          const tint = !disabled && hint ? hint(day) : null;
           return (
             <Pressable
               key={day}
@@ -131,10 +137,10 @@ const Month = memo(function Month({
               {(inside || (isStart && end) || isEnd) && (
                 <View style={[styles.band, isStart && { left: "50%" }, isEnd && { right: "50%" }]} />
               )}
-              <View style={[styles.day, (isStart || isEnd) && styles.dayOn]}>
+              <View style={[styles.day, tint && !inside && !isStart && !isEnd && styles[tint], (isStart || isEnd) && styles.dayOn]}>
                 <Text
                   v="smallMedium"
-                  color={isStart || isEnd ? "#fff" : disabled ? colors.faint : colors.ink}
+                  color={isStart || isEnd ? "#fff" : disabled ? colors.faint : tint && !inside ? TINT_TEXT[tint] : colors.ink}
                   style={disabled && !past ? { textDecorationLine: "line-through" } : undefined}
                 >
                   {parseISO(day).getDate()}
@@ -156,4 +162,8 @@ const styles = StyleSheet.create({
   band: { position: "absolute", top: 4, bottom: 4, left: 0, right: 0, backgroundColor: colors.greenTint },
   day: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   dayOn: { backgroundColor: colors.green },
+  low: { backgroundColor: "#e6f4ea" },
+  high: { backgroundColor: "#fdecea" },
 });
+
+const TINT_TEXT = { low: "#1e7a3c", high: colors.error } as const;
