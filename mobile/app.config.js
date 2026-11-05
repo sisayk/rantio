@@ -5,8 +5,19 @@
 // Firebase's google-services.json (Android push notifications) is used when it's in mobile/.
 const fs = require("fs");
 const path = require("path");
+const { withGradleProperties } = require("expo/config-plugins");
 
-module.exports = ({ config: base }) => {
+// Release builds' R8 step runs out of memory with Gradle's 2 GB and stalls for an hour: give it 4 GB.
+const withGradleMemory = (config) =>
+  withGradleProperties(config, (c) => {
+    c.modResults = c.modResults.filter((p) => !(p.type === "property" && p.key === "org.gradle.jvmargs"));
+    c.modResults.push({ type: "property", key: "org.gradle.jvmargs", value: "-Xmx4096m -XX:MaxMetaspaceSize=1024m" });
+    return c;
+  });
+
+module.exports = (ctx) => withGradleMemory(rantioConfig(ctx));
+
+function rantioConfig({ config: base }) {
   const firebase = fs.existsSync(path.join(__dirname, "google-services.json"));
   const config = firebase ? { ...base, android: { ...base.android, googleServicesFile: "./google-services.json" } } : base;
   const key = process.env.GOOGLE_MAPS_ANDROID_KEY;
@@ -23,4 +34,4 @@ module.exports = ({ config: base }) => {
     // Expo leaves android.config out of the settings the app can read, so the app is told by a flag.
     extra: { ...(config.extra ?? {}), googleMapsAndroid: true },
   };
-};
+}
