@@ -8,6 +8,7 @@ import { colors, radius, shadowFloat, space } from "@/theme";
 import { Avatar, Button, Icon, Logo, Text, Wordmark } from "@/ui/kit";
 import { SwitchPill, TabScreen } from "@/ui/screen";
 import { AboutRows, SettingsRows } from "@/ui/settings";
+import { DeleteAccountButton } from "@/ui/account";
 
 export default function Profile() {
   const { m } = useT();
@@ -41,6 +42,7 @@ export default function Profile() {
                 onPress={() => void signOut()}
                 style={{ marginTop: space.sm }}
               />
+              <DeleteAccountButton />
             </>
           ) : (
             <>

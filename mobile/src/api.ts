@@ -179,6 +179,8 @@ export const ownerApi = {
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { ...json("POST"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
+  /** Deletes the signed-in account (owners/account.py). */
+  deleteAccount: () => call<{ deleted: string }>("owner/me/", { ...json("DELETE"), owner: true }),
   summary: (year?: number) => call<Summary>(`owner/summary/${year ? `?year=${year}` : ""}`, { owner: true }),
   bookings: (year: number) => call<{ results: BookingRow[] }>(`owner/bookings/?year=${year}`, { owner: true }),
   conversations: () => call<{ results: ConversationRow[]; unread: number }>("owner/conversations/", { owner: true }),

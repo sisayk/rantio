@@ -38,6 +38,8 @@ type Session = {
   /** Signed in by the sign-up form (its email was checked with a code). */
   signedUp: (key: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Deletes the account on the server, then forgets it on this phone. */
+  deleteAccount: () => Promise<void>;
 };
 
 const Ctx = createContext<Session | null>(null);
@@ -115,6 +117,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signedUp: keep,
       signOut: async () => {
         await ownerApi.logout().catch(() => undefined);
+        await forget();
+      },
+      deleteAccount: async () => {
+        await ownerApi.deleteAccount();
         await forget();
       },
     }),

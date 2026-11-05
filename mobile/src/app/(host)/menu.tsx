@@ -6,6 +6,7 @@ import { useHost } from "@/state/host";
 import { usePrefs } from "@/state/prefs";
 import { pushState, type PushState, registerForPush } from "@/state/push";
 import { useSession } from "@/state/session";
+import { DeleteAccountButton } from "@/ui/account";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { Avatar, Button, Card, Row, Section, Text } from "@/ui/kit";
@@ -99,6 +100,12 @@ export default function Menu() {
             onPress={async () => {
               setMode("travelling");
               await signOut();
+              router.replace("/explore");
+            }}
+          />
+          <DeleteAccountButton
+            onDeleted={() => {
+              setMode("travelling");
               router.replace("/explore");
             }}
           />

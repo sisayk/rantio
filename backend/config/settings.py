@@ -195,6 +195,9 @@ TRANSLATE_IN_BACKGROUND = os.environ.get("TRANSLATE_IN_BACKGROUND", "1") == "1"
 
 # Where new sign-up notifications go (Sisay and Juha).
 SIGNUP_NOTIFY_EMAILS = env_list("SIGNUP_NOTIFY_EMAILS")
+# Apple App Review: this address signs in with this code, no email sent (owners/account.py).
+APP_REVIEW_EMAIL = os.environ.get("APP_REVIEW_EMAIL", "")
+APP_REVIEW_CODE = os.environ.get("APP_REVIEW_CODE", "")
 
 # Owner sign-in besides the emailed code (owners/social.py, owners/sms.py). Each one is
 # offered only when it's set up:

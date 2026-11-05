@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import app
+from . import account, app
 from . import login as owner_login
 from . import email_check, messaging, social, sms
 from .models import AppDevice, Language, MonitorInterest
@@ -133,9 +133,11 @@ class RequestCodeView(APIView):
         data = EmailSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         body = {"sent": True}
+        email = data.validated_data["email"]
+        if email and account.is_review_email(email):
+            return Response(body)  # App Review: the code is in App Store Connect, no email
         owner = _owner_for(data.validated_data)
         via = "sms" if data.validated_data["phone"] else "email"
-        email = data.validated_data["email"]
         if not owner and email and email_check.can_send(email):
             # Someone new: the code checks the address, and signing in with it makes their account.
             # (Phone numbers only sign in existing accounts: texts cost money and invite abuse.)
@@ -170,6 +172,11 @@ class VerifyCodeView(APIView):
         data = CodeSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         v = data.validated_data
+        if v["email"] and account.is_review_email(v["email"]):
+            owner = account.review_sign_in(v["email"], v["code"])
+            if not owner:
+                return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
+            return _signed_in(request, owner, v)
         owner = _owner_for(v)
         if owner:
             if not owner_login.check_code(owner, v["code"]):
@@ -191,6 +198,10 @@ class MeView(APIView):
         o = request.user.owner
         return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot,
                          "is_host": o.is_host})
+
+    def delete(self, request):
+        """Deletes the account (Settings → Delete account); see owners/account.py."""
+        return Response(account.handle_delete(request))
 
     def patch(self, request):
         """The app's language setting also sets the language of the owner's emails."""
