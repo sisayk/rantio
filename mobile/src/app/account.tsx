@@ -27,7 +27,7 @@ export default function Account() {
   const router = useRouter();
   const [name, setName] = useState(owner?.name ?? "");
   const [phone, setPhone] = useState(owner?.phone ?? "");
-  const [det, setDet] = useState<OwnerDetails | null>(owner?.details ?? null);
+  const [det, setDet] = useState<OwnerDetails | null>(withDefaults(owner?.details));
   const [iban, setIban] = useState("");
   const [tin, setTin] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -46,6 +46,21 @@ export default function Account() {
       .catch(() => setPayment({ available: false, method: null }));
   }, [owner?.is_host]);
   useFocusEffect(loadPayment);
+
+  // The saved profile can be from an older version; read the current details once on opening.
+  const [fresh, setFresh] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (fresh || !owner) return;
+      ownerApi
+        .me()
+        .then((me) => {
+          setFresh(true);
+          if (me.details) setDet(withDefaults(me.details));
+        })
+        .catch(() => {});
+    }, [fresh, owner]),
+  );
 
   if (!owner) {
     return (
@@ -69,7 +84,7 @@ export default function Account() {
         details = { ...rest, ...(iban.trim() ? { payout_iban: iban } : {}), ...(tin.trim() ? { tax_id: tin } : {}) };
       }
       const me = await ownerApi.updateMe({ name: name.trim(), phone: phone.trim(), details });
-      if (me.details) setDet(me.details);
+      if (me.details) setDet(withDefaults(me.details));
       setIban("");
       setTin("");
       await refresh();
@@ -416,3 +431,15 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
   },
 });
+
+/** A profile saved by an older app (or server) lacks the newer lists; give them safe empty values. */
+function withDefaults(d: OwnerDetails | null | undefined): OwnerDetails | null {
+  if (!d) return null;
+  return {
+    ...d,
+    missing: d.missing ?? [],
+    beneficial_owners: d.beneficial_owners ?? [],
+    reservations_contact: d.reservations_contact ?? {},
+    postal_same: d.postal_same ?? true,
+  };
+}
