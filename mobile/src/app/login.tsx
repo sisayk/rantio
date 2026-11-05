@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useRouter } from "expo-router";
@@ -33,8 +34,9 @@ const LANG_COUNTRY: Record<string, string> = { fi: "FI", sv: "SE", nb: "NO", nn:
 // ID as the server client, the ID token is made for the same audience the website uses.
 const GOOGLE_IOS_CLIENT = "42238401416-vs5r0jc5usqt7h5r8ifb5dnnqrcg9enl.apps.googleusercontent.com";
 const GOOGLE_WEB_CLIENT = "42238401416-d9tgb4953a1tova813mof3mgprosvt6l.apps.googleusercontent.com";
-// Android needs its own client (the app's signing fingerprint) first; until then iPhone only.
-const GOOGLE_HERE = Platform.OS === "ios";
+// Android also needs its own client in the same project (package fi.rantio.app and the signing
+// key's SHA-1); app.json's extra.googleSignInAndroid says it exists.
+const GOOGLE_HERE = Platform.OS === "ios" || (Platform.OS === "android" && Constants.expoConfig?.extra?.googleSignInAndroid === true);
 if (GOOGLE_HERE) GoogleSignin.configure({ iosClientId: GOOGLE_IOS_CLIENT, webClientId: GOOGLE_WEB_CLIENT });
 
 /** Owner sign-in: Apple (on iPhone), Google, or a six-digit code by email or SMS. No password. */

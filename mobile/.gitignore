@@ -44,3 +44,6 @@ example
 
 # local backend address
 .env
+
+# Firebase (Android push); lives only on the Mac that builds
+google-services.json
