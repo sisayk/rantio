@@ -6,7 +6,7 @@ import Constants from "expo-constants";
 import * as Leaflet from "./mapsLeaflet";
 import * as Native from "./mapsNative";
 
-const google = !!Constants.expoConfig?.android?.config?.googleMaps?.apiKey;
+const google = Constants.expoConfig?.extra?.googleMapsAndroid === true;
 
 export const CottagesMap = google ? Native.CottagesMap : Leaflet.CottagesMap;
 export const PinMap = google ? Native.PinMap : Leaflet.PinMap;
