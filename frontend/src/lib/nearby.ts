@@ -39,6 +39,12 @@ const KINDS: RegExp[] = [
 ];
 const PER_KIND = 2;
 
+/** Wikimedia refuses requests without a real app name ("Please set a user-agent", HTTP 403), and
+ *  Android's network library sends only "okhttp/…". The apps name themselves; a browser sends its
+ *  own name and may not change it, so on the website this stays empty. Use these for the photos too. */
+const IN_APP = typeof navigator !== "undefined" && navigator.product === "ReactNative";
+export const WIKI_HEADERS: Record<string, string> = IN_APP ? { "User-Agent": "Rantio/1.0 (https://rantio.fi; info@rantio.fi)" } : {};
+
 export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: number) {
   const r = (d: number) => (d * Math.PI) / 180;
   const h =
@@ -93,7 +99,7 @@ async function search(wiki: string, lat: number, lng: number, signal: AbortSigna
     pithumbsize: "240",
     colimit: "max",
   });
-  const res = await fetch(`https://${wiki}.wikipedia.org/w/api.php?${params}`, { signal });
+  const res = await fetch(`https://${wiki}.wikipedia.org/w/api.php?${params}`, { signal, headers: WIKI_HEADERS });
   if (!res.ok) throw new Error(`Wikipedia ${res.status}`);
   const data: { query?: { pages?: WikiPage[] }; error?: { code: string } } = await res.json();
   if (data.error) throw new Error(`Wikipedia ${data.error.code}`); // e.g. "too busy"

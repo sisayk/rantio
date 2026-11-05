@@ -8,7 +8,7 @@ import { API_URL, SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
-import { findNearby, type NearbyPlace } from "@/lib/nearby";
+import { findNearby, type NearbyPlace, WIKI_HEADERS } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import { useMoney } from "@/state/money";
@@ -255,7 +255,7 @@ export default function Cottage() {
               <View style={{ width: space.xl - space.md }} />
               {nearby.map((n) => (
                 <Pressable key={n.key} onPress={() => Linking.openURL(n.url)} style={styles.nearby} accessibilityRole="link">
-                  {n.thumb ? <Image source={{ uri: n.thumb }} style={styles.nearbyPhoto} contentFit="cover" /> : <View style={[styles.nearbyPhoto, { backgroundColor: colors.greenTint }]} />}
+                  {n.thumb ? <Image source={{ uri: n.thumb, headers: WIKI_HEADERS }} style={styles.nearbyPhoto} contentFit="cover" /> : <View style={[styles.nearbyPhoto, { backgroundColor: colors.greenTint }]} />}
                   <View style={{ padding: space.md, gap: 2 }}>
                     <Text v="h3" numberOfLines={1}>
                       {n.title}
