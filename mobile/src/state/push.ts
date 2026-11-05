@@ -8,7 +8,7 @@ import * as Notifications from "expo-notifications";
 import { AndroidImportance } from "expo-notifications";
 import { Platform } from "react-native";
 
-import { ApiError, guestApi, ownerApi } from "@/api";
+import { guestApi, ownerApi } from "@/api";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -68,33 +68,6 @@ export async function registerForPush(ask = false): Promise<PushState> {
   const token = (await Notifications.getExpoPushTokenAsync({ projectId: id })).data;
   await ownerApi.setPushToken(token);
   return "on";
-}
-
-/**
- * Account settings → "Send a test notification": registers this phone again and has the
- * server push to it, then says plainly what went wrong, if anything.
- */
-export async function testPush(title: string, body: string): Promise<{ ok: true } | { ok: false; why: "off" | "noToken" | "failed" | "limit"; error?: string }> {
-  const id = projectId();
-  if (!Device.isDevice || !id) return { ok: false, why: "noToken", error: "no project id" };
-  await ensureChannel();
-  const { status } = await Notifications.getPermissionsAsync();
-  if (status !== "granted") return { ok: false, why: "off" };
-  let token: string;
-  try {
-    token = (await Notifications.getExpoPushTokenAsync({ projectId: id })).data;
-  } catch (e) {
-    return { ok: false, why: "noToken", error: e instanceof Error ? e.message : String(e) };
-  }
-  await ownerApi.setPushToken(token);
-  const r = await ownerApi.testPush(title, body).catch((e: unknown) => ({
-    ok: false as const,
-    step: e instanceof ApiError && e.status === 429 ? "limit" : "send",
-    error: e instanceof Error ? e.message : String(e),
-  }));
-  if (r.ok) return { ok: true };
-  if (r.step === "limit") return { ok: false, why: "limit" };
-  return { ok: false, why: r.step === "no_token" ? "noToken" : "failed", error: r.error || r.step };
 }
 
 /**

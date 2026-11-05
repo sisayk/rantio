@@ -4,8 +4,7 @@ import { ActionSheetIOS, Alert, Linking, Platform, Pressable, StyleSheet, Switch
 
 import { mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
-import { PUSH_TEST } from "@/i18n/messages/pushTest";
-import { pushState, type PushState, registerForPush, testPush, turnPushOff } from "@/state/push";
+import { pushState, type PushState, registerForPush, turnPushOff } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { DeleteAccountButton } from "@/ui/account";
@@ -501,20 +500,8 @@ function Taxes({ form }: { form: Form }) {
 }
 
 function Notifications() {
-  const { m, lang, f } = useT();
-  const t = PUSH_TEST[lang];
+  const { m } = useT();
   const [push, setPush] = useState<PushState | null>(null);
-  const [testing, setTesting] = useState(false);
-  const sendTest = async () => {
-    setTesting(true);
-    const r = await testPush(t.title, t.body);
-    setTesting(false);
-    if (r.ok) return Alert.alert(t.button, t.sent);
-    if (r.why === "off") return Alert.alert(t.button, t.off);
-    if (r.why === "limit") return Alert.alert(t.button, t.limit);
-    // The reason in the message, where Android shows all of it (a title is cut after two lines).
-    Alert.alert(t.button, f(r.why === "noToken" ? t.noToken : t.failed, { error: r.error ?? "" }));
-  };
   useFocusEffect(
     useCallback(() => {
       pushState()
@@ -545,9 +532,6 @@ function Notifications() {
           )
         }
       />
-      {push === "on" ? (
-        <Button small kind="secondary" icon="notifications-outline" label={t.button} busy={testing} onPress={sendTest} style={{ alignSelf: "flex-start", marginTop: space.sm }} />
-      ) : null}
     </>
   );
 }
