@@ -101,7 +101,6 @@ export default function ListingPreview({
     data.events_allowed ? p.eventsYes : p.eventsNo,
     data.quiet_hours ? fill(lang, p.quiet, { hours: data.quiet_hours }) : null,
     data.min_age ? fill(lang, p.minAge, { n: data.min_age }) : null,
-    isPolicy(data.cancellation_policy) ? `${CANCELLATION[lang].title}: ${CANCELLATION[lang].names[data.cancellation_policy]}. ${CANCELLATION[lang].rules[data.cancellation_policy]}` : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -183,11 +182,20 @@ export default function ListingPreview({
             ) : null}
             <div className={s.previewSection}>
               <h2>{p.rules}</h2>
-              <ul className={s.amenityList}>
+              <ul className={s.ruleList}>
                 {ruleLines.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
+              {isPolicy(data.cancellation_policy) ? (
+                <div className={s.rulePolicy}>
+                  <h3>
+                    {CANCELLATION[lang].title} · {CANCELLATION[lang].names[data.cancellation_policy]}
+                  </h3>
+                  <p>{CANCELLATION[lang].rules[data.cancellation_policy]}</p>
+                  <p className={s.muted}>{CANCELLATION[lang].late[data.cancellation_policy]}</p>
+                </div>
+              ) : null}
               {[data.house_rules, data.sauna_instructions, data.fireplace_instructions, data.waste_instructions].filter(Boolean).map((x) => (
                 <p key={x}>{x}</p>
               ))}

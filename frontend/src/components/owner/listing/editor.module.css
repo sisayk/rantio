@@ -780,3 +780,10 @@ h4.subhead { margin-top: 6px; font-size: 15px; }
 .policy input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--o-green); flex: none; }
 .policy:focus-within { outline: 2px solid var(--o-green); outline-offset: 2px; }
 .policyText { display: grid; gap: 3px; font-size: 15px; line-height: 1.45; }
+
+/* The preview's house rules: plain lines in two columns (one on phones), then the cancellation policy. */
+.ruleList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; margin: 0; padding: 0; list-style: none; line-height: 1.45; }
+.rulePolicy { display: grid; gap: 4px; margin-top: 16px; }
+.rulePolicy h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.rulePolicy p { margin: 0; }
+@media (max-width: 600px) { .ruleList { grid-template-columns: 1fr; } }
