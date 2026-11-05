@@ -3,6 +3,7 @@
     manage.py beds24 check            # does the connection work?
     manage.py beds24 push 12          # send cottage 12 and its prices
     manage.py beds24 push 12 --dry-run   # show what would be sent, send nothing
+    manage.py beds24 push 12 --property-only   # the property alone, no prices (a test)
     manage.py beds24                  # daily: fresh prices for every cottage already in Beds24
                                       # (this also keeps the refresh token in use)
 """
@@ -22,8 +23,9 @@ class Command(BaseCommand):
         parser.add_argument("action", nargs="?", default="daily", choices=["check", "push", "daily"])
         parser.add_argument("cottage", nargs="?", type=int)
         parser.add_argument("--dry-run", action="store_true")
+        parser.add_argument("--property-only", action="store_true", help="Send the property and room but no prices.")
 
-    def handle(self, action, cottage=None, dry_run=False, **_):
+    def handle(self, action, cottage=None, dry_run=False, property_only=False, **_):
         try:
             if action == "check":
                 self.stdout.write(beds24.check())
@@ -48,7 +50,7 @@ class Command(BaseCommand):
                 ranges = beds24.price_ranges(c)
                 self.stdout.write(json.dumps({"property": beds24.property_payload(c), "prices": ranges[:6], "price_runs": len(ranges)}, indent=2, ensure_ascii=False))
                 return
-            self.stdout.write(beds24.sync(c))
+            self.stdout.write(beds24.sync(c, prices=not property_only))
         except Cottage.DoesNotExist as e:
             raise CommandError(f"No cottage {cottage}.") from e
         except beds24.Beds24Error as e:

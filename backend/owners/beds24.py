@@ -203,6 +203,9 @@ def push_prices(c: Cottage) -> int:
     if not c.beds24_room_id:
         raise Beds24Error("Send the cottage itself first.")
     ranges = price_ranges(c)
+    # Never a free night on Airbnb or Booking.com: every night needs a real price.
+    if not ranges or any(r["price1"] <= 0 for r in ranges):
+        raise Beds24Error("Some nights have no price (0). Set the cottage's nightly price in Rantio first; nothing was sent.")
     items = _items(call("POST", "/inventory/rooms/calendar", body=[{"roomId": c.beds24_room_id, "calendar": ranges}]))
     for item in items:
         if why := _failed(item):
@@ -210,10 +213,17 @@ def push_prices(c: Cottage) -> int:
     return len(ranges)
 
 
-def sync(c: Cottage) -> str:
-    """Sends the cottage and its prices. Keeps the outcome on the cottage for the admin."""
+def sync(c: Cottage, *, prices: bool = True) -> str:
+    """Sends the cottage and its prices. Keeps the outcome on the cottage for the admin.
+    Without a nightly price nothing is sent at all (prices=False sends the property alone, for a test)."""
     try:
+        if prices and c.price_per_night <= 0:
+            raise Beds24Error("The cottage has no nightly price yet. Set it in Rantio first; nothing was sent.")
         pid, rid = push_property(c)
+        if not prices:
+            c.beds24_synced_at, c.beds24_error = timezone.now(), ""
+            c.save(update_fields=["beds24_synced_at", "beds24_error"])
+            return f"{c.name}: property {pid}, room {rid} (no prices sent)"
         runs = push_prices(c)
     except Beds24Error as e:
         c.beds24_error = str(e)[:500]

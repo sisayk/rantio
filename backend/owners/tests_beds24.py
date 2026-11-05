@@ -85,3 +85,16 @@ class Beds24Tests(TestCase):
         self.assertFalse(beds24.enabled())
         with self.assertRaises(beds24.Beds24Error):
             beds24.token()
+
+    def test_a_cottage_without_a_price_is_never_sent(self):
+        self.c.price_per_night = Decimal("0.00")
+        self.c.weekend_price = None
+        self.c.save()
+        fake = FakeBeds24()
+        with mock.patch.object(beds24, "_request", fake), self.assertRaises(beds24.Beds24Error):
+            beds24.sync(self.c)
+        self.assertEqual([s for s in fake.sent if s[1] != "/authentication/token"], [])
+        # For a test the property alone can go, still without any price.
+        with mock.patch.object(beds24, "_request", fake):
+            self.assertIn("no prices sent", beds24.sync(self.c, prices=False))
+        self.assertFalse(any(s[1] == "/inventory/rooms/calendar" for s in fake.sent))
