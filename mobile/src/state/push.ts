@@ -1,6 +1,7 @@
 // Push notifications. Owners: new bookings, guest messages and booking requests. Guests:
 // the owner's answer in a conversation they follow in the app. The server sends them
 // through Expo's push service to the token we register here.
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -33,10 +34,21 @@ async function ensureChannel() {
   }
 }
 
+/** The owner switched notifications off on this phone (Account settings): don't register it. */
+const OFF_KEY = "rantio.pushOff";
+const isOff = () => AsyncStorage.getItem(OFF_KEY).then((v) => v === "1").catch(() => false);
+
+/** Account settings' switch, off: the server stops pushing to this phone. */
+export async function turnPushOff(): Promise<PushState> {
+  await AsyncStorage.setItem(OFF_KEY, "1").catch(() => undefined);
+  await ownerApi.setPushToken("");
+  return "off";
+}
+
 export async function pushState(): Promise<PushState> {
   if (!Device.isDevice || !projectId()) return "unavailable";
   const { status, canAskAgain } = await Notifications.getPermissionsAsync();
-  if (status === "granted") return "on";
+  if (status === "granted") return (await isOff()) ? "off" : "on";
   return canAskAgain ? "off" : "blocked";
 }
 
@@ -47,6 +59,8 @@ export async function pushState(): Promise<PushState> {
 export async function registerForPush(ask = false): Promise<PushState> {
   const id = projectId();
   if (!Device.isDevice || !id) return "unavailable";
+  if (ask) await AsyncStorage.removeItem(OFF_KEY).catch(() => undefined); // switched on again
+  else if (await isOff()) return "off";
   await ensureChannel();
   let { status, canAskAgain } = await Notifications.getPermissionsAsync();
   if (status !== "granted" && ask && canAskAgain) ({ status, canAskAgain } = await Notifications.requestPermissionsAsync());

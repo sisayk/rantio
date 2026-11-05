@@ -5,7 +5,7 @@ import { ActionSheetIOS, Alert, Linking, Platform, Pressable, StyleSheet, Switch
 import { mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
 import { PUSH_TEST } from "@/i18n/messages/pushTest";
-import { pushState, type PushState, registerForPush, testPush } from "@/state/push";
+import { pushState, type PushState, registerForPush, testPush, turnPushOff } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { DeleteAccountButton } from "@/ui/account";
@@ -509,10 +509,11 @@ function Notifications() {
     setTesting(true);
     const r = await testPush(t.title, t.body);
     setTesting(false);
-    if (r.ok) return Alert.alert(t.sent);
-    if (r.why === "off") return Alert.alert(t.off);
-    if (r.why === "limit") return Alert.alert(t.limit);
-    Alert.alert(f(r.why === "noToken" ? t.noToken : t.failed, { error: r.error ?? "" }));
+    if (r.ok) return Alert.alert(t.button, t.sent);
+    if (r.why === "off") return Alert.alert(t.button, t.off);
+    if (r.why === "limit") return Alert.alert(t.button, t.limit);
+    // The reason in the message, where Android shows all of it (a title is cut after two lines).
+    Alert.alert(t.button, f(r.why === "noToken" ? t.noToken : t.failed, { error: r.error ?? "" }));
   };
   useFocusEffect(
     useCallback(() => {
@@ -534,9 +535,9 @@ function Notifications() {
           ) : push === "unavailable" ? undefined : (
             <Switch
               value={push === "on"}
-              disabled={push === "on"}
               onValueChange={async (on) => {
-                if (on) setPush(await registerForPush(true).catch(() => "off" as const));
+                setPush(on ? "on" : "off"); // the switch moves at once; the result follows
+                setPush(await (on ? registerForPush(true) : turnPushOff()).catch(() => (on ? ("off" as const) : ("on" as const))));
               }}
               trackColor={{ true: colors.green, false: colors.line }}
               thumbColor="#ffffff"
