@@ -94,7 +94,8 @@ export default function MonitorScreen() {
           <StatePill state={stateOf(d)} />
         </View>
         <Text v="tiny" style={{ marginTop: 2 }}>
-          {d.last_seen_at ? f(t.updated, { when: when(d.last_seen_at) }) : t.status.waiting} · {d.occupied ? t.bookedNow : t.emptyNow}
+          {d.last_seen_at ? `${f(t.updated, { when: when(d.last_seen_at) })} · ` : ""}
+          {d.occupied ? t.bookedNow : t.emptyNow}
         </Text>
 
         {d.alerts.length ? (
