@@ -302,6 +302,13 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
         else:
             o.tax_id_sealed = vault.seal(tin)
             changed.append("tax_id_sealed")
+            # A henkilötunnus carries the date of birth: fill it in, or catch a typo in either.
+            born = hetu_birth(tin) if country == "FI" and o.account_type != Owner.AccountType.COMPANY else None
+            if born and not o.date_of_birth:
+                o.date_of_birth = born
+                changed.append("date_of_birth")
+            elif born and o.date_of_birth != born:
+                errors["date_of_birth"] = ["mismatch"]
     if "emergency_phone" in data:
         phone = str(data.get("emergency_phone") or "").strip()
         if phone and not sms.normalize(phone, o.address_country or "FI"):
@@ -360,8 +367,11 @@ def parse_dob(value: str):
 
     if not value:
         return None
+    value = value.strip()
+    # Day first, the European way (02-07-1983 or 2.7.1983), or the ISO form (1983-07-02).
+    m = re.fullmatch(r"(\d{1,2})[-./](\d{1,2})[-./](\d{4})", value)
     try:
-        d = date.fromisoformat(value)
+        d = date(int(m.group(3)), int(m.group(2)), int(m.group(1))) if m else date.fromisoformat(value)
     except ValueError:
         return False
     today = timezone.localdate()
@@ -376,6 +386,19 @@ def hetu_ok(value: str) -> bool:
     """A Finnish personal identity code (DDMMYYCZZZQ) with its check character."""
     m = re.fullmatch(r"(\d{6})([-+ABCDEFUVWXY])(\d{3})([0-9A-Y])", value)
     return bool(m) and HETU_CHECK[int(m.group(1) + m.group(3)) % 31] == m.group(4)
+
+
+def hetu_birth(value: str):
+    """The date of birth a Finnish personal identity code carries (DDMMYY plus the century sign)."""
+    from datetime import date
+
+    if not hetu_ok(value):
+        return None
+    century = {"+": 1800, "-": 1900, "U": 1900, "V": 1900, "W": 1900, "X": 1900, "Y": 1900}.get(value[6], 2000)
+    try:
+        return date(century + int(value[4:6]), int(value[2:4]), int(value[0:2]))
+    except ValueError:
+        return None
 
 
 def tax_id_ok(tin: str, country: str, account_type: str) -> bool:

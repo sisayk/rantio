@@ -98,7 +98,7 @@ export type HostText = {
 export type SettingsText = Record<
   | "title" | "personal" | "personalLead" | "security" | "securityLead" | "payments" | "paymentsLead"
   | "business" | "businessLead" | "taxes" | "taxesLead" | "languages" | "notifications" | "hosting"
-  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile" | "searchCountry" | "chooseCountry",
+  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile" | "searchCountry" | "chooseCountry" | "hetu" | "dobMismatch" | "dobPlaceholder",
   string
 >;
 
@@ -240,6 +240,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Show profile",
       searchCountry: "Search countries",
       chooseCountry: "Choose a country",
+      hetu: "Personal identity code (henkilötunnus)",
+      dobMismatch: "This doesn't match the date in your identity code.",
+      dobPlaceholder: "DD-MM-YYYY",
     },
     profile: {
       title: "Account",
@@ -395,6 +398,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Näytä profiili",
       searchCountry: "Hae maata",
       chooseCountry: "Valitse maa",
+      hetu: "Henkilötunnus",
+      dobMismatch: "Ei vastaa henkilötunnuksesi syntymäaikaa.",
+      dobPlaceholder: "PP-KK-VVVV",
     },
     profile: {
       title: "Tili",
@@ -550,6 +556,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Visa profil",
       searchCountry: "Sök land",
       chooseCountry: "Välj land",
+      hetu: "Finsk personbeteckning (henkilötunnus)",
+      dobMismatch: "Stämmer inte med datumet i din personbeteckning.",
+      dobPlaceholder: "DD-MM-ÅÅÅÅ",
     },
     profile: {
       title: "Konto",
@@ -705,6 +714,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Vis profil",
       searchCountry: "Søk etter land",
       chooseCountry: "Velg land",
+      hetu: "Finsk personnummer (henkilötunnus)",
+      dobMismatch: "Stemmer ikke med datoen i personnummeret ditt.",
+      dobPlaceholder: "DD-MM-ÅÅÅÅ",
     },
     profile: {
       title: "Konto",
@@ -860,6 +872,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Vis profil",
       searchCountry: "Søk etter land",
       chooseCountry: "Vel land",
+      hetu: "Finsk personnummer (henkilötunnus)",
+      dobMismatch: "Stemmer ikkje med datoen i personnummeret ditt.",
+      dobPlaceholder: "DD-MM-ÅÅÅÅ",
     },
     profile: {
       title: "Konto",
@@ -1015,6 +1030,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Vis profil",
       searchCountry: "Søg efter land",
       chooseCountry: "Vælg land",
+      hetu: "Finsk personnummer (henkilötunnus)",
+      dobMismatch: "Passer ikke med datoen i dit personnummer.",
+      dobPlaceholder: "DD-MM-ÅÅÅÅ",
     },
     profile: {
       title: "Konto",
@@ -1170,6 +1188,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Sýna prófíl",
       searchCountry: "Leita að landi",
       chooseCountry: "Veldu land",
+      hetu: "Finnsk kennitala (henkilötunnus)",
+      dobMismatch: "Passar ekki við dagsetninguna í kennitölunni þinni.",
+      dobPlaceholder: "DD-MM-ÁÁÁÁ",
     },
     profile: {
       title: "Aðgangur",
@@ -1325,6 +1346,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Näita profiili",
       searchCountry: "Otsi riiki",
       chooseCountry: "Vali riik",
+      hetu: "Soome isikukood (henkilötunnus)",
+      dobMismatch: "Ei klapi isikukoodis oleva kuupäevaga.",
+      dobPlaceholder: "PP-KK-AAAA",
     },
     profile: {
       title: "Konto",
@@ -1480,6 +1504,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Rādīt profilu",
       searchCountry: "Meklēt valsti",
       chooseCountry: "Izvēlieties valsti",
+      hetu: "Somijas personas kods (henkilötunnus)",
+      dobMismatch: "Neatbilst datumam jūsu personas kodā.",
+      dobPlaceholder: "DD-MM-GGGG",
     },
     profile: {
       title: "Konts",
@@ -1635,6 +1662,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Rodyti profilį",
       searchCountry: "Ieškoti šalies",
       chooseCountry: "Pasirinkite šalį",
+      hetu: "Suomijos asmens kodas (henkilötunnus)",
+      dobMismatch: "Nesutampa su data Jūsų asmens kode.",
+      dobPlaceholder: "DD-MM-MMMM",
     },
     profile: {
       title: "Paskyra",
@@ -1790,6 +1820,9 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       showProfile: "Profil anzeigen",
       searchCountry: "Land suchen",
       chooseCountry: "Land auswählen",
+      hetu: "Finnische Personenkennziffer (henkilötunnus)",
+      dobMismatch: "Passt nicht zum Datum in deiner Personenkennziffer.",
+      dobPlaceholder: "TT-MM-JJJJ",
     },
     profile: {
       title: "Konto",

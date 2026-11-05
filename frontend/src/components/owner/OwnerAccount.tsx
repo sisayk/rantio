@@ -9,6 +9,7 @@ import { ACCOUNT } from "@/i18n/messages/account";
 import { paths } from "@/i18n/paths";
 import { preparePhoto } from "@/lib/imagePrep";
 import { type OwnerDetails, type OwnerMe, ownerApi, type PaymentMethod, SignedOut } from "@/lib/ownerApi";
+import { showDob, typeDob } from "@/lib/dateOfBirth";
 import { forgetOwnerSession } from "@/lib/useOwnerSession";
 import HostingHeader from "./HostingHeader";
 import o from "./owner.module.css";
@@ -74,7 +75,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
     setSaved(false);
   };
   const err = (k: string) => (errors[k] ? <em className={s.error}>{errors[k]}</em> : null);
-  const errText = (code: string) => (code === "taken" ? p.phoneTaken : code === "required" ? d.errors.required : code === "too_long" ? d.errors.too_long : d.errors.invalid);
+  const errText = (code: string) => (code === "taken" ? p.phoneTaken : code === "required" ? d.errors.required : code === "too_long" ? d.errors.too_long : code === "mismatch" ? a.settings.dobMismatch : d.errors.invalid);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -311,7 +312,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                       </label>
                       <label className={s.field} style={{ width: 160 }}>
                         <span>{h.dob}</span>
-                        <input className={s.input} type="date" value={bo.date_of_birth} onChange={(e) => set("beneficial_owners", det.beneficial_owners.map((x, j) => (j === i ? { ...x, date_of_birth: e.target.value } : x)))} />
+                        <input className={s.input} inputMode="numeric" value={showDob(bo.date_of_birth)} placeholder={a.settings.dobPlaceholder} maxLength={10} onChange={(e) => set("beneficial_owners", det.beneficial_owners.map((x, j) => (j === i ? { ...x, date_of_birth: typeDob(e.target.value) } : x)))} />
                       </label>
                       <label className={s.field} style={{ width: 100 }}>
                         <span>{h.ownerShare}</span>
@@ -348,7 +349,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                     </label>
                     <label className={s.field} style={{ width: 180 }}>
                       <span>{h.dob}</span>
-                      <input className={s.input} type="date" value={det.date_of_birth} autoComplete="bday" onChange={(e) => set("date_of_birth", e.target.value)} aria-invalid={!!errors.date_of_birth} />
+                      <input className={s.input} inputMode="numeric" value={showDob(det.date_of_birth)} placeholder={a.settings.dobPlaceholder} maxLength={10} autoComplete="bday" onChange={(e) => set("date_of_birth", typeDob(e.target.value))} aria-invalid={!!errors.date_of_birth} />
                       {err("date_of_birth")}
                     </label>
                   </div>
@@ -358,7 +359,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                   <p className={s.hint} style={{ margin: 0 }}>{h.taxLead}</p>
                   <div className={s.row} style={{ alignItems: "start" }}>
                     <label className={s.field} style={{ flex: 2, minWidth: 220 }}>
-                      <span>{h.tax}</span>
+                      <span>{(det.tax_country || det.address_country || "FI") === "FI" ? a.settings.hetu : h.tax}</span>
                       <input
                         className={s.input}
                         value={tin}
@@ -369,7 +370,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                         onChange={(e) => (setTin(e.target.value.toUpperCase()), setSaved(false))}
                         aria-invalid={!!errors.tax_id}
                       />
-                      {err("tax_id") ?? <small className={s.hint}>{det.has_tax_id ? fill(lang, h.taxSaved, { tin: det.tax_id }) : h.taxSecure}</small>}
+                      {err("tax_id") ?? err("date_of_birth") ?? <small className={s.hint}>{det.has_tax_id ? fill(lang, h.taxSaved, { tin: det.tax_id }) : h.taxSecure}</small>}
                     </label>
                     <label className={s.field} style={{ flex: 1, minWidth: 160 }}>
                       <span>{h.taxCountry}</span>

@@ -97,7 +97,8 @@ export function useAccountForm() {
       const code = String((body.phone as string[] | undefined)?.[0] ?? "");
       const bad: Record<string, string> = {};
       for (const [k, v] of Object.entries((body.details ?? {}) as Record<string, string[]>)) {
-        bad[k] = v[0] === "required" ? d.errors.required : v[0] === "too_long" ? d.errors.too_long : d.errors.invalid;
+        bad[k] =
+          v[0] === "required" ? d.errors.required : v[0] === "too_long" ? d.errors.too_long : v[0] === "mismatch" ? ACCOUNT[lang].settings.dobMismatch : d.errors.invalid;
       }
       if (code) bad.phone = code === "taken" ? t.phoneTaken : t.invalidPhone;
       setFieldErrors(bad);

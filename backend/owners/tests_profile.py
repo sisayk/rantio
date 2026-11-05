@@ -107,7 +107,7 @@ class HostRequirementTests(TestCase):
     def test_what_the_booking_sites_need_from_a_private_host(self):
         missing = self.client.get("/api/owner/me/").json()["details"]["missing"]
         self.assertEqual(missing, ["legal_name", "date_of_birth", "tax_id", "address", "phone", "payout", "emergency"])
-        res = self.patch(legal_first_name="Aino", legal_last_name="Järvinen", date_of_birth="1970-05-13", tax_country="FI",
+        res = self.patch(legal_first_name="Aino", legal_last_name="Järvinen", date_of_birth="13.10.1952", tax_country="FI",
                          tax_id="131052-308T", address_line="Mökkitie 1", postal_code="57100", city="Savonlinna",
                          address_country="FI", payout_iban="FI2112345600000785", emergency_name="Pekka", emergency_phone="0401234567")
         self.assertEqual(res.status_code, 200, res.content)
@@ -132,3 +132,12 @@ class HostRequirementTests(TestCase):
         self.assertEqual(self.patch(tax_country="FI", tax_id="131052-308A").json()["details"], {"tax_id": ["invalid"]})
         self.assertEqual(self.patch(date_of_birth="2015-01-01").json()["details"], {"date_of_birth": ["invalid"]})
         self.assertEqual(self.patch(beneficial_owners=[{"name": "X", "share": 150}]).json()["details"], {"beneficial_owners": ["invalid"]})
+
+    def test_dates_are_written_day_first_and_come_from_the_identity_code(self):
+        self.assertEqual(self.patch(date_of_birth="02-07-1983").json()["details"]["date_of_birth"], "1983-07-02")
+        self.assertEqual(self.patch(date_of_birth="2.7.1983").json()["details"]["date_of_birth"], "1983-07-02")
+        self.assertEqual(self.patch(date_of_birth="31-02-1983").json()["details"], {"date_of_birth": ["invalid"]})
+        self.patch(date_of_birth="")
+        d = self.patch(tax_country="FI", tax_id="131052-308T").json()["details"]
+        self.assertEqual(d["date_of_birth"], "1952-10-13")
+        self.assertEqual(self.patch(date_of_birth="01-01-1960", tax_id="131052-308T").json()["details"], {"date_of_birth": ["mismatch"]})

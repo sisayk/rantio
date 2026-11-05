@@ -12,6 +12,7 @@ import { type SettingsSection, useAccountForm } from "@/ui/accountForm";
 import { Chip } from "@/ui/controls";
 import { CountryField } from "@/ui/countryField";
 import { Field } from "@/ui/form";
+import { showDob, typeDob } from "@/lib/dateOfBirth";
 import { Avatar, Button, Card, Icon, Text } from "@/ui/kit";
 import { MenuDivider, MenuRow, SettingsPage } from "@/ui/menu";
 
@@ -79,6 +80,23 @@ function Heading({ title, lead }: { title: string; lead?: string }) {
       <Text v="h2">{title}</Text>
       {lead ? <Text v="small">{lead}</Text> : null}
     </View>
+  );
+}
+
+/** Day first with the dashes added while typing: 02-07-1983. */
+function DobField({ label, value, onChange, error }: { label: string; value: string; onChange: (v: string) => void; error?: string | null }) {
+  const { lang } = useT();
+  return (
+    <Field
+      label={label}
+      value={showDob(value)}
+      onChangeText={(v) => onChange(typeDob(v))}
+      placeholder={ACCOUNT[lang].settings.dobPlaceholder}
+      keyboardType="number-pad"
+      textContentType="birthdate"
+      maxLength={10}
+      error={error}
+    />
   );
 }
 
@@ -212,7 +230,7 @@ function Personal({ form }: { form: Form }) {
           error={fieldErrors.phone || null}
         />
         {host && det && person ? (
-          <Field label={h.dob} value={det.date_of_birth} placeholder="1980-12-31" keyboardType="numbers-and-punctuation" onChangeText={(v) => setDet({ ...det, date_of_birth: v })} maxLength={10} error={fieldErrors.date_of_birth || null} />
+          <DobField label={h.dob} value={det.date_of_birth} onChange={(v) => setDet({ ...det, date_of_birth: v })} error={fieldErrors.date_of_birth || null} />
         ) : null}
       </View>
 
@@ -401,7 +419,7 @@ function Business({ form }: { form: Form }) {
                 <Field label={h.ownerName} value={bo.name} onChangeText={(v) => setOwner(i, { name: v })} maxLength={160} />
                 <View style={{ flexDirection: "row", gap: space.md }}>
                   <View style={{ flex: 1 }}>
-                    <Field label={h.dob} value={bo.date_of_birth} placeholder="1980-12-31" keyboardType="numbers-and-punctuation" onChangeText={(v) => setOwner(i, { date_of_birth: v })} maxLength={10} />
+                    <DobField label={h.dob} value={bo.date_of_birth} onChange={(v) => setOwner(i, { date_of_birth: v })} />
                   </View>
                   <View style={{ width: 100 }}>
                     <Field label={h.ownerShare} value={bo.share == null ? "" : String(bo.share)} keyboardType="decimal-pad" onChangeText={(v) => setOwner(i, { share: v === "" ? null : Number(v.replace(",", ".")) })} maxLength={6} />
@@ -452,15 +470,15 @@ function Taxes({ form }: { form: Form }) {
           <Text v="small">{h.taxLead}</Text>
           <CountryField label={s.taxCountry} value={det.tax_country} onChange={(c) => setDet({ ...det, tax_country: c })} error={fieldErrors.tax_country || null} />
           <Field
-            label={h.tax}
+            label={(det.tax_country || "FI") === "FI" ? s.hetu : h.tax}
             hint={det.has_tax_id ? f(h.taxSaved, { tin: det.tax_id }) : h.taxSecure}
             value={form.tin}
             onChangeText={(v) => form.setTin(v.toUpperCase())}
-            placeholder={det.has_tax_id ? det.tax_id : "131052-308T"}
+            placeholder={det.has_tax_id ? det.tax_id : (det.tax_country || "FI") === "FI" ? "131052-308T" : ""}
             autoCapitalize="characters"
             autoCorrect={false}
             maxLength={30}
-            error={fieldErrors.tax_id || null}
+            error={fieldErrors.tax_id || fieldErrors.date_of_birth || null}
           />
         </View>
       )}
