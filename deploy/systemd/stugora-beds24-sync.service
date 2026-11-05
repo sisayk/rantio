@@ -1,0 +1,19 @@
+# Every 15 minutes: bookings from Beds24 (Airbnb, Booking.com, Vrbo) into Rantio, and the
+# dates closed in Rantio (owner, Nettimökki, Rantio bookings) out to Beds24.
+# Relies on the management command `beds24` (backend/owners/management/commands/).
+[Unit]
+Description=Rantio: bookings in from Beds24, closed dates out
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stugora
+Group=stugora
+WorkingDirectory=/srv/stugora/app/backend
+EnvironmentFile=/srv/stugora/.env
+ExecStart=/srv/stugora/venv/bin/python manage.py beds24 sync
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

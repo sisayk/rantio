@@ -4,6 +4,7 @@
     manage.py beds24 push 12          # send cottage 12 and its prices
     manage.py beds24 push 12 --dry-run   # show what would be sent, send nothing
     manage.py beds24 push 12 --property-only   # the property alone, no prices (a test)
+    manage.py beds24 sync             # every 15 min: bookings in, closed dates out
     manage.py beds24                  # daily: fresh prices for every cottage already in Beds24
                                       # (this also keeps the refresh token in use)
 """
@@ -20,7 +21,7 @@ class Command(BaseCommand):
     help = "Check the Beds24 connection, or send a cottage and its prices to Beds24."
 
     def add_arguments(self, parser):
-        parser.add_argument("action", nargs="?", default="daily", choices=["check", "push", "daily"])
+        parser.add_argument("action", nargs="?", default="daily", choices=["check", "push", "daily", "sync"])
         parser.add_argument("cottage", nargs="?", type=int)
         parser.add_argument("--dry-run", action="store_true")
         parser.add_argument("--property-only", action="store_true", help="Send the property and room but no prices.")
@@ -29,6 +30,12 @@ class Command(BaseCommand):
         try:
             if action == "check":
                 self.stdout.write(beds24.check())
+                return
+            if action == "sync":
+                if not beds24.enabled():
+                    return
+                for line in beds24.sync_calendars():
+                    self.stdout.write(line)
                 return
             if action == "daily":
                 if not beds24.enabled():

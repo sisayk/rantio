@@ -99,7 +99,7 @@ done
 # The background jobs only once the code has their management commands.
 COMMANDS="$APP_DIR/backend/owners/management/commands"
 JOB_TIMERS=()
-for job in booking-emails:read_booking_emails invoices:make_monthly_invoices calendars:sync_calendars sms-key:check_sms_key reviews:send_review_requests beds24:beds24; do
+for job in booking-emails:read_booking_emails invoices:make_monthly_invoices calendars:sync_calendars sms-key:check_sms_key reviews:send_review_requests beds24:beds24 beds24-sync:beds24; do
   unit="stugora-${job%%:*}"; command="${job##*:}"
   if [ -f "$COMMANDS/$command.py" ]; then
     install -m 0644 "$DEPLOY_DIR/systemd/$unit.service" "$DEPLOY_DIR/systemd/$unit.timer" /etc/systemd/system/

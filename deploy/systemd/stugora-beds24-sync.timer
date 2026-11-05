@@ -1,0 +1,9 @@
+[Unit]
+Description=Bookings in from Beds24 and closed dates out, every 15 minutes
+
+[Timer]
+OnCalendar=*:7/15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -237,3 +237,169 @@ def sync(c: Cottage, *, prices: bool = True) -> str:
 def check() -> str:
     """A quick look that the connection works: how many properties Beds24 has."""
     return f"Connected to Beds24: {len(_items(call('GET', '/properties')))} properties in the account."
+
+
+# ---------- bookings coming in ----------
+
+BOOKINGS_SINCE = "beds24:bookings_since"
+# Beds24's channel names → Rantio's. Anything else (a booking typed into Beds24 by hand,
+# its own booking page) counts as "another site", which is never charged commission.
+CHANNELS = {
+    "airbnb": "airbnb", "airbnbical": "airbnb", "booking": "booking", "vrbo": "vrbo", "homeaway": "vrbo",
+    "expedia": "expedia", "agoda": "agoda", "google": "google", "holidu": "holidu", "hometogo": "hometogo",
+}
+
+
+def _pages(path: str, params: dict) -> list[dict]:
+    out, page = [], 1
+    while True:
+        got = call("GET", path, params={**params, "page": page} if page > 1 else params)
+        out += _items(got)
+        more = isinstance(got, dict) and (got.get("pages") or {}).get("nextPageExists")
+        if not more or page >= 50:
+            return out
+        page += 1
+
+
+def _payout(b: dict, c: Cottage) -> Decimal:
+    """What the owner gets: the guest's price less the site's commission and the cleaning fee.
+    A best reading of Beds24's numbers; the admin can correct one by hand."""
+    price = Decimal(str(b.get("price") or 0))
+    site_fee = Decimal(str(b.get("commission") or 0))
+    payout = price - site_fee - (c.cleaning_fee or Decimal("0"))
+    return max(Decimal("0.00"), payout).quantize(Decimal("0.01"))
+
+
+def pull_bookings() -> dict:
+    """New and changed bookings since the last look become (or update) Rantio bookings.
+    A new one emails the owner like any booking (owners/alerts.py). Returns counts."""
+    from datetime import date
+
+    from .models import Booking
+
+    by_room = {c.beds24_room_id: c for c in Cottage.objects.filter(beds24_room_id__isnull=False)}
+    if not by_room:
+        return {"new": 0, "changed": 0, "skipped": 0}
+    started = timezone.now()
+    since = cache.get(BOOKINGS_SINCE) or (started - timedelta(days=400))
+    rows = _pages("/bookings", {
+        "propertyId": sorted({c.beds24_property_id for c in by_room.values()}),
+        "modifiedFrom": (since - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%S"),
+        "status": ["confirmed", "new", "request", "cancelled"],
+    })
+    counts = {"new": 0, "changed": 0, "skipped": 0}
+    for b in rows:
+        c = by_room.get(b.get("roomId"))
+        try:
+            check_in, check_out = date.fromisoformat(b["arrival"]), date.fromisoformat(b["departure"])
+        except (KeyError, TypeError, ValueError):
+            c = None
+        if not c or check_out <= check_in:
+            counts["skipped"] += 1
+            continue
+        ext = f"b24:{b['id']}"
+        values = {
+            "cottage": c,
+            "channel": CHANNELS.get(str(b.get("channel") or "").lower(), Booking.Channel.OTHER),
+            "check_in": check_in,
+            "check_out": check_out,
+            "guests": max(1, int(b.get("numAdult") or 0) + int(b.get("numChild") or 0)),
+            "owner_payout": _payout(b, c),
+            "cancelled": b.get("status") == "cancelled",
+        }
+        existing = Booking.objects.filter(external_id=ext).first()
+        if existing:
+            for k, v in values.items():
+                setattr(existing, k, v)
+            existing.save()
+            counts["changed"] += 1
+        elif not values["cancelled"]:
+            Booking.objects.create(external_id=ext, **values)
+            counts["new"] += 1
+    cache.set(BOOKINGS_SINCE, started, None)
+    return counts
+
+
+# ---------- dates closed in Rantio going out ----------
+
+CLOSE_DAYS = 365
+
+
+def _closed_in_rantio(c: Cottage, start, end) -> set:
+    """Nights Rantio knows are taken that Beds24 doesn't: the owner's own closed dates,
+    Nettimökki and other calendars Rantio reads, and stays booked on Rantio itself.
+    (Bookings that came from Beds24 are already in its calendar.)"""
+    from . import calendar
+    from .models import Booking
+
+    from_beds24 = set(Booking.objects.filter(cottage=c, external_id__startswith="b24:").values_list("pk", flat=True))
+    nights = set()
+    for e in calendar.entries([c], start, end, requests=False):
+        if not e.busy or (e.kind == "booking" and e.id in from_beds24):
+            continue
+        d = max(e.start, start)
+        while d < min(e.end, end):
+            nights.add(d)
+            d += timedelta(days=1)
+    return nights
+
+
+def _blacked_out(c: Cottage, start, end) -> set:
+    from datetime import date
+
+    rows = _items(call("GET", "/inventory/rooms/calendar", params={
+        "roomId": [c.beds24_room_id], "startDate": start.isoformat(), "endDate": (end - timedelta(days=1)).isoformat(),
+        "includeOverride": "true",
+    }))
+    nights = set()
+    for row in rows:
+        for entry in (row.get("calendar") or []) if isinstance(row, dict) else []:
+            if entry.get("override") != "blackout":
+                continue
+            d, last = date.fromisoformat(entry["from"]), date.fromisoformat(entry.get("to") or entry["from"])
+            while d <= last:
+                nights.add(d)
+                d += timedelta(days=1)
+    return nights
+
+
+def _runs(nights: set, override: str) -> list[dict]:
+    out = []
+    for d in sorted(nights):
+        if out and out[-1]["_to"] + timedelta(days=1) == d:
+            out[-1]["_to"] = d
+        else:
+            out.append({"_from": d, "_to": d})
+    return [{"from": r["_from"].isoformat(), "to": r["_to"].isoformat(), "override": override} for r in out]
+
+
+def push_closed_dates(c: Cottage) -> tuple[int, int]:
+    """Makes Beds24's closed nights match Rantio's: closes the new ones, opens the ones Rantio
+    no longer has. Rantio's calendar is the one that counts; returns (closed, opened) nights."""
+    if not c.beds24_room_id:
+        raise Beds24Error("Send the cottage itself first.")
+    start = timezone.localdate()
+    end = start + timedelta(days=CLOSE_DAYS)
+    want, have = _closed_in_rantio(c, start, end), _blacked_out(c, start, end)
+    close, reopen = want - have, have - want
+    calendar = _runs(close, "blackout") + _runs(reopen, "none")
+    if calendar:
+        items = _items(call("POST", "/inventory/rooms/calendar", body=[{"roomId": c.beds24_room_id, "calendar": calendar}]))
+        for item in items:
+            if why := _failed(item):
+                raise Beds24Error(f"Beds24 refused the closed dates: {why}")
+    return len(close), len(reopen)
+
+
+def sync_calendars() -> list[str]:
+    """Every 15 minutes: bookings in, closed dates out. Returns a line per cottage."""
+    lines = [f"Bookings: {pull_bookings()}"]
+    for c in Cottage.objects.filter(beds24_room_id__isnull=False):
+        try:
+            closed, opened = push_closed_dates(c)
+            lines.append(f"{c.name}: closed {closed}, opened {opened} nights")
+        except Beds24Error as e:
+            c.beds24_error = str(e)[:500]
+            c.save(update_fields=["beds24_error"])
+            lines.append(f"{c.name}: {e}")
+    return lines

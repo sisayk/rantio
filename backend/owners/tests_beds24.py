@@ -98,3 +98,75 @@ class Beds24Tests(TestCase):
         with mock.patch.object(beds24, "_request", fake):
             self.assertIn("no prices sent", beds24.sync(self.c, prices=False))
         self.assertFalse(any(s[1] == "/inventory/rooms/calendar" for s in fake.sent))
+
+
+class FakeCalendarBeds24:
+    """Beds24 with one Airbnb booking, and a blackout Rantio once set that's no longer needed."""
+
+    def __init__(self, today):
+        self.today = today
+        self.posted = []
+
+    def __call__(self, method, path, *, body=None, params=None, headers=None):
+        if path == "/authentication/token":
+            return {"token": "t1", "expiresIn": 86400}
+        if (method, path) == ("GET", "/bookings"):
+            d = self.today + timedelta(days=10)
+            return {"success": True, "pages": {"nextPageExists": False}, "data": [
+                {"id": 77, "roomId": 9001, "propertyId": 501, "channel": "airbnb", "status": "confirmed",
+                 "arrival": d.isoformat(), "departure": (d + timedelta(days=3)).isoformat(),
+                 "numAdult": 2, "numChild": 1, "price": 450.0, "commission": 70.0},
+                {"id": 78, "roomId": 1234, "status": "confirmed", "arrival": d.isoformat(), "departure": d.isoformat()},
+            ]}
+        if (method, path) == ("GET", "/inventory/rooms/calendar"):
+            old = self.today + timedelta(days=40)
+            return {"success": True, "data": [{"roomId": 9001, "calendar": [
+                {"from": old.isoformat(), "to": (old + timedelta(days=1)).isoformat(), "override": "blackout"},
+                {"from": self.today.isoformat(), "to": (self.today + timedelta(days=5)).isoformat(), "override": "none"},
+            ]}]}
+        if (method, path) == ("POST", "/inventory/rooms/calendar"):
+            self.posted.append(body)
+            return [{"success": True}]
+        raise AssertionError(path)
+
+
+@override_settings(BEDS24_REFRESH_TOKEN="r1", BEDS24_API="https://beds24.example/api/v2", BOOKING_ALERTS=False)
+class Beds24CalendarTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.c = make_cottage()
+        self.c.cleaning_fee = Decimal("60.00")
+        self.c.beds24_property_id, self.c.beds24_room_id = 501, 9001
+        self.c.save()
+
+    def test_bookings_come_in_and_update(self):
+        from django.utils import timezone
+
+        from .models import Booking
+
+        fake = FakeCalendarBeds24(timezone.localdate())
+        with mock.patch.object(beds24, "_request", fake):
+            self.assertEqual(beds24.pull_bookings(), {"new": 1, "changed": 0, "skipped": 1})
+            b = Booking.objects.get(external_id="b24:77")
+            self.assertEqual((b.channel, b.guests, b.owner_payout, b.cancelled), ("airbnb", 3, Decimal("320.00"), False))
+            # Seen again (e.g. cancelled on Airbnb): the same booking changes, none is added.
+            self.assertEqual(beds24.pull_bookings()["changed"], 1)
+        self.assertEqual(Booking.objects.filter(external_id="b24:77").count(), 1)
+
+    def test_closed_dates_go_out_and_old_ones_reopen(self):
+        from django.utils import timezone
+
+        from .models import Booking, CalendarBlock
+
+        today = timezone.localdate()
+        CalendarBlock.objects.create(cottage=self.c, start=today + timedelta(days=20), end=today + timedelta(days=23))
+        # A booking that came from Beds24 is already there: not sent back.
+        Booking.objects.create(cottage=self.c, channel="airbnb", external_id="b24:5", check_in=today + timedelta(days=2),
+                               check_out=today + timedelta(days=4), owner_payout=Decimal("100"))
+        fake = FakeCalendarBeds24(today)
+        with mock.patch.object(beds24, "_request", fake):
+            closed, opened = beds24.push_closed_dates(self.c)
+        self.assertEqual((closed, opened), (3, 2))
+        sent = fake.posted[0][0]["calendar"]
+        self.assertEqual(sent[0], {"from": (today + timedelta(days=20)).isoformat(), "to": (today + timedelta(days=22)).isoformat(), "override": "blackout"})
+        self.assertEqual(sent[1], {"from": (today + timedelta(days=40)).isoformat(), "to": (today + timedelta(days=41)).isoformat(), "override": "none"})
