@@ -17,6 +17,13 @@ import { Avatar, Button, Card, Icon, Text } from "@/ui/kit";
 import { MenuDivider, MenuRow, SettingsPage } from "@/ui/menu";
 
 const PHOTO_SIDE = 640;
+// The details each page shows, so a mistake elsewhere is still pointed out above Save.
+const PERSONAL_FIELDS = ["name", "phone", "legal_first_name", "legal_last_name", "date_of_birth", "address_line", "postal_code", "city",
+  "address_country", "postal_line", "postal_postal_code", "postal_city", "postal_country", "emergency_name", "emergency_phone"];
+const PAYMENT_FIELDS = ["payout_holder", "payout_iban", "payout_bic"];
+const BUSINESS_FIELDS = ["account_type", "company_name", "business_type", "business_id", "trading_name", "website", "legal_rep_name",
+  "legal_rep_role", "beneficial_owners", "reservations_contact"];
+const TAX_FIELDS = ["business_id", "vat_id", "tax_country", "tax_id", "date_of_birth"];
 const BRANDS: Record<string, string> = { visa: "Visa", mastercard: "Mastercard", amex: "American Express", discover: "Discover" };
 const SECTIONS: SettingsSection[] = ["personal", "security", "payments", "business", "taxes", "notifications"];
 
@@ -53,14 +60,17 @@ export default function AccountSection() {
 type Form = ReturnType<typeof useAccountForm>;
 type Det = OwnerDetails;
 
-function SaveButton({ form }: { form: Form }) {
+/** Field mistakes show under their fields; the line above Save only names what this page can't show. */
+function SaveButton({ form, fields }: { form: Form; fields: string[] }) {
   const { lang } = useT();
   const t = ACCOUNT[lang].profile;
+  const bad = Object.keys(form.fieldErrors);
+  const message = bad.length && bad.every((k) => fields.includes(k)) ? "" : form.error;
   return (
     <View style={{ gap: space.sm, marginTop: space.xl }}>
-      {form.error ? (
+      {message ? (
         <Text v="small" color={colors.error}>
-          {form.error}
+          {message}
         </Text>
       ) : null}
       <Button
@@ -265,7 +275,7 @@ function Personal({ form }: { form: Form }) {
         </>
       ) : null}
 
-      <SaveButton form={form} />
+      <SaveButton form={form} fields={PERSONAL_FIELDS} />
     </>
   );
 }
@@ -365,7 +375,7 @@ function Payments({ form }: { form: Form }) {
             />
             <Field label={d.bic} optional={d.optional} value={det.payout_bic} onChangeText={(v) => setDet({ ...det, payout_bic: v.toUpperCase() })} autoCapitalize="characters" maxLength={11} error={fieldErrors.payout_bic || null} />
           </View>
-          <SaveButton form={form} />
+          <SaveButton form={form} fields={PAYMENT_FIELDS} />
         </>
       ) : null}
     </>
@@ -446,7 +456,7 @@ function Business({ form }: { form: Form }) {
         <Field label={h.contactEmail} value={det.reservations_contact.email ?? ""} onChangeText={(v) => setDet({ ...det, reservations_contact: { ...det.reservations_contact, email: v } })} keyboardType="email-address" autoCapitalize="none" maxLength={160} error={fieldErrors.reservations_contact || null} />
         <Field label={h.contactPhone} value={det.reservations_contact.phone ?? ""} onChangeText={(v) => setDet({ ...det, reservations_contact: { ...det.reservations_contact, phone: v } })} keyboardType="phone-pad" maxLength={40} />
       </View>
-      <SaveButton form={form} />
+      <SaveButton form={form} fields={BUSINESS_FIELDS} />
     </>
   );
 }
@@ -478,11 +488,13 @@ function Taxes({ form }: { form: Form }) {
             autoCapitalize="characters"
             autoCorrect={false}
             maxLength={30}
-            error={fieldErrors.tax_id || fieldErrors.date_of_birth || null}
+            error={
+              fieldErrors.tax_id && (det.tax_country || "FI") === "FI" ? s.hetuInvalid : fieldErrors.tax_id || fieldErrors.date_of_birth || null
+            }
           />
         </View>
       )}
-      <SaveButton form={form} />
+      <SaveButton form={form} fields={TAX_FIELDS} />
     </>
   );
 }

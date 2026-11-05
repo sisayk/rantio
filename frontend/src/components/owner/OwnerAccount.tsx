@@ -370,7 +370,9 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                         onChange={(e) => (setTin(e.target.value.toUpperCase()), setSaved(false))}
                         aria-invalid={!!errors.tax_id}
                       />
-                      {err("tax_id") ?? err("date_of_birth") ?? <small className={s.hint}>{det.has_tax_id ? fill(lang, h.taxSaved, { tin: det.tax_id }) : h.taxSecure}</small>}
+                      {errors.tax_id ? (
+                        <em className={s.error}>{(det.tax_country || det.address_country || "FI") === "FI" ? a.settings.hetuInvalid : errors.tax_id}</em>
+                      ) : <small className={s.hint}>{det.has_tax_id ? fill(lang, h.taxSaved, { tin: det.tax_id }) : h.taxSecure}</small>}
                     </label>
                     <label className={s.field} style={{ flex: 1, minWidth: 160 }}>
                       <span>{h.taxCountry}</span>

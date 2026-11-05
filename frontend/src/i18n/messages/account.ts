@@ -98,7 +98,7 @@ export type HostText = {
 export type SettingsText = Record<
   | "title" | "personal" | "personalLead" | "security" | "securityLead" | "payments" | "paymentsLead"
   | "business" | "businessLead" | "taxes" | "taxesLead" | "languages" | "notifications" | "hosting"
-  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile" | "searchCountry" | "chooseCountry" | "hetu" | "dobMismatch" | "dobPlaceholder",
+  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile" | "searchCountry" | "chooseCountry" | "hetu" | "dobMismatch" | "dobPlaceholder" | "hetuInvalid",
   string
 >;
 
@@ -243,6 +243,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Personal identity code (henkilötunnus)",
       dobMismatch: "This doesn't match the date in your identity code.",
       dobPlaceholder: "DD-MM-YYYY",
+      hetuInvalid: "That's not a valid henkilötunnus. Check the digits and the last character.",
     },
     profile: {
       title: "Account",
@@ -401,6 +402,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Henkilötunnus",
       dobMismatch: "Ei vastaa henkilötunnuksesi syntymäaikaa.",
       dobPlaceholder: "PP-KK-VVVV",
+      hetuInvalid: "Henkilötunnus ei ole kelvollinen. Tarkista numerot ja viimeinen merkki.",
     },
     profile: {
       title: "Tili",
@@ -559,6 +561,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finsk personbeteckning (henkilötunnus)",
       dobMismatch: "Stämmer inte med datumet i din personbeteckning.",
       dobPlaceholder: "DD-MM-ÅÅÅÅ",
+      hetuInvalid: "Det är ingen giltig henkilötunnus. Kontrollera siffrorna och det sista tecknet.",
     },
     profile: {
       title: "Konto",
@@ -717,6 +720,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finsk personnummer (henkilötunnus)",
       dobMismatch: "Stemmer ikke med datoen i personnummeret ditt.",
       dobPlaceholder: "DD-MM-ÅÅÅÅ",
+      hetuInvalid: "Det er ikke et gyldig henkilötunnus. Sjekk sifrene og det siste tegnet.",
     },
     profile: {
       title: "Konto",
@@ -875,6 +879,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finsk personnummer (henkilötunnus)",
       dobMismatch: "Stemmer ikkje med datoen i personnummeret ditt.",
       dobPlaceholder: "DD-MM-ÅÅÅÅ",
+      hetuInvalid: "Det er ikkje eit gyldig henkilötunnus. Sjekk sifra og det siste teiknet.",
     },
     profile: {
       title: "Konto",
@@ -1033,6 +1038,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finsk personnummer (henkilötunnus)",
       dobMismatch: "Passer ikke med datoen i dit personnummer.",
       dobPlaceholder: "DD-MM-ÅÅÅÅ",
+      hetuInvalid: "Det er ikke et gyldigt henkilötunnus. Tjek cifrene og det sidste tegn.",
     },
     profile: {
       title: "Konto",
@@ -1191,6 +1197,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finnsk kennitala (henkilötunnus)",
       dobMismatch: "Passar ekki við dagsetninguna í kennitölunni þinni.",
       dobPlaceholder: "DD-MM-ÁÁÁÁ",
+      hetuInvalid: "Þetta er ekki gilt henkilötunnus. Athugaðu tölustafina og síðasta stafinn.",
     },
     profile: {
       title: "Aðgangur",
@@ -1349,6 +1356,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Soome isikukood (henkilötunnus)",
       dobMismatch: "Ei klapi isikukoodis oleva kuupäevaga.",
       dobPlaceholder: "PP-KK-AAAA",
+      hetuInvalid: "See pole kehtiv henkilötunnus. Kontrolli numbreid ja viimast märki.",
     },
     profile: {
       title: "Konto",
@@ -1507,6 +1515,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Somijas personas kods (henkilötunnus)",
       dobMismatch: "Neatbilst datumam jūsu personas kodā.",
       dobPlaceholder: "DD-MM-GGGG",
+      hetuInvalid: "Tas nav derīgs henkilötunnus. Pārbaudiet ciparus un pēdējo rakstzīmi.",
     },
     profile: {
       title: "Konts",
@@ -1665,6 +1674,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Suomijos asmens kodas (henkilötunnus)",
       dobMismatch: "Nesutampa su data Jūsų asmens kode.",
       dobPlaceholder: "DD-MM-MMMM",
+      hetuInvalid: "Tai nėra galiojantis henkilötunnus. Patikrinkite skaitmenis ir paskutinį simbolį.",
     },
     profile: {
       title: "Paskyra",
@@ -1823,6 +1833,7 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       hetu: "Finnische Personenkennziffer (henkilötunnus)",
       dobMismatch: "Passt nicht zum Datum in deiner Personenkennziffer.",
       dobPlaceholder: "TT-MM-JJJJ",
+      hetuInvalid: "Das ist keine gültige Personenkennziffer (henkilötunnus). Prüfe die Ziffern und das letzte Zeichen.",
     },
     profile: {
       title: "Konto",
