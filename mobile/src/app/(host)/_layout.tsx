@@ -4,7 +4,7 @@ import { NativeTabs } from "expo-router/native-tabs";
 import { useHost } from "@/state/host";
 import { useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
-import { colors } from "@/theme";
+import { TAB_BAR } from "@/ui/tabBar";
 
 /** Hosting: today's stays and requests, the one calendar, guests' messages, earnings. */
 export default function HostTabs() {
@@ -16,7 +16,7 @@ export default function HostTabs() {
   if (owner && !owner.is_host) return <Redirect href="/list-cottage" />;
   const t = m.app.tabs;
   return (
-    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelVisibilityMode="labeled" labelStyle={{ selected: { color: colors.green } }}>
+    <NativeTabs {...TAB_BAR}>
       <NativeTabs.Trigger name="today">
         <NativeTabs.Trigger.Label>{t.today}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md="home" />

@@ -1,14 +1,14 @@
 import { NativeTabs } from "expo-router/native-tabs";
 
 import { useT } from "@/text/i18n";
-import { colors } from "@/theme";
+import { TAB_BAR } from "@/ui/tabBar";
 
 /** Travelling: find cottages, keep the ones you like, talk to owners. */
 export default function GuestTabs() {
   const { m } = useT();
   const t = m.app.tabs;
   return (
-    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelVisibilityMode="labeled" labelStyle={{ selected: { color: colors.green } }}>
+    <NativeTabs {...TAB_BAR}>
       <NativeTabs.Trigger name="explore">
         <NativeTabs.Trigger.Label>{t.explore}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
