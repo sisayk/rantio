@@ -13,6 +13,11 @@ read -rp "Power cut? [y/N]: " CUT
 MAINS=true; [ "$CUT" = y ] || [ "$CUT" = Y ] && MAINS=false
 SERIAL="$(printf '%s' "$SERIAL" | tr -d '[:space:]' | tr '[:lower:]' '[:upper:]')"
 SECRET="$(printf '%s' "$SECRET" | tr -d '[:space:]')"
+if [ ${#SECRET} -lt 20 ]; then
+  echo "The secret came through as ${#SECRET} characters; it's 32. Paste it again (Cmd+V), then Enter." >&2
+  exit 1
+fi
+echo "Box $SERIAL, secret of ${#SECRET} characters ending in ...${SECRET: -4}"
 curl -s https://rantio.fi/api/monitor/readings/ \
   -H "Authorization: Device $SERIAL:$SECRET" -H "Content-Type: application/json" \
   -d "{\"temp\": $TEMP, \"humidity\": 55, \"mains\": $MAINS, \"battery\": 88, \"signal\": -97, \"fw\": \"test\"}"
