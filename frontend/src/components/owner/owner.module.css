@@ -342,10 +342,14 @@
 .switchLink:focus-visible { outline: 2px solid var(--o-green); outline-offset: 2px; }
 
 .who {
-  color: var(--o-soft);
+  color: var(--o-ink, #1d2a2e);
   font-size: 14px;
   font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
+
+.who[aria-current="page"] { text-decoration-thickness: 2px; }
 
 .main {
   max-width: 1120px;

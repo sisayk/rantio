@@ -195,9 +195,12 @@ class MeView(APIView):
     permission_classes = [IsAccount]
 
     def get(self, request):
+        from . import profile  # (profile imports this module's permissions)
+
         o = request.user.owner
         return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot,
-                         "is_host": o.is_host, "phone": o.phone, "photo": o.photo.url if o.photo else None})
+                         "is_host": o.is_host, "phone": o.phone, "photo": o.photo.url if o.photo else None,
+                         "details": profile.details_row(o)})
 
     def delete(self, request):
         """Deletes the account (Settings → Delete account); see owners/account.py."""
@@ -227,8 +230,16 @@ class MeView(APIView):
                 return Response({"phone": ["taken"]}, status=status.HTTP_400_BAD_REQUEST)
             o.phone = phone
             fields.append("phone")
+        from . import profile
+
+        details, errors = profile.apply_details(o, request.data.get("details") or {})
+        if errors:
+            return Response({"details": errors}, status=status.HTTP_400_BAD_REQUEST)
+        fields += details
         if fields:
             o.save(update_fields=fields)
+            if set(fields) & {"name", "account_type", "company_name", "address_line", "postal_code", "city", "address_country"}:
+                profile.sync_customer(o)
         return self.get(request)
 
 

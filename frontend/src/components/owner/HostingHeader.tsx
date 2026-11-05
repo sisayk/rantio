@@ -31,7 +31,7 @@ export default function HostingHeader({
   lang: Lang;
   t: Messages["dashboard"];
   languageButton: React.ReactNode;
-  active: "overview" | "calendar" | "listings" | "messages";
+  active: "overview" | "calendar" | "listings" | "messages" | "account";
   ownerName?: string;
   unread?: number;
 }) {
@@ -71,7 +71,11 @@ export default function HostingHeader({
             {t.switchToTraveling}
           </a>
           {languageButton}
-          {ownerName ? <span className={styles.who}>{ownerName}</span> : null}
+          {ownerName ? (
+            <a className={styles.who} href={paths.hostingAccount(lang)} aria-current={active === "account" ? "page" : undefined}>
+              {ownerName}
+            </a>
+          ) : null}
           <button type="button" className={styles.outline} onClick={logout}>
             {t.logout}
           </button>

@@ -10,6 +10,7 @@ export const paths = {
   hostingMessages: (lang: Lang) => `/${lang}/hosting/messages`,
   hostingCalendar: (lang: Lang) => `/${lang}/hosting/calendar`,
   hostingListings: (lang: Lang) => `/${lang}/hosting/listings`,
+  hostingAccount: (lang: Lang) => `/${lang}/hosting/account`,
   hostingListing: (lang: Lang, id: number) => `/${lang}/hosting/listings/${id}`,
   hostingListingPreview: (lang: Lang, id: number) => `/${lang}/hosting/listings/${id}/preview`,
   /** The calendar opened on one cottage. */

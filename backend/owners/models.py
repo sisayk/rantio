@@ -253,6 +253,22 @@ class Owner(models.Model):
         max_length=80, blank=True, editable=False, help_text="Stripe's card page the owner opened last (Account → Payment method)."
     )
     photo = models.FileField(upload_to="owners/%Y/", blank=True, help_text="Profile photo (JPG, PNG or WebP).")
+
+    class AccountType(models.TextChoices):
+        PRIVATE = "private", "Private person"
+        COMPANY = "company", "Company"
+
+    account_type = models.CharField(max_length=10, choices=AccountType.choices, default=AccountType.PRIVATE)
+    company_name = models.CharField(max_length=160, blank=True)
+    business_id = models.CharField(max_length=30, blank=True, help_text="Company's registration number (Finland: Y-tunnus 1234567-8).")
+    vat_id = models.CharField(max_length=20, blank=True, help_text="EU VAT number, e.g. FI12345678.")
+    address_line = models.CharField(max_length=200, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    address_country = models.CharField(max_length=2, blank=True)
+    payout_holder = models.CharField(max_length=160, blank=True, help_text="Name on the bank account the owner is paid to.")
+    payout_iban = models.CharField(max_length=34, blank=True, help_text="Bank account (IBAN) the owner is paid to.")
+    payout_bic = models.CharField(max_length=11, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -472,6 +472,36 @@ export type StatusAction = "publish" | "pause" | "relist" | "archive" | "restore
 
 export class SignedOut extends Error {}
 
+/** A person or a company, their address, and the bank account they're paid to (IBAN masked). */
+export type OwnerDetails = {
+  account_type: "private" | "company";
+  company_name: string;
+  business_id: string;
+  vat_id: string;
+  address_line: string;
+  postal_code: string;
+  city: string;
+  address_country: string;
+  payout_holder: string;
+  payout_iban: string;
+  payout_bic: string;
+  has_payout: boolean;
+};
+
+export type OwnerMe = {
+  name: string;
+  email: string;
+  language: string;
+  is_pilot: boolean;
+  is_host: boolean;
+  phone: string;
+  photo: string | null;
+  details: OwnerDetails;
+};
+
+/** The card or bank account Rantio's fees are charged to. */
+export type PaymentMethod = { kind: string; brand: string; last4: string; exp_month: number | null; exp_year: number | null };
+
 function csrfToken() {
   return document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/)?.[1] ?? "";
 }
@@ -554,7 +584,24 @@ export const ownerApi = {
   /** Signs in with a Google or Apple ID token. */
   social: (provider: "google" | "apple", idToken: string, lang?: string) =>
     call<{ ok: boolean }>("auth/social/", { method: "POST", body: JSON.stringify({ provider, id_token: idToken, ...(lang ? { lang } : {}) }) }),
-  me: () => call<{ name: string; email: string; is_host: boolean }>("owner/me/"),
+  me: () => call<OwnerMe>("owner/me/"),
+  updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>
+    call<OwnerMe>("owner/me/", { method: "PATCH", body: JSON.stringify(fields) }),
+  deleteAccount: () => call<{ deleted: string }>("owner/me/", { method: "DELETE" }),
+  setProfilePhoto: async (file: Blob, name: string) => {
+    const form = new FormData();
+    form.append("file", file, name);
+    const res = await fetch("/api/owner/me/photo/", {
+      method: "POST", body: form, credentials: "same-origin", headers: { "X-CSRFToken": csrfToken() },
+    });
+    if (res.status === 401 || res.status === 403) throw new SignedOut();
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status, body });
+    return body as { photo: string };
+  },
+  removeProfilePhoto: () => call<{ photo: null }>("owner/me/photo/", { method: "DELETE" }),
+  paymentMethod: () => call<{ available: boolean; method: PaymentMethod | null }>("owner/payment-method/"),
+  newPaymentPage: () => call<{ url: string }>("owner/payment-method/", { method: "POST", body: "{}" }),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
   monitor: () => call<{ joined: boolean }>("owner/monitor/"),
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { method: "POST" }),

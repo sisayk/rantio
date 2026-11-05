@@ -6,6 +6,7 @@ the customer's default, so the next invoice is charged to it.
 """
 
 import logging
+import re
 
 from django.conf import settings
 from rest_framework import status
@@ -148,3 +149,125 @@ class PaymentMethodView(APIView):
         o.stripe_checkout_id = session["id"]
         o.save(update_fields=["stripe_checkout_id"])
         return Response({"url": session["url"]})
+
+
+# --- Details: private person or company, address, the bank account the owner is paid to ----------
+
+DETAIL_FIELDS = ("account_type", "company_name", "business_id", "vat_id", "address_line", "postal_code", "city",
+                 "address_country", "payout_holder", "payout_iban", "payout_bic")
+
+
+def iban_ok(iban: str) -> bool:
+    """The IBAN's own check digits (ISO 13616: mod 97 = 1)."""
+    if not re.fullmatch(r"[A-Z]{2}\d{2}[A-Z0-9]{11,30}", iban):
+        return False
+    moved = iban[4:] + iban[:4]
+    return int("".join(str(int(ch, 36)) for ch in moved)) % 97 == 1
+
+
+def y_tunnus_ok(value: str) -> bool:
+    """A Finnish business ID, 1234567-8, with its check digit."""
+    m = re.fullmatch(r"(\d{7})-(\d)", value)
+    if not m:
+        return False
+    total = sum(int(d) * w for d, w in zip(m.group(1), (7, 9, 10, 5, 8, 4, 2)))
+    check = 0 if total % 11 == 0 else 11 - total % 11
+    return check != 10 and check == int(m.group(2))
+
+
+def masked_iban(iban: str) -> str:
+    return f"{iban[:2]}•• •••• {iban[-4:]}" if iban else ""
+
+
+def details_row(o: Owner) -> dict:
+    return {
+        "account_type": o.account_type, "company_name": o.company_name, "business_id": o.business_id, "vat_id": o.vat_id,
+        "address_line": o.address_line, "postal_code": o.postal_code, "city": o.city, "address_country": o.address_country,
+        # Only the end of the account number goes back to the browser or the phone.
+        "payout_holder": o.payout_holder, "payout_iban": masked_iban(o.payout_iban), "payout_bic": o.payout_bic,
+        "has_payout": bool(o.payout_iban),
+    }
+
+
+def apply_details(o: Owner, data) -> tuple[list[str], dict]:
+    """Takes the details from a PATCH; the fields changed, or errors by field."""
+    changed, errors = [], {}
+
+    def text(key: str, limit: int) -> str | None:
+        if key not in data:
+            return None
+        v = str(data.get(key) or "").strip()
+        if len(v) > limit:
+            errors[key] = ["too_long"]
+        return v
+
+    kind = data.get("account_type")
+    if kind is not None:
+        if kind not in Owner.AccountType.values:
+            errors["account_type"] = ["invalid"]
+        else:
+            o.account_type = kind
+            changed.append("account_type")
+    for key, limit in (("company_name", 160), ("address_line", 200), ("postal_code", 20), ("city", 100), ("payout_holder", 160)):
+        v = text(key, limit)
+        if v is not None and key not in errors:
+            setattr(o, key, v)
+            changed.append(key)
+    country = text("address_country", 2)
+    if country is not None:
+        country = country.upper()
+        if country and not re.fullmatch(r"[A-Z]{2}", country):
+            errors["address_country"] = ["invalid"]
+        else:
+            o.address_country = country
+            changed.append("address_country")
+    bid = text("business_id", 30)
+    if bid is not None:
+        fi = (o.address_country or "FI") == "FI"
+        if bid and fi and not y_tunnus_ok(bid):
+            errors["business_id"] = ["invalid"]
+        else:
+            o.business_id = bid
+            changed.append("business_id")
+    vat = text("vat_id", 20)
+    if vat is not None:
+        vat = vat.replace(" ", "").upper()
+        if vat and not re.fullmatch(r"[A-Z]{2}[A-Z0-9]{2,13}", vat):
+            errors["vat_id"] = ["invalid"]
+        else:
+            o.vat_id = vat
+            changed.append("vat_id")
+    if "payout_iban" in data:
+        iban = re.sub(r"\s", "", str(data.get("payout_iban") or "")).upper()
+        if iban and "•" in iban:
+            pass  # the masked number sent back unchanged: keep the stored one
+        elif iban and not iban_ok(iban):
+            errors["payout_iban"] = ["invalid"]
+        else:
+            o.payout_iban = iban
+            changed.append("payout_iban")
+    bic = text("payout_bic", 11)
+    if bic is not None:
+        bic = bic.replace(" ", "").upper()
+        if bic and not re.fullmatch(r"[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?", bic):
+            errors["payout_bic"] = ["invalid"]
+        else:
+            o.payout_bic = bic
+            changed.append("payout_bic")
+    if o.account_type == Owner.AccountType.COMPANY and "company_name" in changed and not o.company_name:
+        errors["company_name"] = ["required"]
+    return changed, errors
+
+
+def sync_customer(o: Owner) -> None:
+    """Invoices carry the company's name and the address: kept in step on the Stripe customer."""
+    if not (trial.enabled() and o.stripe_customer_id):
+        return
+    try:
+        stripe_api.post(f"/customers/{o.stripe_customer_id}", {
+            "name": o.company_name if o.account_type == Owner.AccountType.COMPANY and o.company_name else o.name,
+            "address": {"line1": o.address_line or None, "postal_code": o.postal_code or None, "city": o.city or None,
+                        "country": o.address_country or None},
+        })
+    except stripe_api.StripeError:
+        logger.exception("Could not update the Stripe customer of owner %s", o.pk)

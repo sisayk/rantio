@@ -63,3 +63,33 @@ class ProfileTests(TestCase):
     @override_settings(STRIPE_SECRET_KEY="")
     def test_without_stripe_there_is_nothing_to_change(self):
         self.assertEqual(self.client.get("/api/owner/payment-method/").json(), {"available": False, "method": None})
+
+
+@override_settings(MEDIA_ROOT=MEDIA, STRIPE_SECRET_KEY="", DEV_LOGIN_CODES=False)
+class DetailsTests(TestCase):
+    def setUp(self):
+        self.o = make_cottage().owner
+        self.client.force_login(owner_login.user_for(self.o))
+
+    def patch(self, **details):
+        return self.client.patch("/api/owner/me/", {"details": details}, content_type="application/json")
+
+    def test_a_company_with_its_address_and_bank_account(self):
+        res = self.patch(account_type="company", company_name="Elda-Auto Tmi", business_id="2312334-5", vat_id="fi 23123344",
+                         address_line="Mökkitie 1", postal_code="57100", city="Savonlinna", address_country="fi",
+                         payout_holder="Elda-Auto Tmi", payout_iban="FI21 1234 5600 0007 85")
+        self.assertEqual(res.status_code, 200, res.content)
+        d = res.json()["details"]
+        self.assertEqual((d["account_type"], d["vat_id"], d["address_country"]), ("company", "FI23123344", "FI"))
+        self.assertEqual(d["payout_iban"], "FI•• •••• 0785")  # only the end goes back
+        self.o.refresh_from_db()
+        self.assertEqual(self.o.payout_iban, "FI2112345600000785")
+        # Sending the masked number back keeps the stored one.
+        self.assertEqual(self.patch(payout_iban=d["payout_iban"]).status_code, 200)
+        self.o.refresh_from_db()
+        self.assertEqual(self.o.payout_iban, "FI2112345600000785")
+
+    def test_wrong_numbers_are_refused(self):
+        self.assertEqual(self.patch(payout_iban="FI21 1234 5600 0007 86").json(), {"details": {"payout_iban": ["invalid"]}})
+        self.assertEqual(self.patch(business_id="2312334-4").json(), {"details": {"business_id": ["invalid"]}})
+        self.assertEqual(self.patch(account_type="robot").json(), {"details": {"account_type": ["invalid"]}})

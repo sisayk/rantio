@@ -6,6 +6,7 @@ import { NativeModules, TurboModuleRegistry } from "react-native";
 import type { OtherListing } from "@/i18n/messages/otherListings";
 
 import type {
+  OwnerDetails,
   BookingLinkInfo,
   BookingRequestForm,
   BookingRow,
@@ -31,6 +32,7 @@ import type {
 } from "@/lib/ownerApi";
 
 export type {
+  OwnerDetails,
   BookingLinkInfo,
   BookingRequestForm,
   BookingRequestRow,
@@ -174,7 +176,7 @@ export const ownerApi = {
   /** Signs in with an Apple or Google ID token; the app gets its own key back. */
   social: (provider: "apple" | "google", idToken: string, device: string, platform: string) =>
     call<{ ok: boolean; token: string }>("auth/social/", json("POST", { provider, id_token: idToken, app: true, device, platform })),
-  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null }>("owner/me/", { owner: true }),
+  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails }>("owner/me/", { owner: true }),
   setLanguage: (language: string) =>
     call<{ language: string }>("owner/me/", { ...json("PATCH", { language }), owner: true }),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
@@ -182,8 +184,8 @@ export const ownerApi = {
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { ...json("POST"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
-  updateMe: (fields: { name?: string; phone?: string }) =>
-    call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null }>(
+  updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>
+    call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails }>(
       "owner/me/",
       { ...json("PATCH", fields), owner: true },
     ),

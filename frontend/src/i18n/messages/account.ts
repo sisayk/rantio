@@ -1,12 +1,37 @@
 import type { Lang } from "../locales";
 
 /** Deleting one's account (the app's Profile and Menu). Kept apart so the languages sit side by side. */
+/** Who lists (a person or a company), their address, and the bank account they're paid to. */
+export type Details = {
+  title: string;
+  who: string;
+  private: string;
+  company: string;
+  companyName: string;
+  businessId: string;
+  vatId: string;
+  address: string;
+  street: string;
+  postal: string;
+  city: string;
+  country: string;
+  payout: string;
+  payoutLead: string;
+  holder: string;
+  iban: string;
+  ibanSaved: string;
+  bic: string;
+  optional: string;
+  errors: Record<"invalid" | "required" | "too_long", string>;
+};
+
 export type AccountText = {
   delete: string;
   title: string;
   body: string;
   done: string;
   error: string;
+  details: Details;
   profile: Record<"title" | "edit" | "photo" | "addPhoto" | "changePhoto" | "removePhoto" | "name" | "phone" | "phoneHint" | "email" | "emailHint" | "save" | "saved" | "payment" | "paymentLead" | "none" | "add" | "change" | "card" | "expires" | "bank" | "savedMethod" | "back" | "failed" | "phoneTaken" | "invalidPhone", string>;
 };
 
@@ -17,6 +42,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Your name, email and sign-in are removed for good. If you have cottages, they're taken off every booking site; their bookings and invoices are kept, as bookkeeping law requires.",
     done: "Your account has been deleted.",
     error: "Couldn't delete the account. Please try again, or write to info@rantio.fi.",
+    details: {
+      title: "Details",
+      who: "Who is listing",
+      private: "Private person",
+      company: "Company",
+      companyName: "Company name",
+      businessId: "Business ID (Y-tunnus)",
+      vatId: "VAT number",
+      address: "Address",
+      street: "Street address",
+      postal: "Postal code",
+      city: "City",
+      country: "Country",
+      payout: "Bank account for payouts",
+      payoutLead: "Where Rantio pays you, when a site's payments for your bookings come through Rantio.",
+      holder: "Account holder",
+      iban: "IBAN",
+      ibanSaved: "Saved: {iban}. Type a new one to change it.",
+      bic: "BIC",
+      optional: "optional",
+      errors: {
+        invalid: "Check this.",
+        required: "This is needed.",
+        too_long: "This is too long.",
+      },
+    },
     profile: {
       title: "Account",
       edit: "Edit profile",
@@ -52,6 +103,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Nimesi, sähköpostisi ja kirjautumisesi poistetaan pysyvästi. Jos sinulla on mökkejä, ne poistetaan kaikilta varaussivustoilta; niiden varaukset ja laskut säilytetään kirjanpitolain mukaisesti.",
     done: "Tilisi on poistettu.",
     error: "Tilin poistaminen ei onnistunut. Yritä uudelleen tai kirjoita osoitteeseen info@rantio.fi.",
+    details: {
+      title: "Tiedot",
+      who: "Kuka ilmoittaa",
+      private: "Yksityishenkilö",
+      company: "Yritys",
+      companyName: "Yrityksen nimi",
+      businessId: "Y-tunnus",
+      vatId: "ALV-numero",
+      address: "Osoite",
+      street: "Katuosoite",
+      postal: "Postinumero",
+      city: "Postitoimipaikka",
+      country: "Maa",
+      payout: "Pankkitili tilityksiä varten",
+      payoutLead: "Tili, jolle Rantio maksaa sinulle, kun sivuston maksut varauksistasi kulkevat Rantion kautta.",
+      holder: "Tilinomistaja",
+      iban: "IBAN",
+      ibanSaved: "Tallennettu: {iban}. Vaihda kirjoittamalla uusi.",
+      bic: "BIC",
+      optional: "valinnainen",
+      errors: {
+        invalid: "Tarkista tämä.",
+        required: "Tämä tieto tarvitaan.",
+        too_long: "Tämä on liian pitkä.",
+      },
+    },
     profile: {
       title: "Tili",
       edit: "Muokkaa profiilia",
@@ -87,6 +164,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Ditt namn, din e-post och din inloggning tas bort för gott. Har du stugor tas de bort från alla bokningssajter; deras bokningar och fakturor sparas, som bokföringslagen kräver.",
     done: "Ditt konto har raderats.",
     error: "Det gick inte att radera kontot. Försök igen eller skriv till info@rantio.fi.",
+    details: {
+      title: "Uppgifter",
+      who: "Vem annonserar",
+      private: "Privatperson",
+      company: "Företag",
+      companyName: "Företagsnamn",
+      businessId: "Organisationsnummer (Y-tunnus)",
+      vatId: "Momsregistreringsnummer",
+      address: "Adress",
+      street: "Gatuadress",
+      postal: "Postnummer",
+      city: "Ort",
+      country: "Land",
+      payout: "Bankkonto för utbetalningar",
+      payoutLead: "Dit Rantio betalar dig när en sajts betalningar för dina bokningar går via Rantio.",
+      holder: "Kontoinnehavare",
+      iban: "IBAN",
+      ibanSaved: "Sparat: {iban}. Skriv ett nytt för att byta.",
+      bic: "BIC",
+      optional: "valfritt",
+      errors: {
+        invalid: "Kontrollera detta.",
+        required: "Detta behövs.",
+        too_long: "Detta är för långt.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Redigera profil",
@@ -122,6 +225,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Navnet, e-posten og innloggingen din fjernes for godt. Har du hytter, fjernes de fra alle bookingnettsteder; bestillingene og fakturaene deres beholdes, slik bokføringsloven krever.",
     done: "Kontoen din er slettet.",
     error: "Kunne ikke slette kontoen. Prøv igjen, eller skriv til info@rantio.fi.",
+    details: {
+      title: "Opplysninger",
+      who: "Hvem annonserer",
+      private: "Privatperson",
+      company: "Bedrift",
+      companyName: "Bedriftsnavn",
+      businessId: "Organisasjonsnummer (Y-tunnus)",
+      vatId: "MVA-nummer",
+      address: "Adresse",
+      street: "Gateadresse",
+      postal: "Postnummer",
+      city: "Poststed",
+      country: "Land",
+      payout: "Bankkonto for utbetalinger",
+      payoutLead: "Dit Rantio betaler deg når et nettsteds betalinger for bestillingene dine går gjennom Rantio.",
+      holder: "Kontoinnehaver",
+      iban: "IBAN",
+      ibanSaved: "Lagret: {iban}. Skriv inn et nytt for å endre det.",
+      bic: "BIC",
+      optional: "valgfritt",
+      errors: {
+        invalid: "Sjekk dette.",
+        required: "Dette må fylles ut.",
+        too_long: "Dette er for langt.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Rediger profil",
@@ -157,6 +286,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Namnet, e-posten og innlogginga di blir fjerna for godt. Har du hytter, blir dei fjerna frå alle bookingnettstader; bestillingane og fakturaene deira blir tekne vare på, slik bokføringslova krev.",
     done: "Kontoen din er sletta.",
     error: "Kunne ikkje slette kontoen. Prøv igjen, eller skriv til info@rantio.fi.",
+    details: {
+      title: "Opplysningar",
+      who: "Kven annonserer",
+      private: "Privatperson",
+      company: "Bedrift",
+      companyName: "Bedriftsnamn",
+      businessId: "Organisasjonsnummer (Y-tunnus)",
+      vatId: "MVA-nummer",
+      address: "Adresse",
+      street: "Gateadresse",
+      postal: "Postnummer",
+      city: "Poststad",
+      country: "Land",
+      payout: "Bankkonto for utbetalingar",
+      payoutLead: "Dit Rantio betaler deg når betalingane frå ein nettstad for bestillingane dine går gjennom Rantio.",
+      holder: "Kontoinnehavar",
+      iban: "IBAN",
+      ibanSaved: "Lagra: {iban}. Skriv inn eit nytt for å endre det.",
+      bic: "BIC",
+      optional: "valfritt",
+      errors: {
+        invalid: "Sjekk dette.",
+        required: "Dette må fyllast ut.",
+        too_long: "Dette er for langt.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Rediger profil",
@@ -192,6 +347,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Dit navn, din e-mail og dit login fjernes for altid. Har du sommerhuse, fjernes de fra alle bookingsider; deres bookinger og fakturaer gemmes, som bogføringsloven kræver.",
     done: "Din konto er slettet.",
     error: "Kontoen kunne ikke slettes. Prøv igen, eller skriv til info@rantio.fi.",
+    details: {
+      title: "Oplysninger",
+      who: "Hvem annoncerer",
+      private: "Privatperson",
+      company: "Virksomhed",
+      companyName: "Virksomhedsnavn",
+      businessId: "CVR-nummer (Y-tunnus)",
+      vatId: "Momsnummer",
+      address: "Adresse",
+      street: "Vej og husnummer",
+      postal: "Postnummer",
+      city: "By",
+      country: "Land",
+      payout: "Bankkonto til udbetalinger",
+      payoutLead: "Hvor Rantio betaler dig, når en sides betalinger for dine bookinger går gennem Rantio.",
+      holder: "Kontohaver",
+      iban: "IBAN",
+      ibanSaved: "Gemt: {iban}. Skriv et nyt for at ændre det.",
+      bic: "BIC",
+      optional: "valgfrit",
+      errors: {
+        invalid: "Tjek dette.",
+        required: "Dette skal udfyldes.",
+        too_long: "Dette er for langt.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Rediger profil",
@@ -227,6 +408,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Nafnið þitt, netfangið og innskráningin eru fjarlægð fyrir fullt og allt. Ef þú átt bústaði eru þeir teknir af öllum bókunarsíðum; bókanir þeirra og reikningar eru geymdir eins og bókhaldslög krefjast.",
     done: "Aðganginum þínum hefur verið eytt.",
     error: "Ekki tókst að eyða aðganginum. Reyndu aftur eða skrifaðu á info@rantio.fi.",
+    details: {
+      title: "Upplýsingar",
+      who: "Hver auglýsir",
+      private: "Einstaklingur",
+      company: "Fyrirtæki",
+      companyName: "Heiti fyrirtækis",
+      businessId: "Kennitala fyrirtækis (Y-tunnus)",
+      vatId: "VSK-númer",
+      address: "Heimilisfang",
+      street: "Götuheiti og húsnúmer",
+      postal: "Póstnúmer",
+      city: "Staður",
+      country: "Land",
+      payout: "Bankareikningur fyrir útgreiðslur",
+      payoutLead: "Þangað greiðir Rantio þér þegar greiðslur bókunarsíðu fyrir bókanir þínar fara í gegnum Rantio.",
+      holder: "Reikningseigandi",
+      iban: "IBAN",
+      ibanSaved: "Vistað: {iban}. Sláðu inn nýtt til að breyta því.",
+      bic: "BIC",
+      optional: "valfrjálst",
+      errors: {
+        invalid: "Athugaðu þetta.",
+        required: "Þetta þarf að fylla út.",
+        too_long: "Þetta er of langt.",
+      },
+    },
     profile: {
       title: "Aðgangur",
       edit: "Breyta prófíl",
@@ -262,6 +469,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Sinu nimi, e-post ja sisselogimine eemaldatakse jäädavalt. Kui sul on puhkemaju, eemaldatakse need kõigilt broneerimissaitidelt; nende broneeringud ja arved säilitatakse, nagu raamatupidamisseadus nõuab.",
     done: "Sinu konto on kustutatud.",
     error: "Kontot ei õnnestunud kustutada. Proovi uuesti või kirjuta aadressil info@rantio.fi.",
+    details: {
+      title: "Andmed",
+      who: "Kes on pakkuja",
+      private: "Eraisik",
+      company: "Ettevõte",
+      companyName: "Ettevõtte nimi",
+      businessId: "Registrikood (Y-tunnus)",
+      vatId: "KMKR number",
+      address: "Aadress",
+      street: "Tänav ja majanumber",
+      postal: "Postiindeks",
+      city: "Linn",
+      country: "Riik",
+      payout: "Pangakonto väljamakseteks",
+      payoutLead: "Kuhu Rantio sulle maksab, kui saidi maksed sinu broneeringute eest liiguvad läbi Rantio.",
+      holder: "Konto omanik",
+      iban: "IBAN",
+      ibanSaved: "Salvestatud: {iban}. Muutmiseks sisesta uus.",
+      bic: "BIC",
+      optional: "valikuline",
+      errors: {
+        invalid: "Kontrolli seda.",
+        required: "See on kohustuslik.",
+        too_long: "See on liiga pikk.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Muuda profiili",
@@ -297,6 +530,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Jūsu vārds, e-pasts un pieteikšanās tiks neatgriezeniski dzēsti. Ja jums ir mājas, tās tiks noņemtas no visām rezervāciju vietnēm; to rezervācijas un rēķini tiks saglabāti, kā to prasa grāmatvedības likums.",
     done: "Jūsu konts ir dzēsts.",
     error: "Kontu neizdevās dzēst. Mēģiniet vēlreiz vai rakstiet uz info@rantio.fi.",
+    details: {
+      title: "Informācija",
+      who: "Kas izvieto sludinājumu",
+      private: "Privātpersona",
+      company: "Uzņēmums",
+      companyName: "Uzņēmuma nosaukums",
+      businessId: "Reģistrācijas numurs (Y-tunnus)",
+      vatId: "PVN numurs",
+      address: "Adrese",
+      street: "Iela un mājas numurs",
+      postal: "Pasta indekss",
+      city: "Pilsēta",
+      country: "Valsts",
+      payout: "Bankas konts izmaksām",
+      payoutLead: "Kur Rantio jums maksā, kad vietnes maksājumi par jūsu rezervācijām tiek veikti caur Rantio.",
+      holder: "Konta īpašnieks",
+      iban: "IBAN",
+      ibanSaved: "Saglabāts: {iban}. Lai mainītu, ievadiet jaunu.",
+      bic: "BIC",
+      optional: "neobligāti",
+      errors: {
+        invalid: "Pārbaudiet šo.",
+        required: "Šis ir obligāts.",
+        too_long: "Tas ir pārāk garš.",
+      },
+    },
     profile: {
       title: "Konts",
       edit: "Rediģēt profilu",
@@ -332,6 +591,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Jūsų vardas, el. paštas ir prisijungimas bus ištrinti visam laikui. Jei turite namelių, jie bus pašalinti iš visų rezervavimo svetainių; jų rezervacijos ir sąskaitos bus saugomos, kaip reikalauja apskaitos įstatymas.",
     done: "Jūsų paskyra ištrinta.",
     error: "Paskyros ištrinti nepavyko. Bandykite dar kartą arba rašykite info@rantio.fi.",
+    details: {
+      title: "Duomenys",
+      who: "Kas skelbia",
+      private: "Fizinis asmuo",
+      company: "Įmonė",
+      companyName: "Įmonės pavadinimas",
+      businessId: "Įmonės kodas (Y-tunnus)",
+      vatId: "PVM mokėtojo kodas",
+      address: "Adresas",
+      street: "Gatvė ir namo numeris",
+      postal: "Pašto kodas",
+      city: "Miestas",
+      country: "Šalis",
+      payout: "Banko sąskaita išmokoms",
+      payoutLead: "Kur Rantio Jums moka, kai svetainės mokėjimai už Jūsų rezervacijas eina per Rantio.",
+      holder: "Sąskaitos savininkas",
+      iban: "IBAN",
+      ibanSaved: "Išsaugota: {iban}. Norėdami pakeisti, įveskite naują.",
+      bic: "BIC",
+      optional: "neprivaloma",
+      errors: {
+        invalid: "Patikrinkite tai.",
+        required: "Tai privaloma.",
+        too_long: "Tai per ilga.",
+      },
+    },
     profile: {
       title: "Paskyra",
       edit: "Redaguoti profilį",
@@ -367,6 +652,32 @@ export const ACCOUNT: Record<Lang, AccountText> = {
     body: "Dein Name, deine E-Mail-Adresse und deine Anmeldung werden endgültig entfernt. Hast du Ferienhäuser, werden sie von allen Buchungsportalen genommen; ihre Buchungen und Rechnungen bleiben gespeichert, wie es das Buchführungsrecht verlangt.",
     done: "Dein Konto wurde gelöscht.",
     error: "Das Konto konnte nicht gelöscht werden. Versuch es noch einmal oder schreib an info@rantio.fi.",
+    details: {
+      title: "Angaben",
+      who: "Wer inseriert",
+      private: "Privatperson",
+      company: "Unternehmen",
+      companyName: "Firmenname",
+      businessId: "Unternehmensnummer (Y-tunnus)",
+      vatId: "USt-IdNr.",
+      address: "Adresse",
+      street: "Straße und Hausnummer",
+      postal: "Postleitzahl",
+      city: "Ort",
+      country: "Land",
+      payout: "Bankkonto für Auszahlungen",
+      payoutLead: "Hierhin zahlt Rantio dir aus, wenn die Zahlungen eines Portals für deine Buchungen über Rantio laufen.",
+      holder: "Kontoinhaber",
+      iban: "IBAN",
+      ibanSaved: "Gespeichert: {iban}. Gib eine neue ein, um sie zu ändern.",
+      bic: "BIC",
+      optional: "optional",
+      errors: {
+        invalid: "Prüf das.",
+        required: "Das wird benötigt.",
+        too_long: "Das ist zu lang.",
+      },
+    },
     profile: {
       title: "Konto",
       edit: "Profil bearbeiten",

@@ -6,7 +6,7 @@ import * as Secure from "expo-secure-store";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 
-import { onApiSignedOut, ownerApi, setApiKey, SignedOut, type SignInTo } from "@/api";
+import { onApiSignedOut, type OwnerDetails, ownerApi, setApiKey, SignedOut, type SignInTo } from "@/api";
 import { registerForPush } from "@/state/push";
 
 const KEY = "stugora.ownerKey";
@@ -22,7 +22,7 @@ const SecureStore =
     : Secure;
 
 /** Anyone signed in; is_host once they've listed a cottage (only hosts reach the hosting tabs). */
-type Owner = { name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null };
+type Owner = { name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails };
 
 type Session = {
   ready: boolean;

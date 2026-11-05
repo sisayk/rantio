@@ -139,6 +139,9 @@ class OwnerAdmin(ModelAdmin):
         ("Agreement", {"fields": ["is_pilot", "commission_rate", "vat_registered", "agreement_signed_on", "created_at"],
                        "classes": ["st-grid-2"]}),
         ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id", "card"], "classes": ["st-grid-2"]}),
+        ("Who lists, and the address", {"fields": ["account_type", "company_name", "business_id", "vat_id", "address_line",
+                                                   "postal_code", "city", "address_country", "photo"], "classes": ["st-grid-2"]}),
+        ("Payouts", {"fields": ["payout_holder", "payout_iban", "payout_bic"], "classes": ["st-grid-2"]}),
     ]
 
     @display(description="Card")
