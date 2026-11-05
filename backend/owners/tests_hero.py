@@ -68,6 +68,24 @@ class HeroAdminTests(TestCase):
         self.assertEqual(res.status_code, 302)
         self.assertEqual(float(HeroSlide.objects.get(title="Lake").video_seconds), 12.0)
 
+    def test_a_video_added_while_photo_is_selected_makes_a_video_slide(self):
+        # The kind field still says "Photo" (its default) when the video is chosen.
+        res = self.post(video=SimpleUploadedFile("lake.mp4", mp4(10), "video/mp4"))
+        self.assertEqual(res.status_code, 302, res.content[:2000])
+        slide = HeroSlide.objects.get(title="Lake")
+        self.assertEqual((slide.kind, float(slide.video_seconds)), ("video", 10.0))
+
+    def test_a_video_slide_with_only_a_photo_becomes_a_photo_slide(self):
+        res = self.post(kind="video", image=SimpleUploadedFile("lake.png", PNG, "image/png"))
+        self.assertEqual(res.status_code, 302, res.content[:2000])
+        self.assertEqual(HeroSlide.objects.get(title="Lake").kind, "image")
+
+    def test_add_page_shows_both_upload_boxes(self):
+        res = self.client.get("/admin/owners/heroslide/add/")
+        self.assertContains(res, 'name="video"')
+        self.assertContains(res, 'name="image"')
+        self.assertNotContains(res, "vr.style.display")
+
     def test_refuses_a_long_video(self):
         res = self.post(kind="video", video=SimpleUploadedFile("long.mp4", mp4(31), "video/mp4"))
         self.assertEqual(res.status_code, 200)

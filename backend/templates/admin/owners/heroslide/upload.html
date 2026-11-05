@@ -72,20 +72,28 @@ document.addEventListener('DOMContentLoaded', function () {
     ['dragleave', 'drop'].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove('st-over'); }); });
     drop.addEventListener('drop', function (e) {
       var f = e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return;
-      var dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; show(box, f);
+      var dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; input.dispatchEvent(new Event('change'));
     });
   });
-  // Photo slides need no video; for a video slide the photo is its optional still.
+  // Both boxes stay visible; the file chosen sets the slide's kind (the form does the same
+  // on save), and next to a video the photo is its optional still.
   var kind = document.getElementById('id_kind');
   function row(id) { var el = document.getElementById(id); return el && (el.closest('.form-row') || el.closest('.field-line')); }
   function label(id) { var r = row(id); return r && r.querySelector('label[for="' + id + '"], .st-field-label'); }
   var imageLabel = label('id_image');
+  var hasVideo = !!document.querySelector('.st-upload[data-kind="video"] .st-current');
   function sync() {
-    var isVideo = kind && kind.value === 'video', vr = row('id_video');
-    if (vr) vr.style.display = isVideo ? '' : 'none';
+    var isVideo = kind && kind.value === 'video';
     var sr = row('id_seconds'); if (sr) sr.style.visibility = isVideo ? 'hidden' : '';
-    if (imageLabel) imageLabel.firstChild.textContent = isVideo ? 'Still photo for the video (optional) ' : 'Photo ';
+    if (imageLabel && imageLabel.firstChild) imageLabel.firstChild.textContent = isVideo ? 'Still photo for the video (optional) ' : 'Photo ';
   }
+  function setKind(value) { if (kind && kind.value !== value) { kind.value = value; kind.dispatchEvent(new Event('change', { bubbles: true })); } sync(); }
+  var videoInput = document.getElementById('id_video'), imageInput = document.getElementById('id_image');
+  if (videoInput) videoInput.addEventListener('change', function () { if (videoInput.files[0]) setKind('video'); });
+  if (imageInput) imageInput.addEventListener('change', function () {
+    var videoChosen = videoInput && videoInput.files && videoInput.files[0];
+    if (imageInput.files[0] && !videoChosen && !hasVideo) setKind('image');
+  });
   if (kind) { kind.addEventListener('change', sync); sync(); }
 });
 </script>

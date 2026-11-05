@@ -962,7 +962,10 @@ class HeroSlide(models.Model):
         BOTTOM = "center bottom", "Bottom"
 
     title = models.CharField(max_length=120, help_text="For you in the admin, e.g. 'Saimaa at sunset'.")
-    kind = models.CharField(max_length=5, choices=Kind.choices, default=Kind.IMAGE)
+    kind = models.CharField(
+        max_length=5, choices=Kind.choices, default=Kind.IMAGE,
+        help_text="Set from the file you add: a video makes it a video slide.",
+    )
     # Limits and previews are in the upload box (templates/admin/owners/heroslide/upload.html).
     image = models.FileField(
         upload_to="hero/", blank=True,

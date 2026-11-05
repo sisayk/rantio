@@ -371,8 +371,14 @@ class HeroSlideForm(forms.ModelForm):
                 self.instance.video_seconds = Decimal(f"{media_checks.check_video(video):.2f}")
             except forms.ValidationError as err:
                 self.add_error("video", err)
+        # The file decides the kind, so a video added while "Photo" is still selected becomes
+        # a video slide, and a "Video" slide with only a photo becomes a photo slide.
+        if new_video and kind != HeroSlide.Kind.VIDEO:
+            kind = data["kind"] = HeroSlide.Kind.VIDEO
+        elif kind == HeroSlide.Kind.VIDEO and not video and (image or data.get("image_url")):
+            kind = data["kind"] = HeroSlide.Kind.IMAGE
         if kind == HeroSlide.Kind.IMAGE and not image and not data.get("image_url"):
-            self.add_error("image", "Add the photo.")
+            self.add_error("image", "Add a photo or a video.")
         if kind == HeroSlide.Kind.VIDEO and not video:
             self.add_error("video", "Add the video.")
         return data
@@ -391,7 +397,11 @@ class HeroSlideAdmin(ModelAdmin):
     hide_ordering_field = True
     fieldsets = [
         ("Slide", {"fields": ["title", "kind", "active"], "classes": ["st-grid-3"]}),
-        ("Photo or video", {"fields": ["video", "image", "image_url"]}),
+        ("Photo or video", {
+            "fields": ["video", "image", "image_url"],
+            "description": "Add a video (MP4) or a photo. Adding a video makes it a video slide; a photo added "
+                           "next to a video is shown while the video loads.",
+        }),
         ("On the page", {"fields": ["alt", "focus", "seconds"], "classes": ["st-grid-3"]}),
     ]
 
