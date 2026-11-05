@@ -1,6 +1,6 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActionSheetIOS, Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { ActionSheetIOS, Alert, Linking, Platform, Pressable, StyleSheet, Switch, View } from "react-native";
 
 import { mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
@@ -10,12 +10,12 @@ import { colors, space } from "@/theme";
 import { DeleteAccountButton } from "@/ui/account";
 import { type SettingsSection, useAccountForm } from "@/ui/accountForm";
 import { Chip } from "@/ui/controls";
+import { CountryField } from "@/ui/countryField";
 import { Field } from "@/ui/form";
 import { Avatar, Button, Card, Icon, Text } from "@/ui/kit";
 import { MenuDivider, MenuRow, SettingsPage } from "@/ui/menu";
 
 const PHOTO_SIDE = 640;
-const COUNTRIES = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT", "DE", "AT", "CH", "NL", "BE", "FR", "ES", "IT", "PL", "GB", "IE", "US"];
 const BRANDS: Record<string, string> = { visa: "Visa", mastercard: "Mastercard", amex: "American Express", discover: "Discover" };
 const SECTIONS: SettingsSection[] = ["personal", "security", "payments", "business", "taxes", "notifications"];
 
@@ -82,17 +82,6 @@ function Heading({ title, lead }: { title: string; lead?: string }) {
   );
 }
 
-function CountryChips({ value, onPick }: { value: string; onPick: (c: string) => void }) {
-  const { country } = useT();
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
-      {COUNTRIES.map((c) => (
-        <Chip key={c} label={country(c)} on={value === c} onPress={() => onPick(c)} />
-      ))}
-    </ScrollView>
-  );
-}
-
 function Address({ det, setDet, postal }: { det: Det; setDet: (d: Det) => void; postal?: boolean }) {
   const { lang } = useT();
   const d = ACCOUNT[lang].details;
@@ -110,8 +99,7 @@ function Address({ det, setDet, postal }: { det: Det; setDet: (d: Det) => void; 
           <Field label={d.city} value={det[k.city]} onChangeText={(v) => setDet({ ...det, [k.city]: v })} textContentType={postal ? undefined : "addressCity"} maxLength={100} />
         </View>
       </View>
-      <Text v="smallMedium">{d.country}</Text>
-      <CountryChips value={det[k.country]} onPick={(c) => setDet({ ...det, [k.country]: c })} />
+      <CountryField label={d.country} value={det[k.country]} onChange={(c) => setDet({ ...det, [k.country]: c })} />
     </View>
   );
 }
@@ -462,8 +450,7 @@ function Taxes({ form }: { form: Form }) {
       ) : (
         <View style={{ gap: space.md }}>
           <Text v="small">{h.taxLead}</Text>
-          <Text v="smallMedium">{s.taxCountry}</Text>
-          <CountryChips value={det.tax_country} onPick={(c) => setDet({ ...det, tax_country: c })} />
+          <CountryField label={s.taxCountry} value={det.tax_country} onChange={(c) => setDet({ ...det, tax_country: c })} error={fieldErrors.tax_country || null} />
           <Field
             label={h.tax}
             hint={det.has_tax_id ? f(h.taxSaved, { tin: det.tax_id }) : h.taxSecure}

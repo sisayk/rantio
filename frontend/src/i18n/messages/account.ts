@@ -98,7 +98,7 @@ export type HostText = {
 export type SettingsText = Record<
   | "title" | "personal" | "personalLead" | "security" | "securityLead" | "payments" | "paymentsLead"
   | "business" | "businessLead" | "taxes" | "taxesLead" | "languages" | "notifications" | "hosting"
-  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile",
+  | "help" | "legal" | "logout" | "signsIn" | "emailCode" | "smsCode" | "needed" | "taxCountry" | "showProfile" | "searchCountry" | "chooseCountry",
   string
 >;
 
@@ -238,6 +238,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Needed",
       taxCountry: "Country that issued the number",
       showProfile: "Show profile",
+      searchCountry: "Search countries",
+      chooseCountry: "Choose a country",
     },
     profile: {
       title: "Account",
@@ -391,6 +393,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Puuttuu",
       taxCountry: "Numeron myöntänyt maa",
       showProfile: "Näytä profiili",
+      searchCountry: "Hae maata",
+      chooseCountry: "Valitse maa",
     },
     profile: {
       title: "Tili",
@@ -544,6 +548,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Saknas",
       taxCountry: "Land som utfärdat numret",
       showProfile: "Visa profil",
+      searchCountry: "Sök land",
+      chooseCountry: "Välj land",
     },
     profile: {
       title: "Konto",
@@ -697,6 +703,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Mangler",
       taxCountry: "Landet som utstedte nummeret",
       showProfile: "Vis profil",
+      searchCountry: "Søk etter land",
+      chooseCountry: "Velg land",
     },
     profile: {
       title: "Konto",
@@ -850,6 +858,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Manglar",
       taxCountry: "Landet som utferda nummeret",
       showProfile: "Vis profil",
+      searchCountry: "Søk etter land",
+      chooseCountry: "Vel land",
     },
     profile: {
       title: "Konto",
@@ -1003,6 +1013,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Mangler",
       taxCountry: "Landet, der har udstedt nummeret",
       showProfile: "Vis profil",
+      searchCountry: "Søg efter land",
+      chooseCountry: "Vælg land",
     },
     profile: {
       title: "Konto",
@@ -1156,6 +1168,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Vantar",
       taxCountry: "Landið sem gaf út númerið",
       showProfile: "Sýna prófíl",
+      searchCountry: "Leita að landi",
+      chooseCountry: "Veldu land",
     },
     profile: {
       title: "Aðgangur",
@@ -1309,6 +1323,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Puudub",
       taxCountry: "Numbri väljaandnud riik",
       showProfile: "Näita profiili",
+      searchCountry: "Otsi riiki",
+      chooseCountry: "Vali riik",
     },
     profile: {
       title: "Konto",
@@ -1462,6 +1478,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Trūkst",
       taxCountry: "Valsts, kas izdeva numuru",
       showProfile: "Rādīt profilu",
+      searchCountry: "Meklēt valsti",
+      chooseCountry: "Izvēlieties valsti",
     },
     profile: {
       title: "Konts",
@@ -1615,6 +1633,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Trūksta",
       taxCountry: "Numerį išdavusi šalis",
       showProfile: "Rodyti profilį",
+      searchCountry: "Ieškoti šalies",
+      chooseCountry: "Pasirinkite šalį",
     },
     profile: {
       title: "Paskyra",
@@ -1768,6 +1788,8 @@ export const ACCOUNT: Record<Lang, AccountText> = {
       needed: "Fehlt",
       taxCountry: "Land, das die Nummer ausgestellt hat",
       showProfile: "Profil anzeigen",
+      searchCountry: "Land suchen",
+      chooseCountry: "Land auswählen",
     },
     profile: {
       title: "Konto",

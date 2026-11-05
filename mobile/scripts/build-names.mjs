@@ -7,7 +7,15 @@ import { readFileSync, writeFileSync } from "node:fs";
 const locales = readFileSync(new URL("../../frontend/src/i18n/locales.ts", import.meta.url), "utf8");
 const intl = Object.fromEntries([...locales.matchAll(/^\s+(\w\w): \{ native: "[^"]+", intl: "([^"]+)"/gm)].map((m) => [m[1], m[2]]));
 const langs = Object.keys(intl);
-const countries = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT"];
+// The countries Rantio covers first, then every other country (for addresses and tax numbers).
+const covered = ["FI", "SE", "NO", "DK", "IS", "EE", "LV", "LT"];
+const NOT_COUNTRIES = new Set(["AC", "CP", "CQ", "DG", "EA", "EU", "EZ", "IC", "QO", "TA", "UN", "XA", "XB", "ZZ"]);
+const en = new Intl.DisplayNames(["en"], { type: "region" });
+const letters = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
+const others = letters
+  .flatMap((a) => letters.map((b) => a + b))
+  .filter((c) => !covered.includes(c) && !NOT_COUNTRIES.has(c) && en.of(c) !== c);
+const countries = [...covered, ...others];
 const currencies = ["EUR", "SEK", "NOK", "DKK", "ISK"];
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
