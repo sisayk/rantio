@@ -53,7 +53,7 @@ export default function DetailGallery({
       <section className={styles.gallery} aria-label={fill(lang, t.gallery, { name })} data-count={tiles.length}>
         {tiles.map((p, i) => (
           <button key={p.id + i} type="button" className={styles.galleryTile} onClick={(e) => show(i, e.currentTarget)} aria-label={`${alt(p)} – ${count(i)}`}>
-            <img src={unsplash(p.id, i === 0 ? 1400 : 700, i === 0 ? 940 : 470, p.crop)} alt="" loading={i === 0 ? "eager" : "lazy"} />
+            <img src={unsplash(p.id, i === 0 ? 1400 : 700, i === 0 ? 940 : 470, p.crop)} alt={`${name} – ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} />
           </button>
         ))}
         {photos.length > 1 ? (
@@ -75,7 +75,7 @@ export default function DetailGallery({
         >
           {photos.map((p, i) => (
             <button key={p.id + i} type="button" className={styles.galleryRowSlide} onClick={(e) => show(i, e.currentTarget)} aria-label={`${alt(p)} – ${count(i)}`}>
-              <img src={unsplash(p.id, 900, 600, p.crop)} alt="" loading={i === 0 ? "eager" : "lazy"} />
+              <img src={unsplash(p.id, 900, 600, p.crop)} alt={`${name} – ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} />
             </button>
           ))}
         </div>

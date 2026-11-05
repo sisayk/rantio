@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { visitorCountry } from "./i18n/country";
 import { firstLang, isLang, LANG_COOKIE } from "./i18n/locales";
+import { getListing } from "./lib/listings";
 
 // Any address without a language (/, /hosts, /cottages/x) goes to the same page in
 // the visitor's language: the one they picked before (a cookie, set by the language
@@ -14,7 +15,14 @@ export function proxy(request: NextRequest) {
     const url = new URL(pathname.replace(/\/+$/, "") + request.nextUrl.search, request.url);
     return NextResponse.redirect(url, 308);
   }
-  if (isLang(pathname.split("/")[1])) return NextResponse.next();
+  const parts = pathname.split("/");
+  if (isLang(parts[1])) {
+    // /fi/cottages/<unknown>: Next's 404 page with a 404 status (a streamed page can't set it).
+    if (parts[2] === "cottages" && parts[3] && !getListing(parts[3])) {
+      return NextResponse.rewrite(new URL(`/${parts[1]}/cottages-not-found`, request.url));
+    }
+    return NextResponse.next();
+  }
 
   const saved = request.cookies.get(LANG_COOKIE)?.value;
   const lang = isLang(saved) ? saved : firstLang(request.headers.get("accept-language"), visitorCountry(request.headers));

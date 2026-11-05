@@ -20,6 +20,17 @@ const nextConfig: NextConfig = {
       { source: "/media/:path*", destination: `${API_URL}/media/:path*` },
     ];
   },
+  // Private pages (a guest's token links, the owner's dashboard): never indexed, and the link never
+  // leaves in a Referer header. Sent as headers because a streamed page's <meta> can come too late.
+  async headers() {
+    const priv = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }, { key: "Referrer-Policy", value: "no-referrer" }];
+    return [
+      { source: "/:lang/(book|messages|review|newsletter)/:path*", headers: priv },
+      { source: "/:lang/hosting", headers: priv },
+      { source: "/:lang/hosting/:path*", headers: priv },
+      { source: "/:lang/hosts/welcome", headers: priv },
+    ];
+  },
   // Finnish pages used to live at the root; keep old links and bookmarks working.
   async redirects() {
     return [
