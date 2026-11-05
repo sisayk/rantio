@@ -17,8 +17,9 @@ if [ -z "$CODE" ] && command -v pbpaste >/dev/null; then
   CODE="$(pbpaste)"
 fi
 CODE="$(printf '%s' "$CODE" | tr -d '[:space:]')"
-if [ ${#CODE} -lt 20 ]; then
-  echo "That doesn't look like a Beds24 invite code (${#CODE} characters). Nothing was saved." >&2
+# An invite code is letters and digits only (no spaces, colons or question marks).
+if [ ${#CODE} -lt 20 ] || ! printf '%s' "$CODE" | grep -Eq '^[A-Za-z0-9_=+/-]+$'; then
+  echo "That isn't a Beds24 invite code: the clipboard holds something else. In Beds24 click Copy next to the code, then run this again. Nothing was saved." >&2
   exit 1
 fi
 echo "The invite code: ${#CODE} characters, ending in ...${CODE: -6}"
