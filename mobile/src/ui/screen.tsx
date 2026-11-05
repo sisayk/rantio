@@ -2,7 +2,7 @@
 import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from "react-native";
+import { Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useT } from "@/text/i18n";
@@ -75,8 +75,11 @@ export function PageBar({ title, right, onBack }: { title?: string; right?: Reac
 /** A modal sheet's top: a title and a close button. */
 export function SheetBar({ title, onClose }: { title: string; onClose: () => void }) {
   const { m } = useT();
+  const insets = useSafeAreaInsets();
+  // On iPhone a modal is a card below the status bar; on Android it fills the screen, so the bar
+  // moves down past the clock and signal icons.
   return (
-    <View style={styles.sheetBar}>
+    <View style={[styles.sheetBar, Platform.OS === "android" && { paddingTop: insets.top + space.sm }]}>
       <IconButton name="close" filled={false} label={m.guest.contact.close} onPress={onClose} />
       <Text v="h3" style={{ flex: 1, textAlign: "center" }} numberOfLines={1}>
         {title}
