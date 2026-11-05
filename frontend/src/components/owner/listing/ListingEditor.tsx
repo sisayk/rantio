@@ -33,6 +33,7 @@ import { REVIEWS } from "@/i18n/messages/reviews";
 import { ACCOUNT } from "@/i18n/messages/account";
 
 const HOST_TEXT = (lang: Lang) => ACCOUNT[lang].host;
+import CancellationPicker from "./CancellationPicker";
 import PhotoManager from "./PhotoManager";
 import { actionsFor, CHECK_SECTION, checklist, dateFormats, LANG_CODES, type Section, SECTIONS } from "./shared";
 import { ArrowLeft, Check, Dialog, fieldError, Trash, useToasts } from "./ui";
@@ -49,7 +50,8 @@ const FIELDS = [
   "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions", "nearby",
   "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price", "cleaning_fee",
   "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount", "security_deposit",
-  "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by", "self_check_in", "min_age",
+  "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note",
+  "cancellation_policy", "long_stay_policy", "non_refundable_option", "check_in_from", "check_in_until", "check_out_by", "self_check_in", "min_age",
   "pets_allowed", "smoking_allowed", "events_allowed", "quiet_hours", "house_rules", "waste_instructions",
   "sauna_instructions", "fireplace_instructions", "arrival_instructions", "departure_instructions", "access_details",
 ] as const satisfies readonly (keyof ListingFields)[];
@@ -60,6 +62,7 @@ const FIELD_SECTION: Record<string, Section> = {
   extra_guest_fee: "pricing", extra_guest_from: "pricing", pet_fee: "pricing", weekly_discount: "pricing", monthly_discount: "pricing",
   security_deposit: "pricing", seasonal_prices: "pricing", taxes_note: "pricing",
   smart_pricing: "pricing", smart_min_price: "pricing", smart_max_price: "pricing",
+  cancellation_policy: "rules", long_stay_policy: "rules", non_refundable_option: "rules",
   check_in_from: "rules", check_in_until: "rules", check_out_by: "rules", self_check_in: "rules", min_age: "rules",
   pets_allowed: "rules", smoking_allowed: "rules", events_allowed: "rules", quiet_hours: "rules", house_rules: "rules",
   waste_instructions: "rules", sauna_instructions: "rules", fireplace_instructions: "rules",
@@ -954,6 +957,13 @@ export default function ListingEditor({
         {text("fireplace_instructions", l.rules.fireplace, { rows: 3, max: 2000, placeholder: l.rules.fireplacePlaceholder })}
         {text("house_rules", l.rules.other, { rows: 4, max: 4000, placeholder: l.rules.otherPlaceholder })}
       </div>
+      <CancellationPicker
+        lang={lang}
+        policy={f.cancellation_policy}
+        longPolicy={f.long_stay_policy}
+        nonRefundable={f.non_refundable_option}
+        onChange={(next) => (Object.entries(next) as [keyof ListingFields, never][]).forEach(([k, v]) => set(k, v))}
+      />
     </section>
   );
 

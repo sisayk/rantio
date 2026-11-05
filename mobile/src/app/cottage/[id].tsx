@@ -8,6 +8,7 @@ import { API_URL, SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
+import { CANCELLATION } from "@/i18n/messages/cancellation";
 import { EVENTS } from "@/i18n/messages/events";
 import { findNearby, type NearbyPlace, WIKI_HEADERS } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
@@ -22,6 +23,8 @@ import { Button, Empty, Icon, IconButton, Pill, Problem, Text } from "@/ui/kit";
 import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
+import { DEFAULT_LONG_POLICY, policyFromFeatures } from "@/lib/cancellation";
+import { useCancellationLines } from "@/ui/cancellation";
 import { NearbyEvents } from "@/ui/nearbyEvents";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { RatingsBlock, STAR, useScore } from "@/ui/ratings";
@@ -51,6 +54,14 @@ export default function Cottage() {
   const [allAmenities, setAllAmenities] = useState(false);
   const [picking, setPicking] = useState(false);
   const [dates, setDates] = useState<[string | null, string | null]>([null, null]);
+  // Demo listings carry no policy of their own: free cancellation reads as Moderate, else Firm.
+  const cancel = useCancellationLines({
+    policy: policyFromFeatures(l?.features ?? []),
+    longPolicy: DEFAULT_LONG_POLICY,
+    checkIn: dates[0],
+    checkOut: dates[1],
+    nights: dates[0] && dates[1] ? daysBetween(dates[0], dates[1]) : 0,
+  });
 
   useEffect(() => {
     if (!l) return;
@@ -293,11 +304,7 @@ export default function Cottage() {
           <Divider />
           <Text v="h2">{m.app.detail.know}</Text>
           <Know emoji="💳" title={m.app.detail.paidOn} lead={m.app.detail.paidOnLead} />
-          <Know
-            emoji="🗓️"
-            title={m.app.detail.cancellation}
-            lead={has("freeCancellation") ? m.catalog.features.freeCancellation : m.app.detail.cancelSite}
-          />
+          <Know emoji="🗓️" title={`${cancel.title} · ${cancel.name}`} lead={[...cancel.lines, cancel.window, CANCELLATION[lang].siteConfirms].filter(Boolean).join(" ")} />
           <Know emoji="💬" title={m.app.detail.ask} lead={m.guest.contact.lead} onPress={() => router.push(`/contact/${l.id}`)} />
 
           <Divider />

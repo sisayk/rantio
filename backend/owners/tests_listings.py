@@ -59,7 +59,7 @@ class ListingTests(TestCase):
         self.assertEqual(res.status_code, 200, res.content)
         body = res.json()
         self.assertEqual(body["name"], "Rantahuvila")
-        self.assertEqual(body["amenities"], ["lake", "woodSauna", "boat"])
+        self.assertEqual(body["amenities"], ["lake", "woodSauna", "boat", "freeCancellation"])  # Moderate: free cancellation
         self.assertEqual(body["price_per_night"], "175.50")
         self.c.refresh_from_db()
         self.assertTrue(self.c.has_sauna)
@@ -145,6 +145,28 @@ class ListingTests(TestCase):
         self.assertEqual((body["check_in_from"], body["latitude"]), ("16:00", 61.8421))
         self.assertEqual(body["access_details"], "Code 4412")
         self.assertTrue(CottageChange.objects.filter(cottage=self.c, action="edit").exists())
+
+    def test_cancellation_policy_and_the_free_cancellation_filter(self):
+        body = self.client.get(self.base).json()
+        self.assertEqual((body["cancellation_policy"], body["long_stay_policy"], body["non_refundable_option"]), ("moderate", "firm", False))
+        res = self.patch({"cancellation_policy": "firm", "long_stay_policy": "strict", "non_refundable_option": True})
+        self.assertEqual(res.status_code, 200, res.content)
+        body = res.json()
+        self.assertEqual((body["cancellation_policy"], body["long_stay_policy"], body["non_refundable_option"]), ("firm", "strict", True))
+        self.assertNotIn("freeCancellation", body["amenities"])  # Firm isn't free cancellation
+        # Ticking it by hand doesn't count; the policy decides.
+        self.assertNotIn("freeCancellation", self.patch({"amenities": ["lake", "freeCancellation"]}).json()["amenities"])
+        body = self.patch({"cancellation_policy": "flexible"}).json()
+        self.assertEqual(body["amenities"], ["lake", "freeCancellation"])
+        self.assertEqual(self.patch({"cancellation_policy": "strict"}).status_code, 400)  # Strict is only for long stays
+        self.assertEqual(self.patch({"long_stay_policy": "moderate"}).status_code, 400)
+
+    def test_booking_link_shows_the_policy(self):
+        self.c.cancellation_policy, self.c.booking_link_token = "limited", "tok-cancel"
+        self.c.save()
+        self.client.logout()
+        body = self.client.get("/api/book/tok-cancel/").json()
+        self.assertEqual((body["cancellation_policy"], body["long_stay_policy"]), ("limited", "firm"))
 
     def test_rejects_bad_editor_values(self):
         res = self.patch({"max_nights": 1, "min_nights": 3, "amenity_notes": {}, "min_age": 12,

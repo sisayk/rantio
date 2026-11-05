@@ -1,9 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
 
 import type { ListingDetail } from "@/api";
+import { CANCELLATION } from "@/i18n/messages/cancellation";
+import { LONG_POLICIES, POLICIES } from "@/lib/cancellation";
 import { num, numText, useEditor } from "@/state/listing";
 import { useT } from "@/text/i18n";
-import { EditorShell, Group, InlineField, ToggleRow } from "@/ui/editor";
+import { ChoiceCard, EditorShell, Group, InlineField, ToggleRow } from "@/ui/editor";
 import { Field } from "@/ui/form";
 import { Text } from "@/ui/kit";
 
@@ -31,6 +33,9 @@ const from = (d: ListingDetail) => ({
   waste_instructions: d.waste_instructions,
   sauna_instructions: d.sauna_instructions,
   fireplace_instructions: d.fireplace_instructions,
+  cancellation_policy: d.cancellation_policy,
+  long_stay_policy: d.long_stay_policy,
+  non_refundable_option: d.non_refundable_option,
 });
 type Form = ReturnType<typeof from>;
 
@@ -45,7 +50,8 @@ const toFields = (f: Form) => ({
 /** Check-in and check-out, what's allowed, and how the cottage works. */
 export default function ListingRules() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { m } = useT();
+  const { m, lang } = useT();
+  const c = CANCELLATION[lang];
   const l = m.listings;
   const t = l.rules;
   const editor = useEditor(Number(id), from, toFields);
@@ -69,6 +75,19 @@ export default function ListingRules() {
             <ToggleRow label={t.events} value={form.events_allowed} onChange={(v) => set("events_allowed", v)} />
             <InlineField label={t.minAge} hint={t.minAgeHint} keyboard="number-pad" value={form.min_age} onChange={(v) => set("min_age", v)} error={bad("min_age")} width={70} />
             <Field label={t.quiet} placeholder={t.quietPlaceholder} value={form.quiet_hours} maxLength={60} onChangeText={(v) => set("quiet_hours", v)} error={bad("quiet_hours")} />
+          </Group>
+          <Group title={c.title} lead={c.choose}>
+            {POLICIES.map((p) => (
+              <ChoiceCard key={p} title={c.names[p]} lines={[c.rules[p], c.late[p]]} on={form.cancellation_policy === p} onPress={() => set("cancellation_policy", p)} />
+            ))}
+            <Text v="tiny">{c.window}</Text>
+          </Group>
+          <Group title={c.longTitle}>
+            {LONG_POLICIES.map((p) => (
+              <ChoiceCard key={p} title={c.longNames[p]} lines={[c.longRules[p]]} on={form.long_stay_policy === p} onPress={() => set("long_stay_policy", p)} />
+            ))}
+            <ToggleRow label={c.nonRefundable} hint={c.nonRefundableLead} value={form.non_refundable_option} onChange={(v) => set("non_refundable_option", v)} />
+            <Text v="tiny">{c.sites}</Text>
           </Group>
           <Field label={t.waste} multiline placeholder={t.wastePlaceholder} value={form.waste_instructions} onChangeText={(v) => set("waste_instructions", v)} error={bad("waste_instructions")} />
           <Field label={t.sauna} multiline placeholder={t.saunaPlaceholder} value={form.sauna_instructions} onChangeText={(v) => set("sauna_instructions", v)} error={bad("sauna_instructions")} />

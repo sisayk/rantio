@@ -1,7 +1,7 @@
 // Building blocks of the listing editor: a page with a save bar, number and money fields,
 // yes/no rows and the listing's load/error states.
 import type { ReactNode } from "react";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Switch, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from "react-native";
 
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
@@ -157,6 +157,29 @@ export function ToggleRow({ label, hint, value, onChange }: { label: string; hin
   );
 }
 
+/** One choice of several, as a card: the chosen one outlined, like Airbnb's policy picker. */
+export function ChoiceCard({ title, lines, on, onPress }: { title: string; lines: string[]; on: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={[title, ...lines].join(". ")}
+      style={({ pressed }) => [styles.choice, on && styles.choiceOn, pressed && { opacity: 0.8 }]}
+    >
+      <View style={[styles.radio, on && { borderColor: colors.green }]}>{on ? <View style={styles.radioDot} /> : null}</View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text v="bodyMedium">{title}</Text>
+        {lines.map((line, i) => (
+          <Text key={i} v="small" color={i ? colors.soft : undefined}>
+            {line}
+          </Text>
+        ))}
+      </View>
+    </Pressable>
+  );
+}
+
 export function Group({ title, lead, children }: { title: string; lead?: string; children: ReactNode }) {
   return (
     <View style={styles.group}>
@@ -193,5 +216,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.page,
   },
   inline: { flexDirection: "row", alignItems: "center", gap: space.md },
+  choice: { flexDirection: "row", alignItems: "flex-start", gap: space.md, padding: space.lg, borderRadius: radius.md, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.page },
+  choiceOn: { borderColor: colors.ink, borderWidth: 2, padding: space.lg - 1 },
+  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: colors.soft, alignItems: "center", justifyContent: "center", marginTop: 1 },
+  radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.green },
   group: { gap: space.xs, paddingBottom: space.lg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line, borderRadius: radius.sm },
 });

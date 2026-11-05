@@ -441,6 +441,22 @@ class Cottage(models.Model):
         max_digits=9, decimal_places=2, null=True, blank=True, help_text="Smart pricing never goes above this. Empty: twice the price per night."
     )
     taxes_note = models.CharField(max_length=300, blank=True)
+    # Cancellation (frontend/src/lib/cancellation.ts): Airbnb's four policies, so each booking
+    # site gets the closest match; the booking link uses this one as it is.
+    cancellation_policy = models.CharField(
+        max_length=10,
+        choices=[("flexible", "Flexible"), ("moderate", "Moderate"), ("limited", "Limited"), ("firm", "Firm")],
+        default="moderate",
+        help_text="Flexible: full refund up to 1 day before check-in. Moderate: 5 days. "
+        "Limited: 14 days, 50 % up to 7. Firm: 30 days, 50 % up to 7.",
+    )
+    long_stay_policy = models.CharField(
+        max_length=6, choices=[("firm", "Firm"), ("strict", "Strict")], default="firm",
+        help_text="For stays of 28 nights or more.",
+    )
+    non_refundable_option = models.BooleanField(
+        default=False, help_text="On the booking sites, guests may also choose a 10 % lower price with no refund."
+    )
     # House rules
     check_in_from = models.TimeField(null=True, blank=True)
     check_in_until = models.TimeField(null=True, blank=True)

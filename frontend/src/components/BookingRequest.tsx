@@ -7,6 +7,8 @@ import type { Messages } from "@/i18n";
 import { countryName, fill, plural } from "@/i18n/format";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
+import { CANCELLATION } from "@/i18n/messages/cancellation";
+import { DEFAULT_LONG_POLICY, DEFAULT_POLICY, guestLines, isLongPolicy, isPolicy, LONG_STAY_NIGHTS } from "@/lib/cancellation";
 import { formatPrice, isCurrency } from "@/lib/currency";
 import { type BookingLinkInfo, guestApi, type StayQuote } from "@/lib/ownerApi";
 import { CALENDAR_LOCALES } from "./guest/Pickers";
@@ -384,6 +386,23 @@ export default function BookingRequest({
                 {sending ? t.form.sending : t.form.send}
               </button>
               <p className={styles.small}>{t.price.note}</p>
+              <div className={styles.cancellation}>
+                <h3>{CANCELLATION[lang].title}</h3>
+                {guestLines(CANCELLATION[lang], {
+                  policy: isPolicy(info.cancellation_policy) ? info.cancellation_policy : DEFAULT_POLICY,
+                  longPolicy: isLongPolicy(info.long_stay_policy) ? info.long_stay_policy : DEFAULT_LONG_POLICY,
+                  checkIn: range?.from && range.to ? iso(range.from) : null,
+                  nights,
+                  today: info.today,
+                  time: info.check_in_from ?? "15:00",
+                  day: (d) => new Intl.DateTimeFormat(LANG_INFO[lang].intl, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${d}T12:00Z`)),
+                }).map((line) => (
+                  <p key={line} className={styles.small}>
+                    {line}
+                  </p>
+                ))}
+                {nights < LONG_STAY_NIGHTS ? <p className={styles.small}>{CANCELLATION[lang].window}</p> : null}
+              </div>
             </aside>
           </form>
         )}

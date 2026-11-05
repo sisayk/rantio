@@ -4,11 +4,13 @@ import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from "react-native
 
 import { ApiError, type BookingLinkInfo, guestApi, Offline, type Ratings, type StayQuote } from "@/api";
 import { REVIEWS } from "@/i18n/messages/reviews";
+import { DEFAULT_LONG_POLICY, DEFAULT_POLICY, isLongPolicy, isPolicy } from "@/lib/cancellation";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { usePrefs } from "@/state/prefs";
 import { daysBetween, formatRange } from "@/text/dates";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
+import { CancellationInfo } from "@/ui/cancellation";
 import { Stepper } from "@/ui/controls";
 import { Field } from "@/ui/form";
 import { Button, Card, Empty, Loading, Pill, Problem, Section, Text } from "@/ui/kit";
@@ -196,6 +198,18 @@ export default function BookingRequest() {
               <Text v="tiny">{b.price.note}</Text>
             </Card>
           ) : null}
+
+          <Card style={{ marginTop: space.lg }}>
+            <CancellationInfo
+              policy={isPolicy(info.cancellation_policy) ? info.cancellation_policy : DEFAULT_POLICY}
+              longPolicy={isLongPolicy(info.long_stay_policy) ? info.long_stay_policy : DEFAULT_LONG_POLICY}
+              checkIn={start}
+              checkOut={end}
+              nights={nights}
+              today={info.today}
+              time={info.check_in_from}
+            />
+          </Card>
 
           <Section title={b.form.title}>
             <View style={{ gap: space.lg }}>

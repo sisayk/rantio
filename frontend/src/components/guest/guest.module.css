@@ -2789,3 +2789,9 @@ a.rating { color: inherit; text-decoration: underline; text-underline-offset: 3p
   .eventDates input { width: 100%; }
   .eventDates .eventPrimary { flex: 1 1 100%; }
 }
+
+/* The cancellation policy in the booking column (CancellationNote). */
+.cancelNote { display: grid; gap: 6px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--g-line); font-size: 14px; line-height: 1.45; }
+.cancelNote h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.cancelNote p { margin: 0; }
+.cancelSoft { color: var(--g-soft); font-size: 13px; }

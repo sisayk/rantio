@@ -198,3 +198,7 @@
   .block, .summary, .done { padding: 18px 16px; }
   .picker { --rdp-day-width: 40px; --rdp-day-height: 40px; --rdp-day_button-width: 38px; --rdp-day_button-height: 38px; }
 }
+
+/* The host's cancellation policy, under the price (lib/cancellation.ts). */
+.cancellation { display: grid; gap: 6px; padding-top: 14px; border-top: 1px solid #e3e7e5; }
+.cancellation h3 { margin: 0; font-size: 15px; font-weight: 600; }

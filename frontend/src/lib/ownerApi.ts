@@ -1,6 +1,7 @@
 // The owner dashboard's calls to Django, made through this site's /api proxy.
 
 import type { OtherListing } from "@/i18n/messages/otherListings";
+import type { LongPolicy, Policy } from "./cancellation";
 
 export type Money = string; // "1234.50"
 
@@ -233,6 +234,9 @@ export type BookingLinkInfo = {
   today: string;
   busy: [string, string][];
   ratings: Ratings;
+  cancellation_policy: Policy;
+  long_stay_policy: LongPolicy;
+  check_in_from: string | null;
 };
 
 export type ReviewRow = {
@@ -423,6 +427,10 @@ export type ListingFields = {
   smart_max_price: Money | null;
   seasonal_prices: Season[];
   taxes_note: string;
+  /** lib/cancellation.ts: Airbnb's four policies; the long one for 28 nights or more. */
+  cancellation_policy: Policy;
+  long_stay_policy: LongPolicy;
+  non_refundable_option: boolean;
   check_in_from: string | null;
   check_in_until: string | null;
   check_out_by: string | null;

@@ -5,6 +5,7 @@ import { countryName, currencyNames, languageNamesIn, number, plural } from "@/i
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { activitiesFor } from "@/lib/activities";
+import { DEFAULT_LONG_POLICY, policyFromFeatures } from "@/lib/cancellation";
 import { CHANNELS, channelIcon, FEATURE_GROUPS } from "@/lib/catalog";
 import { type Listing, listingCurrency, listingName, listingPhotos } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
@@ -15,6 +16,7 @@ import DetailGallery from "./DetailGallery";
 import HostSwitchLink from "./HostSwitchLink";
 import ListingPrice from "./ListingPrice";
 import { ActivityIcon, ArrowLeft, Bed, CategoryIcon, Wordmark, People, Star } from "./icons";
+import CancellationNote from "./CancellationNote";
 import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
@@ -179,6 +181,8 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
             </ul>
             <ContactOwner lang={lang} listingId={l.id} cottage={name} maxGuests={l.guests} t={t.contact} />
             <p className={styles.bookNote}>{d.bookNote}</p>
+            {/* Demo listings carry no policy of their own: free cancellation reads as Moderate, else Firm. */}
+            <CancellationNote lang={lang} policy={policyFromFeatures(l.features)} longPolicy={DEFAULT_LONG_POLICY} />
           </aside>
         </div>
       </main>

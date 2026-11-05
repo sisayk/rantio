@@ -69,6 +69,8 @@ EDITOR_KEYS = {
     "stepFree", "accessibleBathroom", "accessibleParking", "smokeAlarm", "coAlarm", "fireExtinguisher", "firstAid",
 }
 FEATURE_KEYS = FILTER_KEYS | EDITOR_KEYS
+# Policies that count as "Free cancellation" in the guest site's filter (lib/cancellation.ts).
+FREE_CANCELLATION = {"flexible", "moderate"}
 NEARBY_KINDS = {"lake", "beach", "ski", "hiking", "grocery", "restaurant", "transport", "evCharging", "airport", "station", "other"}
 
 # A site's calendar is read every 15 minutes; two hours without a good read needs a look.
@@ -248,6 +250,9 @@ def cottage_detail(c: Cottage) -> dict:
         "smart_max_price": money(c.smart_max_price),
         "seasonal_prices": list(c.seasonal_prices or []),
         "taxes_note": c.taxes_note,
+        "cancellation_policy": c.cancellation_policy,
+        "long_stay_policy": c.long_stay_policy,
+        "non_refundable_option": c.non_refundable_option,
         "check_in_from": hhmm(c.check_in_from),
         "check_in_until": hhmm(c.check_in_until),
         "check_out_by": hhmm(c.check_out_by),
@@ -381,7 +386,8 @@ class CottageSerializer(serializers.ModelSerializer):
             "show_exact_location", "property_id", "licence_number", "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
             "nearby", "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price",
             "cleaning_fee", "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount",
-            "security_deposit", "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by",
+            "security_deposit", "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note",
+            "cancellation_policy", "long_stay_policy", "non_refundable_option", "check_in_from", "check_in_until", "check_out_by",
             "self_check_in", "min_age", "pets_allowed", "smoking_allowed", "events_allowed", "quiet_hours", "house_rules",
             "waste_instructions", "sauna_instructions", "fireplace_instructions", "arrival_instructions",
             "departure_instructions", "access_details", "nettimokki_url",
@@ -458,6 +464,11 @@ class CottageSerializer(serializers.ModelSerializer):
             if source:
                 self.translation_job = translate.plan(instance, source)
         amenities = validated_data.get("amenities")
+        # The guest site's "Free cancellation" filter follows the policy, never the owner's ticks.
+        if "cancellation_policy" in validated_data or amenities is not None:
+            policy = validated_data.get("cancellation_policy", instance.cancellation_policy)
+            keys = [k for k in (amenities if amenities is not None else instance.amenities or []) if k != "freeCancellation"]
+            validated_data["amenities"] = amenities = keys + (["freeCancellation"] if policy in FREE_CANCELLATION else [])
         if "pets_allowed" in validated_data:
             keys = list(amenities if amenities is not None else instance.amenities or [])
             keys = [k for k in keys if k != "pets"] + (["pets"] if validated_data["pets_allowed"] else [])

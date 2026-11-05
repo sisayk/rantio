@@ -761,3 +761,22 @@
   .nextButton { justify-content: space-between; width: 100%; }
   .panelHolder { scroll-margin-top: 120px; }
 }
+
+/* Cancellation policy (CancellationPicker): one card per policy, the chosen one outlined. */
+.subhead { margin: 0; font-size: 17px; font-weight: 600; }
+h4.subhead { margin-top: 6px; font-size: 15px; }
+.policyList { display: grid; gap: 10px; }
+.policy {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--o-line);
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fff;
+}
+.policy[data-on="true"] { border-color: var(--o-ink); box-shadow: inset 0 0 0 1px var(--o-ink); }
+.policy input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--o-green); flex: none; }
+.policy:focus-within { outline: 2px solid var(--o-green); outline-offset: 2px; }
+.policyText { display: grid; gap: 3px; font-size: 15px; line-height: 1.45; }
