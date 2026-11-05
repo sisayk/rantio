@@ -37,6 +37,13 @@ export const fonts = {
   bold: "HankenGrotesk_800ExtraBold",
 };
 
+/** Android phones are narrower in density-independent units (a OnePlus 13R is 360 wide, an iPhone
+ *  14 Pro Max 430), so the same type size fills more of the screen and reads as bigger. Text on
+ *  Android is set a little smaller to look like the iPhone app. The phone's own font-size setting
+ *  still applies on top. */
+export const ANDROID_TEXT_SCALE = 0.92;
+export const textSize = (n: number) => (Platform.OS === "android" ? Math.round(n * ANDROID_TEXT_SCALE * 2) / 2 : n);
+
 export const radius = { sm: 10, md: 14, lg: 22, pill: 999 };
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };

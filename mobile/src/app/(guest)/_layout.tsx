@@ -8,7 +8,7 @@ export default function GuestTabs() {
   const { m } = useT();
   const t = m.app.tabs;
   return (
-    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelStyle={{ selected: { color: colors.green } }}>
+    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelVisibilityMode="labeled" labelStyle={{ selected: { color: colors.green } }}>
       <NativeTabs.Trigger name="explore">
         <NativeTabs.Trigger.Label>{t.explore}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />

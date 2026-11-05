@@ -8,7 +8,7 @@ import { ApiError, type BookingRequestRow, ownerApi } from "@/api";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { DAY_WEEKDAY, formatDate } from "@/text/dates";
 import { useT } from "@/text/i18n";
-import { colors, fonts, radius, space } from "@/theme";
+import { colors, fonts, radius, space, textSize } from "@/theme";
 import { Button, Card, Problem, Text } from "@/ui/kit";
 
 export function RequestCard({
@@ -102,5 +102,5 @@ export function RequestCard({
 const styles = StyleSheet.create({
   quote: { borderLeftWidth: 3, borderLeftColor: colors.line, paddingLeft: space.md, color: colors.soft },
   payout: { flexDirection: "row", alignItems: "center", gap: space.sm, borderWidth: 1, borderColor: colors.line, borderRadius: radius.sm, paddingHorizontal: space.md },
-  payoutInput: { flex: 1, paddingVertical: 10, fontFamily: fonts.semibold, fontSize: 18, color: colors.ink },
+  payoutInput: { flex: 1, paddingVertical: 10, fontFamily: fonts.semibold, fontSize: textSize(18), color: colors.ink },
 });

@@ -1,7 +1,7 @@
 // Text fields with labels, in the website's calm style.
 import { StyleSheet, TextInput, type TextInputProps, View } from "react-native";
 
-import { colors, fonts, radius, space } from "@/theme";
+import { colors, fonts, radius, space, textSize } from "@/theme";
 import { Text } from "@/ui/kit";
 
 type FieldProps = TextInputProps & { label: string; hint?: string; error?: string | null; optional?: string };
@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: space.md,
     paddingVertical: 12,
     fontFamily: fonts.regular,
-    fontSize: 16,
+    fontSize: textSize(16),
     color: colors.ink,
     backgroundColor: colors.page,
   },

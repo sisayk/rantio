@@ -5,6 +5,7 @@ import * as Haptics from "expo-haptics";
 import { type ComponentProps, type ReactNode, useId } from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   type PressableProps,
   StyleSheet,
@@ -18,7 +19,7 @@ import Svg, { Defs, G, LinearGradient, Path, Rect, Stop } from "react-native-svg
 
 import { MARK, WORDMARK } from "@/lib/brand";
 
-import { colors, fonts, radius, shadow, space } from "@/theme";
+import { ANDROID_TEXT_SCALE, colors, fonts, radius, shadow, space, textSize } from "@/theme";
 
 export type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -41,7 +42,20 @@ const variants = StyleSheet.create({
 export type Variant = keyof typeof variants;
 
 export function Text({ v = "body", color, style, ...rest }: TextProps & { v?: Variant; color?: string }) {
-  return <RNText {...rest} style={[variants[v], color ? { color } : null, style]} />;
+  const styles = [variants[v], color ? { color } : null, style];
+  if (Platform.OS !== "android") return <RNText {...rest} style={styles} />;
+  // Android: the same sizes a little smaller (see ANDROID_TEXT_SCALE), including sizes a screen sets itself.
+  const flat = StyleSheet.flatten(styles) as TextStyle;
+  return (
+    <RNText
+      {...rest}
+      style={{
+        ...flat,
+        fontSize: flat.fontSize ? textSize(flat.fontSize) : undefined,
+        lineHeight: flat.lineHeight ? Math.round(flat.lineHeight * ANDROID_TEXT_SCALE) : undefined,
+      }}
+    />
+  );
 }
 
 export const tap = () => Haptics.selectionAsync().catch(() => undefined);

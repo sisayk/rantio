@@ -5,7 +5,7 @@ import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from "react-n
 import { ACCOUNT } from "@/i18n/messages/account";
 import { NAMES } from "@/text/names";
 import { useT } from "@/text/i18n";
-import { colors, fonts, radius, space } from "@/theme";
+import { colors, fonts, radius, space, textSize } from "@/theme";
 import { Icon, tap, Text } from "@/ui/kit";
 import { styles as fieldStyles } from "@/ui/form";
 import { SheetBar } from "@/ui/screen";
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: colors.ground,
   },
-  searchInput: { flex: 1, paddingVertical: 12, fontFamily: fonts.regular, fontSize: 16, color: colors.ink },
+  searchInput: { flex: 1, paddingVertical: 12, fontFamily: fonts.regular, fontSize: textSize(16), color: colors.ink },
   item: { flexDirection: "row", alignItems: "center", paddingVertical: 15, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   gap: { borderTopWidth: 6, borderTopColor: colors.ground, marginTop: 0 },
 });

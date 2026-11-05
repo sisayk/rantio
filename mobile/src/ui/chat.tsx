@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { ChatMessage } from "@/api";
 import type { Lang } from "@/i18n/locales";
 import { DAY_LONG, formatDate, TIME } from "@/text/dates";
-import { colors, fonts, radius, space } from "@/theme";
+import { colors, fonts, radius, space, textSize } from "@/theme";
 import { Icon, tap, Text } from "@/ui/kit";
 
 export function Messages({
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     paddingTop: 11,
     paddingBottom: 11,
     fontFamily: fonts.regular,
-    fontSize: 16,
+    fontSize: textSize(16),
     color: colors.ink,
   },
   send: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.green, alignItems: "center", justifyContent: "center" },

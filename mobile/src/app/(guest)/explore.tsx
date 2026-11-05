@@ -11,7 +11,7 @@ import { useSession } from "@/state/session";
 import { activeFilters, BEDROOM_CHOICES, COUNTRIES, type Filters, NO_FILTERS, search, type Sort } from "@/state/search";
 import { daysBetween, formatRange } from "@/text/dates";
 import { type T, useT } from "@/text/i18n";
-import { colors, fonts, radius, shadow, shadowFloat, space } from "@/theme";
+import { colors, fonts, radius, shadow, shadowFloat, space, textSize } from "@/theme";
 import { Chip, Stepper } from "@/ui/controls";
 import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
 import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     height: 56,
   },
-  destText: { flex: 1, fontFamily: fonts.regular, fontSize: 17, color: colors.ink, paddingVertical: 0 },
+  destText: { flex: 1, fontFamily: fonts.regular, fontSize: textSize(17), color: colors.ink, paddingVertical: 0 },
   dest: { flexDirection: "row", alignItems: "center", gap: space.lg, paddingVertical: 6 },
   destIcon: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: colors.ground, alignItems: "center", justifyContent: "center" },
   collapsed: {

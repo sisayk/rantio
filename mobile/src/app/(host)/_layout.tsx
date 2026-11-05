@@ -16,7 +16,7 @@ export default function HostTabs() {
   if (owner && !owner.is_host) return <Redirect href="/list-cottage" />;
   const t = m.app.tabs;
   return (
-    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelStyle={{ selected: { color: colors.green } }}>
+    <NativeTabs tintColor={colors.green} backgroundColor={colors.page} indicatorColor={colors.greenTint} labelVisibilityMode="labeled" labelStyle={{ selected: { color: colors.green } }}>
       <NativeTabs.Trigger name="today">
         <NativeTabs.Trigger.Label>{t.today}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md="home" />
