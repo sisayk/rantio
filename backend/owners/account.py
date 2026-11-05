@@ -39,6 +39,8 @@ def delete_account(owner: Owner) -> str:
     user = owner.user
     keep = owner.cottages.exists() or owner.invoices.exists()
     AppDevice.objects.filter(owner=owner).delete()
+    if owner.photo:
+        owner.photo.delete(save=False)
     owner.login_codes.all().delete()
     MonitorInterest.objects.filter(email__iexact=email).delete()
     if not keep:

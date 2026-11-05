@@ -197,20 +197,38 @@ class MeView(APIView):
     def get(self, request):
         o = request.user.owner
         return Response({"name": o.name, "email": o.email, "language": o.language, "is_pilot": o.is_pilot,
-                         "is_host": o.is_host})
+                         "is_host": o.is_host, "phone": o.phone, "photo": o.photo.url if o.photo else None})
 
     def delete(self, request):
         """Deletes the account (Settings → Delete account); see owners/account.py."""
         return Response(account.handle_delete(request))
 
     def patch(self, request):
-        """The app's language setting also sets the language of the owner's emails."""
-        lang = request.data.get("language")
-        if lang not in Language.values:
-            return Response({"detail": "language"}, status=status.HTTP_400_BAD_REQUEST)
+        """Account → name and phone; the app's language setting (also the language of the owner's emails)."""
         o = request.user.owner
-        o.language = lang
-        o.save(update_fields=["language"])
+        fields = []
+        if "language" in request.data:
+            lang = request.data.get("language")
+            if lang not in Language.values:
+                return Response({"detail": "language"}, status=status.HTTP_400_BAD_REQUEST)
+            o.language = lang
+            fields.append("language")
+        if "name" in request.data:
+            name = str(request.data.get("name") or "").strip()
+            if not name or len(name) > 120:
+                return Response({"name": ["invalid"]}, status=status.HTTP_400_BAD_REQUEST)
+            o.name = name
+            fields.append("name")
+        if "phone" in request.data:
+            phone = str(request.data.get("phone") or "").strip()
+            if phone and not sms.normalize(phone, owner_login.owner_country(o)):
+                return Response({"phone": ["invalid"]}, status=status.HTTP_400_BAD_REQUEST)
+            if phone and owner_login.find_owner_by_phone(sms.normalize(phone, owner_login.owner_country(o))) not in (None, o):
+                return Response({"phone": ["taken"]}, status=status.HTTP_400_BAD_REQUEST)
+            o.phone = phone
+            fields.append("phone")
+        if fields:
+            o.save(update_fields=fields)
         return self.get(request)
 
 

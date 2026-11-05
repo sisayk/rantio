@@ -1,5 +1,6 @@
 // Building blocks every screen uses: text, buttons, rows, cards, empty and error states.
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { type ComponentProps, type ReactNode, useId } from "react";
 import {
@@ -223,13 +224,16 @@ export function Pill({ label, tone = "neutral", style }: { label: string; tone?:
   );
 }
 
-export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
+export function Avatar({ name, size = 44, photo }: { name: string; size?: number; photo?: string | null }) {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase())
     .join("");
+  if (photo) {
+    return <Image source={{ uri: photo }} style={{ width: size, height: size, borderRadius: size / 2 }} contentFit="cover" transition={120} />;
+  }
   return (
     <View style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}>
       <Text v="h3" color="#fff" style={{ fontSize: size * 0.38, lineHeight: size * 0.5 }}>

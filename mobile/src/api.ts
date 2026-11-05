@@ -60,6 +60,9 @@ export type {
   Thread,
 } from "@/lib/ownerApi";
 
+/** The payment method Rantio's fees are charged to (owners/profile.py). */
+export type PaymentMethod = { kind: string; brand: string; last4: string; exp_month: number | null; exp_year: number | null };
+
 /** Metro's host:port. Expo's tools pass it as hostUri; an app started from Xcode or Android
  *  Studio doesn't get that, so the address its code was loaded from is used instead. */
 function devServer(): string {
@@ -171,7 +174,7 @@ export const ownerApi = {
   /** Signs in with an Apple or Google ID token; the app gets its own key back. */
   social: (provider: "apple" | "google", idToken: string, device: string, platform: string) =>
     call<{ ok: boolean; token: string }>("auth/social/", json("POST", { provider, id_token: idToken, app: true, device, platform })),
-  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean }>("owner/me/", { owner: true }),
+  me: () => call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null }>("owner/me/", { owner: true }),
   setLanguage: (language: string) =>
     call<{ language: string }>("owner/me/", { ...json("PATCH", { language }), owner: true }),
   /** The Mökki monitor waitlist, joined with the email the owner signs in with. */
@@ -179,6 +182,20 @@ export const ownerApi = {
   joinMonitor: () => call<{ joined: boolean }>("owner/monitor/", { ...json("POST"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
+  updateMe: (fields: { name?: string; phone?: string }) =>
+    call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null }>(
+      "owner/me/",
+      { ...json("PATCH", fields), owner: true },
+    ),
+  setPhoto: async (uri: string) => {
+    const { File } = await import("expo-file-system");
+    const form = new FormData();
+    form.append("file", new File(uri) as unknown as Blob);
+    return upload<{ photo: string }>("owner/me/photo/", form);
+  },
+  removePhoto: () => call<{ photo: null }>("owner/me/photo/", { ...json("DELETE"), owner: true }),
+  paymentMethod: () => call<{ available: boolean; method: PaymentMethod | null }>("owner/payment-method/", { owner: true }),
+  newPaymentPage: () => call<{ url: string }>("owner/payment-method/", { ...json("POST", { app: true }), owner: true }),
   /** Deletes the signed-in account (owners/account.py). */
   deleteAccount: () => call<{ deleted: string }>("owner/me/", { ...json("DELETE"), owner: true }),
   summary: (year?: number) => call<Summary>(`owner/summary/${year ? `?year=${year}` : ""}`, { owner: true }),

@@ -1,15 +1,16 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Linking, Switch, View } from "react-native";
+import { Linking, Pressable, Switch, View } from "react-native";
 
 import { useHost } from "@/state/host";
 import { usePrefs } from "@/state/prefs";
 import { pushState, type PushState, registerForPush } from "@/state/push";
 import { useSession } from "@/state/session";
-import { DeleteAccountButton } from "@/ui/account";
+import { mediaUrl } from "@/api";
+import { ACCOUNT } from "@/i18n/messages/account";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
-import { Avatar, Button, Card, Row, Section, Text } from "@/ui/kit";
+import { Avatar, Button, Card, Icon, Row, Section, Text } from "@/ui/kit";
 import { SwitchPill, TabScreen } from "@/ui/screen";
 import { AboutRows, openSite, SettingsRows } from "@/ui/settings";
 
@@ -37,15 +38,21 @@ export default function Menu() {
   return (
     <View style={{ flex: 1 }}>
       <TabScreen title={m.app.tabs.menu} contentStyle={{ paddingBottom: 140 }}>
-        <Card style={{ gap: space.lg }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
-            <Avatar name={owner?.name ?? summary?.owner.name ?? ""} size={56} />
-            <View style={{ flex: 1 }}>
-              <Text v="h2">{owner?.name ?? summary?.owner.name ?? ""}</Text>
-              <Text v="small">{owner?.email ?? summary?.owner.email ?? ""}</Text>
+        <Pressable onPress={() => router.push("/account")} accessibilityRole="button" accessibilityLabel={ACCOUNT[lang].profile.edit}>
+          <Card style={{ gap: space.lg }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
+              <Avatar name={owner?.name ?? summary?.owner.name ?? ""} size={56} photo={owner?.photo ? mediaUrl(owner.photo) : null} />
+              <View style={{ flex: 1 }}>
+                <Text v="h2">{owner?.name ?? summary?.owner.name ?? ""}</Text>
+                <Text v="small">{owner?.email ?? summary?.owner.email ?? ""}</Text>
+                <Text v="smallMedium" color={colors.green} style={{ marginTop: 4 }}>
+                  {ACCOUNT[lang].profile.edit}
+                </Text>
+              </View>
+              <Icon name="chevron-forward" size={18} color={colors.faint} />
             </View>
-          </View>
-        </Card>
+          </Card>
+        </Pressable>
 
         <Section title={m.app.profile.hosting}>
           <Row icon="grid-outline" label={m.listings.title} detail={m.listings.add} onPress={() => router.push("/listings")} />
@@ -100,12 +107,6 @@ export default function Menu() {
             onPress={async () => {
               setMode("travelling");
               await signOut();
-              router.replace("/explore");
-            }}
-          />
-          <DeleteAccountButton
-            onDeleted={() => {
-              setMode("travelling");
               router.replace("/explore");
             }}
           />

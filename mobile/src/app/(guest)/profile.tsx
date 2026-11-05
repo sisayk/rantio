@@ -8,10 +8,11 @@ import { colors, radius, shadowFloat, space } from "@/theme";
 import { Avatar, Button, Icon, Logo, Text, Wordmark } from "@/ui/kit";
 import { SwitchPill, TabScreen } from "@/ui/screen";
 import { AboutRows, SettingsRows } from "@/ui/settings";
-import { DeleteAccountButton } from "@/ui/account";
+import { mediaUrl } from "@/api";
+import { ACCOUNT } from "@/i18n/messages/account";
 
 export default function Profile() {
-  const { m } = useT();
+  const { m, lang } = useT();
   const { setMode } = usePrefs();
   const { signedIn, owner, signOut } = useSession();
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function Profile() {
         <View style={[styles.card, shadowFloat]}>
           {signedIn ? (
             <>
-              <Avatar name={owner?.name ?? ""} size={96} />
+              <Avatar name={owner?.name ?? ""} size={96} photo={owner?.photo ? mediaUrl(owner.photo) : null} />
               <Text v="title" style={{ textAlign: "center" }}>
                 {owner?.name ?? ""}
               </Text>
@@ -42,7 +43,7 @@ export default function Profile() {
                 onPress={() => void signOut()}
                 style={{ marginTop: space.sm }}
               />
-              <DeleteAccountButton />
+              <Button small kind="secondary" icon="person-outline" label={ACCOUNT[lang].profile.edit} onPress={() => router.push("/account")} style={{ marginTop: space.sm }} />
             </>
           ) : (
             <>

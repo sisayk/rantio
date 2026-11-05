@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path
 
 from config.admin_assets_view import admin_asset
-from owners import calendar_views, events, geocode, inbound, inbox, listing_links, listings, newsletter, portal, reviews, site_icons
+from owners import calendar_views, events, geocode, inbound, inbox, listing_links, listings, newsletter, portal, profile, reviews, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
 
@@ -29,6 +29,8 @@ urlpatterns = [
     path("api/auth/social/", portal.SocialView.as_view(), name="login-social"),
     path("api/owner/device/", portal.DeviceView.as_view(), name="owner-device"),
     path("api/owner/me/", portal.MeView.as_view(), name="owner-me"),
+    path("api/owner/me/photo/", profile.ProfilePhotoView.as_view(), name="owner-photo"),
+    path("api/owner/payment-method/", profile.PaymentMethodView.as_view(), name="owner-payment-method"),
     path("api/owner/monitor/", portal.MonitorWaitlistView.as_view(), name="owner-monitor"),
     path("api/owner/summary/", portal.SummaryView.as_view(), name="owner-summary"),
     path("api/owner/bookings/", portal.BookingsView.as_view(), name="owner-bookings"),

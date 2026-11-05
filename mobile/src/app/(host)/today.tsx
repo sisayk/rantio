@@ -8,6 +8,7 @@ import { HOST_TODAY } from "@/i18n/messages/hostToday";
 import type { Currency } from "@/lib/currency";
 import { formatPrice } from "@/lib/currency";
 import { useHost } from "@/state/host";
+import { useSession } from "@/state/session";
 import { formatDate } from "@/text/dates";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadow, space } from "@/theme";
@@ -23,6 +24,7 @@ export default function Today() {
   const d = m.dashboard;
   const t = HOST_TODAY[lang];
   const { summary: s, conversations, unread: unreadAll, error, loading, refresh, setYear } = useHost();
+  const { owner } = useSession();
   const router = useRouter();
   const [listings, setListings] = useState<ListingSummary[] | null>(null);
   const pending = (conversations ?? []).filter((c) => c.request_status === "pending" && !c.archived);
@@ -70,7 +72,7 @@ export default function Today() {
           {unreadAll > 0 ? <View style={styles.dot} /> : null}
         </Pressable>
         <Pressable onPress={() => router.navigate("/menu")} accessibilityRole="button" accessibilityLabel={m.app.tabs.menu}>
-          <Avatar name={s.owner.name} size={40} />
+          <Avatar name={s.owner.name} size={40} photo={owner?.photo ? mediaUrl(owner.photo) : null} />
         </Pressable>
       </View>
 

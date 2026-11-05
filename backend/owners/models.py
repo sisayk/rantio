@@ -249,6 +249,10 @@ class Owner(models.Model):
     stripe_customer_id = models.CharField(max_length=40, blank=True, editable=False)
     # The card the owner saved for Rantio's invoices; they're charged to it automatically.
     stripe_payment_method = models.CharField(max_length=40, blank=True, editable=False)
+    stripe_checkout_id = models.CharField(
+        max_length=80, blank=True, editable=False, help_text="Stripe's card page the owner opened last (Account → Payment method)."
+    )
+    photo = models.FileField(upload_to="owners/%Y/", blank=True, help_text="Profile photo (JPG, PNG or WebP).")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

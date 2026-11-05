@@ -22,7 +22,7 @@ const SecureStore =
     : Secure;
 
 /** Anyone signed in; is_host once they've listed a cottage (only hosts reach the hosting tabs). */
-type Owner = { name: string; email: string; language: string; is_pilot: boolean; is_host: boolean };
+type Owner = { name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null };
 
 type Session = {
   ready: boolean;
