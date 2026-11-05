@@ -165,6 +165,9 @@ REST_FRAMEWORK = {
 # Events near a cottage (owners/events.py): Ticketmaster's Discovery API key, when there is
 # one (developer.ticketmaster.com). Linked Events (Helsinki region) needs no key.
 TICKETMASTER_API_KEY = os.environ.get("TICKETMASTER_API_KEY", "")
+# Rantio's Ticketmaster affiliate tracking link from Impact (impact.com), so ticket links earn
+# commission; empty = plain links. Set with deploy/set-ticketmaster.sh.
+TICKETMASTER_AFFILIATE_LINK = os.environ.get("TICKETMASTER_AFFILIATE_LINK", "")
 
 # The sign-up form checks the owner's email with a code, and a checked sign-up becomes an
 # owner who is signed in at once (owners/email_check.py).

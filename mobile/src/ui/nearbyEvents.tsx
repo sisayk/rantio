@@ -29,8 +29,9 @@ type EventItem = {
   url: string;
   price: { free: boolean | null; text: string; min: number | null; max: number | null; currency: string };
   interests: Interest[];
+  sponsored?: boolean; // the link carries Rantio's affiliate tag
 };
-type Answer = { events: EventItem[]; sources: string[]; covered: boolean };
+type Answer = { events: EventItem[]; sources: string[]; covered: boolean; affiliate?: boolean };
 type State = { status: "loading" } | { status: "error" } | { status: "ready"; answer: Answer };
 
 const SAVED_KEY = "rantio.savedEvents.v1";
@@ -202,7 +203,10 @@ export function NearbyEvents({ lat, lng, country, from, to, onAddDates }: { lat:
       {matching.length > FIRST ? (
         <Button kind="secondary" label={all ? t.hide : `${t.explore} (${matching.length})`} onPress={() => setAll(!all)} />
       ) : null}
-      <Text v="tiny">{fill(lang, t.source, { sources: state.answer.sources.join(", ") })}</Text>
+      <Text v="tiny">
+        {fill(lang, t.source, { sources: state.answer.sources.join(", ") })}
+        {state.answer.affiliate ? ` ${t.affiliate}` : ""}
+      </Text>
     </View>
   );
 }

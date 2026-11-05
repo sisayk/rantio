@@ -88,7 +88,7 @@ class EventsTests(TestCase):
         with mock.patch.object(events, "_get") as call:
             body = self.get(lat=66.5, lng=25.7, **{"from": D(1), "to": D(5)}).json()
         call.assert_not_called()
-        self.assertEqual(body, {"events": [], "sources": [], "covered": False})
+        self.assertEqual(body, {"events": [], "sources": [], "covered": False, "affiliate": False})
 
     def test_dates_are_checked(self):
         self.assertEqual(self.get(**{"from": D(5), "to": D(1)}).status_code, 400)
@@ -110,3 +110,35 @@ class EventsTests(TestCase):
         days = [e["start"][:10] for e in en]
         self.assertEqual((days.count(D(1)), days.count(D(2))), (events.PER_DAY, events.PER_DAY))
         self.assertTrue(any(e["name"].startswith("Kerho") for e in fi))
+
+
+@override_settings(TICKETMASTER_API_KEY="tm-key")
+class AffiliateLinkTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def get(self):
+        with mock.patch.object(events, "_get", side_effect=answer):
+            return self.client.get("/api/events/", {"lat": 60.17, "lng": 24.94, "lang": "en", "from": D(1), "to": D(5)}).json()
+
+    def test_plain_links_without_a_tracking_link(self):
+        body = self.get()
+        hockey = next(e for e in body["events"] if e["source"] == "Ticketmaster")
+        self.assertEqual(hockey["url"], "https://www.ticketmaster.fi/event/1")
+        self.assertFalse(hockey["sponsored"])
+        self.assertFalse(body["affiliate"])
+
+    @override_settings(TICKETMASTER_AFFILIATE_LINK="https://ticketmaster.evyy.net/c/111/222/333")
+    def test_ticketmaster_links_through_the_tracking_link(self):
+        body = self.get()
+        hockey = next(e for e in body["events"] if e["source"] == "Ticketmaster")
+        self.assertEqual(hockey["url"], "https://ticketmaster.evyy.net/c/111/222/333?u=https%3A%2F%2Fwww.ticketmaster.fi%2Fevent%2F1")
+        self.assertTrue(hockey["sponsored"])
+        self.assertTrue(body["affiliate"])
+        # Linked Events links stay as they are, and the order doesn't change.
+        self.assertTrue(all(not e["sponsored"] for e in body["events"] if e["source"] != "Ticketmaster"))
+        self.assertEqual([e["name"] for e in body["events"]], ["Christmas market", "Jazz evening", "HIFK – Tappara", "Long exhibition"])
+
+    @override_settings(TICKETMASTER_AFFILIATE_LINK="https://example.com/track?id=9&to={url}")
+    def test_a_link_with_its_own_place_for_the_page(self):
+        self.assertEqual(events.affiliate_link("https://www.ticketmaster.fi/e/2"), "https://example.com/track?id=9&to=https%3A%2F%2Fwww.ticketmaster.fi%2Fe%2F2")

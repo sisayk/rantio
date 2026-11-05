@@ -27,6 +27,8 @@ export type EventsText = {
   until: string;
   away: string;
   source: string;
+  /** Under the list when ticket links carry Rantio's affiliate tag. */
+  affiliate: string;
   interests: Record<"music" | "festival" | "market" | "arts" | "sports" | "family" | "food" | "other", string>;
 };
 
@@ -56,6 +58,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "until {date}",
     away: "{distance} away",
     source: "Events: {sources}.",
+    affiliate: "Rantio may earn a commission when you buy tickets through these links. The price is the same, and it doesn't change which events are shown.",
     interests: { music: "Music", festival: "Festivals", market: "Markets", arts: "Arts and exhibitions", sports: "Sports", family: "Family", food: "Food and drink", other: "Other" },
   },
   fi: {
@@ -83,6 +86,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "{date} asti",
     away: "{distance} päässä",
     source: "Tapahtumat: {sources}.",
+    affiliate: "Rantio voi saada palkkion, kun ostat lippuja näiden linkkien kautta. Hinta on sama, eikä palkkio vaikuta siihen, mitä tapahtumia näytetään.",
     interests: { music: "Musiikki", festival: "Festivaalit", market: "Markkinat", arts: "Taide ja näyttelyt", sports: "Urheilu", family: "Perhe", food: "Ruoka ja juoma", other: "Muut" },
   },
   sv: {
@@ -110,6 +114,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "till {date}",
     away: "{distance} bort",
     source: "Evenemang: {sources}.",
+    affiliate: "Rantio kan få provision när du köper biljetter via de här länkarna. Priset är detsamma, och det påverkar inte vilka evenemang som visas.",
     interests: { music: "Musik", festival: "Festivaler", market: "Marknader", arts: "Konst och utställningar", sports: "Sport", family: "Familj", food: "Mat och dryck", other: "Övrigt" },
   },
   nb: {
@@ -137,6 +142,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "til {date}",
     away: "{distance} unna",
     source: "Arrangementer: {sources}.",
+    affiliate: "Rantio kan få provisjon når du kjøper billetter via disse lenkene. Prisen er den samme, og det påvirker ikke hvilke arrangementer som vises.",
     interests: { music: "Musikk", festival: "Festivaler", market: "Markeder", arts: "Kunst og utstillinger", sports: "Sport", family: "Familie", food: "Mat og drikke", other: "Annet" },
   },
   nn: {
@@ -164,6 +170,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "til {date}",
     away: "{distance} unna",
     source: "Arrangement: {sources}.",
+    affiliate: "Rantio kan få provisjon når du kjøper billettar via desse lenkjene. Prisen er den same, og det påverkar ikkje kva arrangement som blir viste.",
     interests: { music: "Musikk", festival: "Festivalar", market: "Marknader", arts: "Kunst og utstillingar", sports: "Sport", family: "Familie", food: "Mat og drikke", other: "Anna" },
   },
   da: {
@@ -191,6 +198,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "til {date}",
     away: "{distance} væk",
     source: "Begivenheder: {sources}.",
+    affiliate: "Rantio kan få provision, når du køber billetter via disse links. Prisen er den samme, og det påvirker ikke, hvilke begivenheder der vises.",
     interests: { music: "Musik", festival: "Festivaler", market: "Markeder", arts: "Kunst og udstillinger", sports: "Sport", family: "Familie", food: "Mad og drikke", other: "Andet" },
   },
   is: {
@@ -218,6 +226,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "til {date}",
     away: "{distance} í burtu",
     source: "Viðburðir: {sources}.",
+    affiliate: "Rantio gæti fengið þóknun þegar þú kaupir miða í gegnum þessa tengla. Verðið er það sama og það hefur ekki áhrif á hvaða viðburðir eru sýndir.",
     interests: { music: "Tónlist", festival: "Hátíðir", market: "Markaðir", arts: "List og sýningar", sports: "Íþróttir", family: "Fjölskylda", food: "Matur og drykkur", other: "Annað" },
   },
   et: {
@@ -245,6 +254,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "kuni {date}",
     away: "{distance} kaugusel",
     source: "Sündmused: {sources}.",
+    affiliate: "Rantio võib saada vahendustasu, kui ostad pileteid nende linkide kaudu. Hind on sama ja see ei mõjuta, milliseid sündmusi näidatakse.",
     interests: { music: "Muusika", festival: "Festivalid", market: "Laadad", arts: "Kunst ja näitused", sports: "Sport", family: "Pere", food: "Söök ja jook", other: "Muu" },
   },
   lv: {
@@ -272,6 +282,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "līdz {date}",
     away: "{distance} attālumā",
     source: "Pasākumi: {sources}.",
+    affiliate: "Rantio var saņemt komisiju, ja iegādājaties biļetes, izmantojot šīs saites. Cena ir tāda pati, un tas neietekmē, kuri pasākumi tiek rādīti.",
     interests: { music: "Mūzika", festival: "Festivāli", market: "Tirdziņi", arts: "Māksla un izstādes", sports: "Sports", family: "Ģimenei", food: "Ēdiens un dzērieni", other: "Citi" },
   },
   lt: {
@@ -299,6 +310,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "iki {date}",
     away: "už {distance}",
     source: "Renginiai: {sources}.",
+    affiliate: "Rantio gali gauti komisinį atlygį, kai bilietus perkate per šias nuorodas. Kaina tokia pati, ir tai neturi įtakos, kurie renginiai rodomi.",
     interests: { music: "Muzika", festival: "Festivaliai", market: "Mugės", arts: "Menas ir parodos", sports: "Sportas", family: "Šeimai", food: "Maistas ir gėrimai", other: "Kita" },
   },
   de: {
@@ -326,6 +338,7 @@ export const EVENTS: Record<Lang, EventsText> = {
     until: "bis {date}",
     away: "{distance} entfernt",
     source: "Veranstaltungen: {sources}.",
+    affiliate: "Rantio erhält möglicherweise eine Provision, wenn du über diese Links Tickets kaufst. Der Preis bleibt gleich, und es beeinflusst nicht, welche Veranstaltungen angezeigt werden.",
     interests: { music: "Musik", festival: "Festivals", market: "Märkte", arts: "Kunst und Ausstellungen", sports: "Sport", family: "Familie", food: "Essen und Trinken", other: "Sonstiges" },
   },
 };

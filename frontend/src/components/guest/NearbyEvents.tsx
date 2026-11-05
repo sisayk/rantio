@@ -22,8 +22,9 @@ type EventItem = {
   url: string;
   price: { free: boolean | null; text: string; min: number | null; max: number | null; currency: string };
   interests: Interest[];
+  sponsored?: boolean; // the link carries Rantio's affiliate tag
 };
-type Answer = { events: EventItem[]; sources: string[]; covered: boolean };
+type Answer = { events: EventItem[]; sources: string[]; covered: boolean; affiliate?: boolean };
 type State = { status: "idle" } | { status: "loading" } | { status: "error" } | { status: "ready"; answer: Answer };
 
 const SAVED_KEY = "rantio.savedEvents.v1";
@@ -252,7 +253,7 @@ export default function NearbyEvents({ lang, lat, lng, country }: { lang: Lang; 
                           {cost.text}
                         </span>
                       ) : null}
-                      <a className={styles.eventLink} href={ev.url} target="_blank" rel="noopener">
+                      <a className={styles.eventLink} href={ev.url} target="_blank" rel={ev.sponsored ? "sponsored noopener" : "noopener"}>
                         {t.tickets}
                         <External className={styles.icon16} />
                       </a>
@@ -271,7 +272,10 @@ export default function NearbyEvents({ lang, lat, lng, country }: { lang: Lang; 
               );
             })}
           </ul>
-          <p className={styles.nearbySource}>{fill(lang, t.source, { sources: state.answer.sources.join(", ") })}</p>
+          <p className={styles.nearbySource}>
+            {fill(lang, t.source, { sources: state.answer.sources.join(", ") })}
+            {state.answer.affiliate ? ` ${t.affiliate}` : ""}
+          </p>
         </>
       ) : null}
     </div>

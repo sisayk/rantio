@@ -6,7 +6,10 @@ Sources, both official event listings that link to the event's own or ticket pag
 - Linked Events (api.hel.fi): the open event database of Helsinki, Espoo and Vantaa and
   partners. Free, no key. Used when the cottage is in the Helsinki region.
 - Ticketmaster Discovery API: concerts, sports and shows across the Nordics (Finland,
-  Sweden, Norway, Denmark). Used when TICKETMASTER_API_KEY is set on the server.
+  Sweden, Norway, Denmark). Used when TICKETMASTER_API_KEY is set on the server. With
+  TICKETMASTER_AFFILIATE_LINK (Rantio's Impact tracking link) the ticket links carry
+  Rantio's affiliate tag; those events say "sponsored", and the pages say so to guests.
+  Commission never changes which events are shown or their order.
 
 Only events that take place during the stay (from arrival day to departure day) within
 RADIUS_KM of the cottage are returned, nearest dates first, each with its distance, price
@@ -176,6 +179,18 @@ def from_linked_events(lat: float, lng: float, start: date, end: date, lang: str
     return out
 
 
+def affiliate_link(url: str) -> str:
+    """The event's Ticketmaster page through Rantio's Impact tracking link, when there is one.
+    The link may hold {url}; otherwise the page goes in its u= parameter (Impact's deep link)."""
+    base = settings.TICKETMASTER_AFFILIATE_LINK
+    if not base:
+        return url
+    page = urllib.parse.quote(url, safe="")
+    if "{url}" in base:
+        return base.replace("{url}", page)
+    return f"{base}{'&' if '?' in base else '?'}u={page}"
+
+
 def from_ticketmaster(lat: float, lng: float, start: date, end: date, lang: str) -> list[dict]:
     params = urllib.parse.urlencode({
         "apikey": settings.TICKETMASTER_API_KEY, "latlong": f"{lat:.4f},{lng:.4f}", "radius": RADIUS_KM, "unit": "km",
@@ -214,7 +229,8 @@ def from_ticketmaster(lat: float, lng: float, start: date, end: date, lang: str)
             "venue": venue.get("name", ""),
             "lat": vlat, "lng": vlng,
             "description": _strip(e.get("info") or e.get("description") or " · ".join(w for w in words if w and w != "Undefined")),
-            "url": e["url"],
+            "url": affiliate_link(e["url"]),
+            "sponsored": bool(settings.TICKETMASTER_AFFILIATE_LINK),
             "price": {"free": (high == 0) if high is not None else None, "text": "", "min": low, "max": high,
                       "currency": (ranges[0].get("currency") if ranges else "") or ""},
             "interests": interests_of(words + [e.get("name", "")]),
@@ -237,7 +253,7 @@ def _day(value: str | None) -> date | None:
 
 def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
     lang = lang if lang in LANGS else "en"
-    key = "events6:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
+    key = "events7:" + hashlib.sha256(f"{lat:.2f}|{lng:.2f}|{start}|{end}|{lang}".encode()).hexdigest()
     hit = cache.get(key)
     if hit is not None:
         return hit
@@ -269,7 +285,7 @@ def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
         if dedupe in seen:
             continue
         seen.add(dedupe)
-        events.append({**e, "km": round(dist, 1), "_long": (last - first).days > 3})
+        events.append({**e, "km": round(dist, 1), "sponsored": bool(e.get("sponsored")), "_long": (last - first).days > 3})
     # Each day of the stay gets its share (nearest first), then long-running ones such as
     # exhibitions, so a busy first day doesn't push the rest of the stay off the list.
     events.sort(key=lambda e: (e["_long"], max(_day(e["start"]), start), e["km"]))
@@ -282,7 +298,8 @@ def find(lat: float, lng: float, start: date, end: date, lang: str) -> dict:
             chosen.append(e)
     for e in chosen:
         del e["_long"]
-    answer = {"events": chosen[:MAX_EVENTS], "sources": sources, "covered": bool(providers)}
+    chosen = chosen[:MAX_EVENTS]
+    answer = {"events": chosen, "sources": sources, "covered": bool(providers), "affiliate": any(e["sponsored"] for e in chosen)}
     cache.set(key, answer, CACHE_SECONDS)
     return answer
 
