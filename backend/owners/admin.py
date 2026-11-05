@@ -219,9 +219,16 @@ class CottageAdmin(ModelAdmin):
     list_filter = ["status", "country", "region", "has_sauna"]
     search_fields = ["name", "owner__name", "municipality", "inbound_code"]
     autocomplete_fields = ["owner"]
-    readonly_fields = ["forwarding_address"]
+    readonly_fields = ["forwarding_address", "beds24_property_id", "beds24_room_id", "beds24_synced_at", "beds24_error"]
+    actions = ["send_to_beds24"]
     fieldsets = [
         ("Cottage", {"fields": ["owner", "name", "status", "listing_slug", "listing_started_on", "trial_months"], "classes": ["st-grid-2"]}),
+        ("Beds24 (channel manager)", {
+            "fields": ["beds24_property_id", "beds24_room_id", "beds24_synced_at", "beds24_error"],
+            "classes": ["st-grid-2"],
+            "description": "Filled in by the action \"Send to Beds24\" in the cottage list. Airbnb, Booking.com and Vrbo are "
+                           "then connected to the property once, in Beds24's control panel.",
+        }),
         ("Where", {"fields": ["country", "region", "municipality", "nettimokki_url"], "classes": ["st-grid-2"]}),
         ("Nettimökki booking emails", {
             "fields": ["forwarding_address"],
@@ -232,6 +239,22 @@ class CottageAdmin(ModelAdmin):
         ("Price, in the cottage's currency", {"fields": ["price_per_night", "cleaning_fee", "min_nights"], "classes": ["st-grid-3"]}),
         ("For guests and the AI helper", {"fields": ["amenities", "house_rules", "description_fi", "description_en"]}),
     ]
+
+
+    @admin.action(description="Send to Beds24 (the cottage and its prices)")
+    def send_to_beds24(self, request, queryset):
+        from django.contrib import messages
+
+        from . import beds24
+
+        if not beds24.enabled():
+            self.message_user(request, "Beds24 isn't connected yet: run deploy/set-beds24.sh on the Mac.", messages.ERROR)
+            return
+        for c in queryset:
+            try:
+                self.message_user(request, beds24.sync(c), messages.SUCCESS)
+            except beds24.Beds24Error as e:
+                self.message_user(request, f"{c.name}: {e}", messages.ERROR)
 
 
 @admin.register(Booking)

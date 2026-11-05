@@ -415,6 +415,10 @@ class Cottage(models.Model):
         max_length=40, blank=True, help_text="Land register id of the property (Finland: kiinteistötunnus 123-456-7-89); the sites report it (DAC7)."
     )
     licence_number = models.CharField(max_length=60, blank=True, help_text="Short-term rental licence or registration number, where required.")
+    beds24_property_id = models.PositiveIntegerField(null=True, blank=True, help_text="The cottage's property in Beds24, once sent.")
+    beds24_room_id = models.PositiveIntegerField(null=True, blank=True)
+    beds24_synced_at = models.DateTimeField(null=True, blank=True)
+    beds24_error = models.CharField(max_length=500, blank=True)
     amenity_notes = models.JSONField(
         default=dict, blank=True, help_text="{amenity key: {\"note\": \"…\", \"fee\": \"10.00\"}} for amenities with conditions or a price."
     )

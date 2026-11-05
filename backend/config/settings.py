@@ -369,6 +369,13 @@ BOOKING_ALERTS = env_bool("BOOKING_ALERTS", True)
 # Monthly commission invoices (manage.py make_monthly_invoices). Without a key they
 # stay drafts in the admin. STRIPE_TAX_RATE_ID: a 25.5 % Finnish VAT tax rate made
 # once in the Stripe dashboard; without it VAT goes on the invoice as its own line.
+# Beds24, the channel manager that puts cottages on Airbnb, Booking.com and Vrbo
+# (owners/beds24.py). The refresh token comes from deploy/set-beds24.sh; without it
+# nothing is sent.
+BEDS24_API = os.environ.get("BEDS24_API", "https://beds24.com/api/v2").rstrip("/")
+BEDS24_REFRESH_TOKEN = os.environ.get("BEDS24_REFRESH_TOKEN", "")
+BEDS24_PROPERTY_TYPE = os.environ.get("BEDS24_PROPERTY_TYPE", "")  # Beds24's own word for a holiday home, once known
+
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_TAX_RATE_ID = os.environ.get("STRIPE_TAX_RATE_ID", "")
 INVOICE_DAYS_UNTIL_DUE = int(os.environ.get("INVOICE_DAYS_UNTIL_DUE", "14"))
