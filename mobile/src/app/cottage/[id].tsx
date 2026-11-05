@@ -141,12 +141,12 @@ export default function Cottage() {
             accessibilityRole="link"
             style={({ pressed }) => [styles.ratingLine, pressed && { opacity: 0.6 }]}
           >
-            <Icon name="star" size={22} color={STAR} />
-            <Text v="h2">{NO_RATINGS.count ? score(NO_RATINGS.average ?? 0) : REVIEWS[lang].newOnRantio}</Text>
+            <Icon name="star" size={13} color={STAR} />
+            <Text v="smallMedium">{NO_RATINGS.count ? score(NO_RATINGS.average ?? 0) : REVIEWS[lang].newOnRantio}</Text>
             {NO_RATINGS.count ? (
               <>
-                <Text v="h2">·</Text>
-                <Text v="bodyMedium" style={{ textDecorationLine: "underline" }}>
+                <Text v="smallMedium">·</Text>
+                <Text v="smallMedium" style={{ textDecorationLine: "underline" }}>
                   {p(REVIEWS[lang].count, NO_RATINGS.count)}
                 </Text>
               </>
@@ -463,7 +463,7 @@ function Fact({ icon, text }: { icon: Parameters<typeof Icon>[0]["name"]; text: 
 const Divider = () => <View style={styles.divider} />;
 
 const styles = StyleSheet.create({
-  ratingLine: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: space.md, alignSelf: "flex-start" },
+  ratingLine: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: space.sm, alignSelf: "flex-start" },
   topButtons: { position: "absolute", left: space.lg, right: space.lg, flexDirection: "row", justifyContent: "space-between" },
   heartWrap: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.94)", alignItems: "center", justifyContent: "center" },
   availability: { flexDirection: "row", alignItems: "center", gap: space.md },
