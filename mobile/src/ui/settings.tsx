@@ -9,7 +9,9 @@ import { CONTACT_EMAIL } from "@/lib/content";
 import { usePrefs } from "@/state/prefs";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
+import { ACCOUNT } from "@/i18n/messages/account";
 import { Row, Section, Text } from "@/ui/kit";
+import { MenuDivider, MenuRow } from "@/ui/menu";
 
 export const openSite = (path: string) =>
   WebBrowser.openBrowserAsync(`${SITE_URL}${path}`, { controlsColor: colors.green, toolbarColor: "#ffffff" }).catch(() => undefined);
@@ -37,6 +39,25 @@ export function AboutRows() {
         <Row icon="document-text-outline" label={m.app.profile.terms} onPress={() => openSite(`/${lang}/terms`)} />
         <Row icon="mail-outline" label={m.app.profile.contact} value={CONTACT_EMAIL} onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} last />
       </Section>
+      <View style={{ marginTop: space.xl, gap: 2 }}>
+        <Text v="tiny">{m.common.footer.note}</Text>
+        <Text v="tiny">{f(m.app.profile.version, { version: `${Application.nativeApplicationVersion ?? "1.0.0"} (${Application.nativeBuildVersion ?? "1"})` })}</Text>
+      </View>
+    </>
+  );
+}
+
+/** The bottom of Profile and Menu: help, privacy and legal, log out, and the version. */
+export function MoreRows({ onLogout }: { onLogout?: () => void }) {
+  const { m, lang, f } = useT();
+  const s = ACCOUNT[lang].settings;
+  return (
+    <>
+      <MenuRow icon="help-circle-outline" label={s.help} detail={CONTACT_EMAIL} onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} />
+      <MenuRow icon="hand-left-outline" label={m.app.profile.privacy} onPress={() => openSite(`/${lang}/privacy`)} />
+      <MenuDivider />
+      <MenuRow icon="document-text-outline" label={s.legal} onPress={() => openSite(`/${lang}/terms`)} />
+      {onLogout ? <MenuRow icon="log-out-outline" label={s.logout} onPress={onLogout} /> : null}
       <View style={{ marginTop: space.xl, gap: 2 }}>
         <Text v="tiny">{m.common.footer.note}</Text>
         <Text v="tiny">{f(m.app.profile.version, { version: `${Application.nativeApplicationVersion ?? "1.0.0"} (${Application.nativeBuildVersion ?? "1"})` })}</Text>

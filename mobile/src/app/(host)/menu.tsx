@@ -1,34 +1,26 @@
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { Linking, Pressable, Switch, View } from "react-native";
+import { useRouter } from "expo-router";
+import { View } from "react-native";
 
+import { ACCOUNT } from "@/i18n/messages/account";
 import { useHost } from "@/state/host";
 import { usePrefs } from "@/state/prefs";
-import { pushState, type PushState, registerForPush } from "@/state/push";
 import { useSession } from "@/state/session";
-import { mediaUrl } from "@/api";
-import { ACCOUNT } from "@/i18n/messages/account";
 import { useT } from "@/text/i18n";
-import { colors, space } from "@/theme";
-import { Avatar, Button, Card, Icon, Row, Section, Text } from "@/ui/kit";
+import { space } from "@/theme";
+import { IconButton } from "@/ui/kit";
+import { MenuDivider, MenuRow, ProfileCard } from "@/ui/menu";
 import { SwitchPill, TabScreen } from "@/ui/screen";
-import { AboutRows, openSite, SettingsRows } from "@/ui/settings";
+import { MoreRows, openSite } from "@/ui/settings";
 
+/** The host's Menu, laid out like Profile: the profile card, hosting, Account settings, help and legal. */
 export default function Menu() {
   const { m, lang } = useT();
+  const s = ACCOUNT[lang].settings;
   const { owner, signOut } = useSession();
   const { summary } = useHost();
   const { setMode } = usePrefs();
   const router = useRouter();
-  const [push, setPush] = useState<PushState | null>(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      pushState()
-        .then(setPush)
-        .catch(() => setPush("unavailable"));
-    }, []),
-  );
+  const missing = owner?.details?.missing ?? [];
 
   const toTravelling = () => {
     setMode("travelling");
@@ -37,74 +29,23 @@ export default function Menu() {
 
   return (
     <View style={{ flex: 1 }}>
-      <TabScreen title={m.app.tabs.menu} contentStyle={{ paddingBottom: 140 }}>
-        <Pressable onPress={() => router.push("/account")} accessibilityRole="button" accessibilityLabel={ACCOUNT[lang].profile.edit}>
-          <Card style={{ gap: space.lg }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
-              <Avatar name={owner?.name ?? summary?.owner.name ?? ""} size={56} photo={owner?.photo ? mediaUrl(owner.photo) : null} />
-              <View style={{ flex: 1 }}>
-                <Text v="h2">{owner?.name ?? summary?.owner.name ?? ""}</Text>
-                <Text v="small">{owner?.email ?? summary?.owner.email ?? ""}</Text>
-                <Text v="smallMedium" color={colors.green} style={{ marginTop: 4 }}>
-                  {ACCOUNT[lang].profile.edit}
-                </Text>
-              </View>
-              <Icon name="chevron-forward" size={18} color={colors.faint} />
-            </View>
-          </Card>
-        </Pressable>
+      <TabScreen
+        title={m.app.tabs.menu}
+        right={<IconButton name="notifications-outline" label={m.app.menu.notifications} onPress={() => router.push("/inbox")} />}
+        contentStyle={{ paddingBottom: 140 }}
+      >
+        {owner ? <ProfileCard owner={owner} onPress={() => router.push("/account/personal")} /> : null}
 
-        <Section title={m.app.profile.hosting}>
-          <Row icon="grid-outline" label={m.listings.title} detail={m.listings.add} onPress={() => router.push("/listings")} />
-          {summary?.cottages.map((c) => (
-            <Row
-              key={c.id}
-              icon="home-outline"
-              label={c.name}
-              detail={`${m.listings.nav.photos} · ${m.listings.nav.pricing}`}
-              onPress={() => router.push(`/listing/${c.id}`)}
-            />
-          ))}
-          <Row icon="list-outline" label={m.app.menu.bookings} onPress={() => router.push("/bookings")} />
-          <Row icon="hardware-chip-outline" label={m.owner.monitor.title.split(":")[0]} detail={m.owner.monitor.badge} onPress={() => router.push("/monitor")} />
-          <Row icon="globe-outline" label={m.app.menu.web} onPress={() => openSite(`/${lang}/hosting`)} last />
-        </Section>
-
-        {push && push !== "unavailable" ? (
-          <Section title={m.app.menu.notifications}>
-            <Row
-              icon="notifications-outline"
-              label={m.app.menu.notifications}
-              detail={push === "blocked" ? m.app.menu.notificationsBlocked : m.app.menu.notificationsLead}
-              right={
-                push === "blocked" ? (
-                  <Button small kind="secondary" label={m.app.menu.openSettings} onPress={() => Linking.openSettings()} />
-                ) : (
-                  <Switch
-                    value={push === "on"}
-                    disabled={push === "on"}
-                    onValueChange={async (on) => {
-                      if (on) setPush(await registerForPush(true).catch(() => "off" as const));
-                    }}
-                    trackColor={{ true: colors.green, false: colors.line }}
-                    thumbColor="#ffffff"
-                  />
-                )
-              }
-              last
-            />
-          </Section>
-        ) : null}
-
-        <SettingsRows currency={false} />
-        <AboutRows />
-
-        <View style={{ marginTop: space.xl }}>
-          <Button
-            kind="danger"
-            icon="log-out-outline"
-            label={m.dashboard.logout}
-            onPress={async () => {
+        <View style={{ marginTop: space.lg }}>
+          <MenuRow icon="settings-outline" label={s.title} badge={missing.length ? s.needed : undefined} onPress={() => router.push("/account")} />
+          <MenuDivider />
+          <MenuRow icon="grid-outline" label={m.listings.title} detail={summary?.cottages.length ? summary.cottages.map((c) => c.name).join(", ") : m.listings.add} onPress={() => router.push("/listings")} />
+          <MenuRow icon="list-outline" label={m.app.menu.bookings} onPress={() => router.push("/bookings")} />
+          <MenuRow icon="hardware-chip-outline" label={m.owner.monitor.title.split(":")[0]} badge={m.owner.monitor.badge} badgeTone="quiet" onPress={() => router.push("/monitor")} />
+          <MenuRow icon="desktop-outline" label={m.app.menu.web} onPress={() => openSite(`/${lang}/hosting`)} />
+          <MenuDivider />
+          <MoreRows
+            onLogout={async () => {
               setMode("travelling");
               await signOut();
               router.replace("/explore");
