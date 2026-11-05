@@ -2,7 +2,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { memo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { type Category, type Listing, listingCurrency, listingName, listingPhotos, unsplash } from "@/lib/listings";
 import { useMoney } from "@/state/money";
@@ -124,7 +124,8 @@ export const ListingCard = memo(function ListingCard({ listing, width, compact =
   const router = useRouter();
   const screen = useWindowDimensions();
   const w = width ?? screen.width - space.xl * 2;
-  const h = Math.round(w * (compact ? 0.95 : 0.9));
+  // Android: compact photos a little less tall, so two rows of them fit above its bottom bar (see explore.tsx).
+  const h = Math.round(w * (compact ? (Platform.OS === "android" ? 0.84 : 0.95) : 0.9));
   const cur = listingCurrency(listing);
   const price = money.show(listing.price, cur);
   const total = nights ? money.show(listing.price * nights, cur) : null;

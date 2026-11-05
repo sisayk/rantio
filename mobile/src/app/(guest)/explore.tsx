@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
+import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listings";
@@ -19,6 +19,10 @@ import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit
 import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
+
+/** Android's bottom bar takes its own height (the iPhone's floats over the page), and its screens are
+ *  narrower in dp: the explore rows are a little tighter there, so two rows of cottages fit, as on iPhone. */
+const ANDROID = Platform.OS === "android";
 
 type Length = "weekend" | "week" | "month";
 /** Exact dates (with a few days either way), or a flexible stay: a length in some months. */
@@ -239,7 +243,7 @@ export default function Explore() {
         <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl * 2 }}>
           {header}
           {rows.map((s, i) => (
-            <View key={s.key} style={{ marginTop: i ? space.xl : space.sm }}>
+            <View key={s.key} style={{ marginTop: i ? (ANDROID ? space.md : space.xl) : ANDROID ? space.xs : space.sm }}>
               <View style={styles.sectionHead}>
                 <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
                   {s.title}
@@ -662,10 +666,10 @@ function FilterPanel({ visible, value, onClose, onChange }: { visible: boolean; 
 }
 
 const styles = StyleSheet.create({
-  searchRow: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: space.md },
+  searchRow: { flexDirection: "row", alignItems: "center", gap: space.sm, paddingHorizontal: space.lg, paddingTop: space.sm, paddingBottom: ANDROID ? space.sm : space.md },
   searchPill: {
     flex: 1,
-    minHeight: 56,
+    minHeight: ANDROID ? 50 : 56,
     borderRadius: radius.pill,
     backgroundColor: "#fff",
     flexDirection: "row",
@@ -688,13 +692,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   count: { position: "absolute", top: 2, right: 2, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: colors.green, alignItems: "center", justifyContent: "center" },
-  categories: { paddingHorizontal: space.lg, gap: space.sm, paddingBottom: space.md },
+  categories: { paddingHorizontal: space.lg, gap: space.sm, paddingBottom: ANDROID ? space.sm : space.md },
   category: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: space.lg,
-    height: 44,
+    height: ANDROID ? 40 : 44,
     borderRadius: radius.pill,
     backgroundColor: "#fff",
     borderWidth: StyleSheet.hairlineWidth,
@@ -710,12 +714,12 @@ const styles = StyleSheet.create({
     paddingBottom: space.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.line,
-    marginBottom: space.md,
+    marginBottom: ANDROID ? space.xs : space.md,
   },
   viewSwitch: { flexDirection: "row", gap: 2, padding: 3, borderRadius: radius.pill, backgroundColor: colors.ground },
   viewButton: { width: 40, height: 32, borderRadius: radius.pill, alignItems: "center", justifyContent: "center" },
   viewButtonOn: { backgroundColor: colors.ink },
-  sectionHead: { flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.xl, marginBottom: space.md },
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.xl, marginBottom: ANDROID ? space.xs : space.md },
   hostBand: { flexDirection: "row", gap: space.lg, alignItems: "center", marginHorizontal: space.xl, marginTop: space.xxl },
   sheetCard: { backgroundColor: "#fff", borderRadius: 28, padding: space.xl, gap: space.md },
   legend: {
