@@ -93,3 +93,42 @@ class DetailsTests(TestCase):
         self.assertEqual(self.patch(payout_iban="FI21 1234 5600 0007 86").json(), {"details": {"payout_iban": ["invalid"]}})
         self.assertEqual(self.patch(business_id="2312334-4").json(), {"details": {"business_id": ["invalid"]}})
         self.assertEqual(self.patch(account_type="robot").json(), {"details": {"account_type": ["invalid"]}})
+
+
+@override_settings(MEDIA_ROOT=MEDIA, STRIPE_SECRET_KEY="", DEV_LOGIN_CODES=False)
+class HostRequirementTests(TestCase):
+    def setUp(self):
+        self.o = make_cottage().owner
+        self.client.force_login(owner_login.user_for(self.o))
+
+    def patch(self, **details):
+        return self.client.patch("/api/owner/me/", {"details": details}, content_type="application/json")
+
+    def test_what_the_booking_sites_need_from_a_private_host(self):
+        missing = self.client.get("/api/owner/me/").json()["details"]["missing"]
+        self.assertEqual(missing, ["legal_name", "date_of_birth", "tax_id", "address", "phone", "payout", "emergency"])
+        res = self.patch(legal_first_name="Aino", legal_last_name="Järvinen", date_of_birth="1970-05-13", tax_country="FI",
+                         tax_id="131052-308T", address_line="Mökkitie 1", postal_code="57100", city="Savonlinna",
+                         address_country="FI", payout_iban="FI2112345600000785", emergency_name="Pekka", emergency_phone="0401234567")
+        self.assertEqual(res.status_code, 200, res.content)
+        d = res.json()["details"]
+        self.assertEqual(d["tax_id"], "•••••308T")
+        self.assertEqual(d["missing"], ["phone"])
+        self.o.refresh_from_db()
+        self.assertNotIn("131052", self.o.tax_id_sealed)  # stored encrypted
+        from . import vault
+        self.assertEqual(vault.unseal(self.o.tax_id_sealed), "131052-308T")
+
+    def test_a_company_needs_its_owners_and_representative(self):
+        res = self.patch(account_type="company", company_name="Elda-Auto Tmi", business_type="tmi", business_id="2312334-5",
+                         legal_rep_name="Sisay Kelka", legal_rep_role="Owner",
+                         beneficial_owners=[{"name": "Sisay Kelka", "date_of_birth": "1980-01-01", "country": "fi", "share": 100}])
+        d = res.json()["details"]
+        self.assertEqual(d["beneficial_owners"][0]["country"], "FI")
+        self.assertNotIn("beneficial_owners", d["missing"])
+        self.assertNotIn("date_of_birth", d["missing"])
+
+    def test_wrong_details_are_refused(self):
+        self.assertEqual(self.patch(tax_country="FI", tax_id="131052-308A").json()["details"], {"tax_id": ["invalid"]})
+        self.assertEqual(self.patch(date_of_birth="2015-01-01").json()["details"], {"date_of_birth": ["invalid"]})
+        self.assertEqual(self.patch(beneficial_owners=[{"name": "X", "share": 150}]).json()["details"], {"beneficial_owners": ["invalid"]})

@@ -132,7 +132,7 @@ class OwnerAdmin(ModelAdmin):
     list_filter = ["is_host", "is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
-    readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with"]
+    readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with", "tax_number"]
     fieldsets = [
         ("Owner", {"fields": ["name", "email", "phone", "language", "is_host", "user", "signup", "signs_in_with"],
                    "classes": ["st-grid-2"]}),
@@ -141,8 +141,21 @@ class OwnerAdmin(ModelAdmin):
         ("Billing", {"fields": ["airbnb_cohost_payout", "stripe_customer_id", "card"], "classes": ["st-grid-2"]}),
         ("Who lists, and the address", {"fields": ["account_type", "company_name", "business_id", "vat_id", "address_line",
                                                    "postal_code", "city", "address_country", "photo"], "classes": ["st-grid-2"]}),
+        ("For the booking sites (private person)", {"fields": ["legal_first_name", "legal_last_name", "date_of_birth", "tax_country",
+                                                                "tax_number", "emergency_name", "emergency_phone"], "classes": ["st-grid-2"]}),
+        ("For the booking sites (company)", {"fields": ["business_type", "trading_name", "website", "legal_rep_name", "legal_rep_role",
+                                                         "beneficial_owners"], "classes": ["st-grid-2"]}),
+        ("Postal address and contacts", {"fields": ["postal_same", "postal_line", "postal_postal_code", "postal_city", "postal_country",
+                                                     "reservations_contact"], "classes": ["st-grid-2"]}),
         ("Payouts", {"fields": ["payout_holder", "payout_iban", "payout_bic"], "classes": ["st-grid-2"]}),
     ]
+
+    @display(description="Tax number")
+    def tax_number(self, obj):
+        # Stored encrypted; the admin sees only the end, like the owner does.
+        from . import vault
+        from .profile import masked_tax_id
+        return masked_tax_id(vault.unseal(obj.tax_id_sealed)) if obj.tax_id_sealed else "—"
 
     @display(description="Card")
     def card(self, obj):

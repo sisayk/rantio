@@ -24,11 +24,13 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
   const a = ACCOUNT[lang];
   const p = a.profile;
   const d = a.details;
+  const h = a.host;
   const [me, setMe] = useState<OwnerMe | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [det, setDet] = useState<OwnerDetails | null>(null);
   const [iban, setIban] = useState("");
+  const [tin, setTin] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -45,6 +47,7 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
     setPhone(m.phone);
     setDet(m.details);
     setIban("");
+    setTin("");
   }, []);
 
   useEffect(() => {
@@ -80,10 +83,10 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
     setErrors({});
     setSaved(false);
     try {
-      const { has_payout: _skip, payout_iban: _masked, ...rest } = det;
-      void _skip;
-      void _masked;
-      const details: Partial<OwnerDetails> = { ...rest, ...(iban.trim() ? { payout_iban: iban } : {}) };
+      // Read-only parts and the masked numbers stay out; a new IBAN or tax number only if typed.
+      const { has_payout: _a, payout_iban: _b, has_tax_id: _c, tax_id: _d, missing: _e, ...rest } = det;
+      void [_a, _b, _c, _d, _e];
+      const details: Partial<OwnerDetails> = { ...rest, ...(iban.trim() ? { payout_iban: iban } : {}), ...(tin.trim() ? { tax_id: tin } : {}) };
       take(await ownerApi.updateMe({ name: name.trim(), phone: phone.trim(), details }));
       setSaved(true);
     } catch (e) {
@@ -163,6 +166,19 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
       <HostingHeader lang={lang} t={t} languageButton={languageButton} active="account" ownerName={me.name} />
       <main className={o.main} style={{ maxWidth: 760 }}>
         <h1 style={{ margin: "8px 0 20px" }}>{p.title}</h1>
+        {me.is_host ? (
+          <section className={s.panel} aria-labelledby="acc-ready" style={{ marginBottom: 20, background: det.missing.length ? "#fbefdc" : "#e4efe9" }}>
+            <h2 id="acc-ready">{h.readyTitle}</h2>
+            <p className={s.panelLead}>{h.readyLead}</p>
+            {det.missing.length ? (
+              <p style={{ margin: 0 }}>
+                <strong>{h.stillNeeded}</strong> {det.missing.map((k) => h.missing[k]).join(", ")}
+              </p>
+            ) : (
+              <p style={{ margin: 0, fontWeight: 600 }}>✓ {h.ready}</p>
+            )}
+          </section>
+        ) : null}
         {problem ? (
           <p className={s.error} role="alert">
             {problem}
@@ -242,6 +258,149 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                 </div>
               </>
             ) : null}
+            {det.account_type === "company" ? (
+              <>
+                <div className={s.row} style={{ alignItems: "start" }}>
+                  <label className={s.field} style={{ flex: 1, minWidth: 200 }}>
+                    <span>{h.businessType}</span>
+                    <select className={s.input} value={det.business_type} onChange={(e) => set("business_type", e.target.value as OwnerDetails["business_type"])} aria-invalid={!!errors.business_type}>
+                      <option value="">–</option>
+                      {(Object.keys(h.types) as (keyof typeof h.types)[]).map((k) => (
+                        <option key={k} value={k}>
+                          {h.types[k]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={s.field} style={{ flex: 1, minWidth: 200 }}>
+                    <span>
+                      {h.tradingName} <i className={s.hint}>({d.optional})</i>
+                    </span>
+                    <input className={s.input} value={det.trading_name} maxLength={160} onChange={(e) => set("trading_name", e.target.value)} />
+                  </label>
+                </div>
+                <label className={s.field}>
+                  <span>
+                    {h.website} <i className={s.hint}>({d.optional})</i>
+                  </span>
+                  <input className={s.input} value={det.website} maxLength={300} type="url" placeholder="https://" onChange={(e) => set("website", e.target.value)} aria-invalid={!!errors.website} />
+                  {err("website")}
+                </label>
+                <div className={s.group}>
+                  <h3>{h.legalRep}</h3>
+                  <p className={s.hint} style={{ margin: 0 }}>{h.legalRepLead}</p>
+                  <div className={s.row} style={{ alignItems: "start" }}>
+                    <label className={s.field} style={{ flex: 2, minWidth: 200 }}>
+                      <span>{h.legalRepName}</span>
+                      <input className={s.input} value={det.legal_rep_name} maxLength={160} onChange={(e) => set("legal_rep_name", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 140 }}>
+                      <span>{h.legalRepRole}</span>
+                      <input className={s.input} value={det.legal_rep_role} maxLength={80} onChange={(e) => set("legal_rep_role", e.target.value)} />
+                    </label>
+                  </div>
+                </div>
+                <div className={s.group}>
+                  <h3>{h.owners}</h3>
+                  <p className={s.hint} style={{ margin: 0 }}>{h.ownersLead}</p>
+                  {det.beneficial_owners.map((bo, i) => (
+                    <div key={i} className={s.row} style={{ alignItems: "end" }}>
+                      <label className={s.field} style={{ flex: 2, minWidth: 180 }}>
+                        <span>{h.ownerName}</span>
+                        <input className={s.input} value={bo.name} maxLength={160} onChange={(e) => set("beneficial_owners", det.beneficial_owners.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+                      </label>
+                      <label className={s.field} style={{ width: 160 }}>
+                        <span>{h.dob}</span>
+                        <input className={s.input} type="date" value={bo.date_of_birth} onChange={(e) => set("beneficial_owners", det.beneficial_owners.map((x, j) => (j === i ? { ...x, date_of_birth: e.target.value } : x)))} />
+                      </label>
+                      <label className={s.field} style={{ width: 100 }}>
+                        <span>{h.ownerShare}</span>
+                        <input className={s.input} inputMode="decimal" value={bo.share ?? ""} onChange={(e) => set("beneficial_owners", det.beneficial_owners.map((x, j) => (j === i ? { ...x, share: e.target.value === "" ? null : Number(e.target.value.replace(",", ".")) } : x)))} />
+                      </label>
+                      <button type="button" className={s.ghost} onClick={() => set("beneficial_owners", det.beneficial_owners.filter((_, j) => j !== i))}>
+                        {h.removeOwner}
+                      </button>
+                    </div>
+                  ))}
+                  {errors.beneficial_owners ? <em className={s.error}>{errors.beneficial_owners}</em> : null}
+                  {det.beneficial_owners.length < 10 ? (
+                    <div>
+                      <button type="button" className={s.button} onClick={() => set("beneficial_owners", [...det.beneficial_owners, { name: "", date_of_birth: "", country: det.address_country || "FI", share: null }])}>
+                        + {h.addOwner}
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={s.group}>
+                  <h3>{h.legal}</h3>
+                  <p className={s.hint} style={{ margin: 0 }}>{h.legalLead}</p>
+                  <div className={s.row} style={{ alignItems: "start" }}>
+                    <label className={s.field} style={{ flex: 1, minWidth: 180 }}>
+                      <span>{h.firstName}</span>
+                      <input className={s.input} value={det.legal_first_name} maxLength={80} autoComplete="given-name" onChange={(e) => set("legal_first_name", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 180 }}>
+                      <span>{h.lastName}</span>
+                      <input className={s.input} value={det.legal_last_name} maxLength={80} autoComplete="family-name" onChange={(e) => set("legal_last_name", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ width: 180 }}>
+                      <span>{h.dob}</span>
+                      <input className={s.input} type="date" value={det.date_of_birth} autoComplete="bday" onChange={(e) => set("date_of_birth", e.target.value)} aria-invalid={!!errors.date_of_birth} />
+                      {err("date_of_birth")}
+                    </label>
+                  </div>
+                </div>
+                <div className={s.group}>
+                  <h3>{h.tax}</h3>
+                  <p className={s.hint} style={{ margin: 0 }}>{h.taxLead}</p>
+                  <div className={s.row} style={{ alignItems: "start" }}>
+                    <label className={s.field} style={{ flex: 2, minWidth: 220 }}>
+                      <span>{h.tax}</span>
+                      <input
+                        className={s.input}
+                        value={tin}
+                        maxLength={30}
+                        autoComplete="off"
+                        spellCheck={false}
+                        placeholder={det.has_tax_id ? det.tax_id : "131052-308T"}
+                        onChange={(e) => (setTin(e.target.value.toUpperCase()), setSaved(false))}
+                        aria-invalid={!!errors.tax_id}
+                      />
+                      {err("tax_id") ?? <small className={s.hint}>{det.has_tax_id ? fill(lang, h.taxSaved, { tin: det.tax_id }) : h.taxSecure}</small>}
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 160 }}>
+                      <span>{h.taxCountry}</span>
+                      <select className={s.input} value={det.tax_country || det.address_country} onChange={(e) => set("tax_country", e.target.value)}>
+                        <option value="">–</option>
+                        {COUNTRIES.map((c) => (
+                          <option key={c} value={c}>
+                            {countryName(lang, c)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+                <div className={s.group}>
+                  <h3>{h.emergency}</h3>
+                  <p className={s.hint} style={{ margin: 0 }}>{h.emergencyLead}</p>
+                  <div className={s.row} style={{ alignItems: "start" }}>
+                    <label className={s.field} style={{ flex: 1, minWidth: 200 }}>
+                      <span>{h.emergencyName}</span>
+                      <input className={s.input} value={det.emergency_name} maxLength={120} onChange={(e) => set("emergency_name", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 200 }}>
+                      <span>{h.emergencyPhone}</span>
+                      <input className={s.input} type="tel" value={det.emergency_phone} maxLength={40} onChange={(e) => set("emergency_phone", e.target.value)} aria-invalid={!!errors.emergency_phone} />
+                      {err("emergency_phone")}
+                    </label>
+                  </div>
+                </div>
+              </>
+            )}
             <div className={s.group}>
               <h3>{d.address}</h3>
               <label className={s.field}>
@@ -270,6 +429,40 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                   </select>
                 </label>
               </div>
+              <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input type="checkbox" checked={det.postal_same} onChange={(e) => set("postal_same", e.target.checked)} />
+                {h.postalSame}
+              </label>
+              {!det.postal_same ? (
+                <>
+                  <h3>{h.postal}</h3>
+                  <label className={s.field}>
+                    <span>{d.street}</span>
+                    <input className={s.input} value={det.postal_line} maxLength={200} onChange={(e) => set("postal_line", e.target.value)} />
+                  </label>
+                  <div className={s.row} style={{ alignItems: "start" }}>
+                    <label className={s.field} style={{ width: 140 }}>
+                      <span>{d.postal}</span>
+                      <input className={s.input} value={det.postal_postal_code} maxLength={20} onChange={(e) => set("postal_postal_code", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 180 }}>
+                      <span>{d.city}</span>
+                      <input className={s.input} value={det.postal_city} maxLength={100} onChange={(e) => set("postal_city", e.target.value)} />
+                    </label>
+                    <label className={s.field} style={{ flex: 1, minWidth: 180 }}>
+                      <span>{d.country}</span>
+                      <select className={s.input} value={det.postal_country} onChange={(e) => set("postal_country", e.target.value)}>
+                        <option value="">–</option>
+                        {COUNTRIES.map((c) => (
+                          <option key={c} value={c}>
+                            {countryName(lang, c)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </>
+              ) : null}
             </div>
           </section>
 
@@ -303,6 +496,26 @@ export default function OwnerAccount({ lang, t, languageButton }: { lang: Lang; 
                 {err("payout_bic")}
               </label>
             </div>
+          </section>
+
+          <section className={s.panel} aria-labelledby="acc-contact">
+            <h2 id="acc-contact">{h.reservations}</h2>
+            <p className={s.panelLead}>{h.reservationsLead}</p>
+            <div className={s.row} style={{ alignItems: "start" }}>
+              {(["name", "email", "phone"] as const).map((k) => (
+                <label key={k} className={s.field} style={{ flex: 1, minWidth: 180 }}>
+                  <span>{k === "name" ? h.contactName : k === "email" ? h.contactEmail : h.contactPhone}</span>
+                  <input
+                    className={s.input}
+                    type={k === "email" ? "email" : k === "phone" ? "tel" : "text"}
+                    value={det.reservations_contact[k] ?? ""}
+                    maxLength={160}
+                    onChange={(e) => set("reservations_contact", { ...det.reservations_contact, [k]: e.target.value })}
+                  />
+                </label>
+              ))}
+            </div>
+            {err("reservations_contact")}
           </section>
 
           <div className={s.row}>

@@ -392,6 +392,9 @@ export type ListingFields = {
   latitude: number | null;
   longitude: number | null;
   show_exact_location: boolean;
+  /** Land register id (kiinteistötunnus) and a rental licence number, which the sites ask for. */
+  property_id: string;
+  licence_number: string;
   max_guests: number;
   bedrooms: number;
   bathrooms: number;
@@ -486,7 +489,36 @@ export type OwnerDetails = {
   payout_iban: string;
   payout_bic: string;
   has_payout: boolean;
+  legal_first_name: string;
+  legal_last_name: string;
+  /** YYYY-MM-DD or "". */
+  date_of_birth: string;
+  tax_country: string;
+  /** Masked when saved ("•••••308T"); type a new one to change it. */
+  tax_id: string;
+  has_tax_id: boolean;
+  postal_same: boolean;
+  postal_line: string;
+  postal_postal_code: string;
+  postal_city: string;
+  postal_country: string;
+  emergency_name: string;
+  emergency_phone: string;
+  business_type: "" | "tmi" | "oy" | "ay" | "ky" | "coop" | "association" | "other";
+  trading_name: string;
+  website: string;
+  legal_rep_name: string;
+  legal_rep_role: string;
+  beneficial_owners: BeneficialOwner[];
+  reservations_contact: { name?: string; email?: string; phone?: string };
+  /** What the booking sites still need (keys of ACCOUNT[lang].host.missing). */
+  missing: HostMissing[];
 };
+
+export type BeneficialOwner = { name: string; date_of_birth: string; country: string; share: number | null };
+export type HostMissing =
+  | "legal_name" | "date_of_birth" | "tax_id" | "address" | "phone" | "payout" | "emergency"
+  | "company_name" | "business_type" | "business_id" | "legal_rep" | "beneficial_owners";
 
 export type OwnerMe = {
   name: string;

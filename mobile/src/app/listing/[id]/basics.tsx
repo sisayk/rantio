@@ -5,6 +5,7 @@ import { ActivityIndicator, View } from "react-native";
 import { type ListingDetail, ownerApi } from "@/api";
 import type { PropertyType } from "@/lib/ownerApi";
 import { LANG_INFO, LANGS, type Lang } from "@/i18n/locales";
+import { ACCOUNT } from "@/i18n/messages/account";
 import { num, numText, useEditor } from "@/state/listing";
 import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
@@ -22,6 +23,8 @@ const from = (d: ListingDetail) => ({
   country: d.country,
   municipality: d.municipality,
   address: d.address,
+  property_id: d.property_id ?? "",
+  licence_number: d.licence_number ?? "",
   max_guests: numText(d.max_guests),
   bedrooms: numText(d.bedrooms),
   bathrooms: numText(d.bathrooms),
@@ -131,6 +134,9 @@ export default function ListingBasics() {
             </View>
             <Field label={b.municipality} value={form.municipality} onChangeText={(v) => set("municipality", v)} maxLength={80} error={bad("municipality")} />
             <Field label={b.address} hint={b.addressHint} value={form.address} onChangeText={(v) => set("address", v)} maxLength={200} error={bad("address")} />
+            {/* What the booking sites (and DAC7 reporting) ask for about the property. */}
+            <Field label={ACCOUNT[lang].host.propertyId} hint={ACCOUNT[lang].host.propertyIdHint} value={form.property_id} onChangeText={(v) => set("property_id", v)} maxLength={40} error={bad("property_id")} />
+            <Field label={ACCOUNT[lang].host.licence} hint={ACCOUNT[lang].host.licenceHint} value={form.licence_number} onChangeText={(v) => set("licence_number", v)} maxLength={60} error={bad("licence_number")} />
           </Group>
 
           <Group title={l.nav.basics}>

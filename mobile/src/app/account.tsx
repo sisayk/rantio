@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActionSheetIOS, Alert, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ActionSheetIOS, Alert, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
 
 import { ApiError, mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
@@ -22,12 +22,14 @@ export default function Account() {
   const { m, lang, f, country } = useT();
   const t = ACCOUNT[lang].profile;
   const d = ACCOUNT[lang].details;
+  const h = ACCOUNT[lang].host;
   const { owner, refresh } = useSession();
   const router = useRouter();
   const [name, setName] = useState(owner?.name ?? "");
   const [phone, setPhone] = useState(owner?.phone ?? "");
   const [det, setDet] = useState<OwnerDetails | null>(owner?.details ?? null);
   const [iban, setIban] = useState("");
+  const [tin, setTin] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
@@ -61,14 +63,15 @@ export default function Account() {
     try {
       let details: Partial<OwnerDetails> | undefined;
       if (det) {
-        const { has_payout: _h, payout_iban: _i, ...rest } = det;
-        void _h;
-        void _i;
-        details = { ...rest, ...(iban.trim() ? { payout_iban: iban } : {}) };
+        // Read-only parts and the masked numbers stay out; a new IBAN or tax number only if typed.
+        const { has_payout: _a, payout_iban: _b, has_tax_id: _c, tax_id: _d, missing: _e, ...rest } = det;
+        void [_a, _b, _c, _d, _e];
+        details = { ...rest, ...(iban.trim() ? { payout_iban: iban } : {}), ...(tin.trim() ? { tax_id: tin } : {}) };
       }
       const me = await ownerApi.updateMe({ name: name.trim(), phone: phone.trim(), details });
       if (me.details) setDet(me.details);
       setIban("");
+      setTin("");
       await refresh();
       setSaved(true);
     } catch (e) {
@@ -175,6 +178,22 @@ export default function Account() {
           </Pressable>
           <Button small kind="ghost" label={photoBusy ? "…" : owner.photo ? t.changePhoto : t.addPhoto} onPress={photoMenu} style={{ alignSelf: "center" }} />
 
+          {owner.is_host && det ? (
+            <Card style={{ marginTop: space.lg, gap: space.sm, backgroundColor: det.missing.length ? colors.berryTint : colors.greenTint }}>
+              <Text v="h3">{h.readyTitle}</Text>
+              <Text v="small">{h.readyLead}</Text>
+              {det.missing.length ? (
+                <Text v="smallMedium">
+                  {h.stillNeeded} {det.missing.map((k) => h.missing[k]).join(", ")}
+                </Text>
+              ) : (
+                <Text v="smallMedium" color={colors.green}>
+                  ✓ {h.ready}
+                </Text>
+              )}
+            </Card>
+          ) : null}
+
           <Section title={t.title}>
             <View style={{ gap: space.md }}>
               <Field label={t.name} value={name} onChangeText={setName} autoComplete="name" textContentType="name" maxLength={120} />
@@ -218,8 +237,65 @@ export default function Account() {
                       <Field label={d.companyName} value={det.company_name} onChangeText={(v) => setDet({ ...det, company_name: v })} maxLength={160} error={fieldErrors.company_name || null} />
                       <Field label={d.businessId} value={det.business_id} onChangeText={(v) => setDet({ ...det, business_id: v })} placeholder="1234567-8" autoCapitalize="characters" maxLength={30} error={fieldErrors.business_id || null} />
                       <Field label={d.vatId} optional={d.optional} value={det.vat_id} onChangeText={(v) => setDet({ ...det, vat_id: v })} placeholder="FI12345678" autoCapitalize="characters" maxLength={20} error={fieldErrors.vat_id || null} />
+                      <Text v="smallMedium">{h.businessType}</Text>
+                      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+                        {(Object.keys(h.types) as (keyof typeof h.types)[]).map((k) => (
+                          <Chip key={k} label={h.types[k]} on={det.business_type === k} onPress={() => setDet({ ...det, business_type: k })} />
+                        ))}
+                      </View>
+                      <Field label={h.tradingName} optional={d.optional} value={det.trading_name} onChangeText={(v) => setDet({ ...det, trading_name: v })} maxLength={160} />
+                      <Field label={h.website} optional={d.optional} value={det.website} onChangeText={(v) => setDet({ ...det, website: v })} placeholder="https://" autoCapitalize="none" keyboardType="url" maxLength={300} error={fieldErrors.website || null} />
+                      <Text v="h3" style={{ marginTop: space.sm }}>{h.legalRep}</Text>
+                      <Text v="tiny">{h.legalRepLead}</Text>
+                      <Field label={h.legalRepName} value={det.legal_rep_name} onChangeText={(v) => setDet({ ...det, legal_rep_name: v })} maxLength={160} />
+                      <Field label={h.legalRepRole} value={det.legal_rep_role} onChangeText={(v) => setDet({ ...det, legal_rep_role: v })} maxLength={80} />
+                      <Text v="h3" style={{ marginTop: space.sm }}>{h.owners}</Text>
+                      <Text v="tiny">{h.ownersLead}</Text>
+                      {det.beneficial_owners.map((bo, i) => (
+                        <Card key={i} style={{ gap: space.sm }}>
+                          <Field label={h.ownerName} value={bo.name} onChangeText={(v) => setDet({ ...det, beneficial_owners: det.beneficial_owners.map((x, j) => (j === i ? { ...x, name: v } : x)) })} maxLength={160} />
+                          <View style={{ flexDirection: "row", gap: space.md }}>
+                            <View style={{ flex: 1 }}>
+                              <Field label={h.dob} value={bo.date_of_birth} placeholder="1980-12-31" keyboardType="numbers-and-punctuation" onChangeText={(v) => setDet({ ...det, beneficial_owners: det.beneficial_owners.map((x, j) => (j === i ? { ...x, date_of_birth: v } : x)) })} maxLength={10} />
+                            </View>
+                            <View style={{ width: 100 }}>
+                              <Field label={h.ownerShare} value={bo.share == null ? "" : String(bo.share)} keyboardType="decimal-pad" onChangeText={(v) => setDet({ ...det, beneficial_owners: det.beneficial_owners.map((x, j) => (j === i ? { ...x, share: v === "" ? null : Number(v.replace(",", ".")) } : x)) })} maxLength={6} />
+                            </View>
+                          </View>
+                          <Button small kind="ghost" label={h.removeOwner} onPress={() => setDet({ ...det, beneficial_owners: det.beneficial_owners.filter((_, j) => j !== i) })} style={{ alignSelf: "flex-start", paddingHorizontal: 0 }} />
+                        </Card>
+                      ))}
+                      {fieldErrors.beneficial_owners ? <Text v="small" color={colors.error}>{fieldErrors.beneficial_owners}</Text> : null}
+                      {det.beneficial_owners.length < 10 ? (
+                        <Button small kind="secondary" icon="add" label={h.addOwner} onPress={() => setDet({ ...det, beneficial_owners: [...det.beneficial_owners, { name: "", date_of_birth: "", country: det.address_country || "FI", share: null }] })} style={{ alignSelf: "flex-start" }} />
+                      ) : null}
                     </>
-                  ) : null}
+                  ) : (
+                    <>
+                      <Text v="h3">{h.legal}</Text>
+                      <Text v="tiny">{h.legalLead}</Text>
+                      <Field label={h.firstName} value={det.legal_first_name} onChangeText={(v) => setDet({ ...det, legal_first_name: v })} textContentType="givenName" maxLength={80} />
+                      <Field label={h.lastName} value={det.legal_last_name} onChangeText={(v) => setDet({ ...det, legal_last_name: v })} textContentType="familyName" maxLength={80} />
+                      <Field label={h.dob} value={det.date_of_birth} placeholder="1980-12-31" keyboardType="numbers-and-punctuation" onChangeText={(v) => setDet({ ...det, date_of_birth: v })} maxLength={10} error={fieldErrors.date_of_birth || null} />
+                      <Text v="h3" style={{ marginTop: space.sm }}>{h.tax}</Text>
+                      <Text v="tiny">{h.taxLead}</Text>
+                      <Field
+                        label={h.tax}
+                        hint={det.has_tax_id ? f(h.taxSaved, { tin: det.tax_id }) : h.taxSecure}
+                        value={tin}
+                        onChangeText={(v) => setTin(v.toUpperCase())}
+                        placeholder={det.has_tax_id ? det.tax_id : "131052-308T"}
+                        autoCapitalize="characters"
+                        autoCorrect={false}
+                        maxLength={30}
+                        error={fieldErrors.tax_id || null}
+                      />
+                      <Text v="h3" style={{ marginTop: space.sm }}>{h.emergency}</Text>
+                      <Text v="tiny">{h.emergencyLead}</Text>
+                      <Field label={h.emergencyName} value={det.emergency_name} onChangeText={(v) => setDet({ ...det, emergency_name: v })} maxLength={120} />
+                      <Field label={h.emergencyPhone} value={det.emergency_phone} onChangeText={(v) => setDet({ ...det, emergency_phone: v })} keyboardType="phone-pad" maxLength={40} error={fieldErrors.emergency_phone || null} />
+                    </>
+                  )}
                   <Text v="h3" style={{ marginTop: space.sm }}>
                     {d.address}
                   </Text>
@@ -238,6 +314,31 @@ export default function Account() {
                       <Chip key={c} label={country(c)} on={det.address_country === c} onPress={() => setDet({ ...det, address_country: c })} />
                     ))}
                   </ScrollView>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
+                    <Text v="body" style={{ flex: 1 }}>
+                      {h.postalSame}
+                    </Text>
+                    <Switch value={det.postal_same} onValueChange={(v) => setDet({ ...det, postal_same: v })} trackColor={{ true: colors.green, false: colors.line }} />
+                  </View>
+                  {!det.postal_same ? (
+                    <>
+                      <Text v="h3">{h.postal}</Text>
+                      <Field label={d.street} value={det.postal_line} onChangeText={(v) => setDet({ ...det, postal_line: v })} maxLength={200} />
+                      <View style={{ flexDirection: "row", gap: space.md }}>
+                        <View style={{ width: 120 }}>
+                          <Field label={d.postal} value={det.postal_postal_code} onChangeText={(v) => setDet({ ...det, postal_postal_code: v })} maxLength={20} />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Field label={d.city} value={det.postal_city} onChangeText={(v) => setDet({ ...det, postal_city: v })} maxLength={100} />
+                        </View>
+                      </View>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+                        {COUNTRIES.map((c) => (
+                          <Chip key={c} label={country(c)} on={det.postal_country === c} onPress={() => setDet({ ...det, postal_country: c })} />
+                        ))}
+                      </ScrollView>
+                    </>
+                  ) : null}
                 </View>
               </Section>
 
@@ -259,6 +360,11 @@ export default function Account() {
                     error={fieldErrors.payout_iban || null}
                   />
                   <Field label={d.bic} optional={d.optional} value={det.payout_bic} onChangeText={(v) => setDet({ ...det, payout_bic: v.toUpperCase() })} autoCapitalize="characters" maxLength={11} error={fieldErrors.payout_bic || null} />
+                  <Text v="h3" style={{ marginTop: space.md }}>{h.reservations}</Text>
+                  <Text v="tiny">{h.reservationsLead}</Text>
+                  <Field label={h.contactName} value={det.reservations_contact.name ?? ""} onChangeText={(v) => setDet({ ...det, reservations_contact: { ...det.reservations_contact, name: v } })} maxLength={160} />
+                  <Field label={h.contactEmail} value={det.reservations_contact.email ?? ""} onChangeText={(v) => setDet({ ...det, reservations_contact: { ...det.reservations_contact, email: v } })} keyboardType="email-address" autoCapitalize="none" maxLength={160} error={fieldErrors.reservations_contact || null} />
+                  <Field label={h.contactPhone} value={det.reservations_contact.phone ?? ""} onChangeText={(v) => setDet({ ...det, reservations_contact: { ...det.reservations_contact, phone: v } })} keyboardType="phone-pad" maxLength={40} />
                   <Button label={saved && !busy ? t.saved : t.save} icon={saved && !busy ? "checkmark" : undefined} busy={busy} disabled={!name.trim()} onPress={save} />
                 </View>
               </Section>

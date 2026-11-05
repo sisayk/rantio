@@ -228,6 +228,8 @@ def cottage_detail(c: Cottage) -> dict:
         "latitude": None if c.latitude is None else float(c.latitude),
         "longitude": None if c.longitude is None else float(c.longitude),
         "show_exact_location": c.show_exact_location,
+        "property_id": c.property_id,
+        "licence_number": c.licence_number,
         "nearby": list(c.nearby or []),
         "amenities": list(c.amenities or []),
         "amenity_notes": dict(c.amenity_notes or {}),
@@ -376,7 +378,7 @@ class CottageSerializer(serializers.ModelSerializer):
         model = Cottage
         fields = [
             "name", "property_type", "country", "region", "municipality", "address", "latitude", "longitude",
-            "show_exact_location", "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
+            "show_exact_location", "property_id", "licence_number", "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions",
             "nearby", "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price",
             "cleaning_fee", "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount",
             "security_deposit", "smart_pricing", "smart_min_price", "smart_max_price", "seasonal_prices", "taxes_note", "check_in_from", "check_in_until", "check_out_by",

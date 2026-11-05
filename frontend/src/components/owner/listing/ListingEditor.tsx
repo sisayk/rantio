@@ -30,6 +30,9 @@ import o from "../owner.module.css";
 import OtherListings from "./OtherListings";
 import ReviewsPanel from "./ReviewsPanel";
 import { REVIEWS } from "@/i18n/messages/reviews";
+import { ACCOUNT } from "@/i18n/messages/account";
+
+const HOST_TEXT = (lang: Lang) => ACCOUNT[lang].host;
 import PhotoManager from "./PhotoManager";
 import { actionsFor, CHECK_SECTION, checklist, dateFormats, LANG_CODES, type Section, SECTIONS } from "./shared";
 import { ArrowLeft, Check, Dialog, fieldError, Trash, useToasts } from "./ui";
@@ -42,6 +45,7 @@ type Errors = Record<string, unknown>;
 
 const FIELDS = [
   "name", "property_type", "country", "region", "municipality", "address", "latitude", "longitude", "show_exact_location",
+  "property_id", "licence_number",
   "max_guests", "bedrooms", "bathrooms", "beds", "floor_area", "floors", "host_languages", "descriptions", "nearby",
   "amenities", "amenity_notes", "min_nights", "max_nights", "price_per_night", "weekend_price", "cleaning_fee",
   "extra_guest_fee", "extra_guest_from", "pet_fee", "weekly_discount", "monthly_discount", "security_deposit",
@@ -62,6 +66,7 @@ const FIELD_SECTION: Record<string, Section> = {
   arrival_instructions: "arrival", departure_instructions: "arrival", access_details: "arrival",
   country: "location", region: "location", municipality: "location", address: "location",
   latitude: "location", longitude: "location", show_exact_location: "location", nearby: "location",
+  property_id: "location", licence_number: "location",
 };
 
 const TYPES: PropertyType[] = ["cottage", "cabin", "villa", "holiday_home", "apartment", "farmhouse", "other"];
@@ -1048,6 +1053,11 @@ export default function ListingEditor({
         <div className={s.grid2}>
           {text("municipality", l.basics.municipality, { max: 80 })}
           {text("address", l.basics.address, { max: 200, hint: l.basics.addressHint })}
+        </div>
+        {/* What the booking sites (and DAC7 reporting) ask for about the property. */}
+        <div className={s.grid2}>
+          {text("property_id", HOST_TEXT(lang).propertyId, { max: 40, hint: HOST_TEXT(lang).propertyIdHint })}
+          {text("licence_number", HOST_TEXT(lang).licence, { max: 60, hint: HOST_TEXT(lang).licenceHint })}
         </div>
       </div>
 

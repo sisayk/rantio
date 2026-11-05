@@ -9,11 +9,12 @@ import logging
 import re
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import stripe_api, trial
+from . import sms, stripe_api, trial, vault
 from .media_checks import IMAGE_MAX, image_type
 from .models import COUNTRY_CURRENCY, Owner
 from .portal import IsAccount, IsOwner
@@ -186,6 +187,17 @@ def details_row(o: Owner) -> dict:
         # Only the end of the account number goes back to the browser or the phone.
         "payout_holder": o.payout_holder, "payout_iban": masked_iban(o.payout_iban), "payout_bic": o.payout_bic,
         "has_payout": bool(o.payout_iban),
+        "legal_first_name": o.legal_first_name, "legal_last_name": o.legal_last_name,
+        "date_of_birth": o.date_of_birth.isoformat() if o.date_of_birth else "",
+        "tax_country": o.tax_country, "tax_id": masked_tax_id(vault.unseal(o.tax_id_sealed)), "has_tax_id": bool(o.tax_id_sealed),
+        "postal_same": o.postal_same, "postal_line": o.postal_line, "postal_postal_code": o.postal_postal_code,
+        "postal_city": o.postal_city, "postal_country": o.postal_country,
+        "emergency_name": o.emergency_name, "emergency_phone": o.emergency_phone,
+        "business_type": o.business_type, "trading_name": o.trading_name, "website": o.website,
+        "legal_rep_name": o.legal_rep_name, "legal_rep_role": o.legal_rep_role,
+        "beneficial_owners": o.beneficial_owners or [],
+        "reservations_contact": o.reservations_contact or {},
+        "missing": host_missing(o),
     }
 
 
@@ -254,9 +266,171 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
         else:
             o.payout_bic = bic
             changed.append("payout_bic")
+    for key, limit in (("legal_first_name", 80), ("legal_last_name", 80), ("postal_line", 200), ("postal_postal_code", 20),
+                       ("postal_city", 100), ("emergency_name", 120), ("trading_name", 160), ("legal_rep_name", 160),
+                       ("legal_rep_role", 80)):
+        v = text(key, limit)
+        if v is not None and key not in errors:
+            setattr(o, key, v)
+            changed.append(key)
+    for key in ("tax_country", "postal_country"):
+        v = text(key, 2)
+        if v is not None:
+            v = v.upper()
+            if v and not re.fullmatch(r"[A-Z]{2}", v):
+                errors[key] = ["invalid"]
+            else:
+                setattr(o, key, v)
+                changed.append(key)
+    if "postal_same" in data:
+        o.postal_same = bool(data.get("postal_same"))
+        changed.append("postal_same")
+    if "date_of_birth" in data:
+        dob = parse_dob(str(data.get("date_of_birth") or ""))
+        if dob is False:
+            errors["date_of_birth"] = ["invalid"]
+        else:
+            o.date_of_birth = dob
+            changed.append("date_of_birth")
+    if "tax_id" in data:
+        tin = re.sub(r"\s", "", str(data.get("tax_id") or "")).upper()
+        country = o.tax_country or o.address_country or "FI"
+        if tin and "•" in tin:
+            pass  # the masked number sent back unchanged
+        elif tin and not tax_id_ok(tin, country, o.account_type):
+            errors["tax_id"] = ["invalid"]
+        else:
+            o.tax_id_sealed = vault.seal(tin)
+            changed.append("tax_id_sealed")
+    if "emergency_phone" in data:
+        phone = str(data.get("emergency_phone") or "").strip()
+        if phone and not sms.normalize(phone, o.address_country or "FI"):
+            errors["emergency_phone"] = ["invalid"]
+        else:
+            o.emergency_phone = phone
+            changed.append("emergency_phone")
+    if "business_type" in data:
+        bt = str(data.get("business_type") or "")
+        if bt and bt not in Owner.BusinessType.values:
+            errors["business_type"] = ["invalid"]
+        else:
+            o.business_type = bt
+            changed.append("business_type")
+    if "website" in data:
+        site = str(data.get("website") or "").strip()
+        if site and not re.match(r"^https?://", site):
+            site = "https://" + site
+        if site and (len(site) > 300 or not re.fullmatch(r"https?://[^\s/$.?#][^\s]*\.[^\s]+", site)):
+            errors["website"] = ["invalid"]
+        else:
+            o.website = site
+            changed.append("website")
+    if "beneficial_owners" in data:
+        rows, bad = clean_owners(data.get("beneficial_owners"))
+        if bad:
+            errors["beneficial_owners"] = [bad]
+        else:
+            o.beneficial_owners = rows
+            changed.append("beneficial_owners")
+    if "reservations_contact" in data:
+        c = data.get("reservations_contact") or {}
+        if not isinstance(c, dict):
+            errors["reservations_contact"] = ["invalid"]
+        else:
+            contact = {k: str(c.get(k) or "").strip()[:160] for k in ("name", "email", "phone")}
+            if contact["email"] and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", contact["email"]):
+                errors["reservations_contact"] = ["invalid"]
+            else:
+                o.reservations_contact = {k: v for k, v in contact.items() if v}
+                changed.append("reservations_contact")
     if o.account_type == Owner.AccountType.COMPANY and "company_name" in changed and not o.company_name:
         errors["company_name"] = ["required"]
     return changed, errors
+
+
+# --- What the booking sites need -----------------------------------------------------------------
+
+def masked_tax_id(tin: str) -> str:
+    return f"•••••{tin[-4:]}" if tin else ""
+
+
+def parse_dob(value: str):
+    """A date of birth (YYYY-MM-DD) of someone 18 or over; None if empty, False if wrong."""
+    from datetime import date
+
+    if not value:
+        return None
+    try:
+        d = date.fromisoformat(value)
+    except ValueError:
+        return False
+    today = timezone.localdate()
+    age = today.year - d.year - ((today.month, today.day) < (d.month, d.day))
+    return d if 18 <= age <= 120 else False
+
+
+HETU_CHECK = "0123456789ABCDEFHJKLMNPRSTUVWXY"
+
+
+def hetu_ok(value: str) -> bool:
+    """A Finnish personal identity code (DDMMYYCZZZQ) with its check character."""
+    m = re.fullmatch(r"(\d{6})([-+ABCDEFUVWXY])(\d{3})([0-9A-Y])", value)
+    return bool(m) and HETU_CHECK[int(m.group(1) + m.group(3)) % 31] == m.group(4)
+
+
+def tax_id_ok(tin: str, country: str, account_type: str) -> bool:
+    if country == "FI":
+        return y_tunnus_ok(tin) if account_type == Owner.AccountType.COMPANY else hetu_ok(tin)
+    return bool(re.fullmatch(r"[A-Z0-9./-]{4,30}", tin))
+
+
+def clean_owners(rows) -> tuple[list, str]:
+    """Up to 10 beneficial owners, each with a name; dates and shares checked."""
+    if not isinstance(rows, list) or len(rows) > 10:
+        return [], "invalid"
+    out = []
+    for r in rows:
+        if not isinstance(r, dict):
+            return [], "invalid"
+        name = str(r.get("name") or "").strip()[:160]
+        if not name:
+            continue
+        dob = parse_dob(str(r.get("date_of_birth") or ""))
+        country = str(r.get("country") or "").strip().upper()[:2]
+        try:
+            share = float(r.get("share")) if r.get("share") not in (None, "") else None
+        except (TypeError, ValueError):
+            return [], "invalid"
+        if dob is False or (share is not None and not 0 < share <= 100) or (country and not re.fullmatch(r"[A-Z]{2}", country)):
+            return [], "invalid"
+        out.append({"name": name, "date_of_birth": dob.isoformat() if dob else "", "country": country, "share": share})
+    return out, ""
+
+
+def host_missing(o: Owner) -> list[str]:
+    """What's still needed before the cottage can go onto Airbnb, Booking.com and Vrbo, which ask for
+    these (also for the EU's DAC7 tax reporting). Keys match the website's and the app's texts."""
+    need = []
+    company = o.account_type == Owner.AccountType.COMPANY
+    if company:
+        for key, ok in (("company_name", o.company_name), ("business_type", o.business_type), ("business_id", o.business_id),
+                        ("legal_rep", o.legal_rep_name), ("beneficial_owners", o.beneficial_owners)):
+            if not ok:
+                need.append(key)
+    else:
+        for key, ok in (("legal_name", o.legal_first_name and o.legal_last_name), ("date_of_birth", o.date_of_birth),
+                        ("tax_id", o.tax_id_sealed)):
+            if not ok:
+                need.append(key)
+    if not (o.address_line and o.postal_code and o.city and o.address_country):
+        need.append("address")
+    if not o.phone:
+        need.append("phone")
+    if not o.payout_iban:
+        need.append("payout")
+    if not company and not o.emergency_name:
+        need.append("emergency")
+    return need
 
 
 def sync_customer(o: Owner) -> None:

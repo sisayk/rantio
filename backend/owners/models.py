@@ -269,6 +269,40 @@ class Owner(models.Model):
     payout_holder = models.CharField(max_length=160, blank=True, help_text="Name on the bank account the owner is paid to.")
     payout_iban = models.CharField(max_length=34, blank=True, help_text="Bank account (IBAN) the owner is paid to.")
     payout_bic = models.CharField(max_length=11, blank=True)
+    # What the booking sites ask of a host (and the EU's DAC7 rules): owners/profile.py HOST_CHECKLIST.
+    legal_first_name = models.CharField(max_length=80, blank=True, help_text="As on an ID; no initials.")
+    legal_last_name = models.CharField(max_length=80, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    tax_country = models.CharField(max_length=2, blank=True, help_text="Country that issued the tax number.")
+    tax_id_sealed = models.TextField(blank=True, editable=False, help_text="Tax number (Finland: personal identity code), encrypted.")
+    postal_same = models.BooleanField(default=True, help_text="Post goes to the address above.")
+    postal_line = models.CharField(max_length=200, blank=True)
+    postal_postal_code = models.CharField(max_length=20, blank=True)
+    postal_city = models.CharField(max_length=100, blank=True)
+    postal_country = models.CharField(max_length=2, blank=True)
+    emergency_name = models.CharField(max_length=120, blank=True)
+    emergency_phone = models.CharField(max_length=40, blank=True)
+
+    class BusinessType(models.TextChoices):
+        TMI = "tmi", "Sole trader (toiminimi)"
+        OY = "oy", "Limited company (osakeyhtiö)"
+        AY = "ay", "General partnership (avoin yhtiö)"
+        KY = "ky", "Limited partnership (kommandiittiyhtiö)"
+        COOP = "coop", "Cooperative"
+        ASSOCIATION = "association", "Association or foundation"
+        OTHER = "other", "Other"
+
+    business_type = models.CharField(max_length=12, choices=BusinessType.choices, blank=True)
+    trading_name = models.CharField(max_length=160, blank=True, help_text="If the company trades under another name.")
+    website = models.URLField(max_length=300, blank=True)
+    legal_rep_name = models.CharField(max_length=160, blank=True, help_text="Who can sign for the company.")
+    legal_rep_role = models.CharField(max_length=80, blank=True)
+    beneficial_owners = models.JSONField(
+        default=list, blank=True, help_text='People owning 25 % or more: [{"name", "date_of_birth", "country", "share"}].'
+    )
+    reservations_contact = models.JSONField(
+        default=dict, blank=True, help_text='Who the sites contact about bookings, if not the owner: {"name", "email", "phone"}.'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -377,6 +411,10 @@ class Cottage(models.Model):
         default=False, help_text="Guests see the exact pin before booking; otherwise an area about 1 km across."
     )
     nearby = models.JSONField(default=list, blank=True, help_text="[{\"kind\": \"lake\", \"name\": \"…\", \"distance_km\": 0.2}]")
+    property_id = models.CharField(
+        max_length=40, blank=True, help_text="Land register id of the property (Finland: kiinteistötunnus 123-456-7-89); the sites report it (DAC7)."
+    )
+    licence_number = models.CharField(max_length=60, blank=True, help_text="Short-term rental licence or registration number, where required.")
     amenity_notes = models.JSONField(
         default=dict, blank=True, help_text="{amenity key: {\"note\": \"…\", \"fee\": \"10.00\"}} for amenities with conditions or a price."
     )
