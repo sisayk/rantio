@@ -8,6 +8,7 @@ import { API_URL, SITE_URL } from "@/api";
 import { activitiesFor } from "@/lib/activities";
 import { CHANNELS, type ChannelId, channelIcon, FEATURE_GROUPS, type FeatureKey } from "@/lib/catalog";
 import { getListing, listingCurrency, listingName, listingPhotos, unsplash, unsplashWhole } from "@/lib/listings";
+import { EVENTS } from "@/i18n/messages/events";
 import { findNearby, type NearbyPlace, WIKI_HEADERS } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
@@ -21,6 +22,7 @@ import { Button, Empty, Icon, IconButton, Pill, Problem, Text } from "@/ui/kit";
 import { CATEGORY_ICONS, HeartButton } from "@/ui/listing";
 import { PinMap } from "@/ui/maps";
 import { PhotoTour } from "@/ui/photos";
+import { NearbyEvents } from "@/ui/nearbyEvents";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { RatingsBlock, STAR, useScore } from "@/ui/ratings";
 import { REVIEWS } from "@/i18n/messages/reviews";
@@ -238,6 +240,12 @@ export default function Cottage() {
           >
             <PinMap lat={l.lat} lng={l.lng} style={{ flex: 1 }} />
           </Pressable>
+
+          <Divider />
+          <Text v="h2" style={{ marginBottom: space.sm }}>
+            {EVENTS[lang].title}
+          </Text>
+          <NearbyEvents key={`${dates[0]}-${dates[1]}`} lat={l.lat} lng={l.lng} country={l.country} from={dates[0]} to={dates[1]} onAddDates={() => setPicking(true)} />
 
           <Divider />
           <Text v="h2">{m.guest.detail.nearbyTitle}</Text>
