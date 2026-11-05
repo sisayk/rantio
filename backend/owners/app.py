@@ -81,6 +81,40 @@ def _post(messages: list[dict]) -> None:
             Conversation.objects.filter(guest_push_token=msg["to"]).update(guest_push_token="")
 
 
+EXPO_RECEIPTS_URL = "https://exp.host/--/api/v2/push/getReceipts"
+
+
+def test_push(token: str, title: str, body: str) -> dict:
+    """Sends one notification now and reports what Expo and Google said about it: the ticket
+    (accepted or not) and, a few seconds later, the receipt (delivered to Google or Apple or
+    not, and why). For the app's "Send a test notification"."""
+    import time
+
+    def post(url: str, payload) -> dict:
+        req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=8) as res:  # noqa: S310 (fixed https URLs)
+            return json.loads(res.read() or b"{}")
+
+    try:
+        reply = post(EXPO_PUSH_URL, [{"to": token, "title": title[:120], "body": body[:240], "data": {"type": "test"}, "sound": "default", "priority": "high"}])
+    except Exception as exc:  # Expo unreachable
+        return {"ok": False, "step": "send", "error": str(exc)[:200]}
+    ticket = (reply.get("data") or [{}])[0] if isinstance(reply.get("data"), list) else reply.get("data") or {}
+    if ticket.get("status") != "ok":
+        return {"ok": False, "step": "ticket", "error": (ticket.get("details") or {}).get("error") or ticket.get("message") or str(reply.get("errors") or "")[:200]}
+    for _ in range(4):  # the receipt is usually ready within a few seconds
+        time.sleep(1.5)
+        try:
+            receipt = (post(EXPO_RECEIPTS_URL, {"ids": [ticket["id"]]}).get("data") or {}).get(ticket["id"])
+        except Exception:
+            receipt = None
+        if receipt:
+            if receipt.get("status") == "ok":
+                return {"ok": True, "step": "delivered"}
+            return {"ok": False, "step": "receipt", "error": (receipt.get("details") or {}).get("error") or receipt.get("message", "")[:200]}
+    return {"ok": True, "step": "accepted"}  # sent; Google or Apple hasn't answered yet
+
+
 def push(tokens: list[str], title: str, body: str, data: dict | None = None, *, who: str = "") -> None:
     """Sends one notification to these phones once the current transaction has committed."""
     tokens = [t for t in tokens if t]

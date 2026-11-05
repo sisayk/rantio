@@ -3,6 +3,7 @@
 import logging
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.auth import login, logout
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -293,6 +294,26 @@ class DeviceView(APIView):
         request.auth.push_token = token
         request.auth.save(update_fields=["push_token"])
         return Response({"ok": True})
+
+
+class TestPushView(APIView):
+    """The app's "Send a test notification": one push to this phone, and what became of it."""
+
+    permission_classes = [IsAccount]
+
+    def post(self, request):
+        if not isinstance(request.auth, AppDevice):
+            return Response({"detail": "app_only"}, status=status.HTTP_400_BAD_REQUEST)
+        request.auth.refresh_from_db(fields=["push_token"])
+        if not request.auth.push_token:
+            return Response({"ok": False, "step": "no_token"})
+        key = f"test-push:{request.auth.pk}"
+        if cache.get(key, 0) >= 5:  # a few tries are plenty
+            return Response({"ok": False, "step": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        cache.set(key, cache.get(key, 0) + 1, 600)
+        title = str(request.data.get("title") or "Rantio")[:120]
+        body = str(request.data.get("body") or "Notifications work on this phone.")[:240]
+        return Response(app.test_push(request.auth.push_token, title, body))
 
 
 def year_param(request) -> int:

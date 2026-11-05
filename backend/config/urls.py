@@ -31,6 +31,7 @@ urlpatterns = [
     path("api/auth/options/", portal.OptionsView.as_view(), name="login-options"),
     path("api/auth/social/", portal.SocialView.as_view(), name="login-social"),
     path("api/owner/device/", portal.DeviceView.as_view(), name="owner-device"),
+    path("api/owner/device/test/", portal.TestPushView.as_view(), name="owner-device-test"),
     path("api/owner/me/", portal.MeView.as_view(), name="owner-me"),
     path("api/owner/me/photo/", profile.ProfilePhotoView.as_view(), name="owner-photo"),
     path("api/owner/payment-method/", profile.PaymentMethodView.as_view(), name="owner-payment-method"),

@@ -220,6 +220,8 @@ export const ownerApi = {
     call<MonitorRow>(`owner/monitors/${id}/`, { ...json("PATCH", fields), owner: true }),
   removeMonitor: (id: number) => call<Record<string, never>>(`owner/monitors/${id}/`, { ...json("DELETE"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
+  testPush: (title: string, body: string) =>
+    call<{ ok: boolean; step: string; error?: string }>("owner/device/test/", { ...json("POST", { title, body }), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
   updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>
     call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails }>(

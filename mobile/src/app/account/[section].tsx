@@ -4,7 +4,8 @@ import { ActionSheetIOS, Alert, Linking, Platform, Pressable, StyleSheet, Switch
 
 import { mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
-import { pushState, type PushState, registerForPush } from "@/state/push";
+import { PUSH_TEST } from "@/i18n/messages/pushTest";
+import { pushState, type PushState, registerForPush, testPush } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { DeleteAccountButton } from "@/ui/account";
@@ -500,8 +501,19 @@ function Taxes({ form }: { form: Form }) {
 }
 
 function Notifications() {
-  const { m } = useT();
+  const { m, lang, f } = useT();
+  const t = PUSH_TEST[lang];
   const [push, setPush] = useState<PushState | null>(null);
+  const [testing, setTesting] = useState(false);
+  const sendTest = async () => {
+    setTesting(true);
+    const r = await testPush(t.title, t.body);
+    setTesting(false);
+    if (r.ok) return Alert.alert(t.sent);
+    if (r.why === "off") return Alert.alert(t.off);
+    if (r.why === "limit") return Alert.alert(t.limit);
+    Alert.alert(f(r.why === "noToken" ? t.noToken : t.failed, { error: r.error ?? "" }));
+  };
   useFocusEffect(
     useCallback(() => {
       pushState()
@@ -511,26 +523,31 @@ function Notifications() {
   );
   if (!push) return null;
   return (
-    <MenuRow
-      icon="notifications-outline"
-      label={m.app.menu.notifications}
-      detail={push === "blocked" ? m.app.menu.notificationsBlocked : push === "unavailable" ? undefined : m.app.menu.notificationsLead}
-      right={
-        push === "blocked" ? (
-          <Button small kind="secondary" label={m.app.menu.openSettings} onPress={() => Linking.openSettings()} />
-        ) : push === "unavailable" ? undefined : (
-          <Switch
-            value={push === "on"}
-            disabled={push === "on"}
-            onValueChange={async (on) => {
-              if (on) setPush(await registerForPush(true).catch(() => "off" as const));
-            }}
-            trackColor={{ true: colors.green, false: colors.line }}
-            thumbColor="#ffffff"
-          />
-        )
-      }
-    />
+    <>
+      <MenuRow
+        icon="notifications-outline"
+        label={m.app.menu.notifications}
+        detail={push === "blocked" ? m.app.menu.notificationsBlocked : push === "unavailable" ? undefined : m.app.menu.notificationsLead}
+        right={
+          push === "blocked" ? (
+            <Button small kind="secondary" label={m.app.menu.openSettings} onPress={() => Linking.openSettings()} />
+          ) : push === "unavailable" ? undefined : (
+            <Switch
+              value={push === "on"}
+              disabled={push === "on"}
+              onValueChange={async (on) => {
+                if (on) setPush(await registerForPush(true).catch(() => "off" as const));
+              }}
+              trackColor={{ true: colors.green, false: colors.line }}
+              thumbColor="#ffffff"
+            />
+          )
+        }
+      />
+      {push === "on" ? (
+        <Button small kind="secondary" icon="notifications-outline" label={t.button} busy={testing} onPress={sendTest} style={{ alignSelf: "flex-start", marginTop: space.sm }} />
+      ) : null}
+    </>
   );
 }
 

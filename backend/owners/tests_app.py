@@ -65,6 +65,35 @@ class AppSignInTests(TestCase):
         self.assertIn(self.client.get("/api/owner/me/", **self.auth(first)).status_code, (401, 403))
         self.assertEqual(self.client.get("/api/owner/me/", **self.auth(second)).status_code, 200)
 
+    def test_test_notification_reports_what_happened(self):
+        key = self.sign_in()
+        url = "/api/owner/device/test/"
+        self.assertEqual(self.client.post(url, **self.auth(key)).json(), {"ok": False, "step": "no_token"})
+        self.client.post("/api/owner/device/", {"push_token": "ExponentPushToken[abc-123]"}, content_type="application/json", **self.auth(key))
+        answers = {
+            app.EXPO_PUSH_URL: {"data": [{"status": "ok", "id": "t1"}]},
+            app.EXPO_RECEIPTS_URL: {"data": {"t1": {"status": "error", "message": "x", "details": {"error": "InvalidCredentials"}}}},
+        }
+        calls = []
+
+        class Reply:
+            def __init__(self, body): self.body = json.dumps(body).encode()
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return self.body
+
+        def fake(req, timeout=8):
+            calls.append(req.full_url)
+            return Reply(answers[req.full_url])
+
+        with mock.patch.object(app.urllib.request, "urlopen", side_effect=fake), mock.patch("time.sleep"):
+            body = self.client.post(url, **self.auth(key)).json()
+        self.assertEqual(body, {"ok": False, "step": "receipt", "error": "InvalidCredentials"})
+        self.assertEqual(calls, [app.EXPO_PUSH_URL, app.EXPO_RECEIPTS_URL])
+        answers[app.EXPO_RECEIPTS_URL] = {"data": {"t1": {"status": "ok"}}}
+        with mock.patch.object(app.urllib.request, "urlopen", side_effect=fake), mock.patch("time.sleep"):
+            self.assertEqual(self.client.post(url, **self.auth(key)).json(), {"ok": True, "step": "delivered"})
+
     def test_push_token_is_checked_and_moves_with_the_phone(self):
         key = self.sign_in()
         bad = self.client.post("/api/owner/device/", {"push_token": "hello"}, content_type="application/json", **self.auth(key))
