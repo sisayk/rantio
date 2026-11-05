@@ -11,7 +11,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Platform, View } from "react-native";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HostProvider } from "@/state/host";
 import { PrefsProvider, usePrefs } from "@/state/prefs";
@@ -71,8 +72,17 @@ function Root() {
         <Stack.Screen name="language" options={{ presentation: "modal" }} />
         <Stack.Screen name="currency" options={{ presentation: "modal" }} />
       </Stack>
+      <StatusBarShield />
     </>
   );
+}
+
+/** Android draws every page under its see-through status bar, so scrolled content ran under the
+ *  clock and signal icons. A strip in the page colour sits behind the icons on every screen. */
+function StatusBarShield() {
+  const insets = useSafeAreaInsets();
+  if (Platform.OS !== "android" || !insets.top) return null;
+  return <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top, backgroundColor: colors.page }} />;
 }
 
 export default function Layout() {
