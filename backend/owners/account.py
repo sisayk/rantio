@@ -93,15 +93,21 @@ def is_review_email(email: str) -> bool:
     return bool(review and getattr(settings, "APP_REVIEW_CODE", "") and email.strip().lower() == review.lower())
 
 
-def review_sign_in(email: str, code: str) -> Owner | None:
+def review_sign_in(email: str, code: str, ip: str = "") -> Owner | None:
     """The reviewer's account when the code is right, made with its example cottage the first time."""
     if not is_review_email(email):
         return None
-    # The code never changes, so wrong tries are counted: after REVIEW_TRIES in a day it stops working.
-    if cache.get(REVIEW_TRIES_KEY, 0) >= REVIEW_TRIES:
+    # The code doesn't change, so wrong tries are counted per address: after REVIEW_TRIES in a day
+    # that address can't use it (others, like Apple's reviewer, still can).
+    key = f"{REVIEW_TRIES_KEY}:{ip}"
+    if cache.get(key, 0) >= REVIEW_TRIES:
         return None
     if not hmac.compare_digest(code.strip(), settings.APP_REVIEW_CODE):
-        cache.set(REVIEW_TRIES_KEY, cache.get(REVIEW_TRIES_KEY, 0) + 1, 24 * 3600)
+        cache.add(key, 0, 24 * 3600)  # the window starts at the first wrong try
+        try:
+            cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, 24 * 3600)
         return None
     owner, _ = Owner.objects.get_or_create(
         email__iexact=email.strip(), defaults={"email": email.strip(), "name": "App Review", "language": "en", "is_host": True}

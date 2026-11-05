@@ -173,7 +173,7 @@ class VerifyCodeView(APIView):
         data.is_valid(raise_exception=True)
         v = data.validated_data
         if v["email"] and account.is_review_email(v["email"]):
-            owner = account.review_sign_in(v["email"], v["code"])
+            owner = account.review_sign_in(v["email"], v["code"], ip=ScopedRateThrottle().get_ident(request))
             if not owner:
                 return Response({"detail": "invalid_code"}, status=status.HTTP_400_BAD_REQUEST)
             return _signed_in(request, owner, v)

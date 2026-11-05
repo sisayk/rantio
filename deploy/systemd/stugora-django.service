@@ -13,7 +13,7 @@ WorkingDirectory=/srv/stugora/app/backend
 EnvironmentFile=/srv/stugora/.env
 ExecStart=/srv/stugora/venv/bin/gunicorn config.wsgi:application \
     --bind 127.0.0.1:8000 \
-    --workers 3 \
+    --workers 3 --threads 4 --worker-class gthread \
     --timeout 120 \
     --worker-tmp-dir /dev/shm \
     --graceful-timeout 30 \

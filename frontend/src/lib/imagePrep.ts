@@ -1,5 +1,6 @@
 // Photos are made web-ready in the browser before they upload: a phone's 12 MB original
-// becomes a JPEG of at most 2560 px on the long side, so uploads are quick and pages light.
+// becomes a JPEG of at most 2560 px on the long side, so uploads are quick and pages light,
+// and without the camera's EXIF data (GPS position, phone, time).
 // The server checks the real file type and size again; nothing here is trusted.
 
 export const MAX_BYTES = 8 * 1024 * 1024;
@@ -12,18 +13,15 @@ export type Prepared = { blob: Blob; name: string };
 /** "not_image" for anything that isn't JPEG, PNG or WebP; "too_big" if it can't be brought under 8 MB. */
 export async function preparePhoto(file: File): Promise<Prepared> {
   if (!ACCEPTED.includes(file.type)) throw new Error("not_image");
-  const small = file.size <= 1.5 * 1024 * 1024;
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
   } catch {
     throw new Error("not_image");
   }
+  // Always drawn again, even a small photo: that drops its EXIF data, whose GPS position would
+  // show where the cottage is (also when the owner hides the exact location).
   const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
-  if (small && scale === 1) {
-    bitmap.close();
-    return { blob: file, name: file.name };
-  }
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);

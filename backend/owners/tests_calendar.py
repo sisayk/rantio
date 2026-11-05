@@ -260,3 +260,14 @@ class OwnerCalendarApiTests(TestCase):
     def test_signed_out_gets_nothing(self):
         self.client.logout()
         self.assertEqual(self.client.get("/api/owner/calendar/").status_code, 403)
+
+
+class FeedAddressTests(TestCase):
+    """Calendar links can't reach the server's own network."""
+
+    def test_internal_addresses_are_refused(self):
+        from .calendar import FeedError, check_address
+        for url in ["https://127.0.0.1/x.ics", "https://localhost/x.ics", "https://10.0.0.5/x.ics",
+                    "https://169.254.169.254/latest", "https://[::1]/x", "https://example.com:8443/x.ics", "http://example.com/x"]:
+            with self.subTest(url=url), self.assertRaises(FeedError):
+                check_address(url)

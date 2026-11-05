@@ -109,6 +109,9 @@ def can_review(c: Conversation, today: date | None = None) -> bool:
     b = stay_of(c)
     if not b or hasattr(c, "review"):
         return False
+    # The owner booking their own cottage can't review it.
+    if c.cottage and c.guest_email and c.guest_email.strip().lower() == c.cottage.owner.email.lower():
+        return False
     return b.check_out <= today <= b.check_out + timedelta(days=REVIEW_DAYS)
 
 
@@ -228,6 +231,8 @@ class GuestReviewView(APIView):
         data = ReviewSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         v = data.validated_data
+        if Review.objects.filter(conversation=c).exists():
+            return Response({"detail": "already_reviewed"}, status=status.HTTP_400_BAD_REQUEST)
         r = Review.objects.create(
             conversation=c, cottage=c.cottage, rating=v["rating"], cleanliness=v.get("cleanliness"),
             location=v.get("location"), value=v.get("value"), comment=v.get("comment", "").strip(),

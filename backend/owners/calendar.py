@@ -14,9 +14,13 @@ Dates are nights: `start` is the first night, `end` (check-out) the first free d
 
 from __future__ import annotations
 
+import ipaddress
 import logging
 import re
+import socket
+import urllib.error
 import urllib.request
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone as dt_timezone
 
@@ -234,15 +238,45 @@ class FeedError(Exception):
     """A calendar link that can't be read; the message is shown to the owner as is."""
 
 
-def fetch(url: str) -> str:
-    if not url.lower().startswith("https://"):
+def check_address(url: str) -> None:
+    """Only https on port 443 to a public address: an owner's link mustn't reach the server's own
+    network (localhost, 10.x, the cloud's metadata address…). Checked again on every redirect."""
+    p = urlparse(url)
+    if p.scheme != "https" or not p.hostname:
         raise FeedError("The link must start with https://")
+    if p.port not in (None, 443):
+        raise FeedError("That address can't be read.")
+    try:
+        infos = socket.getaddrinfo(p.hostname, 443, proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, UnicodeError) as exc:
+        raise FeedError("Couldn't find that address.") from exc
+    if not infos or any(not ipaddress.ip_address(i[4][0].split("%")[0]).is_global for i in infos):
+        raise FeedError("That address can't be read.")
+
+
+class _CheckedRedirects(urllib.request.HTTPRedirectHandler):
+    max_redirections = 5
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        check_address(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _CheckedRedirects)
+
+
+def fetch(url: str) -> str:
+    check_address(url)
     req = urllib.request.Request(url, headers={"User-Agent": "Rantio calendar sync (+https://rantio.fi)"})
     try:
-        with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT) as res:  # noqa: S310 (https checked above)
+        with _opener.open(req, timeout=FETCH_TIMEOUT) as res:  # noqa: S310 (address checked above)
             body = res.read(MAX_FEED_BYTES + 1)
-    except Exception as exc:  # network, TLS, 404 …
-        raise FeedError(f"Couldn't read the link: {exc}"[:300]) from exc
+    except FeedError:
+        raise
+    except urllib.error.HTTPError as exc:  # the site's own answer (404, 403…)
+        raise FeedError(f"The site answered {exc.code}.") from exc
+    except Exception as exc:  # network, TLS, timeout: no details, they could describe other hosts
+        raise FeedError("Couldn't read the link.") from exc
     if len(body) > MAX_FEED_BYTES:
         raise FeedError("The calendar is too large.")
     return body.decode("utf-8", errors="replace")
