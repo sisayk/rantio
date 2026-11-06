@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from .regions import REGION_CHOICES, REGIONS
+from .vault import SealedCharField, SealedDateField, SealedJSONField
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
 # - €99 yearly fee per cottage (or the set amount in the cottage's own currency,
@@ -267,12 +268,12 @@ class Owner(models.Model):
     city = models.CharField(max_length=100, blank=True)
     address_country = models.CharField(max_length=2, blank=True)
     payout_holder = models.CharField(max_length=160, blank=True, help_text="Name on the bank account the owner is paid to.")
-    payout_iban = models.CharField(max_length=34, blank=True, help_text="Bank account (IBAN) the owner is paid to.")
+    payout_iban = SealedCharField(max_length=34, blank=True, help_text="Bank account (IBAN) the owner is paid to (stored encrypted).")
     payout_bic = models.CharField(max_length=11, blank=True)
     # What the booking sites ask of a host (and the EU's DAC7 rules): owners/profile.py HOST_CHECKLIST.
     legal_first_name = models.CharField(max_length=80, blank=True, help_text="As on an ID; no initials.")
     legal_last_name = models.CharField(max_length=80, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_birth = SealedDateField(null=True, blank=True, help_text="Stored encrypted.")
     tax_country = models.CharField(max_length=2, blank=True, help_text="Country that issued the tax number.")
     tax_id_sealed = models.TextField(blank=True, editable=False, help_text="Tax number (Finland: personal identity code), encrypted.")
     postal_same = models.BooleanField(default=True, help_text="Post goes to the address above.")
@@ -297,8 +298,9 @@ class Owner(models.Model):
     website = models.URLField(max_length=300, blank=True)
     legal_rep_name = models.CharField(max_length=160, blank=True, help_text="Who can sign for the company.")
     legal_rep_role = models.CharField(max_length=80, blank=True)
-    beneficial_owners = models.JSONField(
-        default=list, blank=True, help_text='People owning 25 % or more: [{"name", "date_of_birth", "country", "share"}].'
+    beneficial_owners = SealedJSONField(
+        default=list, blank=True,
+        help_text='People owning 25 % or more: [{"name", "date_of_birth", "country", "share"}]. Stored encrypted.',
     )
     reservations_contact = models.JSONField(
         default=dict, blank=True, help_text='Who the sites contact about bookings, if not the owner: {"name", "email", "phone"}.'

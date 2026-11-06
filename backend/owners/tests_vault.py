@@ -8,6 +8,11 @@ from django.test import SimpleTestCase, TestCase, override_settings
 
 from . import login as owner_login
 from . import vault
+from datetime import date
+
+from django.db.models import TextField
+from django.db.models.functions import Cast
+
 from .models import Owner
 from .profile import masked_tax_id
 from .tests_calendar import make_cottage
@@ -155,7 +160,7 @@ class VaultInTheAppTests(TestCase):
             self.save_tax_id()  # legacy
         self.assertIn("legacy", self.run_vault("status"))
         dry = self.run_vault("reseal")
-        self.assertIn("1 to move", dry)
+        self.assertIn("2 to move", dry)  # the tax number, and the date of birth it filled in
         self.o.refresh_from_db()
         self.assertFalse(self.o.tax_id_sealed.startswith("v2:"))  # a dry run changes nothing
         done = self.run_vault("reseal", "--commit")
@@ -181,3 +186,125 @@ class VaultInTheAppTests(TestCase):
     def test_reseal_needs_a_vault_key(self):
         with self.settings(VAULT_KEYS=[]), self.assertRaises(CommandError):
             self.run_vault("reseal")
+
+
+IBAN = "FI2112345600000785"
+PEOPLE = [{"name": "Aino Virtanen", "date_of_birth": "1970-05-01", "country": "FI", "share": 60}]
+
+
+@override_settings(SECRET_KEY="secret-1", SECRET_KEY_FALLBACKS=[], VAULT_KEYS=[A])
+class SealedFieldTests(TestCase):
+    """The bank account, the date of birth and the beneficial owners: encrypted in the database,
+    in clear for the code, and never erased by a save when a key is missing."""
+
+    def setUp(self):
+        self.o = make_cottage().owner
+        self.o.payout_iban, self.o.date_of_birth, self.o.beneficial_owners = IBAN, date(1983, 7, 2), PEOPLE
+        self.o.save()
+        self.client.force_login(owner_login.user_for(self.o))
+
+    def stored(self, name):
+        return Owner.objects.annotate(raw=Cast(name, TextField())).values_list("raw", flat=True).get(pk=self.o.pk)
+
+    def details(self):
+        return self.client.get("/api/owner/me/").json()["details"]
+
+    def test_stored_encrypted_read_in_clear(self):
+        for name, clear in (("payout_iban", IBAN), ("date_of_birth", "1983-07-02"), ("beneficial_owners", "Virtanen")):
+            raw = self.stored(name)
+            self.assertTrue(raw.startswith(f"v2:{vault.key_id(A)}:"), name)
+            self.assertNotIn(clear, raw)
+        o = Owner.objects.get(pk=self.o.pk)
+        self.assertEqual((o.payout_iban, o.date_of_birth, o.beneficial_owners), (IBAN, date(1983, 7, 2), PEOPLE))
+        self.assertEqual(Owner.objects.filter(pk=self.o.pk, payout_iban="").count(), 0)
+
+    def test_nothing_stored_stays_empty(self):
+        o = make_cottage(email="tyhja@example.fi").owner
+        self.assertEqual((self.stored_of(o, "payout_iban"), self.stored_of(o, "date_of_birth"), self.stored_of(o, "beneficial_owners")), ("", None, ""))
+        o = Owner.objects.get(pk=o.pk)
+        self.assertEqual((o.payout_iban, o.date_of_birth, o.beneficial_owners), ("", None, []))
+
+    def stored_of(self, o, name):
+        return Owner.objects.annotate(raw=Cast(name, TextField())).values_list("raw", flat=True).get(pk=o.pk)
+
+    def test_the_account_still_shows_them(self):
+        d = self.details()
+        self.assertEqual((d["payout_iban"], d["has_payout"], d["date_of_birth"]), ("FI•• •••• 0785", True, "1983-07-02"))
+        self.assertEqual(d["beneficial_owners"][0]["name"], "Aino Virtanen")
+
+    def test_a_missing_key_never_erases_them(self):
+        before = {name: self.stored(name) for name in ("payout_iban", "date_of_birth", "beneficial_owners")}
+        with self.settings(VAULT_KEYS=[B]), self.assertLogs("owners.vault", "ERROR") as logs:
+            d = self.details()
+            self.assertEqual((d["payout_iban"], d["has_payout"], d["date_of_birth"], d["beneficial_owners"]), ("•••••", True, "", []))
+            self.assertNotIn("payout", d["missing"])  # not asked again for an operator's mistake
+            # The page sends back what it shows; other details change; then a full save.
+            res = self.client.patch("/api/owner/me/", {"details": {
+                "payout_iban": d["payout_iban"], "date_of_birth": "", "beneficial_owners": [], "city": "Savonlinna",
+            }}, content_type="application/json")
+            self.assertEqual(res.status_code, 200, res.content)
+            o = Owner.objects.get(pk=self.o.pk)
+            self.assertTrue(vault.is_locked(o.payout_iban))
+            o.save()
+            for text in ("FI21", "0785", "1983", "Virtanen"):
+                self.assertNotIn(text, "".join(logs.output))
+        self.assertEqual({name: self.stored(name) for name in before}, before)
+        o = Owner.objects.get(pk=self.o.pk)
+        self.assertEqual((o.payout_iban, o.date_of_birth, o.city), (IBAN, date(1983, 7, 2), "Savonlinna"))
+
+    def test_a_new_value_replaces_one_that_cant_be_opened(self):
+        with self.settings(VAULT_KEYS=[B]), self.assertLogs("owners.vault", "ERROR"):
+            res = self.client.patch("/api/owner/me/", {"details": {"payout_iban": "FI49 5000 9420 0287 30"}}, content_type="application/json")
+            self.assertEqual(res.status_code, 200, res.content)
+            self.assertEqual(Owner.objects.get(pk=self.o.pk).payout_iban, "FI4950009420028730")
+
+    def admin_form(self, o, changes=None):
+        from django.contrib.auth.models import User
+        from django.test import RequestFactory
+
+        request = RequestFactory().get("/")
+        request.user = User.objects.create_superuser("staff", "staff@rantio.fi", "x")
+        form_class = site._registry[Owner].get_form(request, o)
+        initial = form_class(instance=o).initial
+        data = {**{k: v for k, v in initial.items() if v is not None}, **(changes or {})}
+        for name in ("beneficial_owners", "reservations_contact"):
+            if isinstance(data.get(name), (list, dict)):
+                import json
+                data[name] = json.dumps(data[name])
+        return form_class(data=data, files={}, instance=o), initial
+
+    def test_the_admin_shows_them_in_clear_for_payouts(self):
+        o = Owner.objects.get(pk=self.o.pk)
+        form, initial = self.admin_form(o)
+        self.assertEqual((initial["payout_iban"], initial["date_of_birth"]), (IBAN, date(1983, 7, 2)))
+        self.assertIn("Virtanen", form["beneficial_owners"].value())
+
+    def test_the_admin_form_keeps_what_it_cant_open(self):
+        with self.settings(VAULT_KEYS=[B]), self.assertLogs("owners.vault", "ERROR"):
+            o = Owner.objects.get(pk=self.o.pk)
+            form, initial = self.admin_form(o, {"city": "Punkaharju"})
+            self.assertEqual(initial["payout_iban"], "")  # shown empty, not as "•••••"
+            self.assertTrue(form.is_valid(), form.errors)
+            form.save()
+        o = Owner.objects.get(pk=self.o.pk)
+        self.assertEqual((o.payout_iban, o.date_of_birth, o.beneficial_owners, o.city), (IBAN, date(1983, 7, 2), PEOPLE, "Punkaharju"))
+
+    def test_status_and_reseal_cover_them(self):
+        with self.settings(VAULT_KEYS=[B, A]):
+            dry = self.run_vault("reseal")
+            self.assertIn("3 to move", dry)
+            self.run_vault("reseal", "--commit")
+            status = self.run_vault("status")
+            for name in ("payout_iban", "date_of_birth", "beneficial_owners"):
+                self.assertTrue(self.stored(name).startswith(f"v2:{vault.key_id(B)}:"), name)
+                self.assertIn(name, status)
+            self.assertNotIn("older key", status)
+            o = Owner.objects.get(pk=self.o.pk)
+            self.assertEqual((o.payout_iban, o.date_of_birth, o.beneficial_owners), (IBAN, date(1983, 7, 2), PEOPLE))
+        for text in (dry, status):
+            self.assertNotIn("0785", text)
+
+    def run_vault(self, *args):
+        out = io.StringIO()
+        call_command("vault", *args, stdout=out)
+        return out.getvalue()

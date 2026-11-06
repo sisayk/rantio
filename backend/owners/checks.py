@@ -22,7 +22,7 @@ def vault_key_separate(app_configs, **kwargs):
     if getattr(settings, "VAULT_KEYS", None):
         return []
     return [Warning(
-        "Owners' tax numbers are encrypted with a key derived from DJANGO_SECRET_KEY, so changing "
+        "Owners' tax numbers, bank accounts and dates of birth are encrypted with a key derived from DJANGO_SECRET_KEY, so changing "
         "DJANGO_SECRET_KEY without listing the old one in DJANGO_SECRET_KEY_FALLBACKS makes them unreadable.",
         hint="Set VAULT_KEYS and run `stugora-manage vault reseal --commit` (DEPLOY.md, 'Tax numbers: the encryption key').",
         id="owners.W010",

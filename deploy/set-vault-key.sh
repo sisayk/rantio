@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Gives the tax-number vault (backend/owners/vault.py) its own encryption key, so changing
-# DJANGO_SECRET_KEY can never make owners' tax numbers unreadable. Run on the Mac, in a
+# Gives the owner vault (backend/owners/vault.py: tax numbers, bank accounts, dates of birth) its
+# own encryption key, so changing DJANGO_SECRET_KEY can never make them unreadable. Run on the Mac, in a
 # normal terminal:
 #   bash ~/stugora/deploy/set-vault-key.sh           first key (once)
 #   bash ~/stugora/deploy/set-vault-key.sh rotate    a new key; the old one is dropped once
@@ -40,7 +40,7 @@ The new vault key for Rantio's tax numbers:
     $NEW
 
 Save it in your password manager now, as "Rantio VAULT_KEYS ($(date +%Y-%m-%d))".
-Without it, a backup or a new server can't read owners' tax numbers.
+Without it, a backup or a new server can't read owners' tax numbers and bank accounts.
 
 EOF
 read -r -p 'Saved it? Type yes to put it on the server: ' ANSWER < /dev/tty
@@ -103,6 +103,6 @@ PY
   fi
 fi
 echo
-echo "Done. Tax numbers now have their own key."
+echo "Done. The vault (tax numbers, bank accounts, dates of birth) now has its own key."
 REMOTE
 } | ssh $OPTS "$SERVER" "read -r NEW; export NEW MODE=$MODE; bash -s"

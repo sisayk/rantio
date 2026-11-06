@@ -1,5 +1,6 @@
-"""Encryption for the owner details that identify a person (the tax number: in Finland the
-henkilötunnus), so a copy of the database or a backup alone doesn't reveal them.
+"""Encryption for the owner details that identify a person or their money (the tax number, in
+Finland the henkilötunnus; the bank account; the date of birth; a company's beneficial owners),
+so a copy of the database or a backup alone doesn't reveal them.
 
 Keys
   VAULT_KEYS (in /srv/stugora/.env): Fernet keys, comma-separated, newest first. The first one
@@ -21,10 +22,17 @@ Never log or print a decrypted value; the key id and the owner's id are enough t
 
 import base64
 import hashlib
+import json
+import logging
+from datetime import date
 
 from cryptography.fernet import Fernet, InvalidToken
+from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import models
+
+logger = logging.getLogger(__name__)
 
 PREFIX = "v2"
 
@@ -119,3 +127,108 @@ def needs_reseal(token: str) -> bool:
 def reseal(token: str) -> str:
     """The same value encrypted with the newest key. Raises Unreadable if it can't be opened."""
     return seal(unseal(token))
+
+
+# --- Encrypted model fields ----------------------------------------------------------------------
+# Owner.payout_iban, .date_of_birth and .beneficial_owners are stored sealed like the tax number,
+# but the code reads and writes them in clear: the field seals on the way into the database and
+# opens on the way out. A stored value no configured key opens is logged and read as a Locked
+# placeholder ("•••••", which counts as given, so the owner isn't asked again for an operator's
+# mistake); saving the row writes its stored value back unchanged, so a missing key never erases it.
+
+LOCKED_TEXT = "•••••"
+
+
+class Locked(str):
+    """A stored value as it is in the database (encrypted). Read from a field: one that can't be
+    opened. Given to a field (filter, update): written or compared as it is, never sealed again."""
+
+    token: str
+
+    def __new__(cls, token: str):
+        s = super().__new__(cls, LOCKED_TEXT)
+        s.token = token
+        return s
+
+
+def is_locked(value) -> bool:
+    return isinstance(value, Locked)
+
+
+class SealedField(models.TextField):
+    """Base: a text column holding seal(encode(value)); "" (or NULL) for nothing stored."""
+
+    def encode(self, value) -> str:
+        return str(value)
+
+    def decode(self, text: str):
+        return text
+
+    def nothing(self):
+        return None if self.null else ""
+
+    def from_db_value(self, value, expression, connection):
+        if value is None or value == "":
+            return self.nothing()
+        try:
+            return self.decode(unseal(value))
+        except Unreadable as err:
+            logger.error("%s.%s: a stored value can't be decrypted (%s); see `stugora-manage vault status`",
+                         self.model.__name__, self.name, err)
+            return Locked(value)
+
+    def to_python(self, value):
+        return value
+
+    def get_prep_value(self, value):
+        if isinstance(value, Locked):
+            return value.token
+        if value is None or value == "" or value == [] or value == {}:
+            return None if self.null else ""
+        return seal(self.encode(value))
+
+    def value_from_object(self, obj):
+        # Forms (the admin) show a value that can't be opened as empty …
+        value = super().value_from_object(obj)
+        return self.nothing() if isinstance(value, Locked) else value
+
+    def save_form_data(self, instance, data):
+        # … and leaving it empty keeps the stored value.
+        if isinstance(getattr(instance, self.attname), Locked) and data in self.empty_values:
+            return
+        super().save_form_data(instance, data)
+
+
+class SealedCharField(SealedField):
+    def formfield(self, **kwargs):
+        return super().formfield(**{"widget": forms.TextInput, **kwargs})
+
+
+class SealedDateField(SealedField):
+    def encode(self, value) -> str:
+        return value.isoformat() if isinstance(value, date) else str(value)
+
+    def decode(self, text: str):
+        return date.fromisoformat(text)
+
+    def formfield(self, **kwargs):
+        return models.Field.formfield(self, **{"form_class": forms.DateField, **kwargs})
+
+
+class SealedJSONField(SealedField):
+    def encode(self, value) -> str:
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+    def decode(self, text: str):
+        return json.loads(text)
+
+    def nothing(self):
+        return self.get_default() if self.has_default() else super().nothing()
+
+    def formfield(self, **kwargs):
+        return models.Field.formfield(self, **{"form_class": forms.JSONField, **kwargs})
+
+
+def sealed_columns(model) -> list[str]:
+    """The model's encrypted columns, for `vault status` and `vault reseal`."""
+    return [f.attname for f in model._meta.concrete_fields if isinstance(f, SealedField) or f.attname.endswith("_sealed")]

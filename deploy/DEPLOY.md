@@ -263,7 +263,8 @@ systemctl restart stugora-django stugora-next
 
 ## Tax numbers: the encryption key
 
-Owners' tax numbers (in Finland the henkilötunnus) are stored encrypted (`owners/vault.py`).
+Owners' tax numbers (in Finland the henkilötunnus), bank accounts (IBAN), dates of birth and a
+company's beneficial owners are stored encrypted (`owners/vault.py`); the admin shows them in clear.
 Until `VAULT_KEYS` is set they are encrypted with a key made from `DJANGO_SECRET_KEY`, so
 changing that secret would make them unreadable. `manage.py check --deploy` warns about it
 (owners.W010). Give the vault its own key once, before many hosts have entered their numbers.

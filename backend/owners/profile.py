@@ -178,6 +178,8 @@ def y_tunnus_ok(value: str) -> bool:
 
 
 def masked_iban(iban: str) -> str:
+    if vault.is_locked(iban):
+        return vault.LOCKED_TEXT  # stored but can't be decrypted: holds "•", so sent back it changes nothing
     return f"{iban[:2]}•• •••• {iban[-4:]}" if iban else ""
 
 
@@ -189,14 +191,14 @@ def details_row(o: Owner) -> dict:
         "payout_holder": o.payout_holder, "payout_iban": masked_iban(o.payout_iban), "payout_bic": o.payout_bic,
         "has_payout": bool(o.payout_iban),
         "legal_first_name": o.legal_first_name, "legal_last_name": o.legal_last_name,
-        "date_of_birth": o.date_of_birth.isoformat() if o.date_of_birth else "",
+        "date_of_birth": "" if vault.is_locked(o.date_of_birth) else o.date_of_birth.isoformat() if o.date_of_birth else "",
         "tax_country": o.tax_country, **tax_id_row(o),
         "postal_same": o.postal_same, "postal_line": o.postal_line, "postal_postal_code": o.postal_postal_code,
         "postal_city": o.postal_city, "postal_country": o.postal_country,
         "emergency_name": o.emergency_name, "emergency_phone": o.emergency_phone,
         "business_type": o.business_type, "trading_name": o.trading_name, "website": o.website,
         "legal_rep_name": o.legal_rep_name, "legal_rep_role": o.legal_rep_role,
-        "beneficial_owners": o.beneficial_owners or [],
+        "beneficial_owners": [] if vault.is_locked(o.beneficial_owners) else o.beneficial_owners or [],
         "reservations_contact": o.reservations_contact or {},
         "missing": host_missing(o),
     }
@@ -292,6 +294,8 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
         dob = parse_dob(str(data.get("date_of_birth") or ""))
         if dob is False:
             errors["date_of_birth"] = ["invalid"]
+        elif dob is None and vault.is_locked(o.date_of_birth):
+            pass  # shown empty because it can't be decrypted: left as stored
         else:
             o.date_of_birth = dob
             changed.append("date_of_birth")
@@ -307,7 +311,7 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
             changed.append("tax_id_sealed")
             # A henkilötunnus carries the date of birth: fill it in, or catch a typo in either.
             born = hetu_birth(tin) if country == "FI" and o.account_type != Owner.AccountType.COMPANY else None
-            if born and not o.date_of_birth:
+            if born and (not o.date_of_birth or vault.is_locked(o.date_of_birth)):
                 o.date_of_birth = born
                 changed.append("date_of_birth")
             elif born and o.date_of_birth != born:
@@ -339,6 +343,8 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
         rows, bad = clean_owners(data.get("beneficial_owners"))
         if bad:
             errors["beneficial_owners"] = [bad]
+        elif not rows and vault.is_locked(o.beneficial_owners):
+            pass  # shown empty because they can't be decrypted: left as stored
         else:
             o.beneficial_owners = rows
             changed.append("beneficial_owners")

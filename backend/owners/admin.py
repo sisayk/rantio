@@ -9,12 +9,13 @@ from decimal import Decimal
 
 from django import forms
 from django.utils.html import format_html
+from unfold import widgets as unfold_widgets
 from unfold.decorators import display
 
 from . import media_checks
 from django.contrib import messages
 
-from . import booking_emails, invoicing, stripe_api
+from . import booking_emails, invoicing, stripe_api, vault
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, ExternalRating, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
     Message, MonitorAlert, MonitorDevice, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Review, SignupPhoto,
@@ -133,6 +134,12 @@ class OwnerAdmin(ModelAdmin):
     search_fields = ["name", "email"]
     inlines = [CottageInline]
     readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with", "tax_number"]
+    # The encrypted fields (owners/vault.py) are text columns: show them as what they hold.
+    formfield_overrides = {
+        vault.SealedCharField: {"widget": unfold_widgets.UnfoldAdminTextInputWidget},
+        vault.SealedDateField: {"widget": unfold_widgets.UnfoldAdminSingleDateWidget},
+        vault.SealedJSONField: {"widget": unfold_widgets.UnfoldAdminTextareaWidget},
+    }
     fieldsets = [
         ("Owner", {"fields": ["name", "email", "phone", "language", "is_host", "user", "signup", "signs_in_with"],
                    "classes": ["st-grid-2"]}),
