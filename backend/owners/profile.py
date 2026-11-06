@@ -10,6 +10,7 @@ import re
 
 from django.conf import settings
 from django.utils import timezone
+from django.views.decorators.debug import sensitive_variables
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -189,7 +190,7 @@ def details_row(o: Owner) -> dict:
         "has_payout": bool(o.payout_iban),
         "legal_first_name": o.legal_first_name, "legal_last_name": o.legal_last_name,
         "date_of_birth": o.date_of_birth.isoformat() if o.date_of_birth else "",
-        "tax_country": o.tax_country, "tax_id": masked_tax_id(vault.unseal(o.tax_id_sealed)), "has_tax_id": bool(o.tax_id_sealed),
+        "tax_country": o.tax_country, **tax_id_row(o),
         "postal_same": o.postal_same, "postal_line": o.postal_line, "postal_postal_code": o.postal_postal_code,
         "postal_city": o.postal_city, "postal_country": o.postal_country,
         "emergency_name": o.emergency_name, "emergency_phone": o.emergency_phone,
@@ -201,6 +202,8 @@ def details_row(o: Owner) -> dict:
     }
 
 
+# Error reports (Django's 500 emails) leave these local values out; settings.py does the same for Sentry.
+@sensitive_variables("data", "tin", "born", "v")
 def apply_details(o: Owner, data) -> tuple[list[str], dict]:
     """Takes the details from a PATCH; the fields changed, or errors by field."""
     changed, errors = [], {}
@@ -357,8 +360,34 @@ def apply_details(o: Owner, data) -> tuple[list[str], dict]:
 
 # --- What the booking sites need -----------------------------------------------------------------
 
+# Shown instead when the stored number can't be decrypted. It holds "•", so sent back unchanged
+# it never overwrites the stored value.
+UNREADABLE_TAX_ID = "•••••"
+
+
 def masked_tax_id(tin: str) -> str:
-    return f"•••••{tin[-4:]}" if tin else ""
+    """What the owner and the admin see of a stored tax number. A henkilötunnus shows only its date
+    part, which the date of birth gives anyway: its last four characters are what identify the person,
+    so they never leave the server. Other numbers show their last two characters."""
+    if not tin:
+        return ""
+    if re.fullmatch(r"\d{6}[-+ABCDEFUVWXY]\d{3}[0-9A-Y]", tin):
+        return f"{tin[:7]}••••"
+    return f"•••••{tin[-2:]}"
+
+
+def tax_id_row(o: Owner) -> dict:
+    """The tax number's part of the account: masked, and whether one is stored. A stored number that
+    can't be decrypted (a key missing from VAULT_KEYS, or DJANGO_SECRET_KEY changed) still counts as
+    given, so owners aren't asked again for an operator's mistake, and it is logged for the team."""
+    if not o.tax_id_sealed:
+        return {"tax_id": "", "has_tax_id": False, "tax_id_unreadable": False}
+    try:
+        tin = vault.unseal(o.tax_id_sealed)
+    except vault.Unreadable as err:
+        logger.error("Owner %s: the stored tax number can't be decrypted (%s); see `stugora-manage vault status`", o.pk, err)
+        return {"tax_id": UNREADABLE_TAX_ID, "has_tax_id": True, "tax_id_unreadable": True}
+    return {"tax_id": masked_tax_id(tin), "has_tax_id": True, "tax_id_unreadable": False}
 
 
 def parse_dob(value: str):

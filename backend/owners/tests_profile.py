@@ -112,7 +112,7 @@ class HostRequirementTests(TestCase):
                          address_country="FI", payout_iban="FI2112345600000785", emergency_name="Pekka", emergency_phone="0401234567")
         self.assertEqual(res.status_code, 200, res.content)
         d = res.json()["details"]
-        self.assertEqual(d["tax_id"], "•••••308T")
+        self.assertEqual(d["tax_id"], "131052-••••")  # the identifying last four never leave the server
         self.assertEqual(d["missing"], ["phone"])
         self.o.refresh_from_db()
         self.assertNotIn("131052", self.o.tax_id_sealed)  # stored encrypted

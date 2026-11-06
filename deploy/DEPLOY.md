@@ -261,6 +261,39 @@ On the server (after ssh):
 systemctl restart stugora-django stugora-next
 ```
 
+## Tax numbers: the encryption key
+
+Owners' tax numbers (in Finland the henkilötunnus) are stored encrypted (`owners/vault.py`).
+Until `VAULT_KEYS` is set they are encrypted with a key made from `DJANGO_SECRET_KEY`, so
+changing that secret would make them unreadable. `manage.py check --deploy` warns about it
+(owners.W010). Give the vault its own key once, before many hosts have entered their numbers.
+Nothing below prints a tax number; only counts, key ids and owner ids.
+
+On the server (after ssh):
+```bash
+# 1. Make a key, and save a copy in the password manager before going on:
+#    backups (and a new server) can't read the tax numbers without it.
+stugora-manage shell -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# 2. Add it to /srv/stugora/.env as  VAULT_KEYS=<the key>  then:
+systemctl restart stugora-django
+stugora-manage vault status            # numbers so far show as "legacy"
+stugora-manage vault reseal            # dry run: how many would move
+stugora-manage vault reseal --commit   # re-encrypt them with the new key
+stugora-manage vault status            # all on the new key now
+```
+
+**Changing the key later:** put the new key first and keep the old one after it
+(`VAULT_KEYS=new,old`), restart, `vault reseal --commit`, check `vault status` shows nothing
+on the old key, then remove the old key and restart.
+
+**Changing `DJANGO_SECRET_KEY`:** list the old secret in `DJANGO_SECRET_KEY_FALLBACKS` until
+`vault status` shows no "legacy" values (and for sign-ins, a few weeks).
+
+**If `vault status` says some can't be opened:** a key is missing or the secret changed. Put
+the old key back from the password manager and restart; nothing is lost and nothing needs
+re-entering. Meanwhile owners see their number as saved (`•••••`) and aren't asked again, and
+each page view logs an error with the owner's id (`journalctl -u stugora-django`).
+
 ## Worth doing soon after launch
 
 - **SSH hardening**: once key login works, set `PasswordAuthentication no` in

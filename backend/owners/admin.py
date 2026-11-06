@@ -152,10 +152,12 @@ class OwnerAdmin(ModelAdmin):
 
     @display(description="Tax number")
     def tax_number(self, obj):
-        # Stored encrypted; the admin sees only the end, like the owner does.
-        from . import vault
-        from .profile import masked_tax_id
-        return masked_tax_id(vault.unseal(obj.tax_id_sealed)) if obj.tax_id_sealed else "—"
+        # Stored encrypted; the admin sees it masked, like the owner does.
+        from .profile import tax_id_row
+        row = tax_id_row(obj)
+        if row["tax_id_unreadable"]:
+            return "Can't be decrypted: a key is missing (stugora-manage vault status)"
+        return row["tax_id"] or "—"
 
     @display(description="Card")
     def card(self, obj):

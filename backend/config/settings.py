@@ -43,6 +43,12 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
 if not DEBUG and SECRET_KEY.startswith("dev-only"):
     raise RuntimeError("Set DJANGO_SECRET_KEY in production.")
+# Changing DJANGO_SECRET_KEY: list the old one here for a while, so sign-ins and anything signed with
+# it (and tax numbers still under the legacy vault key) keep working. Comma-separated.
+SECRET_KEY_FALLBACKS = env_list("DJANGO_SECRET_KEY_FALLBACKS")
+# Keys that encrypt owners' tax numbers (owners/vault.py): Fernet keys, comma-separated, newest first.
+# Separate from SECRET_KEY on purpose. Keep a copy in the password manager: backups can't be read without it.
+VAULT_KEYS = env_list("VAULT_KEYS")
 
 # Locally any host name, so a phone on the Wi-Fi can reach the API by the Mac's address;
 # production always sets DJANGO_ALLOWED_HOSTS.
@@ -287,12 +293,19 @@ if not DEBUG:
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:
     import sentry_sdk
+    from sentry_sdk.scrubber import DEFAULT_DENYLIST, EventScrubber
 
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         environment=os.environ.get("SENTRY_ENVIRONMENT", "production"),
         traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE") or 0),
         send_default_pii=False,
+        # Error reports carry each frame's local values: owners' identifiers never go with them.
+        event_scrubber=EventScrubber(
+            denylist=[*DEFAULT_DENYLIST, "tin", "tax_id", "tax_id_sealed", "hetu", "payout_iban", "iban",
+                      "date_of_birth", "dob", "born", "vault_keys"],
+            recursive=True,
+        ),
     )
 
 
