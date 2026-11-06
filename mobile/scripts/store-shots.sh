@@ -6,10 +6,10 @@
 #
 # The host screens need bookings and messages, so the app talks to a local Rantio with the demo
 # owner (backend seed_demo: demo@rantio.fi), never to rantio.fi. The shots land in
-# ~/stugora/store-assets/raw/; Claude frames them and adds the headlines.
+# ~/stugora/store-assets/raw/iphone/; Claude frames them and adds the headlines.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-OUT="$ROOT/store-assets/raw"
+OUT="$ROOT/store-assets/raw/iphone"
 SIM_NAME="${SIM_NAME:-iPhone 17 Pro Max}"
 API="http://localhost:8100"
 mkdir -p "$OUT"
