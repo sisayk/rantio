@@ -1045,6 +1045,8 @@ export const lt: Translation = {
       bookings: "Visos rezervacijos",
       notifications: "Pranešimai",
       notificationsLead: "Naujos rezervacijos, žinutės ir rezervacijų užklausos šiame telefone.",
+      notificationsOffFailed: "Nepavyko išjungti pranešimų, todėl jie vis dar įjungti. Patikrinkite ryšį ir bandykite dar kartą.",
+      notificationsOnFailed: "Nepavyko įjungti pranešimų. Patikrinkite ryšį ir bandykite dar kartą.",
       notificationsBlocked: "Rantio pranešimai išjungti telefono nustatymuose.",
       openSettings: "Atidaryti nustatymus",
       web: "Rantio internete",

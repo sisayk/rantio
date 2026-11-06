@@ -1040,6 +1040,8 @@ export const nb: Translation = {
       bookings: "Alle bookinger",
       notifications: "Varsler",
       notificationsLead: "Nye bookinger, meldinger og bookingforespørsler på denne telefonen.",
+      notificationsOffFailed: "Varslene kunne ikke slås av, så de er fortsatt på. Sjekk tilkoblingen og prøv igjen.",
+      notificationsOnFailed: "Varslene kunne ikke slås på. Sjekk tilkoblingen og prøv igjen.",
       notificationsBlocked: "Varsler fra Rantio er slått av i telefonens innstillinger.",
       openSettings: "Åpne innstillinger",
       web: "Rantio på nett",

@@ -4,7 +4,7 @@ import { ActionSheetIOS, Alert, Linking, Platform, Pressable, StyleSheet, Switch
 
 import { mediaUrl, ownerApi, type OwnerDetails, type PaymentMethod } from "@/api";
 import { ACCOUNT } from "@/i18n/messages/account";
-import { pushState, type PushState, registerForPush, turnPushOff } from "@/state/push";
+import { pushState, type PushState, PushSyncError, registerForPush, turnPushOff } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
 import { DeleteAccountButton } from "@/ui/account";
@@ -502,6 +502,8 @@ function Taxes({ form }: { form: Form }) {
 function Notifications() {
   const { m } = useT();
   const [push, setPush] = useState<PushState | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<"on" | "off" | null>(null);
   useFocusEffect(
     useCallback(() => {
       pushState()
@@ -510,22 +512,42 @@ function Notifications() {
     }, []),
   );
   if (!push) return null;
+  // The switch moves at once; if the server can't be reached it goes back and says so. Nothing
+  // changes on the phone or the server until the server has the change (state/pushSwitch.ts).
+  const change = async (on: boolean) => {
+    const before = push;
+    setPush(on ? "on" : "off");
+    setFailed(null);
+    setBusy(true);
+    try {
+      setPush(await (on ? registerForPush(true) : turnPushOff()));
+    } catch (err) {
+      setPush(before);
+      setFailed(err instanceof PushSyncError ? err.wanted : on ? "on" : "off");
+    } finally {
+      setBusy(false);
+    }
+  };
+  const detail =
+    push === "blocked" ? m.app.menu.notificationsBlocked
+    : push === "unavailable" ? undefined
+    : failed === "off" ? m.app.menu.notificationsOffFailed
+    : failed === "on" ? m.app.menu.notificationsOnFailed
+    : m.app.menu.notificationsLead;
   return (
     <>
       <MenuRow
         icon="notifications-outline"
         label={m.app.menu.notifications}
-        detail={push === "blocked" ? m.app.menu.notificationsBlocked : push === "unavailable" ? undefined : m.app.menu.notificationsLead}
+        detail={detail}
         right={
           push === "blocked" ? (
             <Button small kind="secondary" label={m.app.menu.openSettings} onPress={() => Linking.openSettings()} />
           ) : push === "unavailable" ? undefined : (
             <Switch
               value={push === "on"}
-              onValueChange={async (on) => {
-                setPush(on ? "on" : "off"); // the switch moves at once; the result follows
-                setPush(await (on ? registerForPush(true) : turnPushOff()).catch(() => (on ? ("off" as const) : ("on" as const))));
-              }}
+              disabled={busy}
+              onValueChange={(on) => void change(on)}
               trackColor={{ true: colors.green, false: colors.line }}
               thumbColor="#ffffff"
             />

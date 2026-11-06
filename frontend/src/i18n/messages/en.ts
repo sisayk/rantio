@@ -1052,6 +1052,8 @@ export const en = {
       bookings: "All bookings",
       notifications: "Notifications",
       notificationsLead: "New bookings, messages and booking requests on this phone.",
+      notificationsOffFailed: "Couldn't switch notifications off, so they're still on. Check your connection and try again.",
+      notificationsOnFailed: "Couldn't switch notifications on. Check your connection and try again.",
       notificationsBlocked: "Notifications for Rantio are off in your phone's settings.",
       openSettings: "Open settings",
       web: "Rantio on the web",

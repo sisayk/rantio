@@ -53,6 +53,22 @@ class AppSignInTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(AppDevice.objects.get().push_token, "ExponentPushToken[abc-123]")
 
+    def test_switching_notifications_off_and_on_on_one_phone(self):
+        # The app sends "" when the switch goes off, and at every start while it is off.
+        first, second = self.sign_in(), self.sign_in()
+        token = "ExponentPushToken[abc-123]"
+        for key in (first, second):
+            self.client.post("/api/owner/device/", {"push_token": token if key == first else "ExponentPushToken[other]"},
+                             content_type="application/json", **self.auth(key))
+        for _ in range(2):  # sending off again changes nothing
+            res = self.client.post("/api/owner/device/", {"push_token": ""}, content_type="application/json", **self.auth(first))
+            self.assertEqual(res.status_code, 200)
+        owner = AppDevice.objects.first().owner
+        self.assertEqual(list(owner.app_devices.exclude(push_token="").values_list("push_token", flat=True)),
+                         ["ExponentPushToken[other]"])  # only the other phone still gets pushes
+        self.client.post("/api/owner/device/", {"push_token": token}, content_type="application/json", **self.auth(first))
+        self.assertEqual(owner.app_devices.exclude(push_token="").count(), 2)
+
     def test_bad_or_expired_key_is_signed_out(self):
         self.assertIn(self.client.get("/api/owner/me/", **self.auth("stg_nope")).status_code, (401, 403))
         key = self.sign_in()

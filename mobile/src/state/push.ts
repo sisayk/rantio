@@ -10,6 +10,10 @@ import { Platform } from "react-native";
 
 import { guestApi, ownerApi } from "@/api";
 
+import { createPushSwitch, PushSyncError } from "./pushSwitch";
+
+export { PushSyncError };
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
@@ -34,40 +38,52 @@ async function ensureChannel() {
   }
 }
 
-/** The owner switched notifications off on this phone (Account settings): don't register it. */
-const OFF_KEY = "rantio.pushOff";
-const isOff = () => AsyncStorage.getItem(OFF_KEY).then((v) => v === "1").catch(() => false);
+/** Account → Notifications, kept in step with the server (the rules are in pushSwitch.ts). */
+const pushSwitch = createPushSwitch(AsyncStorage, (token) => ownerApi.setPushToken(token));
 
-/** Account settings' switch, off: the server stops pushing to this phone. */
-export async function turnPushOff(): Promise<PushState> {
-  await AsyncStorage.setItem(OFF_KEY, "1").catch(() => undefined);
-  await ownerApi.setPushToken("");
-  return "off";
+/** The push token, asking for permission first when `ask` (the system shows its own prompt); null without permission. */
+async function tokenFor(id: string, ask: boolean): Promise<string | null> {
+  await ensureChannel();
+  let { status, canAskAgain } = await Notifications.getPermissionsAsync();
+  if (status !== "granted" && ask && canAskAgain) ({ status, canAskAgain } = await Notifications.requestPermissionsAsync());
+  if (status !== "granted") return null;
+  return (await Notifications.getExpoPushTokenAsync({ projectId: id })).data;
 }
 
+async function permission(): Promise<PushState> {
+  const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+  return status === "granted" ? "on" : canAskAgain ? "off" : "blocked";
+}
+
+/** Account settings' switch, off. The server first: throws PushSyncError, changing nothing, if it can't be reached. */
+export async function turnPushOff(): Promise<PushState> {
+  if (!Device.isDevice || !projectId()) return "unavailable";
+  return pushSwitch.turnOff();
+}
+
+/** What the switch shows: the saved choice, unless the phone's own settings block notifications. */
 export async function pushState(): Promise<PushState> {
   if (!Device.isDevice || !projectId()) return "unavailable";
-  const { status, canAskAgain } = await Notifications.getPermissionsAsync();
-  if (status === "granted") return (await isOff()) ? "off" : "on";
-  return canAskAgain ? "off" : "blocked";
+  const allowed = await permission();
+  if (allowed !== "on") return allowed;
+  return (await pushSwitch.isOff()) ? "off" : "on";
 }
 
 /**
- * Asks once (the system shows its own prompt) and tells the server where to push.
- * Quietly does nothing in a simulator or before the app has an EAS project id.
+ * ask: the owner switched notifications on (or just signed in): asks for permission once and
+ * registers this phone; throws PushSyncError if the server can't be reached, changing nothing.
+ * Without ask (each app start): tells the server the saved choice again, so a change left half
+ * done is put right. Quietly does nothing in a simulator or before the app has an EAS project id.
  */
 export async function registerForPush(ask = false): Promise<PushState> {
   const id = projectId();
   if (!Device.isDevice || !id) return "unavailable";
-  if (ask) await AsyncStorage.removeItem(OFF_KEY).catch(() => undefined); // switched on again
-  else if (await isOff()) return "off";
-  await ensureChannel();
-  let { status, canAskAgain } = await Notifications.getPermissionsAsync();
-  if (status !== "granted" && ask && canAskAgain) ({ status, canAskAgain } = await Notifications.requestPermissionsAsync());
-  if (status !== "granted") return canAskAgain ? "off" : "blocked";
-  const token = (await Notifications.getExpoPushTokenAsync({ projectId: id })).data;
-  await ownerApi.setPushToken(token);
-  return "on";
+  if (ask) {
+    const result = await pushSwitch.turnOn(() => tokenFor(id, true));
+    return result === "on" ? "on" : permission();
+  }
+  const result = await pushSwitch.resume(() => tokenFor(id, false));
+  return result === "on" ? "on" : (await permission()) === "blocked" ? "blocked" : "off";
 }
 
 /**

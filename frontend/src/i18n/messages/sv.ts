@@ -1040,6 +1040,8 @@ export const sv: Translation = {
       bookings: "Alla bokningar",
       notifications: "Notiser",
       notificationsLead: "Nya bokningar, meddelanden och bokningsförfrågningar på den här telefonen.",
+      notificationsOffFailed: "Notiserna kunde inte stängas av, så de är fortfarande på. Kontrollera anslutningen och försök igen.",
+      notificationsOnFailed: "Notiserna kunde inte slås på. Kontrollera anslutningen och försök igen.",
       notificationsBlocked: "Notiser från Rantio är avstängda i telefonens inställningar.",
       openSettings: "Öppna inställningar",
       web: "Rantio på webben",

@@ -1040,6 +1040,8 @@ export const lv: Translation = {
       bookings: "Visas rezervācijas",
       notifications: "Paziņojumi",
       notificationsLead: "Jaunas rezervācijas, ziņas un rezervācijas pieprasījumi šajā tālrunī.",
+      notificationsOffFailed: "Paziņojumus neizdevās izslēgt, tāpēc tie joprojām ir ieslēgti. Pārbaudiet savienojumu un mēģiniet vēlreiz.",
+      notificationsOnFailed: "Paziņojumus neizdevās ieslēgt. Pārbaudiet savienojumu un mēģiniet vēlreiz.",
       notificationsBlocked: "Rantio paziņojumi ir izslēgti tālruņa iestatījumos.",
       openSettings: "Atvērt iestatījumus",
       web: "Rantio tīmeklī",

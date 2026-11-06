@@ -1040,6 +1040,8 @@ export const is: Translation = {
       bookings: "Allar bókanir",
       notifications: "Tilkynningar",
       notificationsLead: "Nýjar bókanir, skilaboð og bókunarbeiðnir í þennan síma.",
+      notificationsOffFailed: "Ekki tókst að slökkva á tilkynningum, svo enn er kveikt á þeim. Athugaðu tenginguna og reyndu aftur.",
+      notificationsOnFailed: "Ekki tókst að kveikja á tilkynningum. Athugaðu tenginguna og reyndu aftur.",
       notificationsBlocked: "Slökkt er á tilkynningum frá Rantio í stillingum símans.",
       openSettings: "Opna stillingar",
       web: "Rantio á vefnum",

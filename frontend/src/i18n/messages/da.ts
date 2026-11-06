@@ -1040,6 +1040,8 @@ export const da: Translation = {
       bookings: "Alle bookinger",
       notifications: "Notifikationer",
       notificationsLead: "Nye bookinger, beskeder og bookingforespørgsler på denne telefon.",
+      notificationsOffFailed: "Notifikationerne kunne ikke slås fra, så de er stadig slået til. Tjek forbindelsen, og prøv igen.",
+      notificationsOnFailed: "Notifikationerne kunne ikke slås til. Tjek forbindelsen, og prøv igen.",
       notificationsBlocked: "Notifikationer fra Rantio er slået fra i telefonens indstillinger.",
       openSettings: "Åbn indstillinger",
       web: "Rantio på nettet",

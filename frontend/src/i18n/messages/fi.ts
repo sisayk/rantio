@@ -1037,6 +1037,8 @@ export const fi: Translation = {
       bookings: "Kaikki varaukset",
       notifications: "Ilmoitukset",
       notificationsLead: "Uudet varaukset, viestit ja varauspyynnöt tähän puhelimeen.",
+      notificationsOffFailed: "Ilmoituksia ei saatu pois päältä, joten ne ovat yhä päällä. Tarkista yhteys ja yritä uudelleen.",
+      notificationsOnFailed: "Ilmoituksia ei saatu päälle. Tarkista yhteys ja yritä uudelleen.",
       notificationsBlocked: "Rantion ilmoitukset ovat pois päältä puhelimesi asetuksissa.",
       openSettings: "Avaa asetukset",
       web: "Rantio verkossa",

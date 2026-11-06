@@ -1040,6 +1040,8 @@ export const et: Translation = {
       bookings: "Kõik broneeringud",
       notifications: "Teavitused",
       notificationsLead: "Uued broneeringud, sõnumid ja broneerimissoovid sellesse telefoni.",
+      notificationsOffFailed: "Teavitusi ei õnnestunud välja lülitada, seega on need endiselt sees. Kontrolli ühendust ja proovi uuesti.",
+      notificationsOnFailed: "Teavitusi ei õnnestunud sisse lülitada. Kontrolli ühendust ja proovi uuesti.",
       notificationsBlocked: "Rantio teavitused on telefoni seadetes välja lülitatud.",
       openSettings: "Ava seaded",
       web: "Rantio veebis",

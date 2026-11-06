@@ -1040,6 +1040,8 @@ export const de: Translation = {
       bookings: "Alle Buchungen",
       notifications: "Mitteilungen",
       notificationsLead: "Neue Buchungen, Nachrichten und Buchungsanfragen auf diesem Handy.",
+      notificationsOffFailed: "Die Mitteilungen ließen sich nicht ausschalten, sie sind also weiterhin an. Prüf deine Verbindung und versuch es noch einmal.",
+      notificationsOnFailed: "Die Mitteilungen ließen sich nicht einschalten. Prüf deine Verbindung und versuch es noch einmal.",
       notificationsBlocked: "Mitteilungen von Rantio sind in den Einstellungen deines Handys ausgeschaltet.",
       openSettings: "Einstellungen öffnen",
       web: "Rantio im Web",
