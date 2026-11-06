@@ -118,7 +118,8 @@ Replace every `CHANGE_ME`: the SMTP login of your email service (Postmark, Mailg
 Brevo ... all work through SMTP), the error-report address in `DJANGO_ADMINS`, your
 and Juha's addresses in `SIGNUP_NOTIFY_EMAILS`, the booking mailbox (IMAP), and the
 optional keys (`ANTHROPIC_API_KEY`, `STRIPE_SECRET_KEY`, `SENTRY_DSN`). Empty
-optional keys simply switch that feature off. Save with Ctrl+O, Enter, Ctrl+X.
+optional keys simply switch that feature off. (Later, `bash ~/stugora/deploy/set-anthropic.sh` on the Mac
+sets the Claude key and checks it.) Save with Ctrl+O, Enter, Ctrl+X.
 Keep `DEV_LOGIN_CODES=false`.
 
 ## 6. Run the setup script
