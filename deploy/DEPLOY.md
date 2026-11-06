@@ -269,6 +269,10 @@ changing that secret would make them unreadable. `manage.py check --deploy` warn
 (owners.W010). Give the vault its own key once, before many hosts have entered their numbers.
 Nothing below prints a tax number; only counts, key ids and owner ids.
 
+The easy way, on the Mac in a normal terminal: `bash ~/stugora/deploy/set-vault-key.sh` makes the
+key, waits until you've saved it in the password manager, puts it on the server and re-encrypts
+every number (`… rotate` for a new key later, `… status` to look). By hand instead:
+
 On the server (after ssh):
 ```bash
 # 1. Make a key, and save a copy in the password manager before going on:
