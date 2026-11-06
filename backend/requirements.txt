@@ -4,4 +4,4 @@ django-cors-headers==4.9.0
 django-unfold==0.94.0
 Django==5.2.18
 djangorestframework==3.18.3
-PyJWT[crypto]==2.10.1
+PyJWT[crypto]==2.15.0
