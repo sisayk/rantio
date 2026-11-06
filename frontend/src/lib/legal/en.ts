@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Last updated: 4 November 2026";
+const UPDATED = "Last updated: 6 November 2026";
 
 export const en: LegalTexts = {
   privacy: {
@@ -48,6 +48,30 @@ export const en: LegalTexts = {
         ],
       },
       {
+        heading: "The Rantio app",
+        paragraphs: [
+          "The Rantio app for iPhone and Android uses the same account as the website. When you sign in, the app gets its own sign-in key and keeps it in the phone's secure storage (the iPhone Keychain or Android's Keystore). We store only a scrambled (hashed) copy, with the phone's model name. A phone that hasn't been used for 180 days has to sign in again; signing out, or deleting your account in the app, removes it.",
+          "If you allow notifications, the phone gives us a push address, which we save with your account and use to tell you about bookings, messages and monitor alerts. Notifications go through Expo's push service, which hands them to Apple (on iPhone) or Google's Firebase Cloud Messaging (on Android) for delivery; these services see the push address and the notification's text. You can turn notifications off in the app or in the phone's settings at any time.",
+          "The app asks for your photos or camera only when you add pictures to a listing, and sends us only the pictures you choose. Maps in the app come from Apple Maps on iPhone and Google Maps on Android. Your saved cottages, language and similar choices stay on the phone. The app has no advertising, analytics or tracking.",
+          "Legal basis: providing the service you signed in for (6(1)(b)); for notifications, your consent (6(1)(a)), which you withdraw by turning them off.",
+        ],
+      },
+      {
+        heading: "Cottage monitor",
+        paragraphs: [
+          "An owner who installs a Rantio cottage monitor links it to their account and cottage. The monitor then sends us readings from the cottage over the mobile network: the temperature inside and in the sauna, humidity, water leaks, whether the door is open, mains power, battery level and signal strength. We use them to show the owner how the cottage is and to alert them, for example about frost, a power cut or a leak. Because readings such as the door or the sauna can show when someone is at the cottage, we show them only to the owner. Readings are kept for 180 days.",
+          "If you join the waiting list for the monitor, we save your email address, country, language, whether you rent out a cottage and your consent, and use them only to tell you when it's available.",
+          "Legal basis: providing the service to the owner (6(1)(b)); for the waiting list, your consent (6(1)(a)).",
+        ],
+      },
+      {
+        heading: "Events near the cottage",
+        paragraphs: [
+          "A cottage page can show events nearby during your stay. To find them, our server asks the Helsinki region's open event database (Linked Events) and Ticketmaster for events near the cottage on those dates. It sends only the cottage's location and the dates, nothing about you.",
+          "Ticketmaster links can be affiliate links, and the page says so when they are. If you buy tickets through one, Ticketmaster pays Rantio a small commission through its affiliate network Impact; you pay the same price. When you open such a link, Impact and Ticketmaster record the visit on their own sites (for example with cookies) so the sale is credited to us, and their privacy policies apply there. The commission never changes which events we show or their order.",
+        ],
+      },
+      {
         heading: "Newsletter",
         paragraphs: [
           "If you sign up for our newsletter at the bottom of a page, we save your email address and the site's language, and send you a link to confirm. You're on the list only after you click it. We then email you now and then about new cottages, seasons and travel in the Nordics and the Baltics. Every newsletter has a link to unsubscribe, and the confirmation page has one too.",
@@ -83,11 +107,13 @@ export const en: LegalTexts = {
         ],
         list: [
           "Hetzner Online (Germany): servers in Helsinki, Finland, where our database and files are kept",
-          "A transactional email and SMS service that delivers our emails and text messages (sign-in codes, messages and notifications)",
+          "Brevo (France): delivers our emails and text messages (sign-in codes, messages and notifications)",
           "Stripe: invoices and payments for owners",
           "Anthropic: AI reply drafts, only when an owner asks for one",
           "OpenStreetMap (Nominatim): finds the cottage's street address on the map when an owner places the pin; only the address, town and country are sent",
-          "Google and Apple: only if an owner chooses to sign in with their Google or Apple account",
+          "Google and Apple: sign-in, only if you choose your Google or Apple account; app notifications (Firebase Cloud Messaging and Apple's push service); and maps in the app",
+          "Expo (United States): delivers the app's notifications to Apple and Google",
+          "Ticketmaster and Linked Events: event listings near a cottage; only the location and dates are sent",
           "Beds24: the channel manager that connects owners' calendars and listings to the listing sites",
           "Listing sites such as Airbnb, Booking.com and Vrbo: they receive the cottage listing and calendar from us and send us booking details. They decide for themselves how they use guest data.",
         ],
@@ -95,7 +121,7 @@ export const en: LegalTexts = {
       {
         heading: "Transfers outside the EU",
         paragraphs: [
-          "We keep our data in the EU. Anthropic and Stripe may process data in the United States. When that happens, the transfer is protected by the EU–US Data Privacy Framework or by the European Commission's standard contractual clauses, together with the providers' own security measures. The same applies if any other provider processes data outside the EU or EEA. Ask us if you'd like to know more about these safeguards.",
+          "We keep our data in the EU. Anthropic, Stripe and Expo may process data in the United States, as may Apple and Google when they deliver notifications. When that happens, the transfer is protected by the EU–US Data Privacy Framework or by the European Commission's standard contractual clauses, together with the providers' own security measures. The same applies if any other provider processes data outside the EU or EEA. Ask us if you'd like to know more about these safeguards.",
         ],
       },
       {
@@ -108,6 +134,8 @@ export const en: LegalTexts = {
           "Owner accounts, cottages and bookings: while the owner agreement runs, and up to 12 months after it ends",
           "Invoices and other accounting records: six years from the end of the financial year, as Finnish accounting law requires",
           "Server logs: a short time, normally a few weeks",
+          "App sign-ins and push addresses: until you sign out on that phone or delete your account",
+          "Cottage monitor readings: 180 days; the monitor waiting list: until you ask us to remove you or delete your account",
         ],
       },
       {

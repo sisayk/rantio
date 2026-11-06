@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Päivitetty viimeksi 4.11.2026";
+const UPDATED = "Päivitetty viimeksi 6.11.2026";
 
 export const fi: LegalTexts = {
   privacy: {
@@ -48,6 +48,30 @@ export const fi: LegalTexts = {
         ],
       },
       {
+        heading: "Rantio-sovellus",
+        paragraphs: [
+          "Rantio-sovellus iPhonelle ja Androidille käyttää samaa tiliä kuin sivusto. Kun kirjaudut, sovellus saa oman kirjautumisavaimen ja säilyttää sen puhelimen suojatussa tallennustilassa (iPhonen avainnipussa tai Androidin Keystoressa). Me tallennamme siitä vain salatun (tiivistetyn) version puhelimen mallinimen kanssa. Jos puhelinta ei ole käytetty 180 päivään, sen pitää kirjautua uudelleen. Uloskirjautuminen tai tilin poistaminen sovelluksessa poistaa sen.",
+          "Jos sallit ilmoitukset, puhelin antaa meille push-osoitteen. Tallennamme sen tiliisi ja kerromme sen avulla varauksista, viesteistä ja valvontalaitteen hälytyksistä. Ilmoitukset kulkevat Expon push-palvelun kautta, joka välittää ne perille Applelle (iPhonessa) tai Googlen Firebase Cloud Messagingille (Androidissa). Nämä palvelut näkevät push-osoitteen ja ilmoituksen tekstin. Voit poistaa ilmoitukset käytöstä sovelluksessa tai puhelimen asetuksissa milloin tahansa.",
+          "Sovellus pyytää pääsyä kuviisi tai kameraan vain, kun lisäät kuvia ilmoitukseen, ja lähettää meille vain valitsemasi kuvat. Sovelluksen kartat tulevat iPhonessa Apple Mapsista ja Androidissa Google Mapsista. Tallentamasi mökit, kieli ja muut vastaavat valinnat pysyvät puhelimessa. Sovelluksessa ei ole mainontaa, analytiikkaa eikä seurantaa.",
+          "Käsittelyperuste: palvelun tuottaminen, johon kirjauduit (6 artiklan 1 kohdan b alakohta); ilmoitusten osalta suostumuksesi (a alakohta), jonka perut poistamalla ilmoitukset käytöstä.",
+        ],
+      },
+      {
+        heading: "Mökin valvontalaite",
+        paragraphs: [
+          "Omistaja, joka asentaa Rantion valvontalaitteen, liittää sen tiliinsä ja mökkiinsä. Laite lähettää meille mobiiliverkon kautta mökin lukemat: lämpötilan sisällä ja saunassa, kosteuden, vesivuodot, onko ovi auki, verkkovirran, akun varauksen ja signaalin voimakkuuden. Käytämme niitä näyttääksemme omistajalle mökin tilan ja hälyttääksemme esimerkiksi pakkasesta, sähkökatkosta tai vuodosta. Koska esimerkiksi oven tai saunan lukemista voi päätellä, milloin mökillä on joku, näytämme ne vain omistajalle. Lukemia säilytetään 180 päivää.",
+          "Jos liityt laitteen odotuslistalle, tallennamme sähköpostiosoitteesi, maan, kielen, vuokraatko mökkiä sekä suostumuksesi, ja käytämme niitä vain kertoaksemme, kun laite on saatavilla.",
+          "Käsittelyperuste: palvelun tuottaminen omistajalle (b alakohta); odotuslistan osalta suostumuksesi (a alakohta).",
+        ],
+      },
+      {
+        heading: "Tapahtumat mökin lähellä",
+        paragraphs: [
+          "Mökin sivulla voi näkyä lähialueen tapahtumia vierailusi ajalta. Niitä varten palvelimemme kysyy pääkaupunkiseudun avoimesta tapahtumatietokannasta (Linked Events) ja Ticketmasterilta tapahtumia mökin läheltä noiden päivien ajalta. Se lähettää vain mökin sijainnin ja päivät, ei mitään sinusta.",
+          "Ticketmasterin linkit voivat olla kumppanilinkkejä, ja sivulla kerrotaan, kun ne ovat. Jos ostat lippuja sellaisen kautta, Ticketmaster maksaa Rantiolle pienen palkkion kumppaniverkostonsa Impactin kautta; sinä maksat saman hinnan. Kun avaat tällaisen linkin, Impact ja Ticketmaster kirjaavat käynnin omilla sivustoillaan (esimerkiksi evästeillä), jotta myynti hyvitetään meille, ja niillä sovelletaan niiden omia tietosuojakäytäntöjä. Palkkio ei koskaan vaikuta siihen, mitä tapahtumia näytämme tai missä järjestyksessä.",
+        ],
+      },
+      {
         heading: "Uutiskirje",
         paragraphs: [
           "Jos tilaat uutiskirjeemme sivun alareunasta, tallennamme sähköpostiosoitteesi ja sivuston kielen ja lähetämme sinulle vahvistuslinkin. Olet listalla vasta, kun olet avannut sen. Sen jälkeen lähetämme silloin tällöin sähköpostia uusista mökeistä, vuodenajoista ja matkailusta Pohjoismaissa ja Baltiassa. Jokaisessa uutiskirjeessä on linkki tilauksen perumiseen, samoin vahvistussivulla.",
@@ -83,11 +107,13 @@ export const fi: LegalTexts = {
         ],
         list: [
           "Hetzner Online (Saksa): palvelimet Helsingissä, joissa tietokantamme ja tiedostomme ovat",
-          "Sähköposti- ja tekstiviestipalvelu, joka toimittaa viestimme (kirjautumiskoodit, viestit ja ilmoitukset)",
+          "Brevo (Ranska): toimittaa sähköpostimme ja tekstiviestimme (kirjautumiskoodit, viestit ja ilmoitukset)",
           "Stripe: omistajien laskut ja maksut",
           "Anthropic: tekoälyn vastausluonnokset, vain kun omistaja pyytää",
           "OpenStreetMap (Nominatim): etsii mökin katuosoitteen kartalta, kun omistaja asettaa nastaa; palveluun lähetetään vain osoite, paikkakunta ja maa",
-          "Google ja Apple: vain jos omistaja valitsee kirjautumisen Google- tai Apple-tilillään",
+          "Google ja Apple: kirjautuminen, vain jos valitset Google- tai Apple-tilisi; sovelluksen ilmoitukset (Firebase Cloud Messaging ja Applen push-palvelu); sekä sovelluksen kartat",
+          "Expo (Yhdysvallat): toimittaa sovelluksen ilmoitukset Applelle ja Googlelle",
+          "Ticketmaster ja Linked Events: tapahtumatiedot mökin läheltä; niille lähetetään vain sijainti ja päivät",
           "Beds24: kanavanhallintajärjestelmä, joka yhdistää omistajien kalenterit ja ilmoitukset varaussivustoihin",
           "Varaussivustot, kuten Airbnb, Booking.com ja Vrbo: ne saavat meiltä mökin ilmoituksen ja kalenterin ja lähettävät meille varausten tiedot. Ne päättävät itse, miten käyttävät vieraiden tietoja.",
         ],
@@ -95,7 +121,7 @@ export const fi: LegalTexts = {
       {
         heading: "Siirrot EU:n ulkopuolelle",
         paragraphs: [
-          "Säilytämme tietomme EU:ssa. Anthropic ja Stripe voivat käsitellä tietoja Yhdysvalloissa. Silloin siirto on suojattu EU:n ja Yhdysvaltojen välisellä tietosuojakehyksellä (Data Privacy Framework) tai Euroopan komission vakiosopimuslausekkeilla sekä palveluntarjoajien omilla turvatoimilla. Sama koskee muita palveluntarjoajia, jos ne käsittelevät tietoja EU:n tai ETA:n ulkopuolella. Kysy meiltä, jos haluat tietää näistä suojatoimista lisää.",
+          "Säilytämme tietomme EU:ssa. Anthropic, Stripe ja Expo voivat käsitellä tietoja Yhdysvalloissa, samoin Apple ja Google ilmoituksia toimittaessaan. Silloin siirto on suojattu EU:n ja Yhdysvaltojen välisellä tietosuojakehyksellä (Data Privacy Framework) tai Euroopan komission vakiosopimuslausekkeilla sekä palveluntarjoajien omilla turvatoimilla. Sama koskee muita palveluntarjoajia, jos ne käsittelevät tietoja EU:n tai ETA:n ulkopuolella. Kysy meiltä, jos haluat tietää näistä suojatoimista lisää.",
         ],
       },
       {
@@ -108,6 +134,8 @@ export const fi: LegalTexts = {
           "Omistajien tilit, mökit ja varaukset: sopimuksen ajan ja enintään 12 kuukautta sen päättymisen jälkeen",
           "Laskut ja muu kirjanpitoaineisto: kuusi vuotta tilikauden päättymisestä, kuten kirjanpitolaki edellyttää",
           "Palvelinlokit: lyhyen aikaa, yleensä muutaman viikon",
+          "Sovelluksen kirjautumiset ja push-osoitteet: kunnes kirjaudut ulos kyseisellä puhelimella tai poistat tilisi",
+          "Valvontalaitteen lukemat: 180 päivää; laitteen odotuslista: kunnes pyydät poistamaan tietosi tai poistat tilisi",
         ],
       },
       {
