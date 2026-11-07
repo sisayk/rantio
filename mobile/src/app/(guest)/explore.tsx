@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Alert, BackHandler, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CATEGORIES, type Category, getListing, type Listing, LISTINGS } from "@/lib/listings";
@@ -116,10 +116,36 @@ export default function Explore() {
     setStay(NO_STAY);
   };
 
+  // Results (a search, a filter, or a row's arrow or See all card) replace the home rows on this
+  // same screen, so "back" means back to the rows: the ‹ button, and Android's back gesture.
+  useEffect(() => {
+    if (browsing) return;
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      setF(NO_FILTERS);
+      setStay(NO_STAY);
+      return true;
+    });
+    return () => sub.remove();
+  }, [browsing]);
+
   const header = (
     <View style={{ backgroundColor: colors.page }}>
       <SafeAreaView edges={["top"]}>
         <View style={styles.searchRow}>
+          {!browsing ? (
+            <Pressable
+              onPress={() => {
+                tap();
+                clear();
+              }}
+              style={({ pressed }) => [styles.roundButton, pressed && { opacity: 0.6 }]}
+              accessibilityRole="button"
+              accessibilityLabel={m.app.common.back}
+              hitSlop={6}
+            >
+              <Icon name="chevron-back" size={22} />
+            </Pressable>
+          ) : null}
           <Pressable
             onPress={() => {
               tap();
