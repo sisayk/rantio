@@ -24,6 +24,7 @@ import type {
   ListingSummary,
   OwnerReviews,
   PhotoKind,
+  Ratings,
   ReviewRow,
   StatusAction,
   StayQuote,
@@ -323,6 +324,11 @@ export const guestApi = {
   /** Where to push when the owner answers; an empty token stops the notifications. */
   setPush: (token: string, pushToken: string) =>
     call<{ ok: boolean }>(`conversations/${encodeURIComponent(token)}/push/`, json("POST", { push_token: pushToken })),
+  /** A cottage page's real ratings and host; 404 for the example cottages (ui/highlights.tsx). */
+  about: (slug: string) =>
+    call<{ ratings: Ratings; guest_favourite: boolean; host: { name: string; photo: string | null; since: number } | null }>(
+      `cottages/${encodeURIComponent(slug)}/about/`,
+    ),
   bookingLink: (token: string) => call<BookingLinkInfo>(`book/${encodeURIComponent(token)}/`),
   quote: (token: string, checkIn: string, checkOut: string) =>
     call<StayQuote>(`book/${encodeURIComponent(token)}/quote/?check_in=${checkIn}&check_out=${checkOut}`),

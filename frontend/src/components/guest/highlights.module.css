@@ -1,0 +1,146 @@
+/* The top of a cottage's page: rating · Guest favourite · reviews, and who hosts (CottageHighlights). */
+
+.wrap {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+/* Rating | (Guest favourite) | reviews, with thin lines between, as in Airbnb's. */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 16px 8px;
+  border: 1px solid var(--g-line);
+  border-radius: 16px;
+  color: var(--g-ink);
+  text-decoration: none;
+}
+
+.stats.three {
+  grid-template-columns: 1fr 1.6fr 1fr;
+}
+
+.stats > * + * {
+  border-left: 1px solid var(--g-line);
+}
+
+.stat {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.stat strong {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.favourite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  line-height: 1.15;
+  font-size: 17px;
+}
+
+.laurel {
+  width: 26px;
+  height: 44px;
+  flex: none;
+  color: #c9a24a;
+}
+
+/* Before the first review: "★ New on Rantio · No reviews from Rantio guests yet." */
+.newRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--g-line);
+  border-radius: 16px;
+  color: var(--g-ink);
+  text-decoration: none;
+}
+
+.newRow > span:last-child {
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--g-soft);
+}
+
+.newRow strong {
+  color: var(--g-ink);
+  font-size: 16px;
+}
+
+.newStar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e4efe9;
+  color: var(--g-green);
+  font-size: 18px;
+  flex: none;
+}
+
+/* The owner's scores on other sites, each linked to the listing there so guests can check. */
+.elsewhere {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.elsewhere a {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--g-line);
+  border-radius: 999px;
+  color: var(--g-ink);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.host {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0 16px;
+  border-bottom: 1px solid var(--g-line);
+}
+
+.host > span:last-child {
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--g-soft);
+}
+
+.host strong {
+  color: var(--g-ink);
+  font-size: 16px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--g-green);
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  flex: none;
+}

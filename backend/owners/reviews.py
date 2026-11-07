@@ -178,6 +178,52 @@ def summary(cottage: Cottage) -> dict:
     }
 
 
+# --- The top of a cottage's public page: rating, Guest favourite, reviews, and the host ----------
+# Only real data: Rantio's own reviews from stays booked through it, the owner's scores on other
+# sites (shown with their site), and the owner's own first name and photo. A cottage page without
+# a Rantio cottage behind it (the example cottages) gets nothing and says "New on Rantio".
+
+FAVOURITE_MIN_REVIEWS = 5
+FAVOURITE_MIN_AVERAGE = 4.8
+
+
+def guest_favourite(ratings: dict) -> bool:
+    """Rantio's Guest favourite: an average of 4.8 or more from at least five Rantio reviews."""
+    return ratings["count"] >= FAVOURITE_MIN_REVIEWS and (ratings["average"] or 0) >= FAVOURITE_MIN_AVERAGE
+
+
+def host_row(cottage: Cottage) -> dict | None:
+    """Who hosts: the owner's first name, their profile photo, and the year they started on Rantio."""
+    o = cottage.owner
+    first = (o.legal_first_name or o.name or "").split()[:1]
+    if not first:
+        return None
+    started = [d for d in o.cottages.exclude(listing_started_on=None).values_list("listing_started_on", flat=True)]
+    since = min(started).year if started else (o.agreement_signed_on or o.created_at.date()).year
+    return {"name": first[0], "photo": o.photo.url if o.photo else None, "since": since}
+
+
+class CottageAboutView(APIView):
+    """GET /api/cottages/<slug>/about/: ratings, Guest favourite and host for the cottage's page."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request, slug):
+        cottage = (
+            Cottage.objects.select_related("owner")
+            .filter(listing_slug=slug, status=Cottage.Status.LIVE)
+            .order_by("-pk")
+            .first()
+        )
+        if not cottage:
+            return Response({"detail": "not_found"}, status=status.HTTP_404_NOT_FOUND)
+        ratings = summary(cottage)
+        res = Response({"ratings": ratings, "guest_favourite": guest_favourite(ratings), "host": host_row(cottage)})
+        res["Cache-Control"] = "public, max-age=300"
+        return res
+
+
 # --- Guest: write a review -----------------------------------------------------------------------
 
 class ReviewSerializer(serializers.Serializer):

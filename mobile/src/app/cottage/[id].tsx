@@ -28,9 +28,8 @@ import { DEFAULT_LONG_POLICY, policyFromFeatures } from "@/lib/cancellation";
 import { useCancellationLines } from "@/ui/cancellation";
 import { NearbyEvents } from "@/ui/nearbyEvents";
 import { RangeCalendar } from "@/ui/range-calendar";
-import { RatingsBlock, STAR, useScore } from "@/ui/ratings";
-import { REVIEWS } from "@/i18n/messages/reviews";
-import { NO_RATINGS } from "@/lib/ratingsPreview";
+import { RatingsBlock } from "@/ui/ratings";
+import { CottageHighlights, useCottageAbout } from "@/ui/highlights";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
 const SEASON_TONE = { summer: "green", winter: "neutral", autumn: "berry", darkSeason: "neutral", allYear: "green" } as const;
@@ -41,13 +40,13 @@ export default function Cottage() {
   const { m, p, f, lang, country } = useT();
   const money = useMoney();
   const { ready, addViewed } = usePrefs();
+  const about = useCottageAbout(id);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [photo, setPhoto] = useState(0);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const [ratingsY, setRatingsY] = useState(0);
-  const score = useScore();
   const [nearby, setNearby] = useState<NearbyPlace[] | null | "error">(null);
   const [showAll, setShowAll] = useState(false);
   const [booking, setBooking] = useState(false);
@@ -156,23 +155,9 @@ export default function Cottage() {
           <Text v="small" style={{ marginTop: 4 }}>
             {[l.city, region ? regionLabel(region, l.country, lang) : null, country(l.country)].filter(Boolean).join(", ")}
           </Text>
-          {/* ★ and the score (or "New on Rantio"); tapping goes down to the Ratings box. */}
-          <Pressable
-            onPress={() => scrollRef.current?.scrollTo({ y: Math.max(0, ratingsY - space.lg), animated: true })}
-            accessibilityRole="link"
-            style={({ pressed }) => [styles.ratingLine, pressed && { opacity: 0.6 }]}
-          >
-            <Icon name="star" size={13} color={STAR} />
-            <Text v="smallMedium">{NO_RATINGS.count ? score(NO_RATINGS.average ?? 0) : REVIEWS[lang].newOnRantio}</Text>
-            {NO_RATINGS.count ? (
-              <>
-                <Text v="smallMedium">·</Text>
-                <Text v="smallMedium" style={{ textDecorationLine: "underline" }}>
-                  {p(REVIEWS[lang].count, NO_RATINGS.count)}
-                </Text>
-              </>
-            ) : null}
-          </Pressable>
+          {/* Rating · Guest favourite · reviews, and the host: real data only, else "New on Rantio".
+              Tapping the row goes down to the Ratings box. */}
+          <CottageHighlights about={about} onRatings={() => scrollRef.current?.scrollTo({ y: Math.max(0, ratingsY - space.lg), animated: true })} />
 
           <View style={styles.facts}>
             <Fact icon="people-outline" text={p(m.guest.units.guests, l.guests)} />
@@ -304,9 +289,9 @@ export default function Cottage() {
           ) : null}
 
           <Divider />
-          {/* Reviews come only from stays booked through Rantio; none here yet. */}
+          {/* Reviews come only from stays booked through Rantio. */}
           <View onLayout={(e) => setRatingsY(e.nativeEvent.layout.y)}>
-            <RatingsBlock ratings={NO_RATINGS} host="" />
+            <RatingsBlock ratings={about.ratings} host={about.host?.name ?? ""} />
           </View>
 
           <Divider />
@@ -486,7 +471,6 @@ function Fact({ icon, text }: { icon: Parameters<typeof Icon>[0]["name"]; text: 
 const Divider = () => <View style={styles.divider} />;
 
 const styles = StyleSheet.create({
-  ratingLine: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: space.sm, alignSelf: "flex-start" },
   topButtons: { position: "absolute", left: space.lg, right: space.lg, flexDirection: "row", justifyContent: "space-between" },
   heartWrap: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.94)", alignItems: "center", justifyContent: "center" },
   availability: { flexDirection: "row", alignItems: "center", gap: space.md },

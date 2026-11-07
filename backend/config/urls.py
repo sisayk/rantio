@@ -66,6 +66,7 @@ urlpatterns = [
     path("api/owner/cottages/<int:pk>/ratings/", reviews.OwnerRatingsView.as_view(), name="owner-ratings"),
     path("api/owner/ratings/<int:pk>/", reviews.OwnerRatingView.as_view(), name="owner-rating"),
     path("api/reviews/<str:token>/", reviews.GuestReviewView.as_view(), name="guest-review"),
+    path("api/cottages/<slug:slug>/about/", reviews.CottageAboutView.as_view(), name="cottage-about"),
     path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
     path("api/owner/cottages/<int:pk>/translate/", listings.OwnerTranslateView.as_view(), name="owner-cottage-translate"),
     path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),

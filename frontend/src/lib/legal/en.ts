@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Last updated: 6 November 2026";
+const UPDATED = "Last updated: 7 November 2026";
 
 export const en: LegalTexts = {
   privacy: {
@@ -45,6 +45,7 @@ export const en: LegalTexts = {
           "Your cottages' descriptions, photos, prices and calendars",
           "Bookings, yearly fees, commissions, invoices and whether they're paid (payments go through Stripe; we never see or store card numbers)",
           "Your messages with guests and with us",
+          "On your cottages' public pages, guests see your first name, your profile photo if you add one, and the year you started hosting on Rantio, never your surname, email or phone",
         ],
       },
       {

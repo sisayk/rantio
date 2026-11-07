@@ -21,8 +21,7 @@ import ContactOwner from "./ContactOwner";
 import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
 import SiteFooter from "../SiteFooter";
-import RatingsSection from "../Ratings";
-import { NO_RATINGS } from "@/lib/ratingsPreview";
+import { CottageHighlights, LiveRatings, TitleRating } from "./CottageHighlights";
 import { REVIEWS } from "@/i18n/messages/reviews";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
@@ -79,10 +78,7 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
             {l.place}, {country}
             <span aria-hidden="true"> · </span>
             {/* Only real review averages; before the first one, "New on Rantio". Goes to the Ratings box. */}
-            <a className={styles.rating} href="#ratings">
-              <Star className={styles.icon16} />
-              {l.rating ? number(lang, l.rating, { min: 1, max: 1 }) : REVIEWS[lang].newOnRantio}
-            </a>
+            <TitleRating lang={lang} slug={l.id} className={styles.rating} star={<Star className={styles.icon16} />} />
           </p>
         </div>
 
@@ -90,6 +86,8 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
 
         <div className={styles.detailColumns}>
           <div className={styles.detailMain}>
+            {/* Rating · Guest favourite · reviews, and the host: real data only, else "New on Rantio". */}
+            <CottageHighlights lang={lang} slug={l.id} />
             <section className={styles.detailFacts} aria-label={d.facts}>
               <span>
                 <People className={styles.icon20} />
@@ -149,8 +147,8 @@ export default function CottageDetail({ lang, listing: l }: { lang: Lang; listin
               </div>
             </section>
 
-            {/* Reviews come only from stays booked through Rantio; none here yet. */}
-            <RatingsSection lang={lang} ratings={NO_RATINGS} host="" />
+            {/* Reviews come only from stays booked through Rantio. */}
+            <LiveRatings lang={lang} slug={l.id} />
           </div>
 
           <aside className={styles.bookCard}>

@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL } from "@/lib/content";
 import type { LegalTexts } from ".";
 
-const UPDATED = "Päivitetty viimeksi 6.11.2026";
+const UPDATED = "Päivitetty viimeksi 7.11.2026";
 
 export const fi: LegalTexts = {
   privacy: {
@@ -45,6 +45,7 @@ export const fi: LegalTexts = {
           "Mökkiesi kuvaukset, kuvat, hinnat ja kalenterit",
           "Varaukset, vuosimaksut, provisiot, laskut ja niiden maksutilanteen (maksut kulkevat Stripen kautta, emmekä koskaan näe tai tallenna korttinumeroita)",
           "Viestisi vieraiden ja meidän kanssamme",
+          "Mökkiesi julkisilla sivuilla vieraat näkevät etunimesi, profiilikuvasi jos lisäät sellaisen, ja vuoden, jolloin aloitit vuokraamisen Rantiossa, mutta eivät koskaan sukunimeäsi, sähköpostiasi tai puhelinnumeroasi",
         ],
       },
       {

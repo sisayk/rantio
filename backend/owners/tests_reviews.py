@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from . import login as owner_login
 from . import reviews
-from .models import Booking, Conversation, RequestStatus, Review
+from .models import Booking, Conversation, ExternalRating, RequestStatus, Review
 from .tests_calendar import D, make_cottage
 
 
@@ -98,3 +98,47 @@ class ReviewTests(TestCase):
     def test_the_guest_thread_offers_the_review(self):
         conv = self.stay()
         self.assertTrue(self.client.get(f"/api/conversations/{conv.token}/").json()["can_review"])
+
+
+class CottageAboutTests(TestCase):
+    """The top of a cottage's page: only real reviews, Guest favourite by Rantio's rule, the real host."""
+
+    stay = ReviewTests.stay
+    post = ReviewTests.post
+
+    def setUp(self):
+        ReviewTests.setUp(self)
+        self.c.listing_slug = "lakeside-villa"
+        self.c.save()
+
+    def about(self, slug="lakeside-villa"):
+        return self.client.get(f"/api/cottages/{slug}/about/")
+
+    def test_an_example_cottage_has_nothing_to_show(self):
+        self.assertEqual(self.about("arctic-cabin").status_code, 404)  # no Rantio cottage behind it
+        self.c.status = "paused"
+        self.c.save()
+        self.assertEqual(self.about().status_code, 404)  # not shown while paused
+
+    def test_a_new_cottage_shows_its_host_but_no_rating(self):
+        r = self.about().json()
+        self.assertEqual((r["ratings"]["count"], r["ratings"]["average"], r["guest_favourite"]), (0, None, False))
+        self.assertEqual(r["host"]["name"], "Aino")  # first name only
+        self.assertNotIn("email", r["host"])
+        self.assertNotIn("Järvinen", str(r))
+
+    def test_guest_favourite_needs_five_reviews_averaging_4_8(self):
+        for i in range(4):
+            self.post(self.stay(check_in=-5 - 4 * i, check_out=-3 - 4 * i), rating=5)
+        self.assertFalse(self.about().json()["guest_favourite"])  # 4 reviews: not yet
+        self.post(self.stay(check_in=-30, check_out=-28), rating=4)
+        r = self.about().json()
+        self.assertEqual((r["ratings"]["count"], r["ratings"]["average"], r["guest_favourite"]), (5, 4.8, True))
+        self.post(self.stay(check_in=-40, check_out=-38), rating=3)
+        self.assertFalse(self.about().json()["guest_favourite"])  # 4.5 now
+
+    def test_scores_from_other_sites_never_make_a_guest_favourite(self):
+        ExternalRating.objects.create(cottage=self.c, site="airbnb", score=Decimal("4.9"), count=80, url="https://www.airbnb.com/rooms/123")
+        r = self.about().json()
+        self.assertEqual([(e["name"], e["score"], e["count"]) for e in r["ratings"]["external"]], [("Airbnb", 4.9, 80)])
+        self.assertFalse(r["guest_favourite"])
