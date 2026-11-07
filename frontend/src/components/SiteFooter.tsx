@@ -7,7 +7,8 @@ import { getMessages } from "@/i18n";
 import { countryName } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
-import { CONTACT_EMAIL } from "@/lib/content";
+import { siFacebook, siInstagram, siPinterest, siThreads, siTiktok, siX, siYoutube, type SimpleIcon } from "simple-icons";
+import { CONTACT_EMAIL, SOCIAL } from "@/lib/content";
 import { getListing, listingName, unsplash } from "@/lib/listings";
 import AppBadges from "./AppBadges";
 import NewsletterForm from "./NewsletterForm";
@@ -147,8 +148,39 @@ export default function SiteFooter({ lang, variant = "guest", current }: { lang:
       <div className={styles.bottom}>
         <span>© Rantio</span>
         <span>{f.note}</span>
+        <SocialLinks />
       </div>
     </footer>
+  );
+}
+
+// The networks' own marks (simple-icons, CC0), in the order shown.
+const NETWORKS: [keyof typeof SOCIAL, SimpleIcon][] = [
+  ["instagram", siInstagram],
+  ["facebook", siFacebook],
+  ["tiktok", siTiktok],
+  ["x", siX],
+  ["youtube", siYoutube],
+  ["threads", siThreads],
+  ["pinterest", siPinterest],
+];
+
+/** Rantio's accounts: only the ones with an address in lib/content.ts SOCIAL. */
+function SocialLinks() {
+  const shown = NETWORKS.filter(([key]) => SOCIAL[key]);
+  if (!shown.length) return null;
+  return (
+    <ul className={styles.social}>
+      {shown.map(([key, icon]) => (
+        <li key={key}>
+          <a href={SOCIAL[key]} target="_blank" rel="noopener noreferrer me" aria-label={`Rantio · ${icon.title}`} title={icon.title}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d={icon.path} />
+            </svg>
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }
 

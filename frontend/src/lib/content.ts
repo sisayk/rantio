@@ -36,3 +36,16 @@ export const APP_LINKS = {
   ios: "",
   android: "",
 };
+
+/** Rantio's own social media accounts. Fill in an account's full address and its icon appears at
+ *  the bottom of every page (SiteFooter.tsx); an empty one stays hidden, so there's never a link
+ *  to an account that doesn't exist yet. */
+export const SOCIAL = {
+  instagram: "",
+  facebook: "",
+  tiktok: "",
+  x: "",
+  youtube: "",
+  threads: "",
+  pinterest: "",
+} as const satisfies Record<string, string>;

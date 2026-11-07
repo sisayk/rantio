@@ -450,6 +450,44 @@
   border-top: 1px solid var(--f-line);
   color: var(--f-soft);
   font-size: 13px;
+  align-items: center;
+}
+
+/* Rantio's social media accounts, at the right end of the bottom line. */
+.social {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.social a {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--f-line);
+  color: var(--f-ink, currentColor);
+  transition: background-color 0.15s;
+}
+
+.social a:hover {
+  background: var(--f-line);
+}
+
+.social svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+@media (max-width: 760px) {
+  .social {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 
 /* ---------- smaller screens ---------- */
