@@ -59,6 +59,13 @@ OWNER_NEW = {
     "de": ("Neue Nachricht von {name} zu {cottage}", "{name} hat zu {cottage} geschrieben:\n\n„{text}“\n\nAntworte in deinem Rantio-Posteingang:\n{link}"),
 }
 
+# To the team, for an example cottage with no owner yet: they answer in the admin.
+TEAM_NEW = {
+    "en": ("Example cottage: new message from {name} about {cottage}",
+           "{name} wrote about {cottage}, one of the example cottages with no owner yet, so the message came to "
+           "the Rantio team:\n\n“{text}”\n\nAnswer in the admin (Guests → Conversations):\n{link}"),
+}
+
 
 def _send(templates: dict, lang: str, to: list[str], **values) -> None:
     subject, body = templates.get(lang) or templates["en"]
@@ -109,7 +116,7 @@ def _notify_owner(c: Conversation, name: str, text: str) -> None:
         app.notify(owner, subject.format(name=name, cottage=cottage_label(c)), _excerpt(text),
                    {"type": "message", "conversation": c.pk})
     elif settings.SIGNUP_NOTIFY_EMAILS:  # an example cottage with no owner yet: the team answers in the admin
-        _send(OWNER_NEW, "en", settings.SIGNUP_NOTIFY_EMAILS, name=name, cottage=cottage_label(c), text=_excerpt(text),
+        _send(TEAM_NEW, "en", settings.SIGNUP_NOTIFY_EMAILS, name=name, cottage=cottage_label(c), text=_excerpt(text),
               link=f"{settings.ADMIN_URL}/owners/conversation/{c.pk}/change/")
 
 

@@ -40,7 +40,9 @@ class MessagingTests(TestCase):
         res = self.enquire(listing="lofoten-rorbu")
         self.assertEqual(res.status_code, 201)
         self.assertIsNone(Conversation.objects.get().cottage)
-        self.assertIn("team@rantio.fi", [m.to[0] for m in mail.outbox])
+        team = next(m for m in mail.outbox if m.to[0] == "team@rantio.fi")
+        self.assertTrue(team.subject.startswith("Example cottage:"))
+        self.assertIn("/owners/conversation/", team.body)  # the team answers in the admin
 
     def test_enquiry_with_adults_and_children(self):
         c = Conversation.objects.get(token=self.enquire(adults=2, children=1).json()["token"])
