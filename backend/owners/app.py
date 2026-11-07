@@ -40,6 +40,49 @@ def issue_key(owner: Owner, *, name: str = "", platform: str = "") -> str:
     return key
 
 
+# --- Opening rantio.fi from the app, signed in -------------------------------------------------
+# The app's browser window has no website session, so a page like Hosting would ask to sign in
+# again. The app asks for a one-time token (with its own key), then opens
+# /api/auth/handoff/?t=<token>&next=<page>: the site signs that window in and goes on to the page.
+# A token works once, for two minutes; only its hash is kept, in the shared cache.
+
+WEB_TOKEN_SECONDS = 120
+
+
+def _web_key(token: str) -> str:
+    return f"web-handoff:{_hash(token)}"
+
+
+def issue_web_token(owner: Owner) -> str:
+    from django.core.cache import cache
+
+    token = secrets.token_urlsafe(32)
+    cache.set(_web_key(token), owner.pk, WEB_TOKEN_SECONDS)
+    return token
+
+
+def redeem_web_token(token: str) -> Owner | None:
+    """The owner a token was made for, once: a second use (or an old token) gives None."""
+    from django.core.cache import cache
+
+    if not token or len(token) > 100:
+        return None
+    key = _web_key(token)
+    owner_id = cache.get(key)
+    # delete() says whether it removed the key: of two uses at the same moment, only one wins.
+    if owner_id is None or not cache.delete(key):
+        return None
+    return Owner.objects.select_related("user").filter(pk=owner_id).first()
+
+
+def safe_next(path: str) -> str:
+    """A page on this site to go on to; anything else (another site, //host, \\host) becomes "/"."""
+    path = (path or "").strip()
+    if not path.startswith("/") or path.startswith("//") or "\\" in path or len(path) > 300 or any(c in path for c in "\r\n"):
+        return "/"
+    return path
+
+
 class AppKeyAuthentication(authentication.BaseAuthentication):
     """``Authorization: Bearer stg_…`` from the app. No CSRF check: there is no cookie to ride on."""
 

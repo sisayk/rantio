@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Linking, View } from "react-native";
 
-import { SITE_URL } from "@/api";
+import { ownerApi, SITE_URL } from "@/api";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { usePrefs } from "@/state/prefs";
 import { useT } from "@/text/i18n";
@@ -13,8 +13,22 @@ import { ACCOUNT } from "@/i18n/messages/account";
 import { Row, Section, Text } from "@/ui/kit";
 import { MenuDivider, MenuRow } from "@/ui/menu";
 
-export const openSite = (path: string) =>
-  WebBrowser.openBrowserAsync(`${SITE_URL}${path}`, { controlsColor: colors.green, toolbarColor: "#ffffff" }).catch(() => undefined);
+const BROWSER = { controlsColor: colors.green, toolbarColor: "#ffffff" };
+
+export const openSite = (path: string) => WebBrowser.openBrowserAsync(`${SITE_URL}${path}`, BROWSER).catch(() => undefined);
+
+/** A signed-in page of rantio.fi (Hosting, a listing): the browser window gets the website
+ *  session from a one-time token, so the owner isn't asked to sign in again. Without a token
+ *  (offline, signed out) the page opens as it is and asks to sign in. */
+export async function openSignedIn(path: string) {
+  try {
+    const { token } = await ownerApi.webLink();
+    const url = `${SITE_URL}/api/auth/handoff/?t=${encodeURIComponent(token)}&next=${encodeURIComponent(path)}`;
+    await WebBrowser.openBrowserAsync(url, BROWSER);
+  } catch {
+    await openSite(path);
+  }
+}
 
 export function SettingsRows({ currency = true }: { currency?: boolean }) {
   const { m, lang, native, currencyName } = useT();

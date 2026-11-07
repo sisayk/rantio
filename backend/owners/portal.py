@@ -5,8 +5,10 @@ import logging
 from django.conf import settings
 from django.core.cache import cache
 from django.contrib.auth import login, logout
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import permissions, serializers, status
 from rest_framework.response import Response
@@ -294,6 +296,33 @@ class DeviceView(APIView):
         request.auth.push_token = token
         request.auth.save(update_fields=["push_token"])
         return Response({"ok": True})
+
+
+class WebLinkView(APIView):
+    """POST from the app: a one-time token to open rantio.fi signed in (owners/app.py)."""
+
+    permission_classes = [IsAccount]
+
+    def post(self, request):
+        if not isinstance(request.auth, AppDevice):
+            return Response({"detail": "app_only"}, status=status.HTTP_400_BAD_REQUEST)
+        key = f"web-link:{request.auth.pk}"
+        if cache.get(key, 0) >= 30:  # far more than anyone opens the site in ten minutes
+            return Response({"detail": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        cache.set(key, cache.get(key, 0) + 1, 600)
+        return Response({"token": app.issue_web_token(request.user.owner), "seconds": app.WEB_TOKEN_SECONDS})
+
+
+@never_cache
+def web_handoff(request):
+    """GET /api/auth/handoff/?t=…&next=/en/hosting: signs this browser in with the app's one-time
+    token, then goes on to the page. Without a valid token it just goes on (the page asks to sign in)."""
+    owner = app.redeem_web_token(request.GET.get("t", ""))
+    if owner and owner.user_id and owner.user.is_active:
+        login(request, owner.user, backend="django.contrib.auth.backends.ModelBackend")
+    res = HttpResponseRedirect(app.safe_next(request.GET.get("next", "/")))
+    res["Referrer-Policy"] = "no-referrer"  # the token stays out of the next page's Referer
+    return res
 
 
 class TestPushView(APIView):

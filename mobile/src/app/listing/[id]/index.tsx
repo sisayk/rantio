@@ -11,7 +11,7 @@ import { useT } from "@/text/i18n";
 import { colors, radius, space } from "@/theme";
 import { Button, Icon, Loading, Pill, Problem, Row, Section, Text } from "@/ui/kit";
 import { PageBar } from "@/ui/screen";
-import { openSite } from "@/ui/settings";
+import { openSignedIn } from "@/ui/settings";
 
 const TONE = { intake: "neutral", listing: "berry", live: "green", paused: "neutral", archived: "neutral" } as const;
 
@@ -122,7 +122,7 @@ export default function ListingHub() {
             <Row icon="key-outline" label={l.nav.arrival} detail={l.arrival.private} onPress={() => go("arrival")} />
             <Row icon="star-outline" label={REVIEWS[lang].owner.title} onPress={() => go("reviews")} />
             <Row icon="link-outline" label={m.app.menu.settings} onPress={() => router.push(`/cottage-settings/${pk}`)} />
-            <Row icon="globe-outline" label={m.app.listing.onWeb} detail={m.app.listing.onWebLead} onPress={() => openSite(`/${lang}/hosting/listings/${pk}`)} last />
+            <Row icon="globe-outline" label={m.app.listing.onWeb} detail={m.app.listing.onWebLead} onPress={() => openSignedIn(`/${lang}/hosting/listings/${pk}`)} last />
           </Section>
 
           <Text v="small" style={{ marginTop: space.lg }}>

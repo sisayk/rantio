@@ -140,6 +140,63 @@ class AppSignInTests(TestCase):
 
 
 @override_settings(BOOKING_ALERTS=True, APP_PUSH=True)
+@override_settings(DEV_LOGIN_CODES=False)
+class WebHandoffTests(TestCase):
+    """The app opens rantio.fi signed in: a one-time token, then /api/auth/handoff/."""
+
+    setUp = AppSignInTests.setUp
+    sign_in = AppSignInTests.sign_in
+    auth = AppSignInTests.auth
+
+    def token(self, key):
+        res = self.client.post("/api/owner/app/web-link/", **self.auth(key))
+        self.assertEqual(res.status_code, 200, res.content)
+        return res.json()["token"]
+
+    def test_the_app_opens_the_site_signed_in(self):
+        key = self.sign_in()
+        token = self.token(key)
+        res = self.client.get("/api/auth/handoff/", {"t": token, "next": "/fi/hosting"})
+        self.assertEqual((res.status_code, res["Location"]), (302, "/fi/hosting"))
+        self.assertEqual(res["Referrer-Policy"], "no-referrer")
+        self.assertIn("no-store", res["Cache-Control"])
+        me = self.client.get("/api/owner/me/")  # the browser now has the website session
+        self.assertEqual((me.status_code, me.json()["email"]), (200, "owner@example.com"))
+
+    def test_a_token_works_once(self):
+        token = self.token(self.sign_in())
+        self.client.get("/api/auth/handoff/", {"t": token, "next": "/fi/hosting"})
+        self.client.logout()
+        res = self.client.get("/api/auth/handoff/", {"t": token, "next": "/fi/hosting"})
+        self.assertEqual(res["Location"], "/fi/hosting")  # goes on, but not signed in
+        self.assertEqual(self.client.get("/api/owner/me/").status_code, 403)
+
+    def test_an_old_or_made_up_token_signs_nobody_in(self):
+        token = self.token(self.sign_in())
+        with mock.patch("django.core.cache.cache.get", return_value=None):
+            self.client.get("/api/auth/handoff/", {"t": token})
+        self.client.get("/api/auth/handoff/", {"t": "made-up"})
+        self.assertEqual(self.client.get("/api/owner/me/").status_code, 403)
+
+    def test_next_stays_on_this_site(self):
+        for bad in ("https://evil.example/", "//evil.example/x", "/\\evil.example", "javascript:alert(1)", "", "/x\r\nSet-Cookie: a=b"):
+            res = self.client.get("/api/auth/handoff/", {"t": "made-up", "next": bad})
+            self.assertEqual(res["Location"], "/", bad)
+
+    def test_only_the_app_with_its_key_gets_a_token(self):
+        self.assertIn(self.client.post("/api/owner/app/web-link/").status_code, (401, 403))  # nobody
+        # A website session isn't enough: the token is for the app's own browser window.
+        from .login import user_for
+        self.client.force_login(user_for(self.owner))
+        self.assertEqual(self.client.post("/api/owner/app/web-link/").json()["detail"], "app_only")
+
+    def test_tokens_are_limited(self):
+        key = self.sign_in()
+        for _ in range(30):
+            self.token(key)
+        self.assertEqual(self.client.post("/api/owner/app/web-link/", **self.auth(key)).status_code, 429)
+
+
 class PushTests(TestCase):
     def setUp(self):
         cache.clear()

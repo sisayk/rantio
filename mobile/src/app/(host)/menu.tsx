@@ -10,7 +10,7 @@ import { space } from "@/theme";
 import { IconButton } from "@/ui/kit";
 import { MenuDivider, MenuRow, ProfileCard } from "@/ui/menu";
 import { SwitchPill, TabScreen } from "@/ui/screen";
-import { MoreRows, openSite } from "@/ui/settings";
+import { MoreRows, openSignedIn } from "@/ui/settings";
 
 /** The host's Menu, laid out like Profile: the profile card, hosting, Account settings, help and legal. */
 export default function Menu() {
@@ -42,7 +42,7 @@ export default function Menu() {
           <MenuRow icon="grid-outline" label={m.listings.title} detail={summary?.cottages.length ? summary.cottages.map((c) => c.name).join(", ") : m.listings.add} onPress={() => router.push("/listings")} />
           <MenuRow icon="list-outline" label={m.app.menu.bookings} onPress={() => router.push("/bookings")} />
           <MenuRow icon="hardware-chip-outline" label={m.owner.monitor.title.split(":")[0]} badge={m.owner.monitor.badge} badgeTone="quiet" onPress={() => router.push("/monitor")} />
-          <MenuRow icon="desktop-outline" label={m.app.menu.web} onPress={() => openSite(`/${lang}/hosting`)} />
+          <MenuRow icon="desktop-outline" label={m.app.menu.web} onPress={() => openSignedIn(`/${lang}/hosting`)} />
           <MenuDivider />
           <MoreRows
             onLogout={async () => {

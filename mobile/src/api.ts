@@ -220,6 +220,8 @@ export const ownerApi = {
     call<MonitorRow>(`owner/monitors/${id}/`, { ...json("PATCH", fields), owner: true }),
   removeMonitor: (id: number) => call<Record<string, never>>(`owner/monitors/${id}/`, { ...json("DELETE"), owner: true }),
   setPushToken: (push_token: string) => call<{ ok: boolean }>("owner/device/", { ...json("POST", { push_token }), owner: true }),
+  /** A one-time token to open rantio.fi signed in (ui/settings.tsx openSignedIn). */
+  webLink: () => call<{ token: string; seconds: number }>("owner/app/web-link/", { ...json("POST", {}), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
   updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>
     call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails }>(
