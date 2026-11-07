@@ -1,5 +1,5 @@
 // What the app remembers on this phone: language, currency, travelling or hosting,
-// saved cottages, the guest's own conversations (their private tokens) and how
+// saved and recently viewed cottages, the guest's own conversations (their private tokens) and how
 // the Explore page shows cottages.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -19,6 +19,8 @@ type Stored = {
   currency: Currency | null;
   mode: Mode;
   saved: string[];
+  /** Cottages opened on this phone, newest first ("Recently viewed" on Explore). */
+  viewed?: string[];
   chats: GuestChat[];
   homeView?: HomeView;
   rates?: { at: number; rates: Rates };
@@ -34,6 +36,7 @@ type Prefs = {
   currency: Currency;
   mode: Mode;
   saved: string[];
+  viewed: string[];
   chats: GuestChat[];
   rates: Rates;
   ratesAt: number;
@@ -43,6 +46,8 @@ type Prefs = {
   setCurrency: (c: Currency) => void;
   setMode: (m: Mode) => void;
   toggleSaved: (id: string) => void;
+  addViewed: (id: string) => void;
+  clearViewed: () => void;
   addChat: (c: GuestChat) => void;
   setRates: (r: Rates) => void;
   guest: Sender | null;
@@ -51,6 +56,7 @@ type Prefs = {
 
 const KEY = "stugora:prefs:v1";
 const RATES_MAX_AGE = 12 * 60 * 60 * 1000;
+const MAX_VIEWED = 20;
 const Ctx = createContext<Prefs | null>(null);
 
 export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; children: ReactNode }) {
@@ -67,6 +73,7 @@ export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; chil
           ...v,
           currency: isCurrency(v.currency) ? v.currency : null,
           saved: Array.isArray(v.saved) ? v.saved : [],
+          viewed: Array.isArray(v.viewed) ? v.viewed.filter((x) => typeof x === "string") : [],
           chats: Array.isArray(v.chats) ? v.chats : [],
         }));
       })
@@ -88,6 +95,7 @@ export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; chil
       currency: s.currency ?? LANG_CURRENCY[lang],
       mode: s.mode,
       saved: s.saved,
+      viewed: s.viewed ?? [],
       chats: s.chats,
       rates: { ...FALLBACK_RATES, ...(s.rates?.rates ?? {}) },
       ratesAt: s.rates?.at ?? 0,
@@ -98,6 +106,10 @@ export function PrefsProvider({ deviceLang, children }: { deviceLang: Lang; chil
       setMode: (m) => update(() => ({ mode: m })),
       toggleSaved: (id) =>
         update((cur) => ({ saved: cur.saved.includes(id) ? cur.saved.filter((x) => x !== id) : [id, ...cur.saved] })),
+      // Already first: nothing changes, so opening the same cottage again doesn't save anything.
+      addViewed: (id) =>
+        setS((cur) => (cur.viewed?.[0] === id ? cur : { ...cur, viewed: [id, ...(cur.viewed ?? []).filter((x) => x !== id)].slice(0, MAX_VIEWED) })),
+      clearViewed: () => update(() => ({ viewed: [] })),
       addChat: (c) => update((cur) => ({ chats: [c, ...cur.chats.filter((x) => x.token !== c.token)] })),
       setRates: (r) => update(() => ({ rates: { at: Date.now(), rates: { ...FALLBACK_RATES, ...r, EUR: 1 } } })),
       guest: s.guest?.email ? s.guest : null,

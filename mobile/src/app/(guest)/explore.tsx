@@ -3,8 +3,9 @@ import { useMemo, useState } from "react";
 import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CATEGORIES, type Category, type Listing, LISTINGS } from "@/lib/listings";
+import { CATEGORIES, type Category, getListing, type Listing, LISTINGS } from "@/lib/listings";
 import { priceHint } from "@/lib/priceHints";
+import { RECENT } from "@/i18n/messages/recent";
 import { WHEN } from "@/i18n/messages/when";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
@@ -16,7 +17,7 @@ import { type Lang, type T, useT } from "@/text/i18n";
 import { colors, fonts, radius, shadow, shadowFloat, space, textSize } from "@/theme";
 import { Chip, Segmented, Stepper } from "@/ui/controls";
 import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
-import { CATEGORY_EMOJI, ListingCard } from "@/ui/listing";
+import { CATEGORY_EMOJI, ListingCard, MiniCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
@@ -76,7 +77,7 @@ function sections(t: T): Section[] {
 export default function Explore() {
   const t = useT();
   const { m, p, lang } = t;
-  const { rates, homeView, setHomeView, setMode } = usePrefs();
+  const { rates, homeView, setHomeView, setMode, viewed } = usePrefs();
   const { signedIn, owner } = useSession();
   const isHost = signedIn && !!owner?.is_host;
   const router = useRouter();
@@ -95,6 +96,9 @@ export default function Explore() {
   const columns = width >= 700 ? 2 : 1;
   const cardWidth = (width - space.xl * 2 - (columns - 1) * space.lg) / columns;
   const compactWidth = Math.min(220, Math.round((width - space.xl) * 0.44));
+  // Recently viewed: three small cards across and the edge of a fourth, as in Airbnb's app.
+  const recent = useMemo(() => viewed.map(getListing).filter((l): l is Listing => !!l), [viewed]);
+  const miniWidth = Math.min(160, Math.floor((width - space.xl - space.md * 3) / 3.2));
 
   const summary = [
     f.query || null,
@@ -242,8 +246,26 @@ export default function Explore() {
       {asRows ? (
         <ScrollView stickyHeaderIndices={[0]} contentContainerStyle={{ paddingBottom: space.xxl * 2 }}>
           {header}
+          {recent.length ? (
+            <View style={{ marginTop: ANDROID ? space.xs : space.sm }}>
+              <View style={styles.sectionHead}>
+                <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
+                  {RECENT[lang].title}
+                </Text>
+                <IconButton name="arrow-forward" label={RECENT[lang].seeAll} onPress={() => router.push("/recent")} size={18} />
+              </View>
+              <FlatList
+                horizontal
+                data={recent}
+                keyExtractor={(l) => l.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: space.xl, gap: space.md }}
+                renderItem={({ item }) => <MiniCard listing={item} width={miniWidth} />}
+              />
+            </View>
+          ) : null}
           {rows.map((s, i) => (
-            <View key={s.key} style={{ marginTop: i ? (ANDROID ? space.md : space.xl) : ANDROID ? space.xs : space.sm }}>
+            <View key={s.key} style={{ marginTop: i || recent.length ? (ANDROID ? space.md : space.xl) : ANDROID ? space.xs : space.sm }}>
               <View style={styles.sectionHead}>
                 <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
                   {s.title}

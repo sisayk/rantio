@@ -14,6 +14,7 @@ import { findNearby, type NearbyPlace, WIKI_HEADERS } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
 import { useMoney } from "@/state/money";
+import { usePrefs } from "@/state/prefs";
 import { daysBetween, formatRange } from "@/text/dates";
 import { useT } from "@/text/i18n";
 import { colors, radius, shadowFloat, space } from "@/theme";
@@ -39,6 +40,7 @@ export default function Cottage() {
   const l = getListing(id);
   const { m, p, f, lang, country } = useT();
   const money = useMoney();
+  const { ready, addViewed } = usePrefs();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -62,6 +64,12 @@ export default function Cottage() {
     checkOut: dates[1],
     nights: dates[0] && dates[1] ? daysBetween(dates[0], dates[1]) : 0,
   });
+
+  // "Recently viewed" on Explore. Only once the phone's saved list has loaded, or it would replace it.
+  const listingId = l?.id;
+  useEffect(() => {
+    if (ready && listingId) addViewed(listingId);
+  }, [ready, listingId, addViewed]);
 
   useEffect(() => {
     if (!l) return;

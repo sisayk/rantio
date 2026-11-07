@@ -185,7 +185,54 @@ export const ListingCard = memo(function ListingCard({ listing, width, compact =
   );
 });
 
+/** The small cards of "Recently viewed": one photo, the town, and bedrooms with the rating, as in
+ *  Airbnb's app, so three fit across a phone. */
+export const MiniCard = memo(function MiniCard({ listing, width }: { listing: Listing; width: number }) {
+  const { m, p, country } = useT();
+  const router = useRouter();
+  const photo = listingPhotos(listing)[0];
+  const h = Math.round(width * 0.95);
+  return (
+    <View style={{ width }}>
+      <Pressable
+        onPress={() => router.push(`/cottage/${listing.id}`)}
+        accessibilityRole="link"
+        accessibilityLabel={listingName(m.listingNames, listing)}
+        style={({ pressed }) => [pressed && { opacity: 0.85 }]}
+      >
+        <View style={[styles.miniPhoto, { width, height: h }]}>
+          {photo ? (
+            <Image
+              source={unsplash(photo.id, Math.round(width * 2), Math.round(h * 2), photo.crop)}
+              style={{ width, height: h }}
+              contentFit="cover"
+              transition={200}
+              recyclingKey={photo.id}
+            />
+          ) : null}
+        </View>
+        <Text v="smallMedium" color={colors.ink} numberOfLines={1} style={{ marginTop: space.sm }}>
+          {listing.city}, {country(listing.country)}
+        </Text>
+        {/* "🛏 2 · ★ New": short enough for the narrow card, the way Airbnb's says "3 beds · ★ 5.0". */}
+        <View style={styles.miniFacts} accessibilityLabel={p(m.guest.units.bedrooms, listing.bedrooms)}>
+          <Icon name="bed-outline" size={14} color={colors.soft} />
+          <Text v="small" numberOfLines={1} style={{ flexShrink: 1 }}>
+            {listing.bedrooms} · ★ {listing.rating ? listing.rating.toFixed(1) : m.guest.card.isNew}
+          </Text>
+        </View>
+      </Pressable>
+      <View style={styles.miniHeart}>
+        <HeartButton id={listing.id} size={22} />
+      </View>
+    </View>
+  );
+});
+
 const styles = StyleSheet.create({
+  miniPhoto: { borderRadius: 16, overflow: "hidden", backgroundColor: colors.ground },
+  miniHeart: { position: "absolute", top: 8, right: 8 },
+  miniFacts: { flexDirection: "row", alignItems: "center", gap: 4 },
   dots: { position: "absolute", bottom: 12, left: 0, right: 0, flexDirection: "row", justifyContent: "center", gap: 5 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.6)" },
   dotOn: { backgroundColor: "#fff" },
