@@ -444,7 +444,7 @@ export const is: Translation = {
     meta: {
       title: "Rantio – sumarbústaðurinn þinn á Airbnb, Booking.com og Vrbo",
       description:
-        "Rantio færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. {fee} á ári og 12% af bókunum sem við útvegum.",
+        "Rantio færir bústaðnum þínum gesti erlendis frá, hvar sem er á Norðurlöndum eða í Eystrasaltslöndunum, og heldur dagatölum í takt við síðurnar sem þú notar nú þegar. {fee} á ári og {commission}% af bókunum sem við útvegum.",
     },
     nav: { cta: "Skráðu bústaðinn þinn", login: "Innskráning" },
     hero: {
@@ -454,7 +454,7 @@ export const is: Translation = {
       priceLabel: "Verð á nótt",
       perNight: "{currency} / nótt",
       finePrint:
-        "Í matinu hafa þóknanir bókunarsíðna (um 15%), {fee} árgjald Rantio, 12% þóknun og virðisaukaskattur verið dregin frá.",
+        "Í matinu hafa þóknanir bókunarsíðna (um {platformFee}%), {fee} árgjald Rantio, {commission}% þóknun og virðisaukaskattur verið dregin frá.",
       lead: "Rantio setur bústaðinn þinn á Airbnb, Booking.com og Vrbo og heldur öllum dagatölum í takt við innlendu síðurnar sem þú notar nú þegar, eins og Nettimökki í Finnlandi.",
       cta: "Skráðu bústaðinn þinn",
       photoAlt: "Sumarbústaður á vatnsbakka á skýjuðum sumardegi",
@@ -475,7 +475,7 @@ export const is: Translation = {
         { title: "Sýnilegt erlendum gestum", body: "Bústaðurinn þinn á Airbnb, Booking.com, Vrbo og öðrum stórum síðum, með enskri auglýsingu sem við skrifum fyrir þig." },
         { title: "Engar tvíbókanir", body: "Þegar ein síða fær bókun lokast sömu dagar alls staðar, líka á síðunum sem þú notar nú þegar." },
         { title: "Þú ræður", body: "Þú ákveður verð og húsreglur og heldur eftir þeim vikum sem þú vilt hafa fyrir þig." },
-        { title: "Borgaðu þegar það virkar", body: "Lítið árgjald og 12 % af bókunum sem við útvegum. Ekkert af gestunum sem þú hafðir fyrir." },
+        { title: "Borgaðu þegar það virkar", body: "Lítið árgjald og {commission} % af bókunum sem við útvegum. Ekkert af gestunum sem þú hafðir fyrir." },
       ],
     },
     listings: {
@@ -516,13 +516,13 @@ export const is: Translation = {
       ],
     },
     price: {
-      title: "{fee} á ári og 12% af bókunum sem við útvegum",
-      lead: "Ekkert stofngjald og ekkert mánaðargjald. Árgjaldið nær yfir gerð og umsjón skráninganna. Þegar gestur bókar í gegnum rás sem Rantio opnaði greiðir þú 12% af því sem bókunarsíðan greiðir þér. Virðisaukaskattur bætist við hvort tveggja. Við tökum aldrei gjald fyrir bókanir af síðum sem þú notaðir áður, eins og Nettimökki.",
+      title: "{fee} á ári og {commission}% af bókunum sem við útvegum",
+      lead: "Ekkert stofngjald og ekkert mánaðargjald. Árgjaldið nær yfir gerð og umsjón skráninganna. Þegar gestur bókar í gegnum rás sem Rantio opnaði greiðir þú {commission}% af því sem bókunarsíðan greiðir þér. Virðisaukaskattur bætist við hvort tveggja. Við tökum aldrei gjald fyrir bókanir af síðum sem þú notaðir áður, eins og Nettimökki.",
       exampleTitle: "Dæmi: 20 viðbótarnætur á {price} nóttin",
       rows: {
         guests: "Gestir greiða",
-        platform: "Þóknanir bókunarsíðna, um 15%",
-        commission: "Rantio 12% auk VSK",
+        platform: "Þóknanir bókunarsíðna, um {platformFee}%",
+        commission: "Rantio {commission}% auk VSK",
         yearly: "Árgjald {fee} auk VSK",
       },
       total: "Þú heldur eftir",
@@ -965,7 +965,7 @@ export const is: Translation = {
       plusVat: "+ VSK {vat}",
       empty: "Engin árgjöld í ár.",
     },
-    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er {fee} + VSK á hvern bústað; fyrstu 3 mánuðirnir eftir að auglýsingin fer í loftið eru ókeypis. Virðisaukaskattur er 25,5 %.",
+    howItWorks: "Þóknunin er hlutfall af því sem síðan greiðir þér fyrir dvölina (þrifagjald ekki meðtalið). Nettimökki og þínar eigin bókanir kosta aldrei neitt. Árgjaldið er {fee} + VSK á hvern bústað; auglýsingin er ókeypis í {period} eftir að hún fer í loftið. Virðisaukaskattur er 25,5 %.",
     ownBooking: "Eigin bókun",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

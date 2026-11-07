@@ -441,7 +441,7 @@ export const fi: Translation = {
     meta: {
       title: "Rantio – mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon",
       description:
-        "Rantio tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. {fee} vuodessa ja 12 % tuomistamme varauksista.",
+        "Rantio tuo mökillesi ulkomaisia vieraita ja pitää kalenterit samassa tahdissa Nettimökin kanssa. {fee} vuodessa ja {commission} % tuomistamme varauksista.",
     },
     nav: { cta: "Ilmoita mökkisi", login: "Kirjaudu" },
     hero: {
@@ -451,7 +451,7 @@ export const fi: Translation = {
       priceLabel: "Hinta yöltä",
       perNight: "{currency} / yö",
       finePrint:
-        "Arviosta on vähennetty alustojen palkkiot (noin 15 %), Rantion {fee} vuosimaksu, 12 % palkkio ja arvonlisävero.",
+        "Arviosta on vähennetty alustojen palkkiot (noin {platformFee} %), Rantion {fee} vuosimaksu, {commission} % palkkio ja arvonlisävero.",
       lead: "Rantio vie mökkisi Airbnbhin, Booking.comiin ja Vrbo:hon ja pitää kalenterit samassa tahdissa Nettimökin kanssa.",
       cta: "Ilmoita mökkisi",
       photoAlt: "Mökki järven rannalla pilvisenä kesäpäivänä",
@@ -472,7 +472,7 @@ export const fi: Translation = {
         { title: "Ulkomaiset vieraat löytävät", body: "Mökkisi Airbnb:ssä, Booking.comissa, Vrbossa ja muilla suurilla sivustoilla, englanninkielisellä ilmoituksella, jonka kirjoitamme puolestasi." },
         { title: "Ei päällekkäisiä varauksia", body: "Kun yksi sivusto saa varauksen, samat päivät sulkeutuvat kaikkialla, myös sivustoilla, joita jo käytät." },
         { title: "Päätät itse", body: "Sinä päätät hinnat ja talon säännöt ja pidät itselläsi ne viikot, jotka haluat." },
-        { title: "Maksat, kun se toimii", body: "Pieni vuosimaksu ja 12 % tuomistamme varauksista. Ei mitään vieraista, jotka sinulla oli jo ennestään." },
+        { title: "Maksat, kun se toimii", body: "Pieni vuosimaksu ja {commission} % tuomistamme varauksista. Ei mitään vieraista, jotka sinulla oli jo ennestään." },
       ],
     },
     listings: {
@@ -513,13 +513,13 @@ export const fi: Translation = {
       ],
     },
     price: {
-      title: "{fee} vuodessa ja 12 % tuomistamme varauksista",
-      lead: "Ei aloitus- eikä kuukausimaksua. Vuosimaksu kattaa ilmoitusten tekemisen ja ylläpidon. Kun vieras varaa Rantion avaaman kanavan kautta, maksat 12 % summasta, jonka alusta tilittää sinulle. Hintoihin lisätään alv 25,5 %. Nettimökin varauksista emme veloita koskaan.",
+      title: "{fee} vuodessa ja {commission} % tuomistamme varauksista",
+      lead: "Ei aloitus- eikä kuukausimaksua. Vuosimaksu kattaa ilmoitusten tekemisen ja ylläpidon. Kun vieras varaa Rantion avaaman kanavan kautta, maksat {commission} % summasta, jonka alusta tilittää sinulle. Hintoihin lisätään alv 25,5 %. Nettimökin varauksista emme veloita koskaan.",
       exampleTitle: "Esimerkki: 20 lisäyötä, {price} yöltä",
       rows: {
         guests: "Vieraiden maksut",
-        platform: "Alustojen palkkiot, noin 15 %",
-        commission: "Rantion palkkio 12 % ja alv",
+        platform: "Alustojen palkkiot, noin {platformFee} %",
+        commission: "Rantion palkkio {commission} % ja alv",
         yearly: "Vuosimaksu {fee} ja alv",
       },
       total: "Jää sinulle",
@@ -962,7 +962,7 @@ export const fi: Translation = {
       plusVat: "+ ALV {vat}",
       empty: "Ei vuosimaksuja tänä vuonna.",
     },
-    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on {fee} + ALV mökkiä kohden; ensimmäiset 3 kuukautta ilmoituksen julkaisusta ovat maksuttomia. Arvonlisävero on 25,5 %.",
+    howItWorks: "Provisio lasketaan siitä summasta, jonka kanava maksaa sinulle (ilman siivousmaksua). Nettimökistä ja omista varauksistasi ei peritä provisiota. Vuosimaksu on {fee} + ALV mökkiä kohden; ilmoitus on maksuton {period} ajan julkaisusta. Arvonlisävero on 25,5 %.",
     ownBooking: "Oma varaus",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

@@ -444,7 +444,7 @@ export const da: Translation = {
     meta: {
       title: "Rantio – dit sommerhus på Airbnb, Booking.com og Vrbo",
       description:
-        "Rantio skaffer gæster fra udlandet til dit sommerhus overalt i Norden og Baltikum og holder kalenderne i takt med de sider, du allerede bruger. {fee} om året og 12 % af de bookinger, vi skaffer.",
+        "Rantio skaffer gæster fra udlandet til dit sommerhus overalt i Norden og Baltikum og holder kalenderne i takt med de sider, du allerede bruger. {fee} om året og {commission} % af de bookinger, vi skaffer.",
     },
     nav: { cta: "Udlej dit sommerhus", login: "Log ind" },
     hero: {
@@ -454,7 +454,7 @@ export const da: Translation = {
       priceLabel: "Pris pr. nat",
       perNight: "{currency} / nat",
       finePrint:
-        "Estimatet er efter platformsgebyrer (ca. 15 %), Rantios årsgebyr på {fee}, provisionen på 12 % og moms.",
+        "Estimatet er efter platformsgebyrer (ca. {platformFee} %), Rantios årsgebyr på {fee}, provisionen på {commission} % og moms.",
       lead: "Rantio lægger dit sommerhus på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sider, du allerede bruger, som fx Nettimökki i Finland.",
       cta: "Udlej dit sommerhus",
       photoAlt: "Et sommerhus ved en sø en overskyet sommerdag",
@@ -475,7 +475,7 @@ export const da: Translation = {
         { title: "Set af gæster fra udlandet", body: "Dit sommerhus på Airbnb, Booking.com, Vrbo og andre store sider, med en engelsk annonce, som vi skriver for dig." },
         { title: "Ingen dobbeltbookinger", body: "Når én side får en booking, lukkes de samme datoer overalt, også på de sider, du allerede bruger." },
         { title: "Du bestemmer", body: "Du sætter priserne og husreglerne og beholder de uger, du selv vil have." },
-        { title: "Betal, når det virker", body: "Et lille årsgebyr og 12 % af de bookinger, vi skaffer. Intet af de gæster, du allerede havde." },
+        { title: "Betal, når det virker", body: "Et lille årsgebyr og {commission} % af de bookinger, vi skaffer. Intet af de gæster, du allerede havde." },
       ],
     },
     listings: {
@@ -516,13 +516,13 @@ export const da: Translation = {
       ],
     },
     price: {
-      title: "{fee} om året og 12 % af de bookinger, vi skaffer",
-      lead: "Intet oprettelsesgebyr og intet månedligt gebyr. Årsgebyret dækker, at vi laver og vedligeholder dine annoncer. Når en gæst booker via en kanal, Rantio har åbnet, betaler du 12 % af det beløb, platformen udbetaler til dig. Moms lægges oven i begge dele. Vi tager aldrig betaling for bookinger fra de sider, du allerede brugte før, som fx Nettimökki.",
+      title: "{fee} om året og {commission} % af de bookinger, vi skaffer",
+      lead: "Intet oprettelsesgebyr og intet månedligt gebyr. Årsgebyret dækker, at vi laver og vedligeholder dine annoncer. Når en gæst booker via en kanal, Rantio har åbnet, betaler du {commission} % af det beløb, platformen udbetaler til dig. Moms lægges oven i begge dele. Vi tager aldrig betaling for bookinger fra de sider, du allerede brugte før, som fx Nettimökki.",
       exampleTitle: "Eksempel: 20 ekstra nætter à {price} pr. nat",
       rows: {
         guests: "Gæsterne betaler",
-        platform: "Platformsgebyrer, ca. 15 %",
-        commission: "Rantio 12 % plus moms",
+        platform: "Platformsgebyrer, ca. {platformFee} %",
+        commission: "Rantio {commission} % plus moms",
         yearly: "Årsgebyr {fee} plus moms",
       },
       total: "Du beholder",
@@ -965,7 +965,7 @@ export const da: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Ingen årsgebyrer i år.",
     },
-    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er {fee} + moms pr. sommerhus; de første 3 måneder efter at annoncen er gået online, er gratis. Momsen er 25,5 %.",
+    howItWorks: "Provisionen er en andel af det, siden betaler dig for opholdet (rengøringsgebyr ikke medregnet). Nettimökki og dine egne bookinger koster aldrig noget. Årsgebyret er {fee} + moms pr. sommerhus; annoncen er gratis i {period}, efter at den er gået online. Momsen er 25,5 %.",
     ownBooking: "Egen booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

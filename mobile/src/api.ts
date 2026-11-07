@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 import { NativeModules, TurboModuleRegistry } from "react-native";
 
 import type { OtherListing } from "@/i18n/messages/otherListings";
+import type { fromApi } from "@/lib/prices";
 
 import type {
   OwnerDetails,
@@ -335,6 +336,8 @@ export const guestApi = {
   requestBooking: (token: string, form: BookingRequestForm) =>
     call<{ token: string }>(`book/${encodeURIComponent(token)}/`, json("POST", form)),
   rates: () => call<{ rates: Record<string, number>; date?: string }>("rates/"),
+  /** Rantio's prices as set in the admin (lib/usePrices.ts). */
+  pricing: () => call<Parameters<typeof fromApi>[0]>("pricing/"),
   /** "List your cottage": the same sign-up as on rantio.fi/hosts, with its photos (local JPEG files).
    *  checkout_url, when set, is Stripe's page for saving a card for the free trial. */
   listCottage: async (fields: Record<string, string | number | boolean>, photos: string[]) => {

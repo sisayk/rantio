@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { YEARLY_FEES } from "@/lib/content";
+import { withPrices } from "@/lib/prices";
+import { usePrices } from "@/lib/usePrices";
 import { type Currency, formatPrice } from "@/lib/currency";
 import { useHost } from "@/state/host";
 import { formatDate } from "@/text/dates";
@@ -14,6 +15,7 @@ import { TabScreen } from "@/ui/screen";
 
 export default function Earnings() {
   const { m, lang, f, p, n } = useT();
+  const prices = usePrices();
   const d = m.dashboard;
   const { summary: s, error, loading, refresh, setYear } = useHost();
   const router = useRouter();
@@ -124,7 +126,7 @@ export default function Earnings() {
           </Card>
         )}
         <Text v="small" style={{ marginTop: space.lg }}>
-          {f(d.howItWorks, { fee: formatPrice(lang, YEARLY_FEES[cur] ?? YEARLY_FEES.EUR, cur) })}
+          {f(withPrices(lang, d.howItWorks, prices), { fee: formatPrice(lang, prices.yearlyFees[cur] ?? prices.yearlyFees.EUR, cur) })}
         </Text>
       </Section>
     </TabScreen>

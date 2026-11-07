@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
 import { listedChoices, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
+import { type Prices, withPrices } from "@/lib/prices";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
 import { ACCEPTED, preparePhoto } from "@/lib/imagePrep";
@@ -34,11 +35,13 @@ type Props = {
   f: Messages["owner"]["form"];
   /** Country names in the page's language, from the server (see GuestHome). */
   countries: Record<string, string>;
+  /** The prices set in the admin, read by the server (lib/prices.server.ts). */
+  prices: Prices;
 };
 
-export default function SignupForm({ lang, f: words, countries }: Props) {
+export default function SignupForm({ lang, f: words, countries, prices }: Props) {
   const f = { ...words, errors: { ...words.errors, network: words.errors.network.replace("{email}", CONTACT_EMAIL) } };
-  const tr = TRIAL[lang];
+  const tr = withPrices(lang, TRIAL[lang], prices);
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [photos, setPhotos] = useState<Photo[]>([]);
   // The email check: the address a code was sent to; the form goes through with that code.

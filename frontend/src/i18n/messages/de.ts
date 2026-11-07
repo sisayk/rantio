@@ -444,7 +444,7 @@ export const de: Translation = {
     meta: {
       title: "Rantio – dein Ferienhaus auf Airbnb, Booking.com und Vrbo",
       description:
-        "Rantio bringt Gäste aus dem Ausland in dein Ferienhaus, überall im Norden und im Baltikum, und hält die Kalender im Einklang mit den Portalen, die du schon nutzt. {fee} im Jahr und 12 % der Buchungen, die wir dir bringen.",
+        "Rantio bringt Gäste aus dem Ausland in dein Ferienhaus, überall im Norden und im Baltikum, und hält die Kalender im Einklang mit den Portalen, die du schon nutzt. {fee} im Jahr und {commission} % der Buchungen, die wir dir bringen.",
     },
     nav: { cta: "Ferienhaus eintragen", login: "Anmelden" },
     hero: {
@@ -454,7 +454,7 @@ export const de: Translation = {
       priceLabel: "Preis pro Nacht",
       perNight: "{currency} / Nacht",
       finePrint:
-        "Bei der Schätzung sind Plattformgebühren (etwa 15 %), die Jahresgebühr von Rantio ({fee}), die Provision von 12 % und die MwSt. schon abgezogen.",
+        "Bei der Schätzung sind Plattformgebühren (etwa {platformFee} %), die Jahresgebühr von Rantio ({fee}), die Provision von {commission} % und die MwSt. schon abgezogen.",
       lead: "Rantio bringt dein Ferienhaus auf Airbnb, Booking.com und Vrbo und hält alle Kalender im Einklang mit den lokalen Portalen, die du schon nutzt, zum Beispiel Nettimökki in Finnland.",
       cta: "Ferienhaus eintragen",
       photoAlt: "Ein Ferienhaus am Seeufer an einem bewölkten Sommertag",
@@ -475,7 +475,7 @@ export const de: Translation = {
         { title: "Sichtbar für Gäste aus dem Ausland", body: "Dein Ferienhaus auf Airbnb, Booking.com, Vrbo und weiteren großen Portalen, mit einem englischen Inserat, das wir für dich schreiben." },
         { title: "Keine Doppelbuchungen", body: "Wird auf einem Portal gebucht, sind dieselben Tage überall gesperrt, auch auf den Portalen, die du schon nutzt." },
         { title: "Du hast das Sagen", body: "Du legst Preise und Hausregeln fest und behältst die Wochen, die du selbst nutzen willst." },
-        { title: "Zahlen, wenn es sich lohnt", body: "Eine kleine Jahresgebühr und 12 % der Buchungen, die wir dir bringen. Nichts für die Gäste, die du schon hattest." },
+        { title: "Zahlen, wenn es sich lohnt", body: "Eine kleine Jahresgebühr und {commission} % der Buchungen, die wir dir bringen. Nichts für die Gäste, die du schon hattest." },
       ],
     },
     listings: {
@@ -516,13 +516,13 @@ export const de: Translation = {
       ],
     },
     price: {
-      title: "{fee} im Jahr und 12 % der Buchungen, die wir dir bringen",
-      lead: "Keine Einrichtungsgebühr und keine Monatsgebühr. Die Jahresgebühr deckt das Erstellen und Pflegen deiner Inserate. Bucht ein Gast über einen Kanal, den Rantio für dich geöffnet hat, zahlst du 12 % von dem, was die Plattform dir auszahlt. Auf beides kommt die MwSt. Für Buchungen über Portale, die du schon vorher genutzt hast, etwa Nettimökki, berechnen wir nie etwas.",
+      title: "{fee} im Jahr und {commission} % der Buchungen, die wir dir bringen",
+      lead: "Keine Einrichtungsgebühr und keine Monatsgebühr. Die Jahresgebühr deckt das Erstellen und Pflegen deiner Inserate. Bucht ein Gast über einen Kanal, den Rantio für dich geöffnet hat, zahlst du {commission} % von dem, was die Plattform dir auszahlt. Auf beides kommt die MwSt. Für Buchungen über Portale, die du schon vorher genutzt hast, etwa Nettimökki, berechnen wir nie etwas.",
       exampleTitle: "Beispiel: 20 zusätzliche Nächte zu {price} pro Nacht",
       rows: {
         guests: "Gäste zahlen",
-        platform: "Plattformgebühren, etwa 15 %",
-        commission: "Rantio 12 % zzgl. MwSt.",
+        platform: "Plattformgebühren, etwa {platformFee} %",
+        commission: "Rantio {commission} % zzgl. MwSt.",
         yearly: "Jahresgebühr {fee} zzgl. MwSt.",
       },
       total: "Dir bleiben",
@@ -965,7 +965,7 @@ export const de: Translation = {
       plusVat: "+ MwSt. {vat}",
       empty: "Keine Jahresgebühren in diesem Jahr.",
     },
-    howItWorks: "Die Provision ist ein Anteil dessen, was dir das Portal für den Aufenthalt auszahlt (ohne Reinigungsgebühren). Für Nettimökki und deine eigenen Buchungen fällt nie etwas an. Die Jahresgebühr beträgt {fee} zzgl. MwSt. pro Ferienhaus; die ersten 3 Monate, nachdem ein Inserat online gegangen ist, sind kostenlos. Die MwSt. beträgt 25,5 %.",
+    howItWorks: "Die Provision ist ein Anteil dessen, was dir das Portal für den Aufenthalt auszahlt (ohne Reinigungsgebühren). Für Nettimökki und deine eigenen Buchungen fällt nie etwas an. Die Jahresgebühr beträgt {fee} zzgl. MwSt. pro Ferienhaus; ein Inserat ist {period} lang kostenlos, nachdem es online gegangen ist. Die MwSt. beträgt 25,5 %.",
     ownBooking: "Eigene Buchung",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

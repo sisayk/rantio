@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path
 
 from config.admin_assets_view import admin_asset
-from owners import calendar_views, events, monitor, geocode, inbound, inbox, listing_links, listings, newsletter, portal, profile, reviews, site_icons
+from owners import calendar_views, events, monitor, geocode, inbound, inbox, listing_links, listings, newsletter, portal, prices_api, profile, reviews, site_icons
 from owners.views import HeroSlidesView, MonitorInterestCreateView, OwnerSignupCreateView, RatesView, SignupCardView, health
 from owners.views import EmailCodeView
 
@@ -67,6 +67,7 @@ urlpatterns = [
     path("api/owner/ratings/<int:pk>/", reviews.OwnerRatingView.as_view(), name="owner-rating"),
     path("api/reviews/<str:token>/", reviews.GuestReviewView.as_view(), name="guest-review"),
     path("api/cottages/<slug:slug>/about/", reviews.CottageAboutView.as_view(), name="cottage-about"),
+    path("api/pricing/", prices_api.PricingView.as_view(), name="pricing"),
     path("api/owner/cottages/<int:pk>/status/", listings.OwnerStatusView.as_view(), name="owner-cottage-status"),
     path("api/owner/cottages/<int:pk>/translate/", listings.OwnerTranslateView.as_view(), name="owner-cottage-translate"),
     path("api/owner/cottages/<int:pk>/duplicate/", listings.OwnerDuplicateView.as_view(), name="owner-cottage-duplicate"),

@@ -18,7 +18,7 @@ from django.contrib import messages
 from . import booking_emails, invoicing, stripe_api, vault
 from .models import (
     AppDevice, Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, CottageChange, CottagePhoto, ExchangeRate, ExternalRating, HeroSlide, InboundEmail, Invoice, ListingLink, LoginCode,
-    Message, MonitorAlert, MonitorDevice, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Review, SignupPhoto,
+    Message, MonitorAlert, MonitorDevice, MonitorInterest, NewsletterSubscriber, Owner, OwnerSignup, Pricing, Review, SignupPhoto,
 )
 
 
@@ -322,6 +322,43 @@ class ConversationAdmin(ModelAdmin):
     search_fields = ["guest_name", "guest_email", "listing_slug", "cottage__name"]
     readonly_fields = ["token", "created_at", "last_message_at", "owner_read_at", "guest_read_at"]
     inlines = [MessageInline]
+
+
+@admin.register(Pricing)
+class PricingAdmin(ModelAdmin):
+    """Rantio's prices: one page, no list. The website and the app show them within a minute."""
+
+    fieldsets = [
+        ("Commission and free months", {
+            "fields": ["commission_rate", "trial_months"],
+            "classes": ["st-grid-2"],
+            "description": "For owners and cottages added from now on. Someone already signed up keeps what they "
+            "agreed to: change their commission on the owner's page and their free months on the cottage's page.",
+        }),
+        ("Yearly fee per cottage, before VAT", {
+            "fields": ["yearly_fee_eur", "yearly_fee_sek", "yearly_fee_nok", "yearly_fee_dkk", "yearly_fee_isk"],
+            "classes": ["st-grid-3"],
+            "description": "Charged at this price whenever a cottage's next listing year starts, for every owner.",
+        }),
+        ("Website example", {"fields": ["platform_fee", "updated_at"], "classes": ["st-grid-2"]}),
+    ]
+    readonly_fields = ["updated_at"]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        from django.shortcuts import redirect
+        from django.urls import reverse
+
+        return redirect(reverse("admin:owners_pricing_change", args=[Pricing.current().pk]))
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        messages.info(request, "Saved. The website and the app show the new prices within a minute.")
 
 
 @admin.register(ExchangeRate)

@@ -4,11 +4,12 @@ import { useId, useState } from "react";
 import type { Messages } from "@/i18n";
 import { fill as fillIn, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
-import { NIGHT_PRICES, ownerNetGain, YEARLY_FEES } from "@/lib/content";
+import { NIGHT_PRICES } from "@/lib/content";
+import { ownerNetGain, type Prices } from "@/lib/prices";
 import { currencySign, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import styles from "./landing.module.css";
 
-export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"]["hero"] }) {
+export default function Estimator({ lang, t, prices }: { lang: Lang; t: Messages["owner"]["hero"]; prices: Prices }) {
   // In the page's currency: kronor on a Swedish page, with the Swedish yearly fee.
   const currency = LANG_CURRENCY[lang];
   const range = NIGHT_PRICES[currency];
@@ -17,7 +18,7 @@ export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"
   const sliderId = useId();
   const priceId = useId();
 
-  const gain = roundNicely(ownerNetGain(nights, price, currency), currency);
+  const gain = roundNicely(ownerNetGain(prices, nights, price, currency), currency);
   const amount = formatPrice(lang, gain, currency);
   const perNight = fillIn(lang, t.perNight, { currency: currencySign(lang, currency) });
   // "Your cottage could earn {amount} more a year": the amount sits wherever the language puts it.
@@ -71,7 +72,7 @@ export default function Estimator({ lang, t }: { lang: Lang; t: Messages["owner"
         </span>
       </div>
 
-      <p className={styles.finePrint}>{fillIn(lang, t.finePrint, { fee: formatPrice(lang, YEARLY_FEES[currency], currency) })}</p>
+      <p className={styles.finePrint}>{fillIn(lang, t.finePrint, { fee: formatPrice(lang, prices.yearlyFees[currency], currency) })}</p>
     </div>
   );
 }

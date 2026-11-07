@@ -444,7 +444,7 @@ export const nb: Translation = {
     meta: {
       title: "Rantio – hytta di på Airbnb, Booking.com og Vrbo",
       description:
-        "Rantio gir hytta di gjester fra utlandet, uansett hvor i Norden eller Baltikum den ligger, og holder kalenderne i takt med sidene du allerede bruker. {fee} i året og 12 % av bookingene vi skaffer.",
+        "Rantio gir hytta di gjester fra utlandet, uansett hvor i Norden eller Baltikum den ligger, og holder kalenderne i takt med sidene du allerede bruker. {fee} i året og {commission} % av bookingene vi skaffer.",
     },
     nav: { cta: "Lei ut hytta di", login: "Logg inn" },
     hero: {
@@ -454,7 +454,7 @@ export const nb: Translation = {
       priceLabel: "Pris per natt",
       perNight: "{currency} / natt",
       finePrint:
-        "Anslaget trekker fra plattformgebyrer (ca. 15 %), Rantios årsavgift på {fee}, provisjonen på 12 % og mva.",
+        "Anslaget trekker fra plattformgebyrer (ca. {platformFee} %), Rantios årsavgift på {fee}, provisjonen på {commission} % og mva.",
       lead: "Rantio legger ut hytta di på Airbnb, Booking.com og Vrbo og holder alle kalendere i takt med de lokale sidene du allerede bruker, som Nettimökki i Finland.",
       cta: "Lei ut hytta di",
       photoAlt: "En hytte ved en innsjø en overskyet sommerdag",
@@ -475,7 +475,7 @@ export const nb: Translation = {
         { title: "Synlig for gjester fra utlandet", body: "Hytta di på Airbnb, Booking.com, Vrbo og andre store sider, med en engelsk annonse vi skriver for deg." },
         { title: "Ingen dobbeltbookinger", body: "Når én side får en bestilling, stenges de samme datoene overalt, også på sidene du allerede bruker." },
         { title: "Du bestemmer", body: "Du setter prisene og husreglene og beholder ukene du vil ha selv." },
-        { title: "Betal når det virker", body: "En liten årsavgift og 12 % av bestillingene vi gir deg. Ingenting på gjestene du allerede hadde." },
+        { title: "Betal når det virker", body: "En liten årsavgift og {commission} % av bestillingene vi gir deg. Ingenting på gjestene du allerede hadde." },
       ],
     },
     listings: {
@@ -516,13 +516,13 @@ export const nb: Translation = {
       ],
     },
     price: {
-      title: "{fee} i året og 12 % av bookingene vi skaffer",
-      lead: "Ingen etableringsavgift og ingen månedsavgift. Årsavgiften dekker arbeidet med å lage og holde annonsene oppdatert. Når en gjest booker via en kanal Rantio har åpnet, betaler du 12 % av det plattformen utbetaler til deg. Mva. kommer i tillegg på begge. Vi tar aldri betalt for bookinger fra sider du brukte fra før, som Nettimökki.",
+      title: "{fee} i året og {commission} % av bookingene vi skaffer",
+      lead: "Ingen etableringsavgift og ingen månedsavgift. Årsavgiften dekker arbeidet med å lage og holde annonsene oppdatert. Når en gjest booker via en kanal Rantio har åpnet, betaler du {commission} % av det plattformen utbetaler til deg. Mva. kommer i tillegg på begge. Vi tar aldri betalt for bookinger fra sider du brukte fra før, som Nettimökki.",
       exampleTitle: "Eksempel: 20 ekstra netter à {price}",
       rows: {
         guests: "Gjestene betaler",
-        platform: "Plattformgebyrer, ca. 15 %",
-        commission: "Rantio 12 % pluss mva.",
+        platform: "Plattformgebyrer, ca. {platformFee} %",
+        commission: "Rantio {commission} % pluss mva.",
         yearly: "Årsavgift {fee} pluss mva.",
       },
       total: "Du sitter igjen med",
@@ -965,7 +965,7 @@ export const nb: Translation = {
       plusVat: "+ mva. {vat}",
       empty: "Ingen årsavgifter i år.",
     },
-    howItWorks: "Provisjonen er en andel av det nettstedet betaler deg for oppholdet (vaskeavgift ikke medregnet). Nettimökki og dine egne bookinger koster aldri noe. Årsavgiften er {fee} + mva. per hytte; de første 3 månedene etter at annonsen er publisert er gratis. Merverdiavgiften er 25,5 %.",
+    howItWorks: "Provisjonen er en andel av det nettstedet betaler deg for oppholdet (vaskeavgift ikke medregnet). Nettimökki og dine egne bookinger koster aldri noe. Årsavgiften er {fee} + mva. per hytte; annonsen er gratis i {period} etter at den er publisert. Merverdiavgiften er 25,5 %.",
     ownBooking: "Egen booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

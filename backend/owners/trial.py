@@ -1,4 +1,4 @@
-"""The card step after the sign-up form: three months free, then the yearly fee.
+"""The card step after the sign-up form: free months, then the yearly fee (Settings → Prices).
 
 The sign-up form sends the owner to a Stripe Checkout page in setup mode: they save a
 card and nothing is charged. The free months start when the cottage's listing goes live
@@ -20,7 +20,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from . import stripe_api
-from .models import COUNTRY_CURRENCY, TRIAL_MONTHS, YEARLY_FEES, OwnerSignup
+from .models import COUNTRY_CURRENCY, OwnerSignup, Pricing
 
 logger = logging.getLogger(__name__)
 
@@ -28,61 +28,100 @@ logger = logging.getLogger(__name__)
 STRIPE_LOCALES = {"en": "en", "fi": "fi", "sv": "sv", "nb": "nb", "nn": "nb", "da": "da", "et": "et", "lv": "lv",
                   "lt": "lt", "de": "de", "is": "auto"}
 
-# Shown above Stripe's "Save" button (at most 1,200 characters).
+# Shown above Stripe's "Save" button (at most 1,200 characters). {free} is FREE below, {rate} the
+# commission and {fee} the yearly fee, all from the admin's Settings → Prices (models.Pricing).
 TERMS = {
-    "en": "{months} months free. Nothing is charged today: your card is saved for Rantio's invoices. The free months "
-          "start when your cottage's listing goes live. After them, the yearly fee of {fee} + VAT per cottage is "
-          "charged to this card. 12% + VAT of the bookings Rantio brings is charged monthly, also during the free "
-          "months. Stop before the free months end and there's no yearly fee.",
-    "fi": "{months} kuukautta maksutta. Tänään ei veloiteta mitään: korttisi tallennetaan Rantion laskuja varten. "
-          "Maksuttomat kuukaudet alkavat, kun mökkisi ilmoitus julkaistaan. Niiden jälkeen kortilta veloitetaan "
-          "vuosimaksu {fee} + ALV mökkiä kohden. Rantion tuomista varauksista veloitetaan 12 % + ALV kuukausittain, "
-          "myös maksuttomien kuukausien aikana. Jos lopetat ennen kuin maksuttomat kuukaudet päättyvät, vuosimaksua "
-          "ei tule.",
-    "sv": "{months} månader gratis. Inget dras i dag: ditt kort sparas för Rantios fakturor. De gratis månaderna "
-          "börjar när stugans annons publiceras. Därefter dras årsavgiften {fee} + moms per stuga från kortet. 12 % "
-          "+ moms av bokningarna Rantio ger dig dras varje månad, även under de gratis månaderna. Slutar du innan de "
-          "gratis månaderna är slut blir det ingen årsavgift.",
-    "nb": "{months} måneder gratis. Ingenting trekkes i dag: kortet ditt lagres for Rantios fakturaer. De gratis "
-          "månedene starter når hyttas annonse publiseres. Etter dem trekkes årsavgiften {fee} + mva. per hytte fra "
-          "kortet. 12 % + mva. av bookingene Rantio gir deg trekkes hver måned, også i de gratis månedene. Slutter du "
-          "før de gratis månedene er over, blir det ingen årsavgift.",
-    "nn": "{months} månader gratis. Ingenting blir trekt i dag: kortet ditt blir lagra for fakturaene frå Rantio. "
-          "Dei gratis månadene byrjar når annonsen for hytta blir publisert. Etter dei blir årsavgifta {fee} + mva. "
-          "per hytte trekt frå kortet. 12 % + mva. av bookingane Rantio gir deg blir trekt kvar månad, også i dei "
-          "gratis månadene. Sluttar du før dei gratis månadene er over, blir det inga årsavgift.",
-    "da": "{months} måneder gratis. Der trækkes intet i dag: dit kort gemmes til Rantios fakturaer. De gratis "
-          "måneder begynder, når dit sommerhus' annonce går online. Derefter trækkes årsgebyret på {fee} + moms pr. "
-          "sommerhus på kortet. 12 % + moms af de bookinger, Rantio skaffer, trækkes hver måned, også i de gratis "
-          "måneder. Stopper du, før de gratis måneder er gået, kommer der intet årsgebyr.",
-    "is": "{months} mánuðir ókeypis. Ekkert er gjaldfært í dag: kortið þitt er vistað fyrir reikninga Rantio. "
-          "Ókeypis mánuðirnir hefjast þegar auglýsing bústaðarins fer í loftið. Eftir þá er árgjaldið {fee} + VSK "
-          "á hvern bústað gjaldfært á kortið. 12% + VSK af bókunum sem Rantio útvegar er gjaldfært mánaðarlega, "
-          "líka á ókeypis mánuðunum. Ef þú hættir áður en ókeypis mánuðunum lýkur kemur ekkert árgjald.",
-    "et": "{months} kuud tasuta. Täna ei võeta midagi: sinu kaart salvestatakse Rantio arvete jaoks. Tasuta kuud "
-          "algavad, kui sinu suvemaja kuulutus avaldatakse. Pärast neid võetakse kaardilt aastatasu {fee} + km "
-          "suvemaja kohta. Rantio toodud broneeringutelt võetakse 12% + km igakuiselt, ka tasuta kuude ajal. Kui "
-          "lõpetad enne tasuta kuude lõppu, aastatasu ei tule.",
-    "lv": "{months} mēneši bez maksas. Šodien netiek iekasēts nekas: jūsu karte tiek saglabāta Rantio rēķiniem. "
-          "Bezmaksas mēneši sākas, kad jūsu brīvdienu mājas sludinājums tiek publicēts. Pēc tiem no kartes tiek "
-          "iekasēta gada maksa {fee} + PVN par katru māju. 12% + PVN no Rantio piesaistītajām rezervācijām tiek "
-          "iekasēti katru mēnesi, arī bezmaksas mēnešos. Ja pārtraucat pirms bezmaksas mēnešu beigām, gada maksas "
-          "nav.",
-    "lt": "{months} mėnesiai nemokamai. Šiandien nieko nenuskaičiuojama: jūsų kortelė išsaugoma Rantio sąskaitoms. "
-          "Nemokami mėnesiai prasideda, kai jūsų sodybos skelbimas paskelbiamas. Po jų iš kortelės nuskaičiuojamas "
-          "metinis mokestis {fee} + PVM už kiekvieną sodybą. 12 % + PVM nuo Rantio atvestų užsakymų "
-          "nuskaičiuojama kas mėnesį, taip pat ir nemokamais mėnesiais. Jei nutrauksite prieš baigiantis "
-          "nemokamiems mėnesiams, metinio mokesčio nebus.",
-    "de": "{months} Monate kostenlos. Heute wird nichts abgebucht: Deine Karte wird für die Rechnungen von Rantio "
-          "hinterlegt. Die kostenlosen Monate beginnen, sobald das Inserat deines Ferienhauses online ist. Danach "
-          "wird die Jahresgebühr von {fee} + MwSt. pro Ferienhaus von dieser Karte abgebucht. 12 % + MwSt. der "
-          "Buchungen, die Rantio bringt, werden monatlich abgebucht, auch während der kostenlosen Monate. Hörst du "
-          "vor dem Ende der kostenlosen Monate auf, fällt keine Jahresgebühr an.",
+    "en": "{free}. Nothing is charged today: your card is saved for Rantio's invoices. The free period starts when "
+          "your cottage's listing goes live. After it, the yearly fee of {fee} + VAT per cottage is charged to this "
+          "card. {rate}% + VAT of the bookings Rantio brings is charged monthly, also during the free period. Stop "
+          "before the free period ends and there's no yearly fee.",
+    "fi": "{free}. Tänään ei veloiteta mitään: korttisi tallennetaan Rantion laskuja varten. Maksuton jakso alkaa, "
+          "kun mökkisi ilmoitus julkaistaan. Sen jälkeen kortilta veloitetaan vuosimaksu {fee} + ALV mökkiä kohden. "
+          "Rantion tuomista varauksista veloitetaan {rate} % + ALV kuukausittain, myös maksuttoman jakson aikana. Jos "
+          "lopetat ennen kuin maksuton jakso päättyy, vuosimaksua ei tule.",
+    "sv": "{free}. Inget dras i dag: ditt kort sparas för Rantios fakturor. Gratisperioden börjar när stugans annons "
+          "publiceras. Därefter dras årsavgiften {fee} + moms per stuga från kortet. {rate} % + moms av bokningarna "
+          "Rantio ger dig dras varje månad, även under gratisperioden. Slutar du innan gratisperioden är slut blir det "
+          "ingen årsavgift.",
+    "nb": "{free}. Ingenting trekkes i dag: kortet ditt lagres for Rantios fakturaer. Gratisperioden starter når "
+          "hyttas annonse publiseres. Etter den trekkes årsavgiften {fee} + mva. per hytte fra kortet. {rate} % + mva. "
+          "av bookingene Rantio gir deg trekkes hver måned, også i gratisperioden. Slutter du før gratisperioden er "
+          "over, blir det ingen årsavgift.",
+    "nn": "{free}. Ingenting blir trekt i dag: kortet ditt blir lagra for fakturaene frå Rantio. Gratisperioden "
+          "byrjar når annonsen for hytta blir publisert. Etter den blir årsavgifta {fee} + mva. per hytte trekt frå "
+          "kortet. {rate} % + mva. av bookingane Rantio gir deg blir trekt kvar månad, også i gratisperioden. Sluttar "
+          "du før gratisperioden er over, blir det inga årsavgift.",
+    "da": "{free}. Der trækkes intet i dag: dit kort gemmes til Rantios fakturaer. Gratisperioden begynder, når dit "
+          "sommerhus' annonce går online. Derefter trækkes årsgebyret på {fee} + moms pr. sommerhus på kortet. "
+          "{rate} % + moms af de bookinger, Rantio skaffer, trækkes hver måned, også i gratisperioden. Stopper du, før "
+          "gratisperioden er slut, kommer der intet årsgebyr.",
+    "is": "{free}. Ekkert er gjaldfært í dag: kortið þitt er vistað fyrir reikninga Rantio. Ókeypis tímabilið hefst "
+          "þegar auglýsing bústaðarins fer í loftið. Eftir það er árgjaldið {fee} + VSK á hvern bústað gjaldfært á "
+          "kortið. {rate}% + VSK af bókunum sem Rantio útvegar er gjaldfært mánaðarlega, líka á ókeypis tímabilinu. "
+          "Ef þú hættir áður en ókeypis tímabilinu lýkur kemur ekkert árgjald.",
+    "et": "{free}. Täna ei võeta midagi: sinu kaart salvestatakse Rantio arvete jaoks. Tasuta periood algab, kui "
+          "sinu suvemaja kuulutus avaldatakse. Pärast seda võetakse kaardilt aastatasu {fee} + km suvemaja kohta. "
+          "Rantio toodud broneeringutelt võetakse {rate}% + km igakuiselt, ka tasuta perioodi ajal. Kui lõpetad enne "
+          "tasuta perioodi lõppu, aastatasu ei tule.",
+    "lv": "{free}. Šodien netiek iekasēts nekas: jūsu karte tiek saglabāta Rantio rēķiniem. Bezmaksas periods sākas, "
+          "kad jūsu brīvdienu mājas sludinājums tiek publicēts. Pēc tā no kartes tiek iekasēta gada maksa {fee} + PVN "
+          "par katru māju. {rate}% + PVN no Rantio piesaistītajām rezervācijām tiek iekasēti katru mēnesi, arī "
+          "bezmaksas periodā. Ja pārtraucat pirms bezmaksas perioda beigām, gada maksas nav.",
+    "lt": "{free}. Šiandien nieko nenuskaičiuojama: jūsų kortelė išsaugoma Rantio sąskaitoms. Nemokamas laikotarpis "
+          "prasideda, kai jūsų sodybos skelbimas paskelbiamas. Po jo iš kortelės nuskaičiuojamas metinis mokestis "
+          "{fee} + PVM už kiekvieną sodybą. {rate} % + PVM nuo Rantio atvestų užsakymų nuskaičiuojama kas mėnesį, "
+          "taip pat ir nemokamu laikotarpiu. Jei nutrauksite prieš baigiantis nemokamam laikotarpiui, metinio "
+          "mokesčio nebus.",
+    "de": "{free}. Heute wird nichts abgebucht: Deine Karte wird für die Rechnungen von Rantio hinterlegt. Die "
+          "kostenlose Zeit beginnt, sobald das Inserat deines Ferienhauses online ist. Danach wird die Jahresgebühr "
+          "von {fee} + MwSt. pro Ferienhaus von dieser Karte abgebucht. {rate} % + MwSt. der Buchungen, die Rantio "
+          "bringt, werden monatlich abgebucht, auch während der kostenlosen Zeit. Hörst du vor dem Ende der "
+          "kostenlosen Zeit auf, fällt keine Jahresgebühr an.",
+}
+
+# "3 months free": (one, few, other) by the language's plural rule (plural_form below).
+FREE = {
+    "en": ("{n} month free", "{n} months free", "{n} months free"),
+    "fi": ("{n} kuukausi maksutta", "{n} kuukautta maksutta", "{n} kuukautta maksutta"),
+    "sv": ("{n} månad gratis", "{n} månader gratis", "{n} månader gratis"),
+    "nb": ("{n} måned gratis", "{n} måneder gratis", "{n} måneder gratis"),
+    "nn": ("{n} månad gratis", "{n} månader gratis", "{n} månader gratis"),
+    "da": ("{n} måned gratis", "{n} måneder gratis", "{n} måneder gratis"),
+    "is": ("{n} mánuður ókeypis", "{n} mánuðir ókeypis", "{n} mánuðir ókeypis"),
+    "et": ("{n} kuu tasuta", "{n} kuud tasuta", "{n} kuud tasuta"),
+    "lv": ("{n} mēnesis bez maksas", "{n} mēneši bez maksas", "{n} mēneši bez maksas"),
+    "lt": ("{n} mėnuo nemokamai", "{n} mėnesiai nemokamai", "{n} mėnesių nemokamai"),
+    "de": ("{n} Monat kostenlos", "{n} Monate kostenlos", "{n} Monate kostenlos"),
 }
 
 
+def plural_form(lang: str, n: int) -> int:
+    """0 for the "one" form, 1 for Lithuanian "few", 2 for the rest (CLDR rules for whole numbers)."""
+    if lang in ("is", "lv", "lt"):
+        if n % 10 == 1 and n % 100 != 11:
+            return 0
+        if lang == "lt" and 2 <= n % 10 <= 9 and not 12 <= n % 100 <= 19:
+            return 1
+        return 2 if lang == "lt" else 1 if lang == "lv" and not (n % 10 == 0 or 11 <= n % 100 <= 19) else 2
+    return 0 if n == 1 else 2
+
+
+def rate_text(rate, lang: str) -> str:
+    """12 → "12", 12.5 → "12,5" (or "12.5" in English)."""
+    text = f"{rate:f}"
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text if lang == "en" else text.replace(".", ",")
+
+
+def terms(lang: str, currency: str) -> str:
+    p = Pricing.current()
+    free = FREE[lang][plural_form(lang, p.trial_months)].format(n=p.trial_months)
+    return TERMS[lang].format(free=free, rate=rate_text(p.commission_rate, lang), fee=fee_text(currency, lang))
+
+
 def fee_text(currency: str, lang: str) -> str:
-    amount = int(YEARLY_FEES.get(currency, YEARLY_FEES["EUR"]))
+    amount = int(Pricing.current().yearly_fee(currency))
     sep = "," if lang == "en" else " " if lang not in ("da", "is", "de") else "."
     number = f"{amount:,}".replace(",", sep)
     if currency == "EUR":
@@ -123,7 +162,7 @@ def checkout(signup: OwnerSignup, app: bool = False) -> str:
         "locale": STRIPE_LOCALES.get(lang, "auto"),
         "success_url": welcome_url(signup, app),
         "cancel_url": welcome_url(signup, app, cancelled="1"),
-        "custom_text": {"submit": {"message": TERMS[lang].format(months=TRIAL_MONTHS, fee=fee_text(currency, lang))}},
+        "custom_text": {"submit": {"message": terms(lang, currency)}},
         "metadata": {"stugora_signup": signup.pk},
         "setup_intent_data": {"metadata": {"stugora_signup": signup.pk}},
     })

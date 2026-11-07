@@ -31,6 +31,7 @@ GROUPS = [
         ("Homepage slides", "slideshow", ("owners", "heroslide", ""), None),
     ]),
     ("Money", [
+        ("Prices", "sell", ("owners", "pricing", ""), None),
         ("Invoices", "receipt_long", ("owners", "invoice", ""), "draft_invoices"),
         ("Exchange rates", "currency_exchange", ("owners", "exchangerate", ""), None),
     ]),

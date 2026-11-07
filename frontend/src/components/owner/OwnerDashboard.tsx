@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Messages } from "@/i18n";
 import { fill, number, plural } from "@/i18n/format";
-import { YEARLY_FEES } from "@/lib/content";
+import { withPrices } from "@/lib/prices";
+import { usePrices } from "@/lib/usePrices";
 import { type Currency, formatPrice, isCurrency } from "@/lib/currency";
 import { LANG_INFO, type Lang } from "@/i18n/locales";
 import { TRIAL } from "@/i18n/messages/trial";
@@ -43,6 +44,7 @@ export default function OwnerDashboard({
   const [attempt, setAttempt] = useState(0);
   const [allRows, setAllRows] = useState(false);
   // Figures come in the owner's currency (a Swedish owner's in kronor); each stay in its cottage's.
+  const prices = usePrices();
   const currency: Currency = load.state === "ready" && isCurrency(load.summary.currency) ? load.summary.currency : "EUR";
   const cur = (b: BookingRow): Currency => (isCurrency(b.currency) ? b.currency : currency);
   const feeCur = (f: { currency: string }): Currency => (isCurrency(f.currency) ? f.currency : currency);
@@ -391,7 +393,7 @@ export default function OwnerDashboard({
           ) : (
             <p className={styles.note}>{t.fees.empty}</p>
           )}
-          <p className={styles.howItWorks}>{fill(lang, t.howItWorks, { fee: fmt.cur(YEARLY_FEES[currency], currency) })}</p>
+          <p className={styles.howItWorks}>{fill(lang, withPrices(lang, t.howItWorks, prices), { fee: fmt.cur(prices.yearlyFees[currency], currency) })}</p>
         </section>
       </main>
     </div>

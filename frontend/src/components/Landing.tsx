@@ -5,7 +5,9 @@ import { LANG_INFO, type Lang, LANGS } from "@/i18n/locales";
 import { TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { type ChannelId, CHANNELS } from "@/lib/catalog";
-import { COMMISSION, NIGHT_PRICES, PLATFORM_FEE, VAT, YEARLY_FEES } from "@/lib/content";
+import { NIGHT_PRICES } from "@/lib/content";
+import { type Prices, withPrices } from "@/lib/prices";
+import { getPrices } from "@/lib/prices.server";
 import { type Currency, formatPrice, LANG_CURRENCY, roundNicely } from "@/lib/currency";
 import { COUNTRIES } from "@/lib/listings";
 import { PHOTOS, SHOWCASE_CARDS } from "@/lib/showcase";
@@ -77,24 +79,28 @@ const STEP_ICONS = [
 ];
 
 // The price example: 20 extra nights at a typical price, worked out the same way as the
-// estimator, in the page's currency (kronor and the Swedish yearly fee on a Swedish page).
-function example(currency: Currency) {
+// estimator, in the page's currency (kronor and the Swedish yearly fee on a Swedish page), with the
+// prices set in the admin.
+function example(currency: Currency, prices: Prices) {
+  const vat = 1 + prices.vat / 100;
   const guests = 20 * NIGHT_PRICES[currency].typical;
-  const platform = guests * PLATFORM_FEE;
-  const commission = (guests - platform) * COMMISSION * (1 + VAT);
-  const yearly = YEARLY_FEES[currency] * (1 + VAT);
+  const platform = guests * (prices.platformFee / 100);
+  const commission = (guests - platform) * (prices.commission / 100) * vat;
+  const yearly = prices.yearlyFees[currency] * vat;
   return { guests, platform, commission, yearly, keep: guests - platform - commission - yearly };
 }
 
-export default function Landing({ lang }: { lang: Lang }) {
+export default async function Landing({ lang }: { lang: Lang }) {
   const m = getMessages(lang);
-  const t = m.owner;
+  const prices = await getPrices();
+  const t = withPrices(lang, m.owner, prices);
+  const trial = withPrices(lang, TRIAL[lang], prices);
   const intl = LANG_INFO[lang].intl;
   const eur = (n: number) => money(lang, Math.round(n));
   const currency = LANG_CURRENCY[lang];
   const cash = (n: number) => formatPrice(lang, n, currency);
-  const ex = example(currency);
-  const fee = cash(YEARLY_FEES[currency]);
+  const ex = example(currency, prices);
+  const fee = cash(prices.yearlyFees[currency]);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   // July 2027 starts on a Thursday; 5–11 July 2027 is a Monday-to-Sunday week.
   const month = new Intl.DateTimeFormat(intl, { month: "long", year: "numeric" }).format(new Date(2027, 6, 1));
@@ -137,7 +143,7 @@ export default function Landing({ lang }: { lang: Lang }) {
         {/* Hero: the estimate beside the kind of cottage guests are looking for */}
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <Estimator lang={lang} t={t.hero} />
+            <Estimator lang={lang} t={t.hero} prices={prices} />
             <p className={styles.heroLead}>{t.hero.lead}</p>
             <a className={styles.primaryButton} href="#ilmoita">
               {t.hero.cta}
@@ -276,13 +282,13 @@ export default function Landing({ lang }: { lang: Lang }) {
           <div className={styles.scratch}>
             <div>
               <h2 id="scratch-title" className={styles.sectionTitle}>
-                {TRIAL[lang].scratchTitle}
+                {trial.scratchTitle}
               </h2>
-              <p className={styles.sectionLead}>{TRIAL[lang].scratchBody}</p>
+              <p className={styles.sectionLead}>{trial.scratchBody}</p>
             </div>
             <div className={styles.scratchSide}>
               <ul className={styles.scratchPoints}>
-                {TRIAL[lang].scratchPoints.map((point) => (
+                {trial.scratchPoints.map((point) => (
                   <li key={point}>
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -327,8 +333,8 @@ export default function Landing({ lang }: { lang: Lang }) {
             </h2>
             <p className={styles.sectionLead}>{t.price.lead}</p>
             <div className={styles.priceTrial}>
-              <span className={styles.trialBadge}>{TRIAL[lang].badge}</span>
-              <p>{TRIAL[lang].priceNote}</p>
+              <span className={styles.trialBadge}>{trial.badge}</span>
+              <p>{trial.priceNote}</p>
             </div>
             <p className={styles.priceTerms}>{t.price.terms}</p>
           </div>
@@ -413,7 +419,7 @@ export default function Landing({ lang }: { lang: Lang }) {
               {t.form.title}
             </h2>
             <p className={styles.sectionLead}>{t.form.lead}</p>
-            <SignupForm lang={lang} f={t.form} countries={Object.fromEntries(COUNTRIES.map((c) => [c, countryName(lang, c)]))} />
+            <SignupForm lang={lang} f={t.form} prices={prices} countries={Object.fromEntries(COUNTRIES.map((c) => [c, countryName(lang, c)]))} />
           </div>
         </section>
       </main>

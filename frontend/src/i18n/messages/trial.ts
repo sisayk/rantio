@@ -1,9 +1,13 @@
+import type { Plural } from "../format";
 import type { Lang } from "../locales";
 
-/** The free trial (3 months, then the yearly fee) and the photos and card step of the
+/** The free trial (the months set in the admin, then the yearly fee) and the photos and card step of the
  *  sign-up form: the website's hosts page and welcome page, and the app's form.
  *  Kept apart from the big message files so the 10 languages sit side by side. */
 export type TrialText = {
+  /** "3 months", in the case badge, priceNote, welcome.lead and welcome.notSavedLead use it in:
+   *  {period} there (lib/prices.ts withPrices fills it from the admin's free months). */
+  period: Plural;
   badge: string;
   priceNote: string;
   photos: string;
@@ -46,14 +50,14 @@ export const listedChoices = (country: string) =>
   LISTED_ON.filter((key) => !FINNISH_SITES.includes(key) || !country || country === "FI");
 export type ListedOn = (typeof LISTED_ON)[number];
 
-export const TRIAL_MONTHS = 3;
 export const MAX_SIGNUP_PHOTOS = 10;
 
 export const TRIAL: Record<Lang, TrialText> = {
   en: {
-    badge: "First 3 months free",
+    period: { one: "{n} month", other: "{n} months" },
+    badge: "Free for {period}",
     priceNote:
-      "The first 3 months after your listing goes live are free: no yearly fee. You save a card when you sign up, and nothing is charged until the free months end.",
+      "Your listing is free for {period} after it goes live: no yearly fee. You save a card when you sign up, and nothing is charged until the free period ends.",
     photos: "Photos of your cottage",
     photosHint: "1–10 photos: outside, the rooms, the sauna, the view. Phone photos are fine.",
     addPhotos: "Add photos",
@@ -66,9 +70,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Continue to the free trial",
     welcome: {
       title: "Your free trial is set",
-      lead: "{name}, your card is saved and nothing has been charged. Your 3 free months start when your cottage's listing goes live. We'll be in touch soon to set it up.",
+      lead: "{name}, your card is saved and nothing has been charged. Your free period of {period} starts when your cottage's listing goes live. We'll be in touch soon to set it up.",
       notSavedTitle: "Your card isn't saved yet",
-      notSavedLead: "The free trial starts once you've saved a card. Nothing is charged for 3 months.",
+      notSavedLead: "The free trial starts once you've saved a card. Nothing is charged for {period}.",
       retry: "Save a card",
       checking: "Checking…",
       failed: "We couldn't check right now. Try again in a moment, or write to {email}.",
@@ -93,9 +97,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Listings written for you", "Prices set together with you", "One calendar for every site"],
   },
   fi: {
-    badge: "3 ensimmäistä kuukautta maksutta",
+    period: { one: "{n} kuukauden", other: "{n} kuukauden" },
+    badge: "Maksuton {period} ajan",
     priceNote:
-      "3 ensimmäistä kuukautta ilmoituksen julkaisusta ovat maksuttomia: ei vuosimaksua. Tallennat kortin rekisteröityessäsi, eikä mitään veloiteta ennen kuin maksuttomat kuukaudet päättyvät.",
+      "Ilmoitus on maksuton {period} ajan julkaisusta: ei vuosimaksua. Tallennat kortin rekisteröityessäsi, eikä mitään veloiteta ennen kuin maksuton jakso päättyy.",
     photos: "Kuvia mökistäsi",
     photosHint: "1–10 kuvaa: ulkoa, huoneista, saunasta ja maisemasta. Puhelimella otetut kuvat käyvät hyvin.",
     addPhotos: "Lisää kuvia",
@@ -108,9 +113,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Jatka maksuttomaan kokeiluun",
     welcome: {
       title: "Maksuton kokeilusi on valmis",
-      lead: "{name}, korttisi on tallennettu, eikä mitään ole veloitettu. 3 maksutonta kuukauttasi alkavat, kun mökkisi ilmoitus julkaistaan. Otamme pian yhteyttä ja sovitaan loput.",
+      lead: "{name}, korttisi on tallennettu, eikä mitään ole veloitettu. {period} maksuton jaksosi alkaa, kun mökkisi ilmoitus julkaistaan. Otamme pian yhteyttä ja sovitaan loput.",
       notSavedTitle: "Korttia ei ole vielä tallennettu",
-      notSavedLead: "Maksuton kokeilu alkaa, kun olet tallentanut kortin. Mitään ei veloiteta 3 kuukauteen.",
+      notSavedLead: "Maksuton kokeilu alkaa, kun olet tallentanut kortin. Mitään ei veloiteta {period} aikana.",
       retry: "Tallenna kortti",
       checking: "Tarkistetaan…",
       failed: "Emme voineet tarkistaa tätä juuri nyt. Yritä hetken päästä uudelleen tai kirjoita osoitteeseen {email}.",
@@ -135,9 +140,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Ilmoitukset kirjoitetaan puolestasi", "Hinnat sovitaan yhdessä", "Yksi kalenteri kaikille sivustoille"],
   },
   sv: {
-    badge: "De första 3 månaderna gratis",
+    period: { one: "{n} månad", other: "{n} månader" },
+    badge: "Gratis i {period}",
     priceNote:
-      "De första 3 månaderna efter att annonsen publicerats är gratis: ingen årsavgift. Du sparar ett kort när du anmäler dig, och inget dras förrän de gratis månaderna är slut.",
+      "Annonsen är gratis i {period} efter att den publicerats: ingen årsavgift. Du sparar ett kort när du anmäler dig, och inget dras förrän gratisperioden är slut.",
     photos: "Bilder på din stuga",
     photosHint: "1–10 bilder: utsidan, rummen, bastun, utsikten. Mobilbilder går bra.",
     addPhotos: "Lägg till bilder",
@@ -150,9 +156,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Fortsätt till provperioden",
     welcome: {
       title: "Din kostnadsfria provperiod är klar",
-      lead: "{name}, ditt kort är sparat och inget har dragits. Dina 3 gratis månader börjar när stugans annons publiceras. Vi hör av oss snart för att ordna resten.",
+      lead: "{name}, ditt kort är sparat och inget har dragits. Din gratisperiod på {period} börjar när stugans annons publiceras. Vi hör av oss snart för att ordna resten.",
       notSavedTitle: "Ditt kort är inte sparat än",
-      notSavedLead: "Provperioden börjar när du har sparat ett kort. Inget dras på 3 månader.",
+      notSavedLead: "Provperioden börjar när du har sparat ett kort. Inget dras på {period}.",
       retry: "Spara ett kort",
       checking: "Kontrollerar…",
       failed: "Vi kunde inte kontrollera det just nu. Försök igen om en stund eller skriv till {email}.",
@@ -177,9 +183,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Annonserna skrivs åt dig", "Priserna sätts tillsammans med dig", "En kalender för alla sajter"],
   },
   nb: {
-    badge: "De første 3 månedene gratis",
+    period: { one: "{n} måned", other: "{n} måneder" },
+    badge: "Gratis i {period}",
     priceNote:
-      "De første 3 månedene etter at annonsen er publisert er gratis: ingen årsavgift. Du lagrer et kort når du melder deg på, og ingenting trekkes før de gratis månedene er over.",
+      "Annonsen er gratis i {period} etter at den er publisert: ingen årsavgift. Du lagrer et kort når du melder deg på, og ingenting trekkes før gratisperioden er over.",
     photos: "Bilder av hytta di",
     photosHint: "1–10 bilder: utsiden, rommene, badstuen, utsikten. Mobilbilder går fint.",
     addPhotos: "Legg til bilder",
@@ -192,9 +199,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Gå videre til prøveperioden",
     welcome: {
       title: "Den gratis prøveperioden din er klar",
-      lead: "{name}, kortet ditt er lagret, og ingenting er trukket. De 3 gratis månedene starter når hyttas annonse publiseres. Vi tar kontakt snart for å ordne resten.",
+      lead: "{name}, kortet ditt er lagret, og ingenting er trukket. Gratisperioden på {period} starter når hyttas annonse publiseres. Vi tar kontakt snart for å ordne resten.",
       notSavedTitle: "Kortet ditt er ikke lagret ennå",
-      notSavedLead: "Prøveperioden starter når du har lagret et kort. Ingenting trekkes på 3 måneder.",
+      notSavedLead: "Prøveperioden starter når du har lagret et kort. Ingenting trekkes på {period}.",
       retry: "Lagre et kort",
       checking: "Sjekker…",
       failed: "Vi kunne ikke sjekke det akkurat nå. Prøv igjen om litt, eller skriv til {email}.",
@@ -219,9 +226,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Annonsene skrives for deg", "Prisene settes sammen med deg", "Én kalender for alle nettsteder"],
   },
   nn: {
-    badge: "Dei første 3 månadene gratis",
+    period: { one: "{n} månad", other: "{n} månader" },
+    badge: "Gratis i {period}",
     priceNote:
-      "Dei første 3 månadene etter at annonsen er publisert er gratis: inga årsavgift. Du lagrar eit kort når du melder deg på, og ingenting blir trekt før dei gratis månadene er over.",
+      "Annonsen er gratis i {period} etter publisering: inga årsavgift. Du lagrar eit kort når du melder deg på, og ingenting blir trekt før gratisperioden er over.",
     photos: "Bilete av hytta di",
     photosHint: "1–10 bilete: utsida, romma, badstova, utsikta. Mobilbilete går fint.",
     addPhotos: "Legg til bilete",
@@ -234,9 +242,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Gå vidare til prøveperioden",
     welcome: {
       title: "Den gratis prøveperioden din er klar",
-      lead: "{name}, kortet ditt er lagra, og ingenting er trekt. Dei 3 gratis månadene byrjar når annonsen for hytta blir publisert. Vi tek kontakt snart for å ordne resten.",
+      lead: "{name}, kortet ditt er lagra, og ingenting er trekt. Gratisperioden på {period} byrjar når annonsen for hytta blir publisert. Vi tek kontakt snart for å ordne resten.",
       notSavedTitle: "Kortet ditt er ikkje lagra enno",
-      notSavedLead: "Prøveperioden byrjar når du har lagra eit kort. Ingenting blir trekt på 3 månader.",
+      notSavedLead: "Prøveperioden byrjar når du har lagra eit kort. Ingenting blir trekt på {period}.",
       retry: "Lagre eit kort",
       checking: "Sjekkar…",
       failed: "Vi kunne ikkje sjekke det akkurat no. Prøv igjen om litt, eller skriv til {email}.",
@@ -261,9 +269,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Annonsane blir skrivne for deg", "Prisane blir sette saman med deg", "Éin kalender for alle nettstader"],
   },
   da: {
-    badge: "De første 3 måneder gratis",
+    period: { one: "{n} måned", other: "{n} måneder" },
+    badge: "Gratis i {period}",
     priceNote:
-      "De første 3 måneder efter at din annonce er gået online, er gratis: intet årsgebyr. Du gemmer et kort, når du tilmelder dig, og der trækkes intet, før de gratis måneder er gået.",
+      "Din annonce er gratis i {period}, efter at den er gået online: intet årsgebyr. Du gemmer et kort, når du tilmelder dig, og der trækkes intet, før gratisperioden er slut.",
     photos: "Billeder af dit sommerhus",
     photosHint: "1–10 billeder: udefra, værelserne, saunaen, udsigten. Mobilbilleder er fine.",
     addPhotos: "Tilføj billeder",
@@ -276,9 +285,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Fortsæt til prøveperioden",
     welcome: {
       title: "Din gratis prøveperiode er klar",
-      lead: "{name}, dit kort er gemt, og der er ikke trukket noget. Dine 3 gratis måneder begynder, når sommerhusets annonce går online. Vi kontakter dig snart for at klare resten.",
+      lead: "{name}, dit kort er gemt, og der er ikke trukket noget. Din gratisperiode på {period} begynder, når sommerhusets annonce går online. Vi kontakter dig snart for at klare resten.",
       notSavedTitle: "Dit kort er ikke gemt endnu",
-      notSavedLead: "Prøveperioden begynder, når du har gemt et kort. Der trækkes intet i 3 måneder.",
+      notSavedLead: "Prøveperioden begynder, når du har gemt et kort. Der trækkes intet i {period}.",
       retry: "Gem et kort",
       checking: "Tjekker…",
       failed: "Vi kunne ikke tjekke det lige nu. Prøv igen om lidt, eller skriv til {email}.",
@@ -303,9 +312,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Annoncerne skrives for dig", "Priserne fastsættes sammen med dig", "Én kalender til alle sider"],
   },
   is: {
-    badge: "Fyrstu 3 mánuðirnir ókeypis",
+    period: { one: "{n} mánuð", other: "{n} mánuði" },
+    badge: "Ókeypis í {period}",
     priceNote:
-      "Fyrstu 3 mánuðirnir eftir að auglýsingin fer í loftið eru ókeypis: ekkert árgjald. Þú vistar kort þegar þú skráir þig og ekkert er gjaldfært fyrr en ókeypis mánuðunum lýkur.",
+      "Auglýsingin er ókeypis í {period} eftir að hún fer í loftið: ekkert árgjald. Þú vistar kort þegar þú skráir þig og ekkert er gjaldfært fyrr en ókeypis tímabilinu lýkur.",
     photos: "Myndir af bústaðnum",
     photosHint: "1–10 myndir: að utan, herbergin, gufubaðið, útsýnið. Símamyndir eru fínar.",
     addPhotos: "Bæta við myndum",
@@ -318,9 +328,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Áfram í ókeypis prufutíma",
     welcome: {
       title: "Ókeypis prufutíminn þinn er tilbúinn",
-      lead: "{name}, kortið þitt er vistað og ekkert hefur verið gjaldfært. 3 ókeypis mánuðirnir hefjast þegar auglýsing bústaðarins fer í loftið. Við höfum samband fljótlega til að ganga frá restinni.",
+      lead: "{name}, kortið þitt er vistað og ekkert hefur verið gjaldfært. Ókeypis tímabilið hefst þegar auglýsing bústaðarins fer í loftið og stendur í {period}. Við höfum samband fljótlega til að ganga frá restinni.",
       notSavedTitle: "Kortið þitt er ekki vistað enn",
-      notSavedLead: "Prufutíminn hefst þegar þú hefur vistað kort. Ekkert er gjaldfært í 3 mánuði.",
+      notSavedLead: "Prufutíminn hefst þegar þú hefur vistað kort. Ekkert er gjaldfært í {period}.",
       retry: "Vista kort",
       checking: "Athuga…",
       failed: "Við gátum ekki athugað þetta núna. Reyndu aftur eftir smástund eða skrifaðu á {email}.",
@@ -345,9 +355,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Auglýsingarnar skrifaðar fyrir þig", "Verðin ákveðin með þér", "Eitt dagatal fyrir allar síður"],
   },
   et: {
-    badge: "Esimesed 3 kuud tasuta",
+    period: { one: "{n} kuu", other: "{n} kuud" },
+    badge: "{period} tasuta",
     priceNote:
-      "Esimesed 3 kuud pärast kuulutuse avaldamist on tasuta: aastatasu ei ole. Salvestad registreerumisel kaardi ja midagi ei võeta enne, kui tasuta kuud on läbi.",
+      "Kuulutus on pärast avaldamist {period} tasuta: aastatasu ei ole. Salvestad registreerumisel kaardi ja midagi ei võeta enne, kui tasuta periood on läbi.",
     photos: "Pildid sinu suvemajast",
     photosHint: "1–10 pilti: väljast, toad, saun, vaade. Telefoniga tehtud pildid sobivad.",
     addPhotos: "Lisa pilte",
@@ -360,9 +371,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Jätka tasuta prooviajaga",
     welcome: {
       title: "Sinu tasuta prooviaeg on valmis",
-      lead: "{name}, sinu kaart on salvestatud ja midagi pole võetud. Sinu 3 tasuta kuud algavad, kui suvemaja kuulutus avaldatakse. Võtame peagi ühendust, et ülejäänu kokku leppida.",
+      lead: "{name}, sinu kaart on salvestatud ja midagi pole võetud. Tasuta periood algab, kui suvemaja kuulutus avaldatakse, ja kestab {period}. Võtame peagi ühendust, et ülejäänu kokku leppida.",
       notSavedTitle: "Sinu kaarti pole veel salvestatud",
-      notSavedLead: "Prooviaeg algab, kui oled kaardi salvestanud. 3 kuu jooksul ei võeta midagi.",
+      notSavedLead: "Prooviaeg algab, kui oled kaardi salvestanud. Tasuta perioodil ({period}) ei võeta midagi.",
       retry: "Salvesta kaart",
       checking: "Kontrollime…",
       failed: "Me ei saanud seda praegu kontrollida. Proovi hetke pärast uuesti või kirjuta aadressile {email}.",
@@ -387,9 +398,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Kuulutused kirjutatakse sinu eest", "Hinnad lepitakse kokku koos sinuga", "Üks kalender kõigile saitidele"],
   },
   lv: {
-    badge: "Pirmie 3 mēneši bez maksas",
+    period: { zero: "{n} mēnešus", one: "{n} mēnesi", other: "{n} mēnešus" },
+    badge: "{period} bez maksas",
     priceNote:
-      "Pirmie 3 mēneši pēc sludinājuma publicēšanas ir bez maksas: nav gada maksas. Reģistrējoties jūs saglabājat karti, un nekas netiek iekasēts, līdz bezmaksas mēneši beidzas.",
+      "Sludinājums ir bez maksas {period} pēc publicēšanas: nav gada maksas. Reģistrējoties jūs saglabājat karti, un nekas netiek iekasēts, līdz bezmaksas periods beidzas.",
     photos: "Jūsu mājas fotoattēli",
     photosHint: "1–10 fotoattēli: no ārpuses, istabas, pirts, skats. Ar tālruni uzņemti attēli der.",
     addPhotos: "Pievienot fotoattēlus",
@@ -402,9 +414,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Turpināt uz bezmaksas izmēģinājumu",
     welcome: {
       title: "Jūsu bezmaksas izmēģinājums ir sagatavots",
-      lead: "{name}, jūsu karte ir saglabāta, un nekas nav iekasēts. Jūsu 3 bezmaksas mēneši sākas, kad mājas sludinājums tiek publicēts. Drīz sazināsimies, lai vienotos par pārējo.",
+      lead: "{name}, jūsu karte ir saglabāta, un nekas nav iekasēts. Bezmaksas periods sākas, kad mājas sludinājums tiek publicēts, un ilgst {period}. Drīz sazināsimies, lai vienotos par pārējo.",
       notSavedTitle: "Jūsu karte vēl nav saglabāta",
-      notSavedLead: "Izmēģinājums sākas, kad esat saglabājis karti. 3 mēnešus nekas netiek iekasēts.",
+      notSavedLead: "Izmēģinājums sākas, kad esat saglabājis karti. {period} nekas netiek iekasēts.",
       retry: "Saglabāt karti",
       checking: "Pārbaudām…",
       failed: "Šobrīd to nevarējām pārbaudīt. Mēģiniet vēlreiz pēc brīža vai rakstiet uz {email}.",
@@ -429,9 +441,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Sludinājumus uzrakstām mēs", "Cenas nosakām kopā ar jums", "Viens kalendārs visām vietnēm"],
   },
   lt: {
-    badge: "Pirmieji 3 mėnesiai nemokamai",
+    period: { one: "{n} mėnesį", few: "{n} mėnesius", many: "{n} mėnesio", other: "{n} mėnesių" },
+    badge: "{period} nemokamai",
     priceNote:
-      "Pirmieji 3 mėnesiai po skelbimo paskelbimo nemokami: metinio mokesčio nėra. Registruodamiesi išsaugote kortelę, ir niekas nenuskaičiuojama, kol nesibaigia nemokami mėnesiai.",
+      "Skelbimas nemokamas {period} po paskelbimo: metinio mokesčio nėra. Registruodamiesi išsaugote kortelę, ir niekas nenuskaičiuojama, kol nesibaigia nemokamas laikotarpis.",
     photos: "Jūsų sodybos nuotraukos",
     photosHint: "1–10 nuotraukų: iš lauko, kambariai, pirtis, vaizdas. Telefonu darytos nuotraukos tinka.",
     addPhotos: "Pridėti nuotraukų",
@@ -444,9 +457,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Tęsti į nemokamą bandomąjį laikotarpį",
     welcome: {
       title: "Jūsų nemokamas bandomasis laikotarpis paruoštas",
-      lead: "{name}, jūsų kortelė išsaugota ir niekas nenuskaičiuota. Jūsų 3 nemokami mėnesiai prasideda, kai sodybos skelbimas paskelbiamas. Netrukus susisieksime ir susitarsime dėl likusių dalykų.",
+      lead: "{name}, jūsų kortelė išsaugota ir niekas nenuskaičiuota. Nemokamas laikotarpis prasideda, kai sodybos skelbimas paskelbiamas, ir trunka {period}. Netrukus susisieksime ir susitarsime dėl likusių dalykų.",
       notSavedTitle: "Jūsų kortelė dar neišsaugota",
-      notSavedLead: "Bandomasis laikotarpis prasideda, kai išsaugote kortelę. 3 mėnesius niekas nenuskaičiuojama.",
+      notSavedLead: "Bandomasis laikotarpis prasideda, kai išsaugote kortelę. {period} niekas nenuskaičiuojama.",
       retry: "Išsaugoti kortelę",
       checking: "Tikriname…",
       failed: "Šiuo metu negalėjome to patikrinti. Bandykite dar kartą po akimirkos arba rašykite adresu {email}.",
@@ -471,9 +484,10 @@ export const TRIAL: Record<Lang, TrialText> = {
     scratchPoints: ["Skelbimus parašome mes", "Kainas nustatome kartu su jumis", "Vienas kalendorius visoms svetainėms"],
   },
   de: {
-    badge: "Die ersten 3 Monate kostenlos",
+    period: { one: "{n} Monat", other: "{n} Monate" },
+    badge: "{period} kostenlos",
     priceNote:
-      "Die ersten 3 Monate, nachdem dein Inserat online ist, sind kostenlos: keine Jahresgebühr. Bei der Anmeldung hinterlegst du eine Karte, und bis die kostenlosen Monate vorbei sind, wird nichts abgebucht.",
+      "Dein Inserat ist {period} lang kostenlos, sobald es online ist: keine Jahresgebühr. Bei der Anmeldung hinterlegst du eine Karte, und bis die kostenlose Zeit vorbei ist, wird nichts abgebucht.",
     photos: "Fotos von deinem Ferienhaus",
     photosHint: "1–10 Fotos: von außen, die Zimmer, die Sauna, die Aussicht. Handyfotos sind völlig in Ordnung.",
     addPhotos: "Fotos hinzufügen",
@@ -486,9 +500,9 @@ export const TRIAL: Record<Lang, TrialText> = {
     submit: "Weiter zur kostenlosen Testphase",
     welcome: {
       title: "Deine kostenlose Testphase ist eingerichtet",
-      lead: "{name}, deine Karte ist hinterlegt und es wurde nichts abgebucht. Deine 3 kostenlosen Monate beginnen, sobald das Inserat deines Ferienhauses online ist. Wir melden uns bald, um alles einzurichten.",
+      lead: "{name}, deine Karte ist hinterlegt und es wurde nichts abgebucht. Die kostenlose Zeit beginnt, sobald das Inserat deines Ferienhauses online ist, und dauert {period}. Wir melden uns bald, um alles einzurichten.",
       notSavedTitle: "Deine Karte ist noch nicht hinterlegt",
-      notSavedLead: "Die kostenlose Testphase beginnt, sobald du eine Karte hinterlegt hast. 3 Monate lang wird nichts abgebucht.",
+      notSavedLead: "Die kostenlose Testphase beginnt, sobald du eine Karte hinterlegt hast. {period} lang wird nichts abgebucht.",
       retry: "Karte hinterlegen",
       checking: "Wird geprüft…",
       failed: "Wir konnten das gerade nicht prüfen. Versuch es gleich noch einmal oder schreib an {email}.",

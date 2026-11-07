@@ -8,6 +8,8 @@ import { CONTACT_EMAIL } from "@/lib/content";
 import { COUNTRIES, type Country } from "@/lib/listings";
 import { regionLabel } from "@/lib/placeNames";
 import { listedChoices, type ListedOn, MAX_SIGNUP_PHOTOS, TRIAL } from "@/i18n/messages/trial";
+import { withPrices } from "@/lib/prices";
+import { usePrices } from "@/lib/usePrices";
 import { PLACES } from "@/lib/places";
 import { deviceName, useSession } from "@/state/session";
 import { useT } from "@/text/i18n";
@@ -29,12 +31,13 @@ type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimok
 type Step = "form" | "checking" | "saved" | "notSaved" | "thanks";
 
 /** "List your cottage" inside the app: the same sign-up as on rantio.fi/hosts, with photos,
- *  then a card saved on Stripe's page for the 3 free months. */
+ *  then a card saved on Stripe's page for the free months (set in the admin). */
 export default function ListCottage() {
   // country(): the app's own names (Hermes has no Intl.DisplayNames, so not countryName()).
   const { m, lang, f, country: countryLabel } = useT();
   const t = m.owner.form;
-  const tr = TRIAL[lang];
+  const prices = usePrices();
+  const tr = withPrices(lang, TRIAL[lang], prices);
   const router = useRouter();
   const { signedUp, signedIn, owner, refresh } = useSession();
   // Someone already signed in lists with the address they signed in with: no email code.
@@ -306,7 +309,7 @@ export default function ListCottage() {
         <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg, paddingBottom: 64 }} keyboardShouldPersistTaps="handled">
           <Text v="title">{m.owner.why.title}</Text>
           <View style={{ gap: space.md }}>
-            {m.owner.why.items.map((item) => (
+            {withPrices(lang, m.owner.why.items, prices).map((item) => (
               <View key={item.title} style={styles.why}>
                 <Icon name="checkmark-circle" size={22} color={colors.green} />
                 <View style={{ flex: 1, gap: 2 }}>

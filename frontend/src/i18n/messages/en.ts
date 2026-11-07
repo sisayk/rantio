@@ -456,7 +456,7 @@ export const en = {
     meta: {
       title: "Rantio – your cottage on Airbnb, Booking.com and Vrbo",
       description:
-        "Rantio brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. {fee} a year and 12% of the bookings we bring.",
+        "Rantio brings guests from abroad to your cottage anywhere in the Nordics or the Baltics and keeps calendars in step with the sites you already use. {fee} a year and {commission}% of the bookings we bring.",
     },
     nav: { cta: "List your cottage", login: "Sign in" },
     hero: {
@@ -466,7 +466,7 @@ export const en = {
       priceLabel: "Price per night",
       perNight: "{currency} / night",
       finePrint:
-        "The estimate takes off platform fees (about 15%), Rantio's {fee} yearly fee, the 12% commission and VAT.",
+        "The estimate takes off platform fees (about {platformFee}%), Rantio's {fee} yearly fee, the {commission}% commission and VAT.",
       lead: "Rantio puts your cottage on Airbnb, Booking.com and Vrbo and keeps every calendar in step with the local sites you already use, such as Nettimökki in Finland.",
       cta: "List your cottage",
       photoAlt: "A cottage on a lake shore on a cloudy summer day",
@@ -487,7 +487,7 @@ export const en = {
         { title: "Seen by guests abroad", body: "Your cottage on Airbnb, Booking.com, Vrbo and other big sites, with an English listing we write for you." },
         { title: "No double bookings", body: "When one site books, the same dates close everywhere, including the sites you already use." },
         { title: "You stay in charge", body: "You set the prices and the house rules, and keep the weeks you want for yourself." },
-        { title: "Pay when it works", body: "A small yearly fee and 12% of the bookings we bring. Nothing on the guests you already had." },
+        { title: "Pay when it works", body: "A small yearly fee and {commission}% of the bookings we bring. Nothing on the guests you already had." },
       ],
     },
     listings: {
@@ -528,13 +528,13 @@ export const en = {
       ],
     },
     price: {
-      title: "{fee} a year and 12% of the bookings we bring",
-      lead: "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Rantio opened, you pay 12% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
+      title: "{fee} a year and {commission}% of the bookings we bring",
+      lead: "No setup fee and no monthly fee. The yearly fee covers making and keeping up your listings. When a guest books through a channel Rantio opened, you pay {commission}% of what the platform pays you. VAT is added to both. We never charge for bookings from the sites you already used before, such as Nettimökki.",
       exampleTitle: "Example: 20 extra nights at {price} a night",
       rows: {
         guests: "Guests pay",
-        platform: "Platform fees, about 15%",
-        commission: "Rantio 12% plus VAT",
+        platform: "Platform fees, about {platformFee}%",
+        commission: "Rantio {commission}% plus VAT",
         yearly: "Yearly fee {fee} plus VAT",
       },
       total: "You keep",
@@ -977,7 +977,7 @@ export const en = {
       plusVat: "+ VAT {vat}",
       empty: "No yearly fees this year.",
     },
-    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is {fee} + VAT per cottage; the first 3 months after a listing goes live are free. VAT is 25.5%.",
+    howItWorks: "Commission is a share of what the site pays you for the stay (cleaning fees excluded). Nettimökki and your own bookings are never charged. The yearly fee is {fee} + VAT per cottage; a listing is free for {period} after it goes live. VAT is 25.5%.",
     ownBooking: "Own booking",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

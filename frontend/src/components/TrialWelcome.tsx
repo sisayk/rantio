@@ -7,6 +7,8 @@ import type { Lang } from "@/i18n/locales";
 import { TRIAL } from "@/i18n/messages/trial";
 import { paths } from "@/i18n/paths";
 import { CONTACT_EMAIL } from "@/lib/content";
+import { withPrices } from "@/lib/prices";
+import { usePrices } from "@/lib/usePrices";
 import { Wordmark } from "./guest/icons";
 import styles from "./NewsletterConfirm.module.css";
 
@@ -15,7 +17,7 @@ type State = "checking" | "saved" | "notSaved" | "failed";
 /** Where Stripe's card page sends the owner back to after the sign-up form
  *  (/hosts/welcome?signup=<token>, with app=1 from the app). */
 export default function TrialWelcome({ lang }: { lang: Lang }) {
-  const t = TRIAL[lang].welcome;
+  const t = withPrices(lang, TRIAL[lang].welcome, usePrices());
   const query = useSearchParams();
   const token = query.get("signup") ?? "";
   const fromApp = query.get("app") === "1";

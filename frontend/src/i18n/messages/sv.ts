@@ -444,7 +444,7 @@ export const sv: Translation = {
     meta: {
       title: "Rantio – din stuga på Airbnb, Booking.com och Vrbo",
       description:
-        "Rantio ger din stuga gäster från utlandet, var som helst i Norden eller Baltikum, och håller kalendrarna i takt med de sajter du redan använder. {fee} om året och 12 % av bokningarna vi förmedlar.",
+        "Rantio ger din stuga gäster från utlandet, var som helst i Norden eller Baltikum, och håller kalendrarna i takt med de sajter du redan använder. {fee} om året och {commission} % av bokningarna vi förmedlar.",
     },
     nav: { cta: "Lägg ut din stuga", login: "Logga in" },
     hero: {
@@ -454,7 +454,7 @@ export const sv: Translation = {
       priceLabel: "Pris per natt",
       perNight: "{currency} / natt",
       finePrint:
-        "I uppskattningen har vi dragit av plattformarnas avgifter (cirka 15 %), Rantios årsavgift på {fee}, provisionen på 12 % och moms.",
+        "I uppskattningen har vi dragit av plattformarnas avgifter (cirka {platformFee} %), Rantios årsavgift på {fee}, provisionen på {commission} % och moms.",
       lead: "Rantio lägger ut din stuga på Airbnb, Booking.com och Vrbo och håller alla kalendrar i takt med de lokala sajter du redan använder, till exempel Nettimökki i Finland.",
       cta: "Lägg ut din stuga",
       photoAlt: "En stuga på en sjöstrand en molnig sommardag",
@@ -475,7 +475,7 @@ export const sv: Translation = {
         { title: "Synlig för gäster utomlands", body: "Din stuga på Airbnb, Booking.com, Vrbo och andra stora sajter, med en engelsk annons som vi skriver åt dig." },
         { title: "Inga dubbelbokningar", body: "När en sajt får en bokning stängs samma datum överallt, även på sajterna du redan använder." },
         { title: "Du bestämmer", body: "Du sätter priserna och husreglerna och behåller de veckor du vill ha själv." },
-        { title: "Betala när det fungerar", body: "En liten årsavgift och 12 % av bokningarna vi ger dig. Inget på gästerna du redan hade." },
+        { title: "Betala när det fungerar", body: "En liten årsavgift och {commission} % av bokningarna vi ger dig. Inget på gästerna du redan hade." },
       ],
     },
     listings: {
@@ -516,13 +516,13 @@ export const sv: Translation = {
       ],
     },
     price: {
-      title: "{fee} om året och 12 % av bokningarna vi förmedlar",
-      lead: "Ingen startavgift och ingen månadsavgift. Årsavgiften täcker arbetet med att skapa och sköta dina annonser. När en gäst bokar via en kanal som Rantio har öppnat betalar du 12 % av det som plattformen betalar ut till dig. Moms tillkommer på båda. Vi tar aldrig betalt för bokningar från de sajter du använde redan tidigare, till exempel Nettimökki.",
+      title: "{fee} om året och {commission} % av bokningarna vi förmedlar",
+      lead: "Ingen startavgift och ingen månadsavgift. Årsavgiften täcker arbetet med att skapa och sköta dina annonser. När en gäst bokar via en kanal som Rantio har öppnat betalar du {commission} % av det som plattformen betalar ut till dig. Moms tillkommer på båda. Vi tar aldrig betalt för bokningar från de sajter du använde redan tidigare, till exempel Nettimökki.",
       exampleTitle: "Exempel: 20 extra nätter à {price} per natt",
       rows: {
         guests: "Gästerna betalar",
-        platform: "Plattformsavgifter, cirka 15 %",
-        commission: "Rantio 12 % plus moms",
+        platform: "Plattformsavgifter, cirka {platformFee} %",
+        commission: "Rantio {commission} % plus moms",
         yearly: "Årsavgift {fee} plus moms",
       },
       total: "Du behåller",
@@ -965,7 +965,7 @@ export const sv: Translation = {
       plusVat: "+ moms {vat}",
       empty: "Inga årsavgifter i år.",
     },
-    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är {fee} + moms per stuga; de första 3 månaderna efter att annonsen publicerats är gratis. Momsen är 25,5 %.",
+    howItWorks: "Provisionen är en andel av det som sajten betalar dig för vistelsen (städavgift ej inräknad). Nettimökki och dina egna bokningar kostar aldrig något. Årsavgiften är {fee} + moms per stuga; annonsen är gratis i {period} efter att den publicerats. Momsen är 25,5 %.",
     ownBooking: "Egen bokning",
   },
   // The Rantio phone app (mobile/). Everything else the app shows comes from the sections above.

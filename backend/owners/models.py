@@ -14,21 +14,22 @@ from .regions import REGION_CHOICES, REGIONS
 from .vault import SealedCharField, SealedDateField, SealedJSONField
 
 # Plan decisions (Business and Implementation Plan, 28 Oct 2026):
-# - €99 yearly fee per cottage (or the set amount in the cottage's own currency,
-#   YEARLY_FEES), invoiced when each listing year starts.
-# - Free trial (4 Nov 2026): the first TRIAL_MONTHS after a cottage goes live are free;
+# - A yearly fee per cottage in the cottage's own currency, invoiced when each listing year starts.
+# - Free trial (4 Nov 2026): the first months after a cottage goes live are free (Cottage.trial_months);
 #   listing year 1 (and its fee) starts when the trial ends. The owner saves a card at
 #   sign-up (owners/trial.py) and Rantio's invoices are charged to it. This replaced the
 #   pilot deal (first year free, 10 %); is_pilot stays only for owners who already had it.
 # - Commission is a share of the owner's payout for the stay (after platform
 #   fees, cleaning fees excluded); Nettimökki bookings are never charged.
 # - Both carry Finnish VAT.
+# The commission, free months and yearly fees are set in the admin (Settings → Prices, the Pricing
+# model below); the numbers here are only what that starts with.
 STANDARD_COMMISSION_RATE = Decimal("12.00")
 PILOT_COMMISSION_RATE = Decimal("10.00")
 YEARLY_FEE = Decimal("99.00")
 # The yearly fee in each currency, so an owner pays a set amount in their own money: about
 # €99 at the ECB rate of 2 Nov 2026, rounded like Rantio's prices (tens of kronor, hundreds
-# of krónur). Change them here; frontend/src/lib/content.ts YEARLY_FEES must say the same.
+# of krónur).
 YEARLY_FEES = {
     "EUR": YEARLY_FEE,
     "SEK": Decimal("1080.00"),
@@ -39,8 +40,78 @@ YEARLY_FEES = {
 VAT_RATE = Decimal("25.50")
 LISTING_TERM_MONTHS = 12
 TRIAL_MONTHS = 3
+PLATFORM_FEE = Decimal("15.00")
 
 CENT = Decimal("0.01")
+
+
+class Pricing(models.Model):
+    """Rantio's prices, set in the admin: one row. New owners get this commission and new cottages
+    these free months; each owner's own rate and each cottage's own free months stay as agreed and
+    are changed on their pages. The yearly fee is charged at this price when a listing year starts.
+    The website and the app show these numbers (GET /api/pricing/)."""
+
+    commission_rate = models.DecimalField(
+        "Commission (%)", max_digits=5, decimal_places=2, default=STANDARD_COMMISSION_RATE,
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("50"))],
+        help_text="Percent of what the booking site pays the owner, before VAT. Given to owners who sign up from now "
+        "on; an existing owner keeps theirs (change it on the owner's page).",
+    )
+    trial_months = models.PositiveSmallIntegerField(
+        "Free months", default=TRIAL_MONTHS, validators=[MinValueValidator(1), MaxValueValidator(24)],
+        help_text="Free months after a listing goes live, before the yearly fee. Given to cottages added from now on; "
+        "a cottage already added keeps its own (change it on the cottage's page).",
+    )
+    yearly_fee_eur = models.DecimalField("Yearly fee, EUR", max_digits=9, decimal_places=2, default=YEARLY_FEES["EUR"],
+                                         validators=[MinValueValidator(Decimal("0"))],
+                                         help_text="Per cottage, before VAT. Finland, Estonia, Latvia, Lithuania, Germany.")
+    yearly_fee_sek = models.DecimalField("Yearly fee, SEK", max_digits=9, decimal_places=2, default=YEARLY_FEES["SEK"],
+                                         validators=[MinValueValidator(Decimal("0"))], help_text="Cottages in Sweden.")
+    yearly_fee_nok = models.DecimalField("Yearly fee, NOK", max_digits=9, decimal_places=2, default=YEARLY_FEES["NOK"],
+                                         validators=[MinValueValidator(Decimal("0"))], help_text="Cottages in Norway.")
+    yearly_fee_dkk = models.DecimalField("Yearly fee, DKK", max_digits=9, decimal_places=2, default=YEARLY_FEES["DKK"],
+                                         validators=[MinValueValidator(Decimal("0"))], help_text="Cottages in Denmark.")
+    yearly_fee_isk = models.DecimalField("Yearly fee, ISK", max_digits=11, decimal_places=2, default=YEARLY_FEES["ISK"],
+                                         validators=[MinValueValidator(Decimal("0"))], help_text="Cottages in Iceland.")
+    platform_fee = models.DecimalField(
+        "Booking sites' fee for the example (%)", max_digits=5, decimal_places=2, default=PLATFORM_FEE,
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("50"))],
+        help_text="Only for the price example and the estimate on the website: about what Airbnb and Booking.com keep.",
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "prices"
+        verbose_name_plural = "prices"
+
+    def __str__(self) -> str:
+        return "Prices"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def current(cls) -> "Pricing":
+        """The one row (a single quick read by its key; made with the starting prices if missing)."""
+        return cls.objects.get_or_create(pk=1)[0]
+
+    @property
+    def yearly_fees(self) -> dict[str, Decimal]:
+        return {"EUR": self.yearly_fee_eur, "SEK": self.yearly_fee_sek, "NOK": self.yearly_fee_nok,
+                "DKK": self.yearly_fee_dkk, "ISK": self.yearly_fee_isk}
+
+    def yearly_fee(self, currency: str) -> Decimal:
+        fees = self.yearly_fees
+        return fees.get(currency, fees["EUR"])
+
+
+def default_commission_rate() -> Decimal:
+    return Pricing.current().commission_rate
+
+
+def default_trial_months() -> int:
+    return Pricing.current().trial_months
 
 
 def add_months(day: date, months: int) -> date:
@@ -235,8 +306,8 @@ class Owner(models.Model):
         default=False, help_text="The old pilot deal (first year free, 10 %). New owners get the free trial instead."
     )
     commission_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, default=STANDARD_COMMISSION_RATE,
-        help_text="Percent of the owner's payout, before VAT.",
+        max_digits=5, decimal_places=2, default=default_commission_rate,
+        help_text="Percent of the owner's payout, before VAT. New owners get the rate in Settings → Prices.",
     )
     vat_registered = models.BooleanField(
         default=False, help_text="Owner can reclaim VAT (business owners only)."
@@ -314,7 +385,7 @@ class Owner(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self._state.adding and self.is_pilot and self.commission_rate == STANDARD_COMMISSION_RATE:
+        if self._state.adding and self.is_pilot and self.commission_rate == default_commission_rate():
             self.commission_rate = PILOT_COMMISSION_RATE
         super().save(*args, **kwargs)
 
@@ -482,7 +553,9 @@ class Cottage(models.Model):
         null=True, blank=True, help_text="The day the listing went live; the free trial starts here."
     )
     trial_months = models.PositiveSmallIntegerField(
-        default=TRIAL_MONTHS, help_text="Free months after going live, before listing year 1 and its fee start."
+        default=default_trial_months,
+        help_text="Free months after going live, before listing year 1 and its fee start. New cottages get the "
+        "number in Settings → Prices.",
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -526,7 +599,7 @@ class Cottage(models.Model):
         """In the cottage's currency (a Swedish cottage's in kronor)."""
         if year == 1 and self.owner.is_pilot:
             return Decimal("0.00")
-        return YEARLY_FEES.get(self.currency, YEARLY_FEE)
+        return Pricing.current().yearly_fee(self.currency)
 
     def yearly_fee_vat(self, year: int) -> Decimal:
         return vat_on(self.yearly_fee(year))
