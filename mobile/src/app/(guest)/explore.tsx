@@ -6,6 +6,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { CATEGORIES, type Category, getListing, type Listing, LISTINGS } from "@/lib/listings";
 import { priceHint } from "@/lib/priceHints";
 import { RECENT } from "@/i18n/messages/recent";
+import { ROWS } from "@/i18n/messages/rows";
 import { WHEN } from "@/i18n/messages/when";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
@@ -17,7 +18,7 @@ import { type Lang, type T, useT } from "@/text/i18n";
 import { colors, fonts, radius, shadow, shadowFloat, space, textSize } from "@/theme";
 import { Chip, Segmented, Stepper } from "@/ui/controls";
 import { Button, Card, Empty, Icon, IconButton, Logo, tap, Text } from "@/ui/kit";
-import { CATEGORY_EMOJI, ListingCard, MiniCard } from "@/ui/listing";
+import { CATEGORY_EMOJI, ListingCard, MiniCard, SeeAllCard } from "@/ui/listing";
 import { RangeCalendar } from "@/ui/range-calendar";
 import { ModalFoot, SheetBar } from "@/ui/screen";
 
@@ -49,7 +50,8 @@ function whenLabel(lang: Lang, stay: Stay): string | null {
   return null;
 }
 
-type Section = { key: string; title: string; listings: Listing[]; query: string };
+/** A sideways row on the home screen; `subtitle` is the short line under its title, as in Airbnb's app. */
+type Section = { key: string; title: string; subtitle?: string; listings: Listing[]; query: string };
 
 /** Rows on the home screen: regions with several cottages, then countries, then the rest. */
 function sections(t: T): Section[] {
@@ -61,16 +63,16 @@ function sections(t: T): Section[] {
     if (ls.length < 2) continue;
     const r = PLACES[ls[0].country]?.find((x) => x.id === ls[0].region);
     const place = r ? regionLabel(r, ls[0].country, t.lang) : ls[0].city;
-    out.push({ key: k, title: t.f(t.m.app.explore.sectionIn, { place }), listings: ls, query: place });
+    out.push({ key: k, title: t.f(t.m.app.explore.sectionIn, { place }), subtitle: ROWS[t.lang].regions[ls[0].region], listings: ls, query: place });
     left = left.filter((l) => !ls.includes(l));
   }
   for (const c of COUNTRIES) {
     const ls = left.filter((l) => l.country === c);
     if (ls.length < 2) continue;
-    out.push({ key: c, title: t.f(t.m.app.explore.sectionIn, { place: t.country(c) }), listings: ls, query: t.country(c) });
+    out.push({ key: c, title: t.f(t.m.app.explore.sectionIn, { place: t.country(c) }), subtitle: ROWS[t.lang].countries[c], listings: ls, query: t.country(c) });
     left = left.filter((l) => !ls.includes(l));
   }
-  if (left.length) out.push({ key: "more", title: t.m.app.explore.more, listings: left, query: "" });
+  if (left.length) out.push({ key: "more", title: t.m.app.explore.more, subtitle: ROWS[t.lang].more, listings: left, query: "" });
   return out;
 }
 
@@ -99,6 +101,9 @@ export default function Explore() {
   // Recently viewed: three small cards across and the edge of a fourth, as in Airbnb's app.
   const recent = useMemo(() => viewed.map(getListing).filter((l): l is Listing => !!l), [viewed]);
   const miniWidth = Math.min(160, Math.floor((width - space.xl - space.md * 3) / 3.2));
+  // The "See all" card at the end of a row is as tall as that row's photos (ui/listing.tsx).
+  const miniPhoto = Math.round(miniWidth * 0.95);
+  const compactPhoto = Math.round(compactWidth * (ANDROID ? 0.84 : 0.95));
 
   const summary = [
     f.query || null,
@@ -261,15 +266,27 @@ export default function Explore() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: space.xl, gap: space.md }}
                 renderItem={({ item }) => <MiniCard listing={item} width={miniWidth} />}
+                ListFooterComponent={
+                  recent.length > 1 ? (
+                    <SeeAllCard listings={recent} width={miniWidth} height={miniPhoto} label={RECENT[lang].seeAll} onPress={() => router.push("/recent")} />
+                  ) : undefined
+                }
               />
             </View>
           ) : null}
           {rows.map((s, i) => (
             <View key={s.key} style={{ marginTop: i || recent.length ? (ANDROID ? space.md : space.xl) : ANDROID ? space.xs : space.sm }}>
               <View style={styles.sectionHead}>
-                <Text v="h2" style={{ flex: 1 }} numberOfLines={1}>
-                  {s.title}
-                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text v="h2" numberOfLines={1}>
+                    {s.title}
+                  </Text>
+                  {s.subtitle ? (
+                    <Text v="small" numberOfLines={1}>
+                      {s.subtitle}
+                    </Text>
+                  ) : null}
+                </View>
                 {s.query ? (
                   <IconButton name="arrow-forward" label={s.title} onPress={() => setF((c) => ({ ...c, query: s.query }))} size={18} />
                 ) : null}
@@ -281,6 +298,17 @@ export default function Explore() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingHorizontal: space.xl, gap: space.md }}
                 renderItem={({ item }) => <ListingCard listing={item} width={compactWidth} compact />}
+                ListFooterComponent={
+                  s.query ? (
+                    <SeeAllCard
+                      listings={s.listings}
+                      width={compactWidth}
+                      height={compactPhoto}
+                      label={RECENT[lang].seeAll}
+                      onPress={() => setF((c) => ({ ...c, query: s.query }))}
+                    />
+                  ) : undefined
+                }
               />
             </View>
           ))}

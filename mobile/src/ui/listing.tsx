@@ -8,7 +8,7 @@ import { type Category, type Listing, listingCurrency, listingName, listingPhoto
 import { useMoney } from "@/state/money";
 import { usePrefs } from "@/state/prefs";
 import { useT } from "@/text/i18n";
-import { colors, radius, space } from "@/theme";
+import { colors, radius, shadow, space } from "@/theme";
 import { ChannelStack } from "@/ui/channels";
 import { Icon, type IconName, tap, Text } from "@/ui/kit";
 
@@ -229,7 +229,60 @@ export const MiniCard = memo(function MiniCard({ listing, width }: { listing: Li
   );
 });
 
+/** The last card of a sideways row: a small fan of the row's photos and "See all", as in Airbnb's
+ *  app. As tall as the row's photos, so it lines up with them. */
+export function SeeAllCard({ listings, width, height, label, onPress }: { listings: Listing[]; width: number; height: number; label: string; onPress: () => void }) {
+  const thumbs = listings.slice(0, 3).map((l) => listingPhotos(l)[0]).filter(Boolean);
+  const size = Math.round(Math.min(width, height) * 0.42);
+  // Fanned out from the middle: the first photo on top, tilted the least.
+  const fan = [
+    { rotate: "-9deg", left: -size * 0.32, top: size * 0.06 },
+    { rotate: "8deg", left: size * 0.32, top: size * 0.04 },
+    { rotate: "0deg", left: 0, top: 0 },
+  ];
+  return (
+    <Pressable
+      onPress={() => {
+        tap();
+        onPress();
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [styles.seeAll, { width, height }, pressed && { transform: [{ scale: 0.98 }] }]}
+    >
+      <View style={{ width: size * 1.7, height: size * 1.1, alignItems: "center" }}>
+        {[...thumbs].reverse().map((ph, i) => {
+          const f = fan[3 - thumbs.length + i];
+          return (
+            <Image
+              key={ph.id}
+              source={unsplash(ph.id, size * 2, size * 2, ph.crop)}
+              style={[styles.seeAllThumb, { width: size, height: size, transform: [{ translateX: f.left }, { translateY: f.top }, { rotate: f.rotate }] }]}
+              contentFit="cover"
+              recyclingKey={`see-${ph.id}`}
+            />
+          );
+        })}
+      </View>
+      <Text v="smallMedium" color={colors.ink}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  seeAll: {
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.sm,
+    ...shadow,
+  },
+  seeAllThumb: { position: "absolute", borderRadius: 10, borderWidth: 2, borderColor: "#fff" },
   miniPhoto: { borderRadius: 16, overflow: "hidden", backgroundColor: colors.ground },
   miniHeart: { position: "absolute", top: 8, right: 8 },
   miniFacts: { flexDirection: "row", alignItems: "center", gap: 4 },
