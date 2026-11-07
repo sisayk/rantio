@@ -57,10 +57,35 @@ function ContactDialog({
   const [body, setBody] = useState("");
   const [writing, setWriting] = useState(false);
   const [ai, setAi] = useState<"idle" | "done" | "failed" | "off">("idle");
+  // Signed in on this browser: the message goes out with the account's name and email, so the
+  // form doesn't ask for them (Change shows the fields again).
+  const [me, setMe] = useState<{ name: string; email: string } | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [checkIn, setCheckIn] = useState("");
+  // Today on this device, once (the dialog only lives a few minutes): no dates in the past.
+  const [today] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/owner/me/", { credentials: "same-origin", headers: { Accept: "application/json" } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((v: { name?: string; email?: string } | null) => {
+        if (live && v?.email) setMe({ name: v.name ?? "", email: v.email });
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
+  const known = !!me && !!me.name && !editing;
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    dialog.current?.querySelector<HTMLInputElement>("input")?.focus();
+    // The dialog itself, not its first field: on a phone that would open the keyboard at once.
+    dialog.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
     const overflow = document.body.style.overflow;
@@ -132,7 +157,7 @@ function ContactDialog({
   return (
     <OnTop>
       <div className={styles.modalBackdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-        <div ref={dialog} className={`${styles.modal} ${chat.contactModal}`} role="dialog" aria-modal="true" aria-labelledby="contact-title">
+        <div ref={dialog} tabIndex={-1} className={`${styles.modal} ${chat.contactModal}`} role="dialog" aria-modal="true" aria-labelledby="contact-title">
           <header className={styles.modalHeader}>
             <button type="button" className={styles.modalClose} aria-label={t.close} onClick={onClose}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
@@ -143,25 +168,36 @@ function ContactDialog({
             <p className={chat.contactLead}>
               <strong>{cottage}</strong> · {t.lead}
             </p>
-            <div className={chat.fieldRow}>
-              <label>
-                {t.name}
-                <input name="name" required maxLength={120} autoComplete="name" disabled={busy} />
-              </label>
-              <label>
-                {t.email}
-                <input name="email" type="email" required autoComplete="email" disabled={busy} />
-              </label>
-            </div>
+            {known && me ? (
+              <p className={chat.fieldHint}>
+                <input type="hidden" name="name" value={me.name} />
+                <input type="hidden" name="email" value={me.email} />
+                {t.sendingAs} <strong>{me.name}</strong> · {me.email}{" "}
+                <button type="button" className={chat.linkButton} onClick={() => setEditing(true)} disabled={busy}>
+                  {t.change}
+                </button>
+              </p>
+            ) : (
+              <div className={chat.fieldRow} key={me ? "me" : "anon"}>
+                <label>
+                  {t.name}
+                  <input name="name" required maxLength={120} autoComplete="name" defaultValue={me?.name ?? ""} disabled={busy} />
+                </label>
+                <label>
+                  {t.email}
+                  <input name="email" type="email" required autoComplete="email" defaultValue={me?.email ?? ""} disabled={busy} />
+                </label>
+              </div>
+            )}
             <p className={chat.fieldHint}>{t.emailHint}</p>
             <div className={`${chat.fieldRow} ${chat.pairRow}`}>
               <label>
                 <span>{t.checkIn} <span className={chat.optional}>({t.optional})</span></span>
-                <input name="check_in" type="date" disabled={busy} />
+                <input name="check_in" type="date" min={today} onChange={(e) => setCheckIn(e.target.value)} disabled={busy} />
               </label>
               <label>
                 <span>{t.checkOut} <span className={chat.optional}>({t.optional})</span></span>
-                <input name="check_out" type="date" disabled={busy} />
+                <input name="check_out" type="date" min={checkIn || today} disabled={busy} />
               </label>
             </div>
             <div className={`${chat.fieldRow} ${chat.pairRow}`}>
