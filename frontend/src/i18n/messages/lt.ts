@@ -129,6 +129,12 @@ export const lt: Translation = {
       aiFailed: "Šiuo metu nepavyko parengti pasiūlymo. Bandykite dar kartą.",
       aiOff: "Rašymo pagalba šiuo metu neprieinama.",
       aiHint: "Parašykite kelis žodžius (datas, augintinius, vėlyvą atvykimą), o DI pavers juos žinute.",
+      example: {
+        button: "Klausti Rantio",
+        title: "Klausti apie nakvynės pavyzdį",
+        lead: "Tai nakvynės pavyzdys: jis dar neturi savininko Rantio ir jo negalima užsakyti. Jūsų žinutė pateks Rantio komandai, o mes atsakysime el. paštu.",
+        emailHint: "El. paštu atsiųsime Jums privačią nuorodą į pokalbį.",
+      },
     },
     chat: {
       metaTitle: "Jūsų pokalbis – Rantio",
@@ -146,6 +152,8 @@ export const lt: Translation = {
       loading: "Įkeliama…",
       viewCottage: "Peržiūrėti namelį",
       waiting: "Savininkas paprastai atsako per parą. Pranešime el. paštu, kai gausite atsakymą.",
+      team: "Rantio",
+      waitingTeam: "Rantio komanda atsakys čia. Pranešime el. paštu, kai atsakysime.",
     },
     meta: {
       title: "Rantio – poilsio nameliai Šiaurės ir Baltijos šalyse",

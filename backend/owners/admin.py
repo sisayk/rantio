@@ -323,6 +323,17 @@ class ConversationAdmin(ModelAdmin):
     readonly_fields = ["token", "created_at", "last_message_at", "owner_read_at", "guest_read_at"]
     inlines = [MessageInline]
 
+    def save_formset(self, request, form, formset, change):
+        # A reply added here ("Host" is the team for an example stay) reaches the guest by email and in
+        # the app, as an owner's reply from the inbox does.
+        super().save_formset(request, form, formset, change)
+        if formset.model is Message:
+            from . import messaging
+
+            for m in formset.new_objects:
+                if m.sender == Message.Sender.HOST:
+                    messaging.team_replied(m)
+
 
 @admin.register(Pricing)
 class PricingAdmin(ModelAdmin):

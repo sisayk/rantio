@@ -93,6 +93,20 @@ class EnquiryView(APIView):
         return Response({"token": c.token}, status=status.HTTP_201_CREATED)
 
 
+class CottageContactView(APIView):
+    """GET /api/cottages/<slug>/contact/: who answers this page's messages, so the page and the app say so
+    before the guest writes: "owner", or "rantio" for an example stay with no owner on Rantio yet."""
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request, slug):
+        cottage = messaging.cottage_for(slug)
+        res = Response({"answered_by": "owner" if cottage and cottage.owner_id else "rantio"})
+        res["Cache-Control"] = "public, max-age=300"
+        return res
+
+
 class EnquiryDraftSerializer(serializers.Serializer):
     listing = serializers.SlugField(max_length=60)
     # Example cottages aren't in the database yet: the page says what it shows.

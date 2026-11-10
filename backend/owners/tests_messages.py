@@ -44,6 +44,80 @@ class MessagingTests(TestCase):
         self.assertTrue(team.subject.startswith("Example cottage:"))
         self.assertIn("/owners/conversation/", team.body)  # the team answers in the admin
 
+    def test_a_guest_of_an_example_stay_is_told_the_rantio_team_answers(self):
+        for lang in ("en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt", "de"):
+            with self.subTest(lang=lang):
+                cache.clear()  # past the guests' rate limit
+                mail.outbox.clear()
+                token = self.enquire(listing="lofoten-rorbu", lang=lang).json()["token"]
+                guest = next(m for m in mail.outbox if m.to[0] == "lukas@example.com")
+                self.assertIn(token, guest.body)  # still their private link
+                self.assertIn("Rantio", guest.body.split("\n\n")[1])
+                for promise in ("within a day", "vuorokauden", "inom ett dygn", "innen et døgn", "innan eit døgn",
+                                "inden for et døgn", "innan sólarhrings", "ööpäeva", "diennakts", "per parą", "innerhalb eines Tages"):
+                    self.assertNotIn(promise, guest.body)  # no owner, so no owner's answering time
+        cache.clear()
+        mail.outbox.clear()
+        self.enquire(listing="lofoten-rorbu", lang="en")
+        guest = next(m for m in mail.outbox if m.to[0] == "lukas@example.com")
+        self.assertIn("example stay", guest.body)
+        self.assertIn("Rantio team", guest.body)
+        self.assertNotIn("owner usually", guest.body)
+
+    def test_a_guest_of_a_real_owner_still_hears_about_the_owner(self):
+        self.enquire(lang="en")
+        guest = next(m for m in mail.outbox if m.to[0] == "lukas@example.com")
+        self.assertIn("The owner usually answers within a day", guest.body)
+        self.assertNotIn("example", guest.body)
+
+    def test_the_page_and_the_thread_say_who_answers(self):
+        self.assertEqual(self.client.get("/api/cottages/lakeside-villa/contact/").json(), {"answered_by": "owner"})
+        self.assertEqual(self.client.get("/api/cottages/lofoten-rorbu/contact/").json(), {"answered_by": "rantio"})
+        mine = self.enquire().json()["token"]
+        example = self.enquire(listing="lofoten-rorbu").json()["token"]
+        self.assertEqual(self.client.get(f"/api/conversations/{mine}/").json()["answered_by"], "owner")
+        self.assertEqual(self.client.get(f"/api/conversations/{example}/").json()["answered_by"], "rantio")
+
+    def test_a_team_reply_in_the_admin_reaches_the_guest_signed_by_the_team(self):
+        from django.contrib.auth.models import User
+
+        token = self.enquire(listing="lofoten-rorbu", lang="sv").json()["token"]
+        c = Conversation.objects.get(token=token)
+        admin = User.objects.create_superuser("staff", "staff@rantio.fi", "pw-for-tests-only")
+        self.client.force_login(admin)
+        mail.outbox.clear()
+        url = f"/admin/owners/conversation/{c.pk}/change/"
+        page = self.client.get(url)
+        self.assertEqual(page.status_code, 200)
+        form = page.context["adminform"].form
+        data = {k: v for k, v in form.initial.items() if v is not None and not isinstance(v, (list, dict))}
+        data.update({
+            "guest_name": c.guest_name, "guest_email": c.guest_email, "guest_language": c.guest_language,
+            "listing_slug": c.listing_slug, "channel": c.channel, "children": 0,
+            "messages-TOTAL_FORMS": "2", "messages-INITIAL_FORMS": "1", "messages-MIN_NUM_FORMS": "0", "messages-MAX_NUM_FORMS": "1000",
+            "messages-0-id": str(c.messages.get().pk), "messages-0-conversation": str(c.pk),
+            "messages-0-sender": "guest", "messages-0-body": "Is the cottage free in February?",
+            "messages-1-conversation": str(c.pk), "messages-1-sender": "host", "messages-1-body": "Hej! Det här är ett exempel.",
+        })
+        res = self.client.post(url, data)
+        self.assertEqual(res.status_code, 302, getattr(res, "context", None) and res.context["adminform"].form.errors)
+        self.assertEqual(c.messages.count(), 2)
+        self.assertEqual([m.to for m in mail.outbox], [["lukas@example.com"]])
+        self.assertIn("Rantios team har svarat", mail.outbox[0].body)
+        self.assertIn("Det här är ett exempel", mail.outbox[0].body)
+        c.refresh_from_db()
+        self.assertIsNotNone(c.owner_read_at)
+
+    def test_an_owner_reply_is_still_signed_by_the_owner(self):
+        token = self.enquire(lang="en").json()["token"]
+        c = Conversation.objects.get(token=token)
+        from . import messaging
+
+        mail.outbox.clear()
+        messaging.add(c, Message.Sender.HOST, "Yes, it's free.")
+        self.assertIn("the owner of", mail.outbox[0].body)
+        self.assertNotIn("Rantio team", mail.outbox[0].body)
+
     def test_enquiry_with_adults_and_children(self):
         c = Conversation.objects.get(token=self.enquire(adults=2, children=1).json()["token"])
         self.assertEqual((c.guests, c.children), (2, 1))

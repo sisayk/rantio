@@ -6,6 +6,7 @@ import type { Messages } from "@/i18n";
 import { fill } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
+import { threadAnsweredBy } from "@/lib/answeredBy";
 import { getListing, listingName, unsplash } from "@/lib/listings";
 import { REVIEWS } from "@/i18n/messages/reviews";
 import { guestApi, type Thread } from "@/lib/ownerApi";
@@ -87,6 +88,7 @@ export default function GuestChat({
   const listing = getListing(th.listing_slug);
   const cottage = listing ? listingName(listingNames, listing) : th.cottage;
   const last = th.messages[th.messages.length - 1];
+  const byOwner = threadAnsweredBy(th) === "owner";
 
   return (
     <div className={styles.guestPage}>
@@ -96,7 +98,7 @@ export default function GuestChat({
           {listing ? <img src={unsplash(listing.photo, 240, 240, listing.photoCrop)} alt="" width={72} height={72} /> : null}
           <div>
             <h1>{fill(lang, t.title, { cottage })}</h1>
-            <p>{th.host_name ? fill(lang, t.withHost, { name: th.host_name }) : t.withRantio}</p>
+            <p>{byOwner ? (th.host_name ? fill(lang, t.withHost, { name: th.host_name }) : t.host) : t.withRantio}</p>
             {listing ? <a href={paths.cottage(lang, listing.id)}>{t.viewCottage}</a> : null}
           </div>
         </div>
@@ -117,8 +119,8 @@ export default function GuestChat({
             lang={lang}
             messages={th.messages}
             mine="guest"
-            names={{ guest: t.you, host: th.host_name || t.host }}
-            note={last?.sender === "guest" ? t.waiting : undefined}
+            names={{ guest: t.you, host: byOwner ? th.host_name || t.host : t.team }}
+            note={last?.sender === "guest" ? (byOwner ? t.waiting : t.waitingTeam) : undefined}
             words={{ placeholder: t.placeholder, send: t.send, sending: t.sending, failed: t.failed }}
             onSend={send}
           />

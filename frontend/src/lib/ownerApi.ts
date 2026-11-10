@@ -83,6 +83,8 @@ export type ConversationRow = {
   channel: string;
   channel_label: string;
   replies_here: boolean;
+  /** Who answers the guest: the owner, or the Rantio team for an example stay with no owner yet. */
+  answered_by?: "owner" | "rantio";
   check_in: string | null;
   check_out: string | null;
   guests: number | null;

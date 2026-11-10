@@ -129,6 +129,12 @@ export const de: Translation = {
       aiFailed: "Gerade konnte kein Vorschlag geschrieben werden. Bitte versuch es noch einmal.",
       aiOff: "Die Schreibhilfe ist gerade nicht verfügbar.",
       aiHint: "Schreib ein paar Stichworte (Termine, Haustiere, späte Anreise) und die KI macht daraus eine Nachricht.",
+      example: {
+        button: "Rantio fragen",
+        title: "Frag zur Beispielunterkunft",
+        lead: "Das ist eine Beispielunterkunft: Sie hat noch keinen Eigentümer auf Rantio und kann nicht gebucht werden. Deine Nachricht geht an das Rantio-Team, und wir antworten per E-Mail.",
+        emailHint: "Wir schicken dir per E-Mail einen privaten Link zur Unterhaltung.",
+      },
     },
     chat: {
       metaTitle: "Deine Unterhaltung – Rantio",
@@ -146,6 +152,8 @@ export const de: Translation = {
       loading: "Wird geladen…",
       viewCottage: "Zum Ferienhaus",
       waiting: "Der Eigentümer antwortet meist innerhalb eines Tages. Wir schicken dir eine E-Mail, sobald die Antwort da ist.",
+      team: "Rantio",
+      waitingTeam: "Das Rantio-Team antwortet hier. Wir schicken dir eine E-Mail, sobald wir geantwortet haben.",
     },
     meta: {
       title: "Rantio – Ferienhäuser im Norden und im Baltikum",

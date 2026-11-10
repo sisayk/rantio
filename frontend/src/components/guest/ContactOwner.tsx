@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import type { Messages } from "@/i18n";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
+import { useAnsweredBy } from "@/lib/answeredBy";
 import { guestApi } from "@/lib/ownerApi";
 import chat from "../chat.module.css";
 import OnTop from "../OnTop";
 import styles from "./guest.module.css";
 
 /** "Message the owner" on a cottage page: a short form that opens a private conversation.
- *  AI writing help turns a few words into the message; the guest checks it and sends it. */
+ *  AI writing help turns a few words into the message; the guest checks it and sends it.
+ *  An example stay has no owner yet: the button and the form say the Rantio team answers. */
 export default function ContactOwner({
   lang,
   listingId,
@@ -25,12 +27,14 @@ export default function ContactOwner({
   t: Messages["guest"]["contact"];
 }) {
   const [open, setOpen] = useState(false);
+  const who = useAnsweredBy(listingId);
+  const words = who === "owner" ? t : { ...t, ...t.example };
   return (
     <>
       <button type="button" className={chat.contactButton} onClick={() => setOpen(true)}>
-        {t.button}
+        {words.button}
       </button>
-      {open ? <ContactDialog lang={lang} listingId={listingId} cottage={cottage} maxGuests={maxGuests} t={t} onClose={() => setOpen(false)} /> : null}
+      {open ? <ContactDialog lang={lang} listingId={listingId} cottage={cottage} maxGuests={maxGuests} t={words} onClose={() => setOpen(false)} /> : null}
     </>
   );
 }

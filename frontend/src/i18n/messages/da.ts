@@ -129,6 +129,12 @@ export const da: Translation = {
       aiFailed: "Kunne ikke lave et forslag lige nu. Prøv igen.",
       aiOff: "Skrivehjælpen er ikke tilgængelig lige nu.",
       aiHint: "Skriv et par ord (datoer, kæledyr, sen ankomst), så laver AI dem til en besked.",
+      example: {
+        button: "Spørg Rantio",
+        title: "Spørg om eksemplet",
+        lead: "Dette er et eksempel på et ophold: det har ingen ejer på Rantio endnu og kan ikke bookes. Din besked går til Rantio-teamet, og vi svarer på e-mail.",
+        emailHint: "Vi sender dig et privat link til samtalen på e-mail.",
+      },
     },
     chat: {
       metaTitle: "Din samtale – Rantio",
@@ -146,6 +152,8 @@ export const da: Translation = {
       loading: "Indlæser…",
       viewCottage: "Se sommerhuset",
       waiting: "Ejeren svarer som regel inden for et døgn. Vi sender dig en e-mail, når svaret kommer.",
+      team: "Rantio",
+      waitingTeam: "Rantio-teamet svarer her. Vi sender dig en e-mail, når vi har svaret.",
     },
     meta: {
       title: "Rantio – sommerhuse og hytter i Norden og Baltikum",

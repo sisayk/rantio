@@ -59,6 +59,35 @@ OWNER_NEW = {
     "de": ("Neue Nachricht von {name} zu {cottage}", "{name} hat zu {cottage} geschrieben:\n\n„{text}“\n\nAntworte in deinem Rantio-Posteingang:\n{link}"),
 }
 
+# The same for an example stay with no owner on Rantio yet: the Rantio team answers, so the guest is
+# told that, and no owner or response time is promised.
+GUEST_STARTED_TEAM = {
+    "en": ("Your message about {cottage}", "Hi {name},\n\nthanks for your message about {cottage}. It's an example stay on Rantio: it has no owner on Rantio yet and can't be booked, so your message has gone to the Rantio team. When we answer, you'll get an email. You can read the answer and write more here:\n\n{link}\n\nKeep this link to yourself: it opens your conversation.\n\nRantio"),
+    "fi": ("Viestisi kohteesta {cottage}", "Hei {name},\n\nkiitos viestistäsi kohteesta {cottage}. Se on Rantion esimerkkikohde: sillä ei vielä ole omistajaa Rantiossa eikä sitä voi varata, joten viestisi meni Rantion tiimille. Kun vastaamme, saat siitä sähköpostin. Voit lukea vastauksen ja jatkaa keskustelua täällä:\n\n{link}\n\nPidä linkki omana tietonasi: se avaa keskustelusi.\n\nRantio"),
+    "sv": ("Ditt meddelande om {cottage}", "Hej {name},\n\ntack för ditt meddelande om {cottage}. Det är ett exempelboende på Rantio: det har ingen ägare på Rantio ännu och kan inte bokas, så ditt meddelande har gått till Rantios team. När vi svarar får du ett mejl. Du kan läsa svaret och skriva mer här:\n\n{link}\n\nDela inte länken: den öppnar ert samtal.\n\nRantio"),
+    "nb": ("Meldingen din om {cottage}", "Hei {name},\n\ntakk for meldingen din om {cottage}. Det er en eksempelhytte på Rantio: den har ingen eier på Rantio ennå og kan ikke bookes, så meldingen din har gått til Rantio-teamet. Når vi svarer, får du en e-post. Du kan lese svaret og skrive mer her:\n\n{link}\n\nIkke del lenken: den åpner samtalen deres.\n\nRantio"),
+    "nn": ("Meldinga di om {cottage}", "Hei {name},\n\ntakk for meldinga di om {cottage}. Det er ei eksempelhytte på Rantio: ho har ingen eigar på Rantio enno og kan ikkje bestillast, så meldinga di har gått til Rantio-teamet. Når vi svarar, får du ein e-post. Du kan lese svaret og skrive meir her:\n\n{link}\n\nIkkje del lenkja: ho opnar samtalen dykkar.\n\nRantio"),
+    "da": ("Din besked om {cottage}", "Hej {name},\n\ntak for din besked om {cottage}. Det er et eksempel på et ophold på Rantio: det har ingen ejer på Rantio endnu og kan ikke bookes, så din besked er gået til Rantio-teamet. Når vi svarer, får du en e-mail. Du kan læse svaret og skrive mere her:\n\n{link}\n\nDel ikke linket: det åbner jeres samtale.\n\nRantio"),
+    "is": ("Skilaboðin þín um {cottage}", "Hæ {name},\n\ntakk fyrir skilaboðin um {cottage}. Þetta er dæmi um gistingu á Rantio: hún er ekki enn með eiganda á Rantio og ekki er hægt að bóka hana, svo skilaboðin fóru til teymis Rantio. Þegar við svörum færðu tölvupóst. Þú getur lesið svarið og skrifað meira hér:\n\n{link}\n\nDeildu ekki hlekknum: hann opnar samtalið ykkar.\n\nRantio"),
+    "et": ("Sinu sõnum: {cottage}", "Tere {name},\n\naitäh sõnumi eest ({cottage}). See on Rantio näidismajutus: sellel pole Rantios veel omanikku ja seda ei saa broneerida, seega jõudis sinu sõnum Rantio meeskonnani. Kui vastame, saadame sulle e-kirja. Vastust saad lugeda ja edasi kirjutada siin:\n\n{link}\n\nÄra jaga seda linki: see avab teie vestluse.\n\nRantio"),
+    "lv": ("Jūsu ziņa par {cottage}", "Sveiki, {name}!\n\nPaldies par ziņu par {cottage}. Tā ir Rantio piemēra naktsmītne: tai Rantio vēl nav īpašnieka un to nevar rezervēt, tāpēc jūsu ziņa nonāca pie Rantio komandas. Kad atbildēsim, jūs saņemsiet e-pastu. Atbildi varat izlasīt un rakstīt vēl šeit:\n\n{link}\n\nNedalieties ar šo saiti: tā atver jūsu sarunu.\n\nRantio"),
+    "lt": ("Jūsų žinutė apie {cottage}", "Sveiki, {name},\n\načiū už žinutę apie {cottage}. Tai Rantio nakvynės pavyzdys: jis dar neturi savininko Rantio ir jo negalima užsakyti, todėl Jūsų žinutė pateko Rantio komandai. Kai atsakysime, gausite el. laišką. Atsakymą galite perskaityti ir rašyti toliau čia:\n\n{link}\n\nNesidalykite šia nuoroda: ji atveria Jūsų pokalbį.\n\nRantio"),
+    "de": ("Deine Nachricht zu {cottage}", "Hallo {name},\n\ndanke für deine Nachricht zu {cottage}. Das ist eine Beispielunterkunft auf Rantio: Sie hat noch keinen Eigentümer auf Rantio und kann nicht gebucht werden, deshalb ist deine Nachricht beim Rantio-Team angekommen. Wenn wir antworten, bekommst du eine E-Mail. Hier kannst du die Antwort lesen und weiterschreiben:\n\n{link}\n\nBehalte diesen Link für dich: Er öffnet eure Unterhaltung.\n\nRantio"),
+}
+GUEST_REPLY_TEAM = {
+    "en": ("New reply about {cottage}", "Hi {name},\n\nthe Rantio team has answered your message about {cottage}:\n\n“{text}”\n\nRead and reply here:\n{link}\n\nRantio"),
+    "fi": ("Uusi vastaus: {cottage}", "Hei {name},\n\nRantion tiimi vastasi viestiisi kohteesta {cottage}:\n\n”{text}”\n\nLue ja vastaa täällä:\n{link}\n\nRantio"),
+    "sv": ("Nytt svar om {cottage}", "Hej {name},\n\nRantios team har svarat på ditt meddelande om {cottage}:\n\n”{text}”\n\nLäs och svara här:\n{link}\n\nRantio"),
+    "nb": ("Nytt svar om {cottage}", "Hei {name},\n\nRantio-teamet har svart på meldingen din om {cottage}:\n\n«{text}»\n\nLes og svar her:\n{link}\n\nRantio"),
+    "nn": ("Nytt svar om {cottage}", "Hei {name},\n\nRantio-teamet har svart på meldinga di om {cottage}:\n\n«{text}»\n\nLes og svar her:\n{link}\n\nRantio"),
+    "da": ("Nyt svar om {cottage}", "Hej {name},\n\nRantio-teamet har svaret på din besked om {cottage}:\n\n»{text}«\n\nLæs og svar her:\n{link}\n\nRantio"),
+    "is": ("Nýtt svar um {cottage}", "Hæ {name},\n\nteymi Rantio hefur svarað skilaboðunum þínum um {cottage}:\n\n„{text}“\n\nLestu og svaraðu hér:\n{link}\n\nRantio"),
+    "et": ("Uus vastus: {cottage}", "Tere {name},\n\nRantio meeskond vastas sinu sõnumile ({cottage}):\n\n„{text}“\n\nLoe ja vasta siin:\n{link}\n\nRantio"),
+    "lv": ("Jauna atbilde par {cottage}", "Sveiki, {name}!\n\nRantio komanda atbildēja uz jūsu ziņu par {cottage}:\n\n“{text}”\n\nIzlasiet un atbildiet šeit:\n{link}\n\nRantio"),
+    "lt": ("Naujas atsakymas apie {cottage}", "Sveiki, {name},\n\nRantio komanda atsakė į Jūsų žinutę apie {cottage}:\n\n„{text}“\n\nPerskaitykite ir atsakykite čia:\n{link}\n\nRantio"),
+    "de": ("Neue Antwort zu {cottage}", "Hallo {name},\n\ndas Rantio-Team hat auf deine Nachricht zu {cottage} geantwortet:\n\n„{text}“\n\nHier lesen und antworten:\n{link}\n\nRantio"),
+}
+
 # To the team, for an example cottage with no owner yet: they answer in the admin.
 TEAM_NEW = {
     "en": ("Example cottage: new message from {name} about {cottage}",
@@ -83,6 +112,16 @@ def inbox_link(owner_language: str, c: Conversation) -> str:
     return f"{settings.SITE_URL}/{owner_language}/hosting/messages?c={c.pk}"
 
 
+def answered_by(c: Conversation) -> str:
+    """Who answers the guest: "owner", or "rantio" for an example stay with no owner on Rantio yet."""
+    return "owner" if c.owner else "rantio"
+
+
+def cottage_for(listing_slug: str) -> Cottage | None:
+    """The Rantio cottage behind a cottage page, if any: its owner gets the page's messages."""
+    return Cottage.objects.filter(listing_slug=listing_slug).select_related("owner").first()
+
+
 def cottage_label(c: Conversation) -> str:
     return c.cottage.name if c.cottage else c.listing_slug.replace("-", " ").title()
 
@@ -95,14 +134,15 @@ def _excerpt(text: str) -> str:
 def start(*, listing_slug: str, name: str, email: str, lang: str, text: str, check_in=None, check_out=None,
           guests=None, children=0) -> Conversation:
     """A guest writes from a cottage page; the owner (or, for cottages not yet with an owner, the team) is told."""
-    cottage = Cottage.objects.filter(listing_slug=listing_slug).select_related("owner").first()
+    cottage = cottage_for(listing_slug)
     c = Conversation.objects.create(
         cottage=cottage, listing_slug=listing_slug, channel=Booking.Channel.DIRECT, guest_name=name,
         guest_email=email, guest_language=lang, check_in=check_in, check_out=check_out, guests=guests,
         children=children or 0, token=secrets.token_urlsafe(24), guest_read_at=timezone.now(),
     )
     add(c, Message.Sender.GUEST, text, notify=False)
-    _send(GUEST_STARTED, lang, [email], name=name.split()[0], cottage=cottage_label(c), link=guest_link(c))
+    templates = GUEST_STARTED if answered_by(c) == "owner" else GUEST_STARTED_TEAM
+    _send(templates, lang, [email], name=name.split()[0], cottage=cottage_label(c), link=guest_link(c))
     _notify_owner(c, name, text)
     return c
 
@@ -135,14 +175,33 @@ def add(c: Conversation, sender: str, text: str, *, notify: bool = True) -> Mess
     c.save(update_fields=fields)
     if notify and sender == Message.Sender.GUEST:
         _notify_owner(c, c.guest_name, text)
-    if notify and sender == Message.Sender.HOST and c.replies_here and c.guest_email:
-        _send(GUEST_REPLY, c.guest_language, [c.guest_email], name=c.guest_name.split()[0], cottage=cottage_label(c),
+    if notify and sender == Message.Sender.HOST:
+        notify_guest(c, text)
+    return m
+
+
+def notify_guest(c: Conversation, text: str) -> None:
+    """An answer the guest reads on rantio.fi: by email, and on their phone if they follow it in the app.
+    Signed by whoever answers: the owner, or the Rantio team for an example stay."""
+    if not c.replies_here:
+        return  # they read it on the booking site
+    if c.guest_email:
+        templates = GUEST_REPLY if answered_by(c) == "owner" else GUEST_REPLY_TEAM
+        _send(templates, c.guest_language, [c.guest_email], name=c.guest_name.split()[0], cottage=cottage_label(c),
               text=_excerpt(text), link=guest_link(c))
-    if notify and sender == Message.Sender.HOST and c.replies_here and c.guest_push_token:
+    if c.guest_push_token:
         # The guest follows this conversation in the app: tell their phone at once.
         app.push([c.guest_push_token], cottage_label(c), _excerpt(text), {"type": "guest-message", "token": c.token},
                  who=f"guest of conversation {c.pk}")
-    return m
+
+
+def team_replied(m: Message) -> None:
+    """The team answered an example stay's guest in the admin: the conversation and the guest catch up,
+    as when an owner answers in the inbox."""
+    c = m.conversation
+    c.last_message_at, c.owner_read_at, c.archived = m.created_at, m.created_at, False
+    c.save(update_fields=["last_message_at", "owner_read_at", "archived"])
+    notify_guest(c, m.body)
 
 
 def unread_for_owner(c: Conversation) -> bool:
@@ -174,6 +233,7 @@ def conversation_row(c: Conversation) -> dict:
         "booking_id": c.booking_id,
         "archived": c.archived,
         "unread": unread_for_owner(c),
+        "answered_by": answered_by(c),
         "last_at": c.last_message_at.isoformat() if c.last_message_at else None,
         "preview": {"sender": last.sender, "body": last.body[:140]} if last else None,
     }

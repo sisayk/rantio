@@ -129,6 +129,12 @@ export const fi: Translation = {
       aiFailed: "Ehdotusta ei saatu juuri nyt. Yritä uudelleen.",
       aiOff: "Kirjoitusapu ei ole juuri nyt käytettävissä.",
       aiHint: "Kirjoita muutama sana (päivät, lemmikit, myöhäinen saapuminen), niin tekoäly tekee niistä viestin.",
+      example: {
+        button: "Kysy Rantiolta",
+        title: "Kysy esimerkkikohteesta",
+        lead: "Tämä on esimerkkikohde: sillä ei vielä ole omistajaa Rantiossa eikä sitä voi varata. Viestisi menee Rantion tiimille, ja vastaamme sähköpostilla.",
+        emailHint: "Lähetämme sinulle sähköpostilla yksityisen linkin keskusteluun.",
+      },
     },
     chat: {
       metaTitle: "Keskustelusi – Rantio",
@@ -146,6 +152,8 @@ export const fi: Translation = {
       loading: "Ladataan…",
       viewCottage: "Katso mökki",
       waiting: "Omistaja vastaa yleensä vuorokauden sisällä. Ilmoitamme sähköpostilla, kun hän vastaa.",
+      team: "Rantio",
+      waitingTeam: "Rantion tiimi vastaa täällä. Ilmoitamme sähköpostilla, kun vastaamme.",
     },
     meta: {
       title: "Rantio – mökit Pohjoismaissa ja Baltiassa",

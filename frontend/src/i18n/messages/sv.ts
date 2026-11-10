@@ -129,6 +129,12 @@ export const sv: Translation = {
       aiFailed: "Det gick inte att skriva ett förslag just nu. Försök igen.",
       aiOff: "Skrivhjälpen är inte tillgänglig just nu.",
       aiHint: "Skriv några ord (datum, husdjur, sen ankomst) så gör AI ett meddelande av dem.",
+      example: {
+        button: "Fråga Rantio",
+        title: "Fråga om exempelboendet",
+        lead: "Det här är ett exempelboende: det har ingen ägare på Rantio ännu och kan inte bokas. Ditt meddelande går till Rantios team, och vi svarar via mejl.",
+        emailHint: "Vi mejlar dig en privat länk till samtalet.",
+      },
     },
     chat: {
       metaTitle: "Din konversation – Rantio",
@@ -146,6 +152,8 @@ export const sv: Translation = {
       loading: "Laddar…",
       viewCottage: "Se stugan",
       waiting: "Ägaren svarar oftast inom ett dygn. Vi mejlar dig när svaret kommer.",
+      team: "Rantio",
+      waitingTeam: "Rantios team svarar här. Vi mejlar dig när vi har svarat.",
     },
     meta: {
       title: "Rantio – stugor i Norden och Baltikum",

@@ -129,6 +129,12 @@ export const is: Translation = {
       aiFailed: "Ekki tókst að skrifa tillögu núna. Reyndu aftur.",
       aiOff: "Skrifaðstoðin er ekki í boði núna.",
       aiHint: "Skrifaðu nokkur orð (dagsetningar, gæludýr, seina komu) og gervigreindin býr til skilaboð úr þeim.",
+      example: {
+        button: "Spyrja Rantio",
+        title: "Spyrja um dæmið",
+        lead: "Þetta er dæmi um gistingu: hún er ekki enn með eiganda á Rantio og ekki er hægt að bóka hana. Skilaboðin fara til teymis Rantio og við svörum með tölvupósti.",
+        emailHint: "Við sendum þér einkahlekk á samtalið í tölvupósti.",
+      },
     },
     chat: {
       metaTitle: "Samtalið þitt – Rantio",
@@ -146,6 +152,8 @@ export const is: Translation = {
       loading: "Hleður…",
       viewCottage: "Skoða bústaðinn",
       waiting: "Eigandinn svarar yfirleitt innan sólarhrings. Við sendum þér tölvupóst þegar svarið kemur.",
+      team: "Rantio",
+      waitingTeam: "Teymi Rantio svarar hér. Við sendum þér tölvupóst þegar við höfum svarað.",
     },
     meta: {
       title: "Rantio – sumarbústaðir á Norðurlöndum og í Eystrasaltslöndunum",

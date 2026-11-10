@@ -13,6 +13,7 @@ import { EVENTS } from "@/i18n/messages/events";
 import { findNearby, type NearbyPlace, WIKI_HEADERS } from "@/lib/nearby";
 import { regionLabel } from "@/lib/placeNames";
 import { PLACES } from "@/lib/places";
+import { useAnsweredBy } from "@/state/answeredBy";
 import { useMoney } from "@/state/money";
 import { usePrefs } from "@/state/prefs";
 import { daysBetween, formatRange } from "@/text/dates";
@@ -41,6 +42,9 @@ export default function Cottage() {
   const money = useMoney();
   const { ready, addViewed } = usePrefs();
   const about = useCottageAbout(id);
+  // An example stay has no owner yet: "Ask Rantio", and the Rantio team answers.
+  const answeredBy = useAnsweredBy(id);
+  const ask = answeredBy === "owner" ? m.guest.contact : { ...m.guest.contact, ...m.guest.contact.example };
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -298,7 +302,7 @@ export default function Cottage() {
           <Text v="h2">{m.app.detail.know}</Text>
           <Know emoji="💳" title={m.app.detail.paidOn} lead={m.app.detail.paidOnLead} />
           <Know emoji="🗓️" title={`${cancel.title} · ${cancel.name}`} lead={[...cancel.lines, cancel.window, CANCELLATION[lang].siteConfirms].filter(Boolean).join(" ")} />
-          <Know emoji="💬" title={m.app.detail.ask} lead={m.guest.contact.lead} onPress={() => router.push(`/contact/${l.id}`)} />
+          <Know emoji="💬" title={m.app.detail.ask} lead={ask.lead} onPress={() => router.push(`/contact/${l.id}`)} />
 
           <Divider />
           <Text v="h2">{m.guest.detail.bookTitle}</Text>
@@ -334,7 +338,7 @@ export default function Cottage() {
             </>
           )}
         </Pressable>
-        <IconButton name="chatbubble-ellipses-outline" filled={false} label={m.guest.contact.button} onPress={() => router.push(`/contact/${l.id}`)} size={24} />
+        <IconButton name="chatbubble-ellipses-outline" filled={false} label={ask.button} onPress={() => router.push(`/contact/${l.id}`)} size={24} />
         <Button label={m.app.explore.book} onPress={() => setBooking(true)} style={{ paddingHorizontal: space.xxl }} />
       </SafeAreaView>
 
@@ -356,7 +360,7 @@ export default function Cottage() {
             <Button
               kind="secondary"
               icon="chatbubble-ellipses-outline"
-              label={m.guest.contact.button}
+              label={ask.button}
               onPress={() => {
                 setBooking(false);
                 router.push(`/contact/${l.id}`);

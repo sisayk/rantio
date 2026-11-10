@@ -325,6 +325,8 @@ export const guestApi = {
   /** Where to push when the owner answers; an empty token stops the notifications. */
   setPush: (token: string, pushToken: string) =>
     call<{ ok: boolean }>(`conversations/${encodeURIComponent(token)}/push/`, json("POST", { push_token: pushToken })),
+  /** Who answers a cottage page's messages: the owner, or the Rantio team for an example stay (state/answeredBy.ts). */
+  contact: (slug: string) => call<{ answered_by: "owner" | "rantio" }>(`cottages/${encodeURIComponent(slug)}/contact/`),
   /** A cottage page's real ratings and host; 404 for the example cottages (ui/highlights.tsx). */
   about: (slug: string) =>
     call<{ ratings: Ratings; guest_favourite: boolean; host: { name: string; photo: string | null; since: number } | null }>(

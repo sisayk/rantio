@@ -129,6 +129,12 @@ export const et: Translation = {
       aiFailed: "Ettepanekut ei õnnestunud praegu koostada. Proovi uuesti.",
       aiOff: "Kirjutamisabi pole praegu saadaval.",
       aiHint: "Kirjuta paar sõna (kuupäevad, lemmikloomad, hiline saabumine) ja tehisintellekt teeb neist sõnumi.",
+      example: {
+        button: "Küsi Rantiolt",
+        title: "Küsi näidismajutuse kohta",
+        lead: "See on näidismajutus: sellel pole Rantios veel omanikku ja seda ei saa broneerida. Sinu sõnum läheb Rantio meeskonnale ja me vastame e-postiga.",
+        emailHint: "Saadame sulle e-postiga privaatse lingi vestlusele.",
+      },
     },
     chat: {
       metaTitle: "Sinu vestlus – Rantio",
@@ -146,6 +152,8 @@ export const et: Translation = {
       loading: "Laadin…",
       viewCottage: "Vaata maja",
       waiting: "Omanik vastab tavaliselt ööpäeva jooksul. Anname e-postiga teada, kui vastus tuleb.",
+      team: "Rantio",
+      waitingTeam: "Rantio meeskond vastab siin. Anname e-postiga teada, kui oleme vastanud.",
     },
     meta: {
       title: "Rantio – puhkemajad Põhjamaades ja Baltikumis",

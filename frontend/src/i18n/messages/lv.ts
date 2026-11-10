@@ -129,6 +129,12 @@ export const lv: Translation = {
       aiFailed: "Pašlaik neizdevās sagatavot ieteikumu. Mēģiniet vēlreiz.",
       aiOff: "Rakstīšanas palīdzība pašlaik nav pieejama.",
       aiHint: "Uzrakstiet dažus vārdus (datumus, mājdzīvniekus, vēlu ierašanos), un MI no tiem izveidos ziņu.",
+      example: {
+        button: "Jautāt Rantio",
+        title: "Jautāt par piemēra naktsmītni",
+        lead: "Šī ir piemēra naktsmītne: tai Rantio vēl nav īpašnieka un to nevar rezervēt. Jūsu ziņa nonāks pie Rantio komandas, un mēs atbildēsim e-pastā.",
+        emailHint: "Mēs jums nosūtīsim privātu saiti uz sarunu e-pastā.",
+      },
     },
     chat: {
       metaTitle: "Jūsu saruna – Rantio",
@@ -146,6 +152,8 @@ export const lv: Translation = {
       loading: "Ielādē…",
       viewCottage: "Apskatīt māju",
       waiting: "Īpašnieks parasti atbild diennakts laikā. Mēs jums paziņosim e-pastā, kad pienāks atbilde.",
+      team: "Rantio",
+      waitingTeam: "Rantio komanda atbildēs šeit. Mēs jums paziņosim e-pastā, kad būsim atbildējuši.",
     },
     meta: {
       title: "Rantio – brīvdienu mājas Ziemeļvalstīs un Baltijā",

@@ -4,6 +4,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, ScrollView, 
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { getListing, listingName } from "@/lib/listings";
+import { useAnsweredBy } from "@/state/answeredBy";
 import { usePrefs } from "@/state/prefs";
 import { formatRange } from "@/text/dates";
 import { useT } from "@/text/i18n";
@@ -18,14 +19,16 @@ import { SenderCard, useSender } from "@/ui/sender";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** "Message the owner" from a cottage page; the answer comes by email and in Messages.
- *  AI writing help turns a few words into the message (the guest checks it and sends it). */
+ *  AI writing help turns a few words into the message (the guest checks it and sends it).
+ *  An example stay has no owner yet: the screen says the Rantio team answers. */
 export default function Contact() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const l = getListing(id);
   const { m, lang, p } = useT();
   const { addChat } = usePrefs();
   const router = useRouter();
-  const c = m.guest.contact;
+  const answeredBy = useAnsweredBy(id);
+  const c = answeredBy === "owner" ? m.guest.contact : { ...m.guest.contact, ...m.guest.contact.example };
   const sender = useSender();
   const { name, email } = sender;
   const [body, setBody] = useState("");

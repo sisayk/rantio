@@ -137,6 +137,13 @@ export const en = {
       aiFailed: "Couldn't write a suggestion just now. Please try again.",
       aiOff: "Writing help isn't available right now.",
       aiHint: "Jot down a few words (dates, pets, a late arrival) and AI turns them into a message.",
+      // An example stay with no owner on Rantio yet: the Rantio team answers (GET /api/cottages/<slug>/contact/).
+      example: {
+        button: "Ask Rantio",
+        title: "Ask about this example stay",
+        lead: "This is an example stay: it has no owner on Rantio yet and can't be booked. Your message goes to the Rantio team, and we answer by email.",
+        emailHint: "We'll email you a private link to the conversation.",
+      },
     },
     chat: {
       metaTitle: "Your conversation – Rantio",
@@ -154,6 +161,8 @@ export const en = {
       loading: "Loading…",
       viewCottage: "See the cottage",
       waiting: "The owner usually answers within a day. We'll email you when they do.",
+      team: "Rantio",
+      waitingTeam: "The Rantio team will answer here. We'll email you when we do.",
     },
     meta: {
       title: "Rantio – cottages across the Nordics and the Baltics",

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AppState, View } from "react-native";
 
 import { ApiError, guestApi, Offline, type Thread } from "@/api";
+import { threadAnsweredBy } from "@/lib/answeredBy";
 import { getListing } from "@/lib/listings";
 import { formatRange } from "@/text/dates";
 import { registerGuestPush } from "@/state/push";
@@ -88,11 +89,13 @@ export default function GuestChat() {
             lang={lang}
             messages={thread.messages}
             mine="guest"
-            theirName={thread.host_name || m.guest.chat.host}
+            theirName={threadAnsweredBy(thread) === "owner" ? thread.host_name || c.host : c.team}
             header={
               <Card style={{ gap: 4, marginBottom: space.md }}>
                 <Text v="h3">{f(c.title, { cottage: thread.cottage })}</Text>
-                <Text v="small">{thread.host_name ? f(c.withHost, { name: thread.host_name }) : c.withRantio}</Text>
+                <Text v="small">
+                  {threadAnsweredBy(thread) === "owner" ? (thread.host_name ? f(c.withHost, { name: thread.host_name }) : c.host) : c.withRantio}
+                </Text>
                 {thread.check_in && thread.check_out ? <Text v="small">{formatRange(lang, thread.check_in, thread.check_out)}</Text> : null}
                 {thread.request_status ? (
                   <Pill
@@ -115,7 +118,7 @@ export default function GuestChat() {
             footer={
               thread.messages.every((x) => x.sender === "guest") ? (
                 <Text v="small" style={{ textAlign: "center", marginTop: space.md }}>
-                  {c.waiting}
+                  {threadAnsweredBy(thread) === "owner" ? c.waiting : c.waitingTeam}
                 </Text>
               ) : null
             }
