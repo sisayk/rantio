@@ -69,23 +69,30 @@ rm -rf "$TMP"
 xcrun simctl shutdown "$UDID"
 xcrun simctl boot "$UDID"
 xcrun simctl bootstatus "$UDID" -b >/dev/null
+open -a Simulator --args -CurrentDeviceUDID "$UDID"
 xcrun simctl ui "$UDID" appearance light
 xcrun simctl status_bar "$UDID" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
-sleep 3
+sleep 15  # the home screen finishes starting after "booted"; until then iOS refuses to open apps
 
 # --- 4. The screenshots, one language at a time ---------------------------------------------------
 say "4/4  Taking the screenshots…"
 # Each screen is its own launch: the app follows the phone's language until one is picked in the app,
 # and -AppleLanguages says which; -RantioOpen opens the map (app/_layout.tsx). No links, so iOS
 # doesn't put its "Open in Rantio?" prompt over the pictures.
-shot() {  # language, screen, file
+launch() {  # language, screen; tries again while iOS isn't ready to open apps
+  local args=(-AppleLanguages "($1)")
+  [ "$2" = "/explore" ] || args+=(-RantioOpen "$2")
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    if xcrun simctl launch "$UDID" "$APP_ID" "${args[@]}" >/dev/null 2>&1; then return 0; fi
+    sleep 3
+  done
+  echo "  The simulator wouldn't open the app. Unlock it (Device → Home in the Simulator menu) and run this again."
+  exit 1
+}
+shot() {  # language, screen, file, seconds to wait
   xcrun simctl terminate "$UDID" "$APP_ID" 2>/dev/null || true
-  if [ "$2" = "/explore" ]; then
-    xcrun simctl launch "$UDID" "$APP_ID" -AppleLanguages "($1)" >/dev/null
-  else
-    xcrun simctl launch "$UDID" "$APP_ID" -AppleLanguages "($1)" -RantioOpen "$2" >/dev/null
-  fi
+  launch "$1" "$2"
   sleep "${4:-9}"
   xcrun simctl io "$UDID" screenshot --type=png "$3" >/dev/null 2>&1
 }
