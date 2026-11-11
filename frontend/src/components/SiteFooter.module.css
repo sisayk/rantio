@@ -248,6 +248,31 @@
   font-size: 11px;
 }
 
+/* The app's own screenshots: the screen takes the iPhone's shape (1290 × 2796). */
+.shots .phone {
+  height: auto;
+}
+
+.shots .screen {
+  height: auto;
+  aspect-ratio: 1290 / 2796;
+  background: #fff;
+}
+
+.shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.shots .island {
+  top: 4px;
+  width: 40px;
+  height: 12px;
+}
+
 .ask {
   display: block;
   margin-top: 10px;

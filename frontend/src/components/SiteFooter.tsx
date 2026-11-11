@@ -8,6 +8,7 @@ import { countryName } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { siFacebook, siInstagram, siPinterest, siThreads, siTiktok, siX, siYoutube, type SimpleIcon } from "simple-icons";
+import { APP_SHOTS } from "@/lib/appShots";
 import { CONTACT_EMAIL, SOCIAL } from "@/lib/content";
 import { getListing, listingName, unsplash } from "@/lib/listings";
 import AppBadges from "./AppBadges";
@@ -184,9 +185,25 @@ function SocialLinks() {
   );
 }
 
-/** Two phones showing the app: the cottage list and a cottage page. Drawn in HTML, so the
- *  text is in the page's language and stays sharp; the photos are the example cottages'. */
+/** Two phones showing the app: the real app's cottage list and map, taken in the page's language
+ *  (lib/appShots.ts). A language without screenshots yet gets the list and a cottage page drawn in
+ *  HTML, in the page's language; the photos are the example cottages'. */
 function Phones({ lang }: { lang: Lang }) {
+  const shots = APP_SHOTS[lang];
+  if (shots) {
+    return (
+      <div className={`${styles.phones} ${styles.shots}`} aria-hidden="true">
+        {([["explore", styles.back], ["map", styles.front]] as const).map(([key, place]) => (
+          <div key={key} className={`${styles.phone} ${place}`}>
+            <div className={styles.screen}>
+              <div className={styles.island} />
+              <img className={styles.shot} src={shots[key].src} width={shots[key].width} height={shots[key].height} alt="" loading="lazy" decoding="async" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
   const m = getMessages(lang);
   const list = PHONE_LIST.map((id) => getListing(id)).filter((l) => l !== undefined);
   const detail = getListing(PHONE_DETAIL);
