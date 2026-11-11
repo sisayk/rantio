@@ -11,7 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Platform, View } from "react-native";
+import { Platform, Settings, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HostProvider } from "@/state/host";
@@ -46,12 +46,26 @@ function useNotificationTaps() {
   }, [signedIn, router]);
 }
 
+/** Screenshots (scripts/site-shots.sh): a launch with  -RantioOpen /map  opens that screen, without the
+ *  "Open in Rantio?" prompt iOS puts in front of a link. Launch arguments only exist for that launch. */
+function useLaunchRoute(ready: boolean) {
+  const router = useRouter();
+  useEffect(() => {
+    if (!ready || Platform.OS !== "ios") return;
+    const route = Settings.get("RantioOpen");
+    if (typeof route !== "string" || !/^\/[a-z-]+$/.test(route)) return;
+    const timer = setTimeout(() => router.navigate(route as never), 300);
+    return () => clearTimeout(timer);
+  }, [ready, router]);
+}
+
 function Root() {
   const prefs = usePrefs();
   const session = useSession();
   const [fontsLoaded] = useFonts({ HankenGrotesk_400Regular, HankenGrotesk_500Medium, HankenGrotesk_600SemiBold, HankenGrotesk_800ExtraBold });
   const ready = prefs.ready && session.ready && fontsLoaded;
   useNotificationTaps();
+  useLaunchRoute(ready);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => undefined);

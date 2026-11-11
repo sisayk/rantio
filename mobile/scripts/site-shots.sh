@@ -2,7 +2,8 @@
 # The app's screenshots for the website's "Take Rantio with you" band, in all 11 languages: the
 # cottage list and the map, from the iPhone simulator, with the app in each language in turn.
 # Run on the Mac, in a normal terminal:
-#   bash ~/stugora/mobile/scripts/site-shots.sh
+#   bash ~/stugora/mobile/scripts/site-shots.sh           take the shots (builds the app if it isn't installed)
+#   bash ~/stugora/mobile/scripts/site-shots.sh --build   build the app again first (after app changes)
 # The app must be built for the simulator once (store-shots.sh does it, or this script does when the
 # app isn't installed). The app starts from a clean install, so no language picked in the app, no
 # saved cottages and no recently viewed ones get into the pictures. The shots land in
@@ -51,7 +52,7 @@ xcrun simctl status_bar "$UDID" override --time "9:41" --dataNetwork wifi --wifi
   --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
 
 # --- 3. A clean install of the app ----------------------------------------------------------------
-if ! xcrun simctl get_app_container "$UDID" "$APP_ID" app >/dev/null 2>&1; then
+if [ "${1:-}" = "--build" ] || ! xcrun simctl get_app_container "$UDID" "$APP_ID" app >/dev/null 2>&1; then
   say "3/4  Building the app for the simulator (10–20 minutes the first time)…"
   cd "$ROOT/mobile"
   EXPO_PUBLIC_API_URL="$API" EXPO_PUBLIC_SITE_URL="$API" \
@@ -66,17 +67,28 @@ rm -rf "$TMP"
 
 # --- 4. The screenshots, one language at a time ---------------------------------------------------
 say "4/4  Taking the screenshots…"
+# Each screen is its own launch: the app follows the phone's language until one is picked in the app,
+# and -AppleLanguages says which; -RantioOpen opens the map (app/_layout.tsx). No links, so iOS
+# doesn't put its "Open in Rantio?" prompt over the pictures.
+shot() {  # language, screen, file
+  xcrun simctl terminate "$UDID" "$APP_ID" 2>/dev/null || true
+  if [ "$2" = "/explore" ]; then
+    xcrun simctl launch "$UDID" "$APP_ID" -AppleLanguages "($1)" >/dev/null
+  else
+    xcrun simctl launch "$UDID" "$APP_ID" -AppleLanguages "($1)" -RantioOpen "$2" >/dev/null
+  fi
+  sleep "${4:-9}"
+  xcrun simctl io "$UDID" screenshot --type=png "$3" >/dev/null 2>&1
+}
 for L in $LANGS; do
   mkdir -p "$OUT/$L"
-  xcrun simctl terminate "$UDID" "$APP_ID" 2>/dev/null || true
-  # The app follows the phone's language until one is picked in the app: this launch says which.
-  xcrun simctl launch "$UDID" "$APP_ID" -AppleLanguages "($L)" >/dev/null
-  sleep 7
-  xcrun simctl openurl "$UDID" "rantio://explore"; sleep 5
-  xcrun simctl io "$UDID" screenshot --type=png "$OUT/$L/explore.png" >/dev/null
-  xcrun simctl openurl "$UDID" "rantio://map"; sleep 9
-  xcrun simctl io "$UDID" screenshot --type=png "$OUT/$L/map.png" >/dev/null
-  echo "  ✓ $L"
+  shot "$L" /explore "$OUT/$L/explore.png" 9
+  shot "$L" /map "$OUT/$L/map.png" 12
+  if cmp -s "$OUT/$L/explore.png" "$OUT/$L/map.png"; then
+    echo "  ✗ $L: the map didn't open (both pictures are the same)"
+  else
+    echo "  ✓ $L"
+  fi
 done
 
 xcrun simctl status_bar "$UDID" clear
