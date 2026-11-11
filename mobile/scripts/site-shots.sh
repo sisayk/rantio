@@ -64,6 +64,15 @@ cp -R "$(xcrun simctl get_app_container "$UDID" "$APP_ID" app)" "$TMP/"
 xcrun simctl uninstall "$UDID" "$APP_ID"
 xcrun simctl install "$UDID" "$TMP"/*.app
 rm -rf "$TMP"
+# Restart the simulator: a question iOS left on screen (such as "Open in Rantio?" after the build
+# opened the app with a link) would otherwise sit in front of every picture.
+xcrun simctl shutdown "$UDID"
+xcrun simctl boot "$UDID"
+xcrun simctl bootstatus "$UDID" -b >/dev/null
+xcrun simctl ui "$UDID" appearance light
+xcrun simctl status_bar "$UDID" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 \
+  --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+sleep 3
 
 # --- 4. The screenshots, one language at a time ---------------------------------------------------
 say "4/4  Taking the screenshots…"
