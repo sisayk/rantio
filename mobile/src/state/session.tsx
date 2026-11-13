@@ -10,6 +10,8 @@ import { onApiSignedOut, type OwnerDetails, ownerApi, setApiKey, SignedOut, type
 import { registerForPush } from "@/state/push";
 
 const KEY = "stugora.ownerKey";
+// A key whose sign-out didn't reach the server (no connection): ended there at the next start.
+const PENDING = "stugora.ownerKeyToEnd";
 
 // Keychain / Keystore on phones; the browser's storage only for the web preview used in development.
 const SecureStore =
@@ -72,6 +74,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     onApiSignedOut(() => void forget());
+    SecureStore.getItemAsync(PENDING)
+      .then(async (old) => {
+        if (!old) return;
+        const ended = await ownerApi.logoutKey(old).then(() => true, (e) => e instanceof SignedOut);
+        if (ended) await SecureStore.deleteItemAsync(PENDING);
+      })
+      .catch(() => undefined);
     SecureStore.getItemAsync(KEY)
       .then((k) => {
         if (k) {
@@ -116,7 +125,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       refresh,
       signedUp: keep,
       signOut: async () => {
-        await ownerApi.logout().catch(() => undefined);
+        const ending = key;
+        const done = await ownerApi.logout().then(() => true, (e) => e instanceof SignedOut);
+        // Not reached: the key (and its notifications) would stay alive on the server for months.
+        if (!done && ending) await SecureStore.setItemAsync(PENDING, ending).catch(() => undefined);
         await forget();
       },
       deleteAccount: async () => {

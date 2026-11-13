@@ -1,7 +1,8 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ApiError, guestApi, Offline } from "@/api";
 import { CONTACT_EMAIL } from "@/lib/content";
@@ -29,6 +30,9 @@ const LONG_SIDE = 2400; // as the listing photos: big enough for any screen, qui
 type Errors = Partial<Record<"name" | "email" | "country" | "region" | "nettimokki" | "photos" | "consent" | "code" | "form", string>>;
 // After the form: Stripe's card page for the free trial, then whether the card was saved.
 type Step = "form" | "checking" | "saved" | "notSaved" | "thanks";
+
+// The sign-up this phone sent last, so the link back from the card page can be told from a stranger's.
+const SIGNUP_KEY = "rantio:signup";
 
 /** "List your cottage" inside the app: the same sign-up as on rantio.fi/hosts, with photos,
  *  then a card saved on Stripe's page for the free months (set in the admin). */
@@ -61,7 +65,10 @@ export default function ListCottage() {
   const [errors, setErrors] = useState<Errors>({});
   const [step, setStep] = useState<Step>(params.signup ? "checking" : "form");
   const [submitted, setToken] = useState("");
-  const token = submitted || params.signup || "";
+  // The link's sign-up counts only if this phone sent it (SIGNUP_KEY): a link carrying someone
+  // else's sign-up must not get this person's card saved for it.
+  const [linked, setLinked] = useState("");
+  const token = submitted || linked;
   const [firstName, setFirstName] = useState("");
   // The email check: the address a code went to, the code typed in, and whether the sign-up signed in.
   const [codeFor, setCodeFor] = useState("");
@@ -93,8 +100,15 @@ export default function ListCottage() {
 
   useEffect(() => {
     // Opened by the link from the welcome page: the screen starts on "checking".
-    if (!params.signup) return;
-    guestApi.signupCard(params.signup).then(showCard, () => setStep("notSaved"));
+    const signup = params.signup;
+    if (!signup) return;
+    AsyncStorage.getItem(SIGNUP_KEY)
+      .catch(() => null)
+      .then((mine) => {
+        if (mine !== signup) return setStep("form");
+        setLinked(signup);
+        return guestApi.signupCard(signup).then(showCard, () => setStep("notSaved"));
+      });
   }, [params.signup, showCard]);
 
   // Stripe's page in a browser sheet; the welcome page opens rantio://list-cottage, which closes it.
@@ -127,14 +141,7 @@ export default function ListCottage() {
     } catch {
       return setErrors((e) => ({ ...e, photos: tr.photoType }));
     }
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
-      Alert.alert(m.app.listing.permission, undefined, [
-        { text: m.app.common.cancel, style: "cancel" },
-        { text: m.app.menu.openSettings, onPress: () => Linking.openSettings() },
-      ]);
-      return;
-    }
+    // No permission asked: the system's photo picker hands over only the photos picked.
     const room = MAX_SIGNUP_PHOTOS - photos.length;
     if (room <= 0) return setErrors((e) => ({ ...e, photos: tr.tooManyPhotos }));
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -238,6 +245,7 @@ export default function ListCottage() {
         setIsOwner(true);
       }
       setToken(res.token);
+      AsyncStorage.setItem(SIGNUP_KEY, res.token).catch(() => undefined);
       setFirstName(name.trim().split(" ")[0]);
       if (res.checkout_url) await saveCard(res.checkout_url, res.token);
       else setStep("thanks");

@@ -26,6 +26,7 @@ export const paths = {
   guide: (lang: Lang, id: string) => `/${lang}/inspiration/${id}`,
   privacy: (lang: Lang) => `/${lang}/privacy`,
   terms: (lang: Lang) => `/${lang}/terms`,
+  accountDeletion: (lang: Lang) => `/${lang}/account-deletion`,
 };
 
 /** The same page in another language: swaps the first path segment. */

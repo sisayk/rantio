@@ -38,6 +38,12 @@ export default function HostingHeader({
   async function logout() {
     await ownerApi.logout().catch(() => undefined);
     forgetOwnerSession();
+    // Unsaved listing drafts are this owner's: they don't stay behind on a shared computer.
+    try {
+      for (const key of Object.keys(window.localStorage)) if (key.startsWith("stugora.listing.")) window.localStorage.removeItem(key);
+    } catch {
+      // storage is off: nothing to clear
+    }
     window.location.assign(paths.hostingLogin(lang));
   }
   return (

@@ -186,7 +186,7 @@ export function NearbyEvents({ lat, lng, country, from, to, onAddDates }: { lat:
                     </Text>
                   </View>
                 ) : null}
-                <Pressable onPress={() => Linking.openURL(ev.url)} accessibilityRole="link" hitSlop={6} style={styles.link}>
+                <Pressable onPress={() => ev.url.startsWith("https://") && Linking.openURL(ev.url)} accessibilityRole="link" hitSlop={6} style={styles.link}>
                   <Text v="smallMedium" color={colors.green}>
                     {t.tickets}
                   </Text>

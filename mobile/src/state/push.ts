@@ -110,5 +110,6 @@ export function routeFor(data: Record<string, unknown> | undefined): string | nu
   if (data.type === "booking") return "/calendar";
   if (data.type === "guest-message" && typeof data.token === "string") return `/chat/${data.token}`;
   if (data.type === "monitor" && typeof data.id === "number") return `/monitor/${data.id}`;
+  if (data.type === "review" && typeof data.cottage === "number") return `/listing/${data.cottage}/reviews`;
   return null;
 }

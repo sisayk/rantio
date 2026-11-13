@@ -260,4 +260,51 @@ export const en: LegalTexts = {
       },
     ],
   },
+  deletion: {
+    title: "Deleting your Rantio account",
+    description: "How to delete a Rantio account and its data, and what is kept afterwards.",
+    updated: "Last updated: 13 November 2026",
+    intro:
+      "You can delete your Rantio account yourself at any time, in the app or on the website. This page says how, what is removed and what we have to keep.",
+    sections: [
+      {
+        heading: "How to delete your account",
+        paragraphs: [
+          "In the Rantio app: open Menu (or Profile), then Account settings, then Login & security, and choose Delete account.",
+          "On rantio.fi: sign in, open Account, then Login & security, and choose Delete account.",
+          `If you can't sign in, write to ${CONTACT_EMAIL} from the email address of your account and ask us to delete it. We do it within 30 days and confirm by email.`,
+        ],
+      },
+      {
+        heading: "What is removed",
+        paragraphs: ["Deleting the account removes, at once and for good:"],
+        list: [
+          "your name, email address, phone number, profile photo and sign-in (including Google and Apple sign-in and every phone you were signed in on)",
+          "your legal name, date of birth, tax number, bank account, addresses and emergency contact",
+          "your cottages' photos, street address, door codes and arrival and departure instructions",
+          "your cottages' calendar links and booking links, which stop working",
+        ],
+      },
+      {
+        heading: "What we keep, and for how long",
+        paragraphs: [
+          "If you had cottages, their bookings and Rantio's invoices to you are kept for six years after the end of the financial year, as Finnish bookkeeping law requires. They are kept with the cottage's name and location, without your name or contact details. A company's name, business ID and VAT number stay on its invoices.",
+          "Messages guests wrote about your cottages are theirs too: they are kept as described in the privacy policy and then deleted.",
+          "An account that never had a cottage or an invoice is removed completely.",
+        ],
+      },
+      {
+        heading: "Guests",
+        paragraphs: [
+          `Guests don't have an account: a message to an owner is reached through its private link. To have a conversation and your details in it deleted, write to ${CONTACT_EMAIL} from the email address you used.`,
+        ],
+      },
+      {
+        heading: "Deleting some data without deleting the account",
+        paragraphs: [
+          `You can change or clear your details under Account at any time, remove photos and cottages that have no bookings, and sign out of the app on a phone. For anything else, write to ${CONTACT_EMAIL}.`,
+        ],
+      },
+    ],
+  },
 };

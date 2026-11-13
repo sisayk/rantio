@@ -260,4 +260,51 @@ export const fi: LegalTexts = {
       },
     ],
   },
+  deletion: {
+    title: "Rantio-tilin poistaminen",
+    description: "Miten Rantio-tili ja sen tiedot poistetaan ja mitä sen jälkeen säilytetään.",
+    updated: "Päivitetty viimeksi 13.11.2026",
+    intro:
+      "Voit poistaa Rantio-tilisi itse milloin tahansa sovelluksessa tai verkkosivulla. Tällä sivulla kerromme, miten se tehdään, mitä poistetaan ja mitä meidän on säilytettävä.",
+    sections: [
+      {
+        heading: "Näin poistat tilisi",
+        paragraphs: [
+          "Rantio-sovelluksessa: avaa Valikko (tai Profiili), sitten Tilin asetukset, sitten Kirjautuminen ja turvallisuus, ja valitse Poista tili.",
+          "Sivulla rantio.fi: kirjaudu sisään, avaa Tili, sitten Kirjautuminen ja turvallisuus, ja valitse Poista tili.",
+          `Jos et pääse kirjautumaan, kirjoita osoitteeseen ${CONTACT_EMAIL} tilisi sähköpostiosoitteesta ja pyydä tilin poistamista. Poistamme sen 30 päivän kuluessa ja vahvistamme sähköpostitse.`,
+        ],
+      },
+      {
+        heading: "Mitä poistetaan",
+        paragraphs: ["Tilin poistaminen poistaa heti ja pysyvästi:"],
+        list: [
+          "nimesi, sähköpostiosoitteesi, puhelinnumerosi, profiilikuvasi ja kirjautumisesi (myös Google- ja Apple-kirjautumisen ja kaikki puhelimet, joilla olit kirjautuneena)",
+          "virallisen nimesi, syntymäaikasi, verotunnisteesi, pankkitilisi, osoitteesi ja hätäyhteyshenkilösi",
+          "mökkiesi kuvat, katuosoitteen, ovikoodit sekä saapumis- ja lähtöohjeet",
+          "mökkiesi kalenterilinkit ja varauslinkit, jotka lakkaavat toimimasta",
+        ],
+      },
+      {
+        heading: "Mitä säilytämme ja kuinka kauan",
+        paragraphs: [
+          "Jos sinulla oli mökkejä, niiden varaukset ja Rantion sinulle lähettämät laskut säilytetään kuusi vuotta tilikauden päättymisestä, kuten kirjanpitolaki edellyttää. Ne säilytetään mökin nimen ja sijainnin kanssa, ilman nimeäsi tai yhteystietojasi. Yrityksen nimi, Y-tunnus ja ALV-numero säilyvät sen laskuissa.",
+          "Vieraiden mökeistäsi kirjoittamat viestit ovat myös heidän: ne säilytetään tietosuojaselosteessa kuvatulla tavalla ja poistetaan sen jälkeen.",
+          "Tili, jolla ei ole koskaan ollut mökkiä tai laskua, poistetaan kokonaan.",
+        ],
+      },
+      {
+        heading: "Vieraat",
+        paragraphs: [
+          `Vierailla ei ole tiliä: omistajalle lähetettyyn viestiin pääsee sen yksityisellä linkillä. Jos haluat keskustelun ja siinä olevat tietosi poistettavan, kirjoita osoitteeseen ${CONTACT_EMAIL} käyttämästäsi sähköpostiosoitteesta.`,
+        ],
+      },
+      {
+        heading: "Tietojen poistaminen ilman tilin poistamista",
+        paragraphs: [
+          `Voit muuttaa tai tyhjentää tietojasi Tili-sivulla milloin tahansa, poistaa kuvia ja mökkejä, joilla ei ole varauksia, ja kirjautua ulos sovelluksesta puhelimella. Muissa asioissa kirjoita osoitteeseen ${CONTACT_EMAIL}.`,
+        ],
+      },
+    ],
+  },
 };

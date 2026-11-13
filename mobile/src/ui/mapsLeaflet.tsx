@@ -65,7 +65,7 @@ send({type:"ready"});`,
 /** Keeps links (the OpenStreetMap credit) out of the map: they open in the browser. */
 function stayOnMap(req: { url: string }) {
   if (req.url === BASE || req.url.startsWith("about:") || req.url.startsWith("data:")) return true;
-  void Linking.openURL(req.url);
+  if (req.url.startsWith("https://")) void Linking.openURL(req.url);
   return false;
 }
 

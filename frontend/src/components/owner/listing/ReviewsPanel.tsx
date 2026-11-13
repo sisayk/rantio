@@ -111,7 +111,7 @@ function OwnerReview({ lang, row, onChange, onSignedOut }: {
       {row.hidden ? <span className={s.badge}>{t.owner.hidden}</span> : null}
       {editing ? (
         <>
-          <textarea className={s.input} rows={3} maxLength={1000} value={text} placeholder={t.owner.replyPlaceholder} onChange={(e) => setText(e.target.value)} />
+          <textarea className={s.input} rows={3} maxLength={1000} value={text} placeholder={t.owner.replyPlaceholder} aria-label={t.owner.replyPlaceholder} onChange={(e) => setText(e.target.value)} />
           <div className={s.row}>
             <button type="button" className={o.primary} disabled={busy} onClick={() => void save()}>
               {t.owner.save}

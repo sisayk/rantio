@@ -146,7 +146,8 @@ function Personal({ form }: { form: Form }) {
   const pickPhoto = async (from: "camera" | "library") => {
     const ImagePicker = await import("expo-image-picker");
     const { ImageManipulator, SaveFormat } = await import("expo-image-manipulator");
-    const perm = from === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // The camera needs permission; the photo library doesn't (the system's picker hands over only the photos picked).
+    const perm = from === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : { granted: true };
     if (!perm.granted) {
       Alert.alert(m.app.listing.permission, undefined, [
         { text: m.app.common.cancel, style: "cancel" },

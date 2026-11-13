@@ -21,7 +21,8 @@ export type LegalPage = {
   sections: LegalSection[];
 };
 
-export type LegalTexts = { privacy: LegalPage; terms: LegalPage };
+/** deletion: how to delete an account (the page the app stores link to; Google Play asks for one). */
+export type LegalTexts = { privacy: LegalPage; terms: LegalPage; deletion: LegalPage };
 export type LegalKind = keyof LegalTexts;
 
 const TEXTS: Partial<Record<Lang, LegalTexts>> = { en, fi };

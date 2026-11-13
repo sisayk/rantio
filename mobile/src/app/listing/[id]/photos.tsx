@@ -45,7 +45,8 @@ export default function ListingPhotos() {
       return setProblem(f(t.errors.failed, { name: "" }).trim());
     }
     const { ImageManipulator, SaveFormat } = Manipulator;
-    const perm = from === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // The camera needs permission; the photo library doesn't (the system's picker hands over only the photos picked).
+    const perm = from === "camera" ? await ImagePicker.requestCameraPermissionsAsync() : { granted: true };
     if (!perm.granted) {
       Alert.alert(m.app.listing.permission, undefined, [
         { text: l.cancel, style: "cancel" },

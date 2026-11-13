@@ -28,10 +28,10 @@ function useNotificationTaps() {
   const router = useRouter();
   const { signedIn } = useSession();
   useEffect(() => {
-    if (!signedIn) return;
     const open = (n: Notifications.Notification) => {
       const href = routeFor(n.request.content.data as Record<string, unknown>);
-      if (href) router.push(href as never);
+      // A guest's "the owner answered" opens without an account; the rest are the owner's.
+      if (href && (signedIn || href.startsWith("/chat/"))) router.push(href as never);
     };
     Notifications.getLastNotificationResponseAsync()
       .then((r) => {

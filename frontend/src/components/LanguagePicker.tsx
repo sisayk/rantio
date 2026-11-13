@@ -15,7 +15,7 @@ const normalise = (text: string) => text.toLowerCase().normalize("NFD").replace(
 
 /** Remembers the choice, then opens the same page, with the same search, in that language. */
 function choose(to: Lang) {
-  document.cookie = `${LANG_COOKIE}=${to}; path=/; max-age=${LANG_COOKIE_MAX_AGE}; samesite=lax`;
+  document.cookie = `${LANG_COOKIE}=${to}; path=/; max-age=${LANG_COOKIE_MAX_AGE}; samesite=lax${window.location.protocol === "https:" ? "; secure" : ""}`;
   const { pathname, search, hash } = window.location;
   // A full load, so <html lang>, metadata and every word on the page switch together.
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination

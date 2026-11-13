@@ -225,6 +225,16 @@ export const ownerApi = {
   /** A one-time token to open rantio.fi signed in (ui/settings.tsx openSignedIn). */
   webLink: () => call<{ token: string; seconds: number }>("owner/app/web-link/", { ...json("POST", {}), owner: true }),
   logout: () => call<{ ok: boolean }>("auth/logout/", { ...json("POST"), owner: true }),
+  /** Ends another key than the one in use (a sign-out that couldn't reach the server earlier). */
+  logoutKey: async (old: string) => {
+    const res = await fetch(`${API_URL}/api/auth/logout/`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json", Authorization: `Bearer ${old}` },
+      body: "{}",
+    });
+    if (res.status === 401 || res.status === 403) throw new SignedOut();
+    if (!res.ok) throw new Error(String(res.status));
+  },
   updateMe: (fields: { name?: string; phone?: string; details?: Partial<OwnerDetails> }) =>
     call<{ name: string; email: string; language: string; is_pilot: boolean; is_host: boolean; phone?: string; photo?: string | null; details?: OwnerDetails }>(
       "owner/me/",

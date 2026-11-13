@@ -6,6 +6,7 @@ import { ApiError, guestApi, Offline, type Thread } from "@/api";
 import { threadAnsweredBy } from "@/lib/answeredBy";
 import { getListing } from "@/lib/listings";
 import { formatRange } from "@/text/dates";
+import { usePrefs } from "@/state/prefs";
 import { registerGuestPush } from "@/state/push";
 import { useT } from "@/text/i18n";
 import { colors, space } from "@/theme";
@@ -21,6 +22,7 @@ export default function GuestChat() {
   const { m, lang, f } = useT();
   const c = m.guest.chat;
   const router = useRouter();
+  const { chats } = usePrefs();
   const [thread, setThread] = useState<Thread | null>(null);
   const [state, setState] = useState<"loading" | "ok" | "missing" | "error">("loading");
   const [text, setText] = useState("");
@@ -38,9 +40,12 @@ export default function GuestChat() {
   }, [token]);
 
   // Notify this phone when the owner answers (the system asks for permission once).
+  // Only for a conversation started on this phone: a link to someone else's conversation must not
+  // sign this phone up for its notifications (or take them from the guest it belongs to).
+  const mine = chats.some((c) => c.token === token);
   useEffect(() => {
-    registerGuestPush(token).catch(() => undefined);
-  }, [token]);
+    if (mine) registerGuestPush(token).catch(() => undefined);
+  }, [token, mine]);
 
   useFocusEffect(
     useCallback(() => {

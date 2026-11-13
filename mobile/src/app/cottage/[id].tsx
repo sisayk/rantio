@@ -270,7 +270,7 @@ export default function Cottage() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.md }} style={{ marginHorizontal: -space.xl }}>
               <View style={{ width: space.xl - space.md }} />
               {nearby.map((n) => (
-                <Pressable key={n.key} onPress={() => Linking.openURL(n.url)} style={styles.nearby} accessibilityRole="link">
+                <Pressable key={n.key} onPress={() => n.url.startsWith("https://") && Linking.openURL(n.url)} style={styles.nearby} accessibilityRole="link">
                   {n.thumb ? <Image source={{ uri: n.thumb, headers: WIKI_HEADERS }} style={styles.nearbyPhoto} contentFit="cover" /> : <View style={[styles.nearbyPhoto, { backgroundColor: colors.greenTint }]} />}
                   <View style={{ padding: space.md, gap: 2 }}>
                     <Text v="h3" numberOfLines={1}>

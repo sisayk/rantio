@@ -20,6 +20,7 @@ const PAGES = [
   ...LISTINGS.map((l) => `/cottages/${l.id}`),
   "/privacy",
   "/terms",
+  "/account-deletion",
 ];
 
 export default async function sitemap(props: { id: Promise<string> }): Promise<MetadataRoute.Sitemap> {
@@ -30,8 +31,8 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
     const { canonical, languages } = alternates(lang, path);
     return {
       url: String(canonical),
-      changeFrequency: path.startsWith("/cottages") ? "weekly" : path === "/privacy" || path === "/terms" ? "yearly" : "monthly",
-      priority: path === "" ? 1 : path === "/hosts" ? 0.8 : path === "/privacy" || path === "/terms" ? 0.2 : 0.6,
+      changeFrequency: path.startsWith("/cottages") ? "weekly" : path === "/privacy" || path === "/terms" || path === "/account-deletion" ? "yearly" : "monthly",
+      priority: path === "" ? 1 : path === "/hosts" ? 0.8 : path === "/privacy" || path === "/terms" || path === "/account-deletion" ? 0.2 : 0.6,
       alternates: { languages: languages as Record<string, string> },
     };
   });

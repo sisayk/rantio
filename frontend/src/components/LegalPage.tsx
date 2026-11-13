@@ -63,7 +63,7 @@ export default async function LegalPage({ lang, kind }: { lang: Lang; kind: Lega
         </article>
       </main>
 
-      <SiteFooter lang={lang} variant="legal" current={kind} />
+      <SiteFooter lang={lang} variant="legal" current={kind === "deletion" ? undefined : kind} />
     </div>
   );
 }
