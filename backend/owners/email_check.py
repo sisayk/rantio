@@ -16,11 +16,13 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from .models import EmailCheck
 
 CODES_PER_HOUR = 5  # per address, on top of the per-IP throttle
+TRIES_PER_DAY = 15  # wrong and right guesses per address in 24 hours, as for sign-in codes (login.py)
 
 MESSAGES = {
     "en": ("Your Rantio code: {code}",
@@ -78,9 +80,22 @@ def _hash(email: str, code: str) -> str:
     return hmac.new(settings.SECRET_KEY.encode(), f"signup:{_norm(email)}:{code}".encode(), hashlib.sha256).hexdigest()
 
 
+def tries_today(email: str) -> int:
+    since = timezone.now() - timedelta(hours=24)
+    return EmailCheck.objects.filter(email=_norm(email), created_at__gte=since).aggregate(n=Sum("attempts"))["n"] or 0
+
+
 def can_send(email: str) -> bool:
     since = timezone.now() - timedelta(hours=1)
-    return EmailCheck.objects.filter(email=_norm(email), created_at__gte=since).count() < CODES_PER_HOUR
+    return (tries_today(email) < TRIES_PER_DAY
+            and EmailCheck.objects.filter(email=_norm(email), created_at__gte=since).count() < CODES_PER_HOUR)
+
+
+def _first_name(name: str) -> str:
+    """The first name for "Hi …,", only if it reads as a name: the email goes to an address nobody
+    has proven yet, so it must not carry a link or other text of the sender's choosing."""
+    first = (name.split() or [""])[0]
+    return first if len(first) <= 40 and re.fullmatch(r"[^\W\d_]+(?:[-'’][^\W\d_]+)*", first) else ""
 
 
 def _greet(text: str) -> str:
@@ -101,7 +116,7 @@ def send(email: str, name: str, lang: str, purpose: str = "signup") -> str:
         subject, body = SIGN_IN.get(lang) or SIGN_IN["en"]
     else:
         subject, body = MESSAGES.get(lang) or MESSAGES["en"]
-    values = {"code": code, "name": (name.split() or [""])[0], "minutes": EmailCheck.LIFETIME_MINUTES}
+    values = {"code": code, "name": _first_name(name), "minutes": EmailCheck.LIFETIME_MINUTES}
     send_mail(subject.format(**values), _greet(body.format(**values)), settings.DEFAULT_FROM_EMAIL, [email])
     return code
 
@@ -111,7 +126,7 @@ def check(email: str, code: str) -> bool:
     with transaction.atomic():
         row = (EmailCheck.objects.select_for_update()
                .filter(email=_norm(email), used_at__isnull=True, expires_at__gt=timezone.now()).first())
-        if not row or row.attempts >= EmailCheck.MAX_ATTEMPTS:
+        if not row or row.attempts >= EmailCheck.MAX_ATTEMPTS or tries_today(email) >= TRIES_PER_DAY:
             return False
         row.attempts += 1
         ok = hmac.compare_digest(row.code_hash, _hash(email, (code or "").strip()))

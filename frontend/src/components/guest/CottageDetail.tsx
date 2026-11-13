@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- remote Unsplash photos, sized by CSS */
 import { getMessages } from "@/i18n";
 import AmenityIcon from "@/components/AmenityIcon";
-import { countryName, currencyNames, languageNamesIn, number, plural } from "@/i18n/format";
+import { countryName, currencyNames, languageNamesIn, plural } from "@/i18n/format";
 import type { Lang } from "@/i18n/locales";
 import { paths } from "@/i18n/paths";
 import { activitiesFor } from "@/lib/activities";
@@ -22,7 +22,6 @@ import Surroundings from "./Surroundings";
 import styles from "./guest.module.css";
 import SiteFooter from "../SiteFooter";
 import { CottageHighlights, LiveRatings, TitleRating } from "./CottageHighlights";
-import { REVIEWS } from "@/i18n/messages/reviews";
 
 export default function CottageDetail({ lang, listing: l }: { lang: Lang; listing: Listing }) {
   const m = getMessages(lang);

@@ -445,6 +445,7 @@ export const listings = {
     deleted: "Property deleted",
     deleteHasBookings: "This property has stays on record, so it can't be deleted: they're part of your earnings and Rantio's invoices. Archive it instead.",
     deleteHasMessages: "Guests have written about this property, so it can't be deleted. Archive it instead to keep the messages.",
+    deleteWasLive: "This property has been live on Rantio, so it can't be deleted. Archive it instead.",
     deleteName: "The name doesn't match.",
     history: "Change history",
     historyEmpty: "No changes recorded yet.",

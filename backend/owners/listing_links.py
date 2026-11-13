@@ -47,11 +47,19 @@ def host(url: str) -> str:
     return h[4:] if h.startswith("www.") else h
 
 
+# Endings a known site's own address can have: airbnb.fi, booking.com, airbnb.co.uk. A look-alike
+# on a throwaway ending (airbnb.xyz, vrbo.top) isn't the site and must not be shown under its name.
+SITE_ENDINGS = {"com", "fi", "se", "no", "dk", "is", "ee", "lv", "lt", "de", "nl", "fr", "es", "it", "pt", "at", "ch",
+                "be", "ie", "pl", "cz", "ca", "eu", "co.uk", "com.au", "co.nz"}
+
+
 def detect_site(url: str) -> str:
     """The known site an address belongs to, or "" for another site."""
     parts = host(url).split(".")
-    name = parts[-2] if len(parts) >= 2 else ""
-    return name if name in SITES else ""
+    for n in (2, 3):  # name.fi, name.co.uk; subdomains (www., fi.) in front are fine
+        if len(parts) >= n and parts[-n] in SITES and ".".join(parts[-n + 1:]) in SITE_ENDINGS:
+            return parts[-n]
+    return ""
 
 
 def site_name(site: str, url: str) -> str:

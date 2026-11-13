@@ -146,7 +146,7 @@ class EmailCheckTests(TestCase):
         res = self.client.post("/api/signups/email-code/", {"email": email, "name": "Matti Virtanen", "lang": "fi"},
                                format="json")
         self.assertEqual(res.status_code, 200, res.content)
-        self.assertIn("Rantio-koodisi", mail.outbox[-1].subject)
+        self.assertIn("koodisi", mail.outbox[-1].subject)  # "Rantio-koodisi" or, with an account, the sign-in code
         return mail.outbox[-1].subject.rsplit(" ", 1)[-1]
 
     def sign_up(self, **extra):
@@ -208,6 +208,54 @@ class EmailCheckTests(TestCase):
         self.assertEqual(res.status_code, 201, res.content)
         account.refresh_from_db()
         self.assertTrue(account.is_host)
+
+    def test_an_existing_account_is_proven_with_its_sign_in_code_and_limits(self):
+        """The form signs an existing owner in, so it can't be an easier way in than signing in."""
+        from django.core import mail
+
+        from . import login as owner_login
+        from .models import LoginCode
+
+        account = owner_login.new_account("matti@example.fi", lang="fi")
+        self.code_for("matti@example.fi")
+        self.assertIn("kirjautumiskoodisi", mail.outbox[-1].subject)
+        self.assertEqual(LoginCode.objects.filter(owner=account).count(), 1)
+        from .views import OwnerSignupCreateView
+
+        self.assertEqual(self.sign_up(email="matti@example.fi", email_code="000000x").status_code, 400)
+        for _ in range(owner_login.TRIES_PER_DAY - 1):  # wrong guesses, each with a fresh code
+            owner_login.issue_code(account, "fi")
+            self.assertFalse(OwnerSignupCreateView.code_ok("matti@example.fi", "000000x"))
+        code = owner_login.issue_code(account, "fi")
+        self.assertEqual(self.sign_up(email="matti@example.fi", email_code=code).status_code, 400)  # locked
+        self.assertEqual(self.client.post("/api/signups/email-code/", {"email": "matti@example.fi"}, format="json").status_code, 429)
+
+    def test_a_look_alike_address_is_not_the_same_account(self):
+        """victim@gmaıl.com (dotless ı) is another address: PostgreSQL's UPPER() would call them equal."""
+        from . import login as owner_login
+
+        victim = owner_login.new_account("victim@gmail.com")
+        self.assertIsNone(owner_login.find_owner("victim@gmaıl.com"))
+        self.assertEqual(owner_login.find_owner("Victim@GMAIL.com"), victim)
+
+    def test_sign_up_codes_have_a_daily_limit_on_guesses(self):
+        from . import email_check
+
+        for _ in range(email_check.TRIES_PER_DAY // 5):
+            email_check.send("new@example.fi", "", "en")
+            for _ in range(5):
+                self.assertFalse(email_check.check("new@example.fi", "bad"))
+        self.assertFalse(email_check.can_send("new@example.fi"))
+
+    def test_the_code_email_carries_a_name_but_not_a_link(self):
+        from django.core import mail
+
+        from . import email_check
+
+        email_check.send("a@example.fi", "Anna-Liisa Virtanen", "en")
+        self.assertIn("Hi Anna-Liisa,", mail.outbox[-1].body)
+        email_check.send("b@example.fi", "http://evil.example/win now", "en")
+        self.assertNotIn("evil", mail.outbox[-1].body)
 
     def test_codes_are_limited(self):
         for _ in range(5):

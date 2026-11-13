@@ -70,9 +70,10 @@ def owner_for(provider: str, token: str, lang: str = "en") -> Owner:
     # Google sends a boolean, Apple a boolean or the string "true".
     if not email or str(claims.get("email_verified", "")).lower() != "true":
         raise SignInError("no_email")
-    owner = Owner.objects.filter(email__iexact=email).first()
+    from .login import find_owner, new_account
+
+    owner = find_owner(email)
     if not owner:  # someone new: Google or Apple has checked the address, so it's their account
-        from .login import new_account
 
         owner = new_account(email, name=str(claims.get("name") or ""), lang=lang)
     setattr(owner, field, claims["sub"])  # next time the account id finds them, even if the email changes

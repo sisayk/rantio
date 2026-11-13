@@ -318,7 +318,10 @@ def web_handoff(request):
     """GET /api/auth/handoff/?t=…&next=/en/hosting: signs this browser in with the app's one-time
     token, then goes on to the page. Without a valid token it just goes on (the page asks to sign in)."""
     owner = app.redeem_web_token(request.GET.get("t", ""))
-    if owner and owner.user_id and owner.user.is_active:
+    # A browser already signed in as someone else stays as it is: otherwise a link sent by an
+    # attacker could quietly switch a victim into the attacker's account (login CSRF).
+    other = request.user.is_authenticated and (not owner or request.user.pk != owner.user_id)
+    if owner and owner.user_id and owner.user.is_active and not other:
         login(request, owner.user, backend="django.contrib.auth.backends.ModelBackend")
     res = HttpResponseRedirect(app.safe_next(request.GET.get("next", "/")))
     res["Referrer-Policy"] = "no-referrer"  # the token stays out of the next page's Referer

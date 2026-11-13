@@ -17,6 +17,7 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+from django.db.models import Q
 from django.db import transaction
 
 from . import rates as fx
@@ -112,4 +113,6 @@ def build(owner: Owner, month: date, rates: tuple[dict, str | None] | None = Non
 
 def build_all(month: date) -> list[Invoice]:
     rates = fx.current()
-    return [inv for owner in Owner.objects.filter(is_host=True) if (inv := build(owner, month, rates))]
+    # Closed accounts too (is_host False, cottages kept): stays before the account was deleted are still owed.
+    owners = Owner.objects.filter(Q(is_host=True) | Q(cottages__isnull=False)).distinct()
+    return [inv for owner in owners if (inv := build(owner, month, rates))]

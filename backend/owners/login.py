@@ -128,7 +128,14 @@ def new_account(email: str, name: str = "", lang: str = "en") -> Owner:
 
 
 def find_owner(email: str) -> Owner | None:
-    return Owner.objects.filter(email__iexact=email.strip()).first()
+    """The owner with this address, whatever its capitals. The database's own case folding isn't
+    trusted: PostgreSQL's UPPER() turns a dotless "ı" into "I", so "victim@gmaıl.com" (a domain
+    anyone can register) would match victim@gmail.com and sign a stranger in as them."""
+    email = email.strip()
+    for owner in Owner.objects.filter(email__iexact=email):
+        if owner.email.strip().lower() == email.lower():
+            return owner
+    return None
 
 
 def owner_country(owner: Owner) -> str:

@@ -415,7 +415,7 @@ export default function ListingEditor({
       const reason = (err as { body?: { reason?: string } }).body?.reason;
       toasts.push(
         "error",
-        reason === "has_bookings" ? l.status.deleteHasBookings : reason === "has_messages" ? l.status.deleteHasMessages : reason === "confirm" ? l.status.deleteName : l.networkError,
+        reason === "has_bookings" ? l.status.deleteHasBookings : reason === "has_messages" ? l.status.deleteHasMessages : reason === "was_live" ? l.status.deleteWasLive : reason === "confirm" ? l.status.deleteName : l.networkError,
       );
       setWorking(false);
     }

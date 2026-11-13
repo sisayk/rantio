@@ -442,6 +442,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Īpašums dzēsts",
     deleteHasBookings: "Šim īpašumam ir reģistrētas uzturēšanās, tāpēc to nevar dzēst: tās ir daļa no jūsu ienākumiem un Rantio rēķiniem. Tā vietā arhivējiet to.",
     deleteHasMessages: "Viesi ir rakstījuši par šo īpašumu, tāpēc to nevar dzēst. Tā vietā arhivējiet to, lai saglabātu ziņas.",
+    deleteWasLive: "Šis īpašums ir bijis publicēts Rantio, tāpēc to nevar dzēst. Tā vietā arhivējiet to.",
     deleteName: "Nosaukums nesakrīt.",
     history: "Izmaiņu vēsture",
     historyEmpty: "Izmaiņas vēl nav reģistrētas.",

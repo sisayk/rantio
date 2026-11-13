@@ -441,6 +441,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Kohde poistettu",
     deleteHasBookings: "Kohteella on kirjattuja varauksia, joten sitä ei voi poistaa: ne kuuluvat tuloihisi ja Rantion laskuihin. Arkistoi se sen sijaan.",
     deleteHasMessages: "Vieraat ovat kirjoittaneet tästä kohteesta, joten sitä ei voi poistaa. Arkistoi se, niin viestit säilyvät.",
+    deleteWasLive: "Tämä kohde on ollut julkaistuna Rantiossa, joten sitä ei voi poistaa. Arkistoi se sen sijaan.",
     deleteName: "Nimi ei täsmää.",
     history: "Muutoshistoria",
     historyEmpty: "Muutoksia ei ole vielä kirjattu.",

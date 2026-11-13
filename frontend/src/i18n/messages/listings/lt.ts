@@ -443,6 +443,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Objektas ištrintas",
     deleteHasBookings: "Šiam objektui užregistruota viešnagių, todėl jo ištrinti negalima: jos yra Jūsų pajamų ir Rantio sąskaitų dalis. Vietoj to jį archyvuokite.",
     deleteHasMessages: "Svečiai rašė apie šį objektą, todėl jo ištrinti negalima. Archyvuokite jį, kad žinutės išliktų.",
+    deleteWasLive: "Šis būstas buvo paskelbtas Rantio, todėl jo ištrinti negalima. Vietoj to suarchyvuokite.",
     deleteName: "Pavadinimas nesutampa.",
     history: "Pakeitimų istorija",
     historyEmpty: "Pakeitimų dar neužregistruota.",

@@ -14,8 +14,8 @@ const { LISTINGS } = require("../src/lib/listings.ts");
 const { cityNames, regionLabel } = require("../src/lib/placeNames.ts");
 const { PLACES } = require("../src/lib/places.ts");
 
-test("ten languages, English first and as the default", () => {
-  assert.deepEqual([...LANGS], ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt"]);
+test("eleven languages, English first and as the default", () => {
+  assert.deepEqual([...LANGS], ["en", "fi", "sv", "nb", "nn", "da", "is", "et", "lv", "lt", "de"]);
   for (const lang of LANGS) assert.ok(LANG_INFO[lang].native.length > 1, lang);
 });
 
@@ -25,13 +25,14 @@ test("every language is complete: keys, plural forms, lists and placeholders", (
 
 test("browser languages map to ours, best match first, English otherwise", () => {
   assert.equal(negotiateLang(null), "en");
-  assert.equal(negotiateLang("de-DE,de;q=0.9"), "en");
+  assert.equal(negotiateLang("de-DE,de;q=0.9"), "de");
+  assert.equal(negotiateLang("fr-FR,fr;q=0.9"), "en");
   assert.equal(negotiateLang("fi-FI,fi;q=0.9,en;q=0.8"), "fi");
   assert.equal(negotiateLang("sv-FI"), "sv");
   assert.equal(negotiateLang("no"), "nb");
   assert.equal(negotiateLang("nb-NO"), "nb");
   assert.equal(negotiateLang("nn"), "nn");
-  assert.equal(negotiateLang("de;q=1, lt;q=0.5, et;q=0.7"), "et");
+  assert.equal(negotiateLang("fr;q=1, lt;q=0.5, et;q=0.7"), "et");
   assert.equal(negotiateLang("en;q=0, lv"), "lv");
 });
 
@@ -42,8 +43,9 @@ test("first visit: browser language if it's ours, else the country's for English
   assert.equal(firstLang(null, "LT"), "lt");
   assert.equal(firstLang("sv-FI,sv;q=0.9,fi;q=0.8", "FI"), "sv"); // Swedish-speaking Finn
   assert.equal(firstLang("et-EE", "FI"), "et"); // an Estonian in Helsinki
-  assert.equal(firstLang("de-DE,de;q=0.9,en;q=0.8", "FI"), "en"); // a German tourist
-  assert.equal(firstLang("de-DE,de;q=0.9,da;q=0.5", "FI"), "da");
+  assert.equal(firstLang("de-DE,de;q=0.9,en;q=0.8", "FI"), "de"); // a German tourist
+  assert.equal(firstLang("fr-FR,fr;q=0.9,en;q=0.8", "FI"), "en"); // a French tourist
+  assert.equal(firstLang("fr-FR,fr;q=0.9,da;q=0.5", "FI"), "da");
   assert.equal(firstLang("en-US", "US"), "en");
   assert.equal(firstLang("en-US", null), "en");
   assert.equal(firstLang("fi", "US"), "fi");

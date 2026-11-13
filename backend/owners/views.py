@@ -62,16 +62,25 @@ class EmailCodeView(views.APIView):
             validate_email(email)
         except ValidationError:
             return Response({"email": ["invalid"]}, status=400)
+        lang = str(request.data.get("lang", "en"))
+        # Someone who already has an account proves the address with a sign-in code, under the
+        # sign-in limits (tries per day, the lock): the form signs them in, so it must not be an
+        # easier way into an account than signing in is.
+        owner = owner_login.find_owner(email)
+        if owner:
+            if not owner_login.can_send(owner):
+                return Response({"detail": "too_many"}, status=429)
+            owner_login.issue_code(owner, lang)
+            return Response({"sent": True})
         if not email_check.can_send(email):
             return Response({"detail": "too_many"}, status=429)
-        lang = str(request.data.get("lang", "en"))
         email_check.send(email, str(request.data.get("name", ""))[:120], lang)
         return Response({"sent": True})
 
 
 def become_owner(signup: OwnerSignup) -> Owner:
     """A checked sign-up is an owner at once, with their cottage (its photos) waiting to be listed."""
-    owner = Owner.objects.filter(email__iexact=signup.email).first()
+    owner = owner_login.find_owner(signup.email)
     if owner is None:
         owner = Owner.objects.create(name=signup.name, email=signup.email, phone=signup.phone,
                                      language=signup.language, signup=signup)
@@ -142,7 +151,7 @@ class OwnerSignupCreateView(generics.CreateAPIView):
         checked = settings.SIGNUP_EMAIL_CHECK or account is not None
         if account:
             serializer.validated_data["email"] = account.email  # the address they signed in with
-        elif checked and not email_check.check(serializer.validated_data["email"], str(request.data.get("email_code", ""))):
+        elif checked and not self.code_ok(serializer.validated_data["email"], str(request.data.get("email_code", ""))):
             return Response({"email_code": ["wrong"]}, status=400)
         owner = None
         with transaction.atomic():
@@ -172,6 +181,13 @@ class OwnerSignupCreateView(generics.CreateAPIView):
                 login(request._request, owner_login.user_for(owner), backend="django.contrib.auth.backends.ModelBackend")
             answer["signed_in"] = True
         return Response(answer, status=201)
+
+    @staticmethod
+    def code_ok(email: str, code: str) -> bool:
+        """An existing account's address is proven with its sign-in code (EmailCodeView), a new one's
+        with the sign-up code."""
+        owner = owner_login.find_owner(email)
+        return owner_login.check_code(owner, code) if owner else email_check.check(email, code)
 
     def notify(self, signup: OwnerSignup, photos: int):
         if settings.SIGNUP_NOTIFY_EMAILS:

@@ -441,6 +441,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Eign eytt",
     deleteHasBookings: "Dvalir eru skráðar á þessa eign, svo ekki er hægt að eyða henni: þær eru hluti af tekjum þínum og reikningum Rantio. Settu hana frekar í geymslu.",
     deleteHasMessages: "Gestir hafa skrifað um þessa eign, svo ekki er hægt að eyða henni. Settu hana frekar í geymslu til að halda skilaboðunum.",
+    deleteWasLive: "Þessi eign hefur verið birt á Rantio og því er ekki hægt að eyða henni. Settu hana í geymslu í staðinn.",
     deleteName: "Heitið passar ekki.",
     history: "Breytingasaga",
     historyEmpty: "Engar breytingar skráðar enn.",

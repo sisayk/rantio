@@ -441,6 +441,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Stedet er slettet",
     deleteHasBookings: "Stedet har registrerede ophold, så det kan ikke slettes: de indgår i dine indtægter og Rantios fakturaer. Arkivér det i stedet.",
     deleteHasMessages: "Gæster har skrevet om stedet, så det kan ikke slettes. Arkivér det i stedet for at beholde beskederne.",
+    deleteWasLive: "Denne bolig har været online på Rantio og kan derfor ikke slettes. Arkivér den i stedet.",
     deleteName: "Navnet passer ikke.",
     history: "Ændringshistorik",
     historyEmpty: "Ingen ændringer registreret endnu.",

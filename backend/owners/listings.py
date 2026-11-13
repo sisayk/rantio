@@ -536,6 +536,8 @@ class OwnerCottagesView(APIView):
         data = CreateSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         owner = request.user.owner
+        if too_many(owner):
+            return Response({"reason": "too_many"}, status=status.HTTP_409_CONFLICT)
         signup = owner.signup
         cottage = Cottage.objects.create(
             owner=owner, name=data.validated_data["name"], max_guests=2, price_per_night=Decimal("0.00"),
@@ -574,6 +576,10 @@ class OwnerCottageView(APIView):
             return Response({"reason": "has_bookings"}, status=status.HTTP_409_CONFLICT)
         if Conversation.objects.filter(cottage=cottage).exists():
             return Response({"reason": "has_messages"}, status=status.HTTP_409_CONFLICT)
+        # A cottage that has been live has used its free months: it's archived, not deleted and
+        # made again for a new free period.
+        if cottage.listing_started_on:
+            return Response({"reason": "was_live"}, status=status.HTTP_409_CONFLICT)
         with transaction.atomic():
             cottage.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -665,7 +671,15 @@ class OwnerStatusView(APIView):
 
 
 COPY_SKIP = {"id", "owner", "name", "status", "listing_started_on", "listing_slug", "inbound_code", "calendar_token",
-             "booking_link_token", "created_at", "updated_at", "nettimokki_url", "address", "access_details"}
+             "booking_link_token", "created_at", "updated_at", "nettimokki_url", "address", "access_details",
+             # The copy is a new cottage to the channel manager: with the original's room it would
+             # reopen the original's closed dates and take its bookings.
+             "beds24_property_id", "beds24_room_id", "beds24_synced_at", "beds24_error"}
+MAX_COTTAGES = 30  # per owner, drafts and archived ones included (each copy also copies its photos)
+
+
+def too_many(owner) -> bool:
+    return Cottage.objects.filter(owner=owner).count() >= MAX_COTTAGES
 
 
 class OwnerDuplicateView(APIView):
@@ -676,6 +690,8 @@ class OwnerDuplicateView(APIView):
 
     def post(self, request, pk):
         source = own(request, pk)
+        if too_many(source.owner):
+            return Response({"reason": "too_many"}, status=status.HTTP_409_CONFLICT)
         with transaction.atomic():
             copy = Cottage(owner=source.owner, name=f"{source.name} (2)"[:120], status=S.INTAKE)
             for field in Cottage._meta.concrete_fields:

@@ -195,7 +195,7 @@ def guest_favourite(ratings: dict) -> bool:
 def host_row(cottage: Cottage) -> dict | None:
     """Who hosts: the owner's first name, their profile photo, and the year they started on Rantio."""
     o = cottage.owner
-    first = (o.legal_first_name or o.name or "").split()[:1]
+    first = (o.name or "").split()[:1]  # the name they chose to show, never the one on their ID
     if not first:
         return None
     started = [d for d in o.cottages.exclude(listing_started_on=None).values_list("listing_started_on", flat=True)]

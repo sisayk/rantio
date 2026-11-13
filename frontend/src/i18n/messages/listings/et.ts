@@ -441,6 +441,7 @@ export const listings: NonNullable<Translation["listings"]> = {
     deleted: "Majutuskoht kustutatud",
     deleteHasBookings: "Sellel majutuskohal on registreeritud broneeringuid, seega seda ei saa kustutada: need on osa sinu tulust ja Rantio arvetest. Arhiveeri see hoopis.",
     deleteHasMessages: "Külalised on selle majutuskoha kohta kirjutanud, seega seda ei saa kustutada. Arhiveeri see, et sõnumid alles jääksid.",
+    deleteWasLive: "See majutuskoht on olnud Rantios avaldatud, seega ei saa seda kustutada. Arhiveeri see selle asemel.",
     deleteName: "Nimi ei kattu.",
     history: "Muudatuste ajalugu",
     historyEmpty: "Muudatusi pole veel registreeritud.",

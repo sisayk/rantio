@@ -66,7 +66,7 @@ class OwnerSignupAdmin(ModelAdmin):
     def card(self, obj):
         return f"Saved {obj.card_saved_at:%-d.%-m.%Y}" if obj.card_saved_at else "Not saved"
 
-    @admin.action(description="Copy the photos to the owner's first cottage")
+    @admin.action(description="Copy the photos to the owner's first cottage", permissions=["change"])
     def copy_photos(self, request, queryset):
         from django.core.files.base import ContentFile
 
@@ -105,7 +105,7 @@ class NewsletterSubscriberAdmin(ModelAdmin):
     def is_active(self, obj):
         return obj.active
 
-    @admin.action(description="Export confirmed subscribers (CSV)")
+    @admin.action(description="Export confirmed subscribers (CSV)", permissions=["change"])
     def export_active(self, request, queryset):
         import csv
 
@@ -133,7 +133,8 @@ class OwnerAdmin(ModelAdmin):
     list_filter = ["is_host", "is_pilot", "language"]
     search_fields = ["name", "email"]
     inlines = [CottageInline]
-    readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with", "tax_number"]
+    # "user" is read-only: pointing an owner at a staff user would let that owner's sign-in code open the admin.
+    readonly_fields = ["created_at", "stripe_customer_id", "card", "signs_in_with", "tax_number", "user"]
     # The encrypted fields (owners/vault.py) are text columns: show them as what they hold.
     formfield_overrides = {
         vault.SealedCharField: {"widget": unfold_widgets.UnfoldAdminTextInputWidget},
@@ -250,7 +251,7 @@ class CottageAdmin(ModelAdmin):
     ]
 
 
-    @admin.action(description="Send to Beds24 (the cottage and its prices)")
+    @admin.action(description="Send to Beds24 (the cottage and its prices)", permissions=["change"])
     def send_to_beds24(self, request, queryset):
         from django.contrib import messages
 
@@ -518,7 +519,7 @@ class InboundEmailAdmin(ModelAdmin):
         ("Email", {"fields": ["received_at", "from_address", "to_address", "subject", "message_id", "body"]}),
     ]
 
-    @admin.action(description="Read again")
+    @admin.action(description="Read again", permissions=["change"])
     def read_again(self, request, queryset):
         for email in queryset.exclude(raw=""):
             booking_emails.reread(email)
@@ -546,24 +547,25 @@ class InvoiceAdmin(ModelAdmin):
 
     @display(description="Lines")
     def line_table(self, obj):
-        rows = "".join(
-            format_html("<tr><td style='padding:2px 12px 2px 0'>{}</td><td style='text-align:right'>{} {}</td><td style='padding-left:8px;color:#888'>{}</td></tr>",
-                        x["description"], x["amount"], obj.currency, x.get("original", ""))
-            for x in obj.lines
+        from django.utils.html import format_html_join
+
+        rows = format_html_join(
+            "", "<tr><td style='padding:2px 12px 2px 0'>{}</td><td style='text-align:right'>{} {}</td><td style='padding-left:8px;color:#888'>{}</td></tr>",
+            ((x["description"], x["amount"], obj.currency, x.get("original", "")) for x in obj.lines),
         )
-        return format_html("<table>{}</table>", format_html(rows)) if rows else "—"
+        return format_html("<table>{}</table>", rows) if rows else "—"
 
     @display(description="Stripe page")
     def stripe_link(self, obj):
         return format_html('<a href="{}" target="_blank" rel="noopener">Open</a>', obj.stripe_url) if obj.stripe_url else "—"
 
-    @admin.action(description="Rebuild drafts from the latest bookings")
+    @admin.action(description="Rebuild drafts from the latest bookings", permissions=["change"])
     def rebuild(self, request, queryset):
         for inv in queryset.filter(status=Invoice.Status.DRAFT):
             invoicing.build(inv.owner, inv.month)
         self.message_user(request, "Drafts rebuilt. A draft with nothing left to charge is removed.")
 
-    @admin.action(description="Send through Stripe")
+    @admin.action(description="Send through Stripe", permissions=["change"])
     def send_with_stripe(self, request, queryset):
         if not stripe_api.enabled():
             self.message_user(request, "Set STRIPE_SECRET_KEY first; nothing was sent.", messages.ERROR)
@@ -577,7 +579,7 @@ class InvoiceAdmin(ModelAdmin):
                 self.message_user(request, f"{inv.number}: {e}", messages.ERROR)
         self.message_user(request, f"Sent {sent} invoice(s).")
 
-    @admin.action(description="Mark as paid")
+    @admin.action(description="Mark as paid", permissions=["change"])
     def mark_paid(self, request, queryset):
         n = queryset.filter(status=Invoice.Status.SENT).update(status=Invoice.Status.PAID)
         self.message_user(request, f"Marked {n} invoice(s) paid.")

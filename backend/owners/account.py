@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 REVIEW_COTTAGE = "Example cottage (App Review)"
 REVIEW_TRIES = 20
 REVIEW_TRIES_KEY = "app-review-wrong-codes"
+REVIEW_TRIES_ALL = 200  # wrong tries from every address together in a day; then the code rests until tomorrow
 
 
 @transaction.atomic
@@ -50,13 +51,25 @@ def delete_account(owner: Owner) -> str:
             signup.delete()
         outcome = "deleted"
     else:
-        owner.cottages.exclude(status=Cottage.Status.ARCHIVED).update(status=Cottage.Status.ARCHIVED, booking_requests_open=False)
+        wipe_cottages(owner)
         owner.name = "Deleted account"
         owner.email = f"deleted-{pk}-{secrets.token_hex(4)}@deleted.invalid"
         owner.phone = ""
         owner.google_sub = owner.apple_sub = ""
         owner.is_host = False
         owner.user = None
+        # Everything personal that bookkeeping doesn't need. A company's name, business and VAT
+        # numbers and country stay with its invoices; a private person's invoices are in Stripe.
+        for field in ("legal_first_name", "legal_last_name", "tax_country", "tax_id_sealed", "payout_holder", "payout_iban",
+                      "payout_bic", "address_line", "postal_code", "city", "postal_line", "postal_postal_code",
+                      "postal_city", "postal_country", "emergency_name", "emergency_phone", "legal_rep_name",
+                      "legal_rep_role", "website", "stripe_payment_method", "stripe_checkout_id"):
+            setattr(owner, field, "")
+        owner.date_of_birth = None
+        owner.beneficial_owners = []
+        owner.reservations_contact = {}
+        if owner.account_type != Owner.AccountType.COMPANY:
+            owner.company_name = owner.trading_name = owner.business_id = owner.vat_id = ""
         owner.save()
         if owner.signup:
             s = owner.signup
@@ -81,6 +94,26 @@ def delete_account(owner: Owner) -> str:
     return outcome
 
 
+def wipe_cottages(owner: Owner) -> None:
+    """A closed account's cottages stay as the records behind bookings and invoices, without what
+    was private or still in use: door codes and instructions, the address, photos, the calendar and
+    booking links (new keys, so the old links stop answering), feeds, and its Mökki monitors."""
+    from .models import CalendarFeed, MonitorDevice, new_link_token
+
+    MonitorDevice.objects.filter(owner=owner).update(owner=None, cottage=None)
+    for cottage in owner.cottages.all():
+        for photo in cottage.photos.all():
+            photo.image.delete(save=False)
+            photo.delete()
+        CalendarFeed.objects.filter(cottage=cottage).delete()
+        cottage.status = Cottage.Status.ARCHIVED
+        cottage.booking_requests_open = False
+        cottage.address = cottage.access_details = cottage.arrival_instructions = cottage.departure_instructions = ""
+        cottage.nettimokki_url = ""
+        cottage.calendar_token, cottage.booking_link_token = new_link_token(), new_link_token()
+        cottage.save()
+
+
 def handle_delete(request) -> dict:
     owner = request.user.owner
     if not isinstance(request.auth, AppDevice):
@@ -101,19 +134,22 @@ def review_sign_in(email: str, code: str, ip: str = "") -> Owner | None:
         return None
     # The code doesn't change, so wrong tries are counted per address: after REVIEW_TRIES in a day
     # that address can't use it (others, like Apple's reviewer, still can).
-    key = f"{REVIEW_TRIES_KEY}:{ip}"
-    if cache.get(key, 0) >= REVIEW_TRIES:
+    key, everyone = f"{REVIEW_TRIES_KEY}:{ip}", f"{REVIEW_TRIES_KEY}:all"
+    if cache.get(key, 0) >= REVIEW_TRIES or cache.get(everyone, 0) >= REVIEW_TRIES_ALL:
         return None
     if not hmac.compare_digest(code.strip(), settings.APP_REVIEW_CODE):
-        cache.add(key, 0, 24 * 3600)  # the window starts at the first wrong try
-        try:
-            cache.incr(key)
-        except ValueError:
-            cache.set(key, 1, 24 * 3600)
+        for k in (key, everyone):
+            cache.add(k, 0, 24 * 3600)  # the window starts at the first wrong try
+            try:
+                cache.incr(k)
+            except ValueError:
+                cache.set(k, 1, 24 * 3600)
+        if cache.get(everyone, 0) == REVIEW_TRIES_ALL:
+            logger.error("App Review sign-in paused for a day: %s wrong codes", REVIEW_TRIES_ALL)
         return None
-    owner, _ = Owner.objects.get_or_create(
-        email__iexact=email.strip(), defaults={"email": email.strip(), "name": "App Review", "language": "en", "is_host": True}
-    )
+    from .login import find_owner
+
+    owner = find_owner(email) or Owner.objects.create(email=email.strip(), name="App Review", language="en", is_host=True)
     if not owner.is_host:
         owner.is_host = True
         owner.save(update_fields=["is_host"])
