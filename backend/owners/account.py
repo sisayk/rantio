@@ -23,6 +23,7 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 
+from . import limits
 from .models import AppDevice, Cottage, MonitorInterest, Owner
 
 logger = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ def delete_account(owner: Owner) -> str:
         for field in ("legal_first_name", "legal_last_name", "tax_country", "tax_id_sealed", "payout_holder", "payout_iban",
                       "payout_bic", "address_line", "postal_code", "city", "postal_line", "postal_postal_code",
                       "postal_city", "postal_country", "emergency_name", "emergency_phone", "legal_rep_name",
-                      "legal_rep_role", "website", "stripe_payment_method", "stripe_checkout_id"):
+                      "legal_rep_role", "website"):  # the saved card stays in Stripe until what's owed is settled
             setattr(owner, field, "")
         owner.date_of_birth = None
         owner.beneficial_owners = []
@@ -98,13 +99,15 @@ def wipe_cottages(owner: Owner) -> None:
     """A closed account's cottages stay as the records behind bookings and invoices, without what
     was private or still in use: door codes and instructions, the address, photos, the calendar and
     booking links (new keys, so the old links stop answering), feeds, and its Mökki monitors."""
-    from .models import CalendarFeed, MonitorDevice, new_link_token
+    from .models import CalendarBlock, CalendarFeed, MonitorDevice, new_link_token
 
     MonitorDevice.objects.filter(owner=owner).update(owner=None, cottage=None)
     for cottage in owner.cottages.all():
         for photo in cottage.photos.all():
-            photo.image.delete(save=False)
-            photo.delete()
+            photo.delete()  # its file goes once this is committed (models: delete_photo_file)
+        # The nights the sites' calendars had closed stay closed (as blocks of their own): Beds24
+        # would otherwise open them for booking until the team has taken the listings down.
+        CalendarBlock.objects.filter(cottage=cottage, feed__isnull=False).update(feed=None)
         CalendarFeed.objects.filter(cottage=cottage).delete()
         cottage.status = Cottage.Status.ARCHIVED
         cottage.booking_requests_open = False
@@ -135,16 +138,11 @@ def review_sign_in(email: str, code: str, ip: str = "") -> Owner | None:
     # The code doesn't change, so wrong tries are counted per address: after REVIEW_TRIES in a day
     # that address can't use it (others, like Apple's reviewer, still can).
     key, everyone = f"{REVIEW_TRIES_KEY}:{ip}", f"{REVIEW_TRIES_KEY}:all"
-    if cache.get(key, 0) >= REVIEW_TRIES or cache.get(everyone, 0) >= REVIEW_TRIES_ALL:
+    if limits.used(key) >= REVIEW_TRIES or limits.used(everyone) >= REVIEW_TRIES_ALL:
         return None
     if not hmac.compare_digest(code.strip(), settings.APP_REVIEW_CODE):
-        for k in (key, everyone):
-            cache.add(k, 0, 24 * 3600)  # the window starts at the first wrong try
-            try:
-                cache.incr(k)
-            except ValueError:
-                cache.set(k, 1, 24 * 3600)
-        if cache.get(everyone, 0) == REVIEW_TRIES_ALL:
+        limits.count(key, 24 * 3600)  # the day starts at the first wrong try
+        if limits.count(everyone, 24 * 3600) == REVIEW_TRIES_ALL:
             logger.error("App Review sign-in paused for a day: %s wrong codes", REVIEW_TRIES_ALL)
         return None
     from .login import find_owner

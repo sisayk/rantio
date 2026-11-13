@@ -28,17 +28,21 @@ function useNotificationTaps() {
   const router = useRouter();
   const { signedIn } = useSession();
   useEffect(() => {
+    /** True when it opened (or there's nowhere to go); false when it must wait for the sign-in to be read. */
     const open = (n: Notifications.Notification) => {
       const href = routeFor(n.request.content.data as Record<string, unknown>);
+      if (!href) return true;
       // A guest's "the owner answered" opens without an account; the rest are the owner's.
-      if (href && (signedIn || href.startsWith("/chat/"))) router.push(href as never);
+      if (!signedIn && !href.startsWith("/chat/")) return false;
+      router.push(href as never);
+      return true;
     };
     Notifications.getLastNotificationResponseAsync()
       .then((r) => {
-        if (r && r.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
-          open(r.notification);
+        // Kept until it has been opened: on a cold start this runs once before the owner's
+        // sign-in has been read from the phone, and again when it has.
+        if (r && r.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER && open(r.notification))
           Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
-        }
       })
       .catch(() => undefined);
     const sub = Notifications.addNotificationResponseReceivedListener((r) => open(r.notification));

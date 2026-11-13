@@ -144,7 +144,7 @@ class BookingEmailTests(TestCase):
         self.assertEqual(self.client.post(url, r, content_type="message/rfc822").status_code, 403)
         res = self.client.post(url, r, content_type="message/rfc822", HTTP_X_RANTIO_SECRET="s3cret")
         self.assertEqual(res.json()["status"], "booked")
-        res = self.client.post(url + "?secret=s3cret", {"body-mime": r.replace("a1@", "a2@")})
+        res = self.client.post(url + "?secret=s3cret", {"body-mime": r.replace("<a1@nettimokki", "<a2@nettimokki")})
         self.assertEqual(res.json()["status"], "duplicate")  # same stay, second email
 
     def test_webhook_off_without_secret(self):

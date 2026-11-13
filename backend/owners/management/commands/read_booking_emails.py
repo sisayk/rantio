@@ -6,6 +6,8 @@ In a normal terminal (local):  backend/.venv/bin/python backend/manage.py read_b
 import imaplib
 import logging
 
+from django.db import InterfaceError, OperationalError
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
@@ -36,6 +38,8 @@ class Command(BaseCommand):
                 try:
                     email = ingest(raw)  # stored even when unclear, so it's safe to mark it read
                     status = email.status
+                except (OperationalError, InterfaceError):
+                    raise  # the database is away: the email stays unread for the next run
                 except Exception:
                     # One unreadable email must not be met again every five minutes with every
                     # email after it left unread: it's marked read and reported, to be looked at.

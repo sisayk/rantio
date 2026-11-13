@@ -339,7 +339,8 @@ def sync_feed(feed: CalendarFeed, *, get=fetch) -> int:
 def sync_all(*, get=fetch) -> tuple[int, int]:
     ok = failed = 0
     # The one read longest ago first, so a slow or broken calendar can't keep the others waiting.
-    feeds = CalendarFeed.objects.select_related("cottage").order_by(F("last_synced_at").asc(nulls_first=True), "pk")
+    # Calendars that failed last time come after the ones that work.
+    feeds = CalendarFeed.objects.select_related("cottage").order_by("last_error", F("last_synced_at").asc(nulls_first=True), "pk")
     for feed in feeds:
         try:
             sync_feed(feed, get=get)

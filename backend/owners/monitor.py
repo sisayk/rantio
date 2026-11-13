@@ -143,11 +143,18 @@ def _may_tell(d: MonitorDevice, kind: str) -> bool:
 
 
 def _start(d: MonitorDevice, kind: str, value: str, key: str | None = None, **vars) -> None:
+    untold = f"monitor-untold:{d.pk}:{kind}"
     if _open(d, kind):
+        # Still on, and the owner wasn't told when it began (too many messages just then): told now.
+        if cache.get(untold) and _may_tell(d, kind):
+            cache.delete(untold)
+            _tell(d, key or kind, email=kind in EMAILED, value=value, **vars)
         return
     MonitorAlert.objects.create(device=d, kind=kind, value=value[:60])
     if _may_tell(d, kind):
         _tell(d, key or kind, email=kind in EMAILED, value=value, **vars)
+    else:
+        cache.set(untold, 1, 24 * 3600)
 
 
 def _end(d: MonitorDevice, kind: str, key: str | None = None, **vars) -> None:
@@ -156,7 +163,9 @@ def _end(d: MonitorDevice, kind: str, key: str | None = None, **vars) -> None:
         return
     a.ended_at = timezone.now()
     a.save(update_fields=["ended_at"])
-    if key and _may_tell(d, kind):
+    if cache.get(f"monitor-untold:{d.pk}:{kind}"):
+        cache.delete(f"monitor-untold:{d.pk}:{kind}")  # began and ended untold: nothing to say
+    elif key and _may_tell(d, kind):
         _tell(d, key, **vars)
 
 

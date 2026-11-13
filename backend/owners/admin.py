@@ -542,7 +542,7 @@ class InvoiceAdmin(ModelAdmin):
     readonly_fields = ["number", "owner", "month", "currency", "line_table", "subtotal", "vat", "total", "rates_date",
                        "stripe_invoice_id", "stripe_link", "created_at", "sent_at"]
     exclude = ["lines", "stripe_url"]
-    actions = ["rebuild", "send_with_stripe", "mark_paid"]
+    actions = ["rebuild", "send_with_stripe", "mark_paid", "forget_stripe_draft"]
     fieldsets = [
         ("Invoice", {"fields": ["number", "owner", "month", "currency", "status"], "classes": ["st-grid-2"]}),
         ("Lines, before VAT", {"fields": ["line_table", "subtotal", "vat", "total", "rates_date"],
@@ -586,6 +586,12 @@ class InvoiceAdmin(ModelAdmin):
             except stripe_api.StripeError as e:
                 self.message_user(request, f"{inv.number}: {e}", messages.ERROR)
         self.message_user(request, f"Sent {sent} invoice(s).")
+
+    @admin.action(description="Forget the unfinished Stripe draft", permissions=["change"])
+    def forget_stripe_draft(self, request, queryset):
+        """After deleting an old unfinished draft in Stripe (stripe_api.send says when): sending makes a new one."""
+        n = queryset.filter(status=Invoice.Status.DRAFT).exclude(stripe_invoice_id="").update(stripe_invoice_id="")
+        self.message_user(request, f"Forgot the Stripe draft of {n} invoice(s). Send them again.")
 
     @admin.action(description="Mark as paid", permissions=["change"])
     def mark_paid(self, request, queryset):

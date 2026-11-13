@@ -9,6 +9,7 @@ STRIPE_SECRET_KEY nothing is sent and invoices stay drafts.
 
 from __future__ import annotations
 
+import time
 import json
 import urllib.error
 import urllib.parse
@@ -117,10 +118,22 @@ def send(invoice: Invoice) -> Invoice:
         raise StripeError("STRIPE_SECRET_KEY is not set.")
     if invoice.status != Invoice.Status.DRAFT:
         return invoice
+    unfinished = None
     if invoice.stripe_invoice_id:
-        # An earlier try got as far as making the invoice in Stripe and then lost its answer.
+        # An earlier try got as far as making the invoice in Stripe and then lost an answer.
         # It's finished there, never made (and charged) a second time.
-        return _resume(invoice)
+        unfinished = get(f"/invoices/{invoice.stripe_invoice_id}")
+        if unfinished.get("status") != "draft":
+            return _resume(invoice, unfinished)
+        # Still a draft: the steps below are repeated with the same keys, which Stripe answers
+        # from memory for the ones it already did. It remembers keys for 24 hours; after that the
+        # lines can't be told from new ones, so someone has to look.
+        if time.time() - (unfinished.get("created") or 0) > 23 * 3600:
+            raise StripeError(
+                f"Stripe has an old unfinished draft {invoice.stripe_invoice_id} for {invoice.number}. Delete it in "
+                "Stripe (and any pending items it leaves on the customer), then use the admin action "
+                "\"Forget the unfinished Stripe draft\" and send again."
+            )
     customer = ensure_customer(invoice.owner)
     card = payment_method(invoice.owner)
     key = f"invoice-{invoice.number}-{invoice.subtotal}"
@@ -129,7 +142,7 @@ def send(invoice: Invoice) -> Invoice:
         {"collection_method": "charge_automatically", "default_payment_method": card}
         if card else {"collection_method": "send_invoice", "days_until_due": settings.INVOICE_DAYS_UNTIL_DUE}
     )
-    inv = _post("/invoices", {
+    inv = unfinished or _post("/invoices", {
         "customer": customer, **how, "currency": invoice.currency.lower(), "pending_invoice_items_behavior": "exclude",
         "auto_advance": False, "description": f"Rantio {invoice.month:%m/%Y} · {invoice.number}",
         "metadata": {"stugora_invoice": invoice.number},
@@ -170,19 +183,18 @@ def _record(invoice: Invoice, final: dict, failed: str = "") -> Invoice:
     return invoice
 
 
-def _resume(invoice: Invoice) -> Invoice:
-    """Carries on with the Stripe invoice an interrupted send() left behind, from wherever it stopped."""
-    sid = invoice.stripe_invoice_id
-    current = get(f"/invoices/{sid}")
-    state = current.get("status")
-    if state == "draft":
-        # Its lines may be incomplete and can't be told apart from here: someone looks at it in
-        # Stripe (delete it there, clear the id in the admin, send again).
-        raise StripeError(f"Stripe has an unfinished draft {sid} for {invoice.number}: check it in Stripe before sending again.")
+def _resume(invoice: Invoice, current: dict) -> Invoice:
+    """Carries on with a finalized Stripe invoice an interrupted send() left behind."""
+    sid, state = invoice.stripe_invoice_id, current.get("status")
+    if state in ("void", "uncollectible"):
+        raise StripeError(f"Stripe invoice {sid} for {invoice.number} is {state}: check it in Stripe.")
     failed = ""
-    if state == "open" and current.get("collection_method") == "charge_automatically":
+    if state == "open":
         try:
-            current = _post(f"/invoices/{sid}/pay", {}, idempotency_key=f"resume-{sid}-pay")
+            if current.get("collection_method") == "charge_automatically":
+                current = _post(f"/invoices/{sid}/pay", {}, idempotency_key=f"resume-{sid}-pay")
+            else:  # the email with the payment page may not have gone out
+                current = _post(f"/invoices/{sid}/send", {}, idempotency_key=f"resume-{sid}-send")
         except StripeError as e:
             failed = str(e)
     return _record(invoice, current, failed)

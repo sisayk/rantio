@@ -65,13 +65,11 @@ def lines_for(owner: Owner, month: date, rates: dict, currency: str = "EUR") -> 
             "amount": str(amount),
             "original": f"{b.commission} {b.currency}" if b.currency != currency else "",
         })
-    # An archived cottage has stopped: no yearly fee (as the card page says: stop before the free
-    # months end and there's no yearly fee). Paused ones are still listed and are charged.
-    for cottage in owner.cottages.exclude(listing_started_on=None).exclude(status=Cottage.Status.ARCHIVED):
+    for cottage in owner.cottages.exclude(listing_started_on=None):
         n = 1
         while (starts := cottage.listing_year_starts_on(n)) < end:
             fee = cottage.yearly_fee(n)
-            if starts >= start and fee > 0:
+            if starts >= start and fee > 0 and not archived_on(cottage, starts):
                 lines.append({
                     "kind": "yearly_fee",
                     "cottage": cottage.pk,
@@ -81,6 +79,21 @@ def lines_for(owner: Owner, month: date, rates: dict, currency: str = "EUR") -> 
                 })
             n += 1
     return lines
+
+
+def archived_on(cottage: Cottage, day: date) -> bool:
+    """Was the cottage archived when this listing year began? Then the year isn't charged (as the
+    card page says: stop before the free months end and there's no yearly fee). It goes by the
+    day the year began, not by today: archiving afterwards doesn't undo a year that has started.
+    Paused cottages are still listed and are charged."""
+    last = (cottage.changes.filter(action__in=["archive", "restore"], at__date__lt=day)
+            .order_by("-at", "-pk").values_list("action", flat=True).first())
+    if last:
+        return last == "archive"
+    # No record of it being archived before that day: archived in the admin (which keeps no such
+    # record), or by an account being closed, counts if it's archived now and wasn't archived later.
+    later = cottage.changes.filter(action="archive", at__date__gte=day).exists()
+    return cottage.status == Cottage.Status.ARCHIVED and not later
 
 
 def _next_number(year: int) -> str:
@@ -96,8 +109,8 @@ def build(owner: Owner, month: date, rates: tuple[dict, str | None] | None = Non
     month = month_start(month)
     table, rates_day = rates or fx.current()
     invoice = Invoice.objects.select_for_update().filter(owner=owner, month=month).first()
-    if invoice and invoice.status != Invoice.Status.DRAFT:
-        return invoice
+    if invoice and (invoice.status != Invoice.Status.DRAFT or invoice.stripe_invoice_id):
+        return invoice  # sent, or half-way into Stripe: its lines must stay as Stripe has them
     currency = owner_currency(list(owner.cottages.all()))
     lines = lines_for(owner, month, table, currency)
     if not lines:

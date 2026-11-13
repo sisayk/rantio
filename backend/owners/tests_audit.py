@@ -121,7 +121,8 @@ class DeletedAccountTests(TestCase):
         o.date_of_birth, o.emergency_phone = date(1980, 1, 2), "+358401234567"
         o.save()
         Cottage.objects.filter(pk=c.pk).update(address="Rantatie 1", access_details="Door 1234", arrival_instructions="Key box")
-        CalendarFeed.objects.create(cottage=c, channel="airbnb", url="https://www.airbnb.fi/calendar/ical/1.ics")
+        feed = CalendarFeed.objects.create(cottage=c, channel="airbnb", url="https://www.airbnb.fi/calendar/ical/1.ics")
+        CalendarBlock.objects.create(cottage=c, feed=feed, uid="a@airbnb", start=D(20), end=D(23))
         c.refresh_from_db()
         old_calendar, old_booking = c.calendar_token, c.booking_link_token
         self.client.force_login(owner_login.user_for(o))
@@ -132,6 +133,7 @@ class DeletedAccountTests(TestCase):
                          ("", "", "", "", None, ""))
         self.assertEqual((c.address, c.access_details, c.arrival_instructions), ("", "", ""))
         self.assertFalse(c.feeds.exists())
+        self.assertEqual(c.blocks.count(), 1)  # the nights a site's calendar had closed stay closed
         self.assertNotIn(old_calendar, (c.calendar_token,))
         self.assertEqual(self.client.get(f"/api/calendar/{old_calendar}.ics").status_code, 404)
         self.assertEqual(self.client.get(f"/api/book/{old_booking}/").status_code, 404)
@@ -294,11 +296,40 @@ class StripeTests(TestCase):
         self.assertEqual((self.inv.stripe_invoice_id, self.inv.status), ("in_1", "draft"))
         posts.clear()
         open_invoice = {"id": "in_1", "status": "open", "collection_method": "send_invoice", "hosted_invoice_url": "https://pay/1"}
-        with mock.patch.object(stripe_api, "_post", side_effect=post), mock.patch.object(stripe_api, "get", return_value=open_invoice):
+        with mock.patch.object(stripe_api, "_post", return_value=open_invoice) as again, \
+                mock.patch.object(stripe_api, "get", return_value=open_invoice):
             stripe_api.send(self.inv)
-        self.assertEqual(posts, [])  # nothing new was made in Stripe
+        # Nothing new was made in Stripe: only the email with the payment page is sent (again).
+        self.assertEqual([c.args[0] for c in again.call_args_list], ["/invoices/in_1/send"])
         self.inv.refresh_from_db()
         self.assertEqual((self.inv.status, self.inv.stripe_url), ("sent", "https://pay/1"))
+
+    @override_settings(STRIPE_SECRET_KEY="sk_test_x")
+    def test_a_fresh_stripe_draft_is_carried_on_with_and_an_old_one_needs_a_look(self):
+        import time
+
+        Invoice.objects.filter(pk=self.inv.pk).update(stripe_invoice_id="in_1")
+        self.inv.refresh_from_db()
+        Owner.objects.filter(pk=self.inv.owner_id).update(stripe_customer_id="cus_1")
+        self.inv.owner.refresh_from_db()
+        paths = []
+
+        def post(path, data=None, idempotency_key=None):
+            paths.append(path)
+            return {"id": "in_1", "status": "open", "hosted_invoice_url": "https://pay/1"}
+
+        fresh = {"id": "in_1", "status": "draft", "created": time.time() - 60}
+        with mock.patch.object(stripe_api, "_post", side_effect=post), mock.patch.object(stripe_api, "get", return_value=fresh):
+            stripe_api.send(self.inv)
+        self.assertNotIn("/invoices", paths)  # no second invoice
+        self.assertIn("/invoices/in_1/finalize", paths)
+        Invoice.objects.filter(pk=self.inv.pk).update(status="draft")
+        self.inv.refresh_from_db()
+        old = {"id": "in_1", "status": "draft", "created": time.time() - 3 * 86400}
+        with mock.patch.object(stripe_api, "get", return_value=old), self.assertRaises(stripe_api.StripeError):
+            stripe_api.send(self.inv)
+        with mock.patch.object(stripe_api, "get", return_value={"id": "in_1", "status": "void"}), self.assertRaises(stripe_api.StripeError):
+            stripe_api.send(self.inv)
 
 
 class RequestRaceTests(TestCase):
@@ -316,12 +347,19 @@ class RequestRaceTests(TestCase):
 
 
 class InvoiceRuleTests(TestCase):
-    def test_an_archived_cottage_has_no_yearly_fee(self):
-        c = make_cottage(listing_started_on=date(2026, 8, 15), trial_months=3)
+    def test_a_cottage_archived_before_its_listing_year_began_has_no_yearly_fee(self):
+        from .models import CottageChange
+
+        c = make_cottage(listing_started_on=date(2026, 8, 15), trial_months=3)  # year 1 starts 15 Nov
         self.assertEqual([x["kind"] for x in invoicing.build(c.owner, date(2026, 11, 1)).lines], ["yearly_fee"])
         Invoice.objects.all().delete()
         Cottage.objects.filter(pk=c.pk).update(status=Cottage.Status.ARCHIVED)
+        change = CottageChange.objects.create(cottage=c, by="Aino", action="archive")
+        CottageChange.objects.filter(pk=change.pk).update(at=timezone.make_aware(timezone.datetime(2026, 11, 10)))
         self.assertIsNone(invoicing.build(Owner.objects.get(pk=c.owner_id), date(2026, 11, 1)))
+        # Archived after the year began (and even restored since): the year is charged.
+        CottageChange.objects.filter(pk=change.pk).update(at=timezone.make_aware(timezone.datetime(2026, 11, 28)))
+        self.assertEqual([x["kind"] for x in invoicing.build(Owner.objects.get(pk=c.owner_id), date(2026, 11, 1)).lines], ["yearly_fee"])
 
     def test_invoice_numbers_count_past_9999(self):
         c = make_cottage()
@@ -377,6 +415,51 @@ class LimitTests(TestCase):
         from . import limits
 
         self.assertEqual([limits.allow("t", 2, 60) for _ in range(3)], [True, True, False])
+
+    def test_a_window_ends_on_time_on_the_database_cache_too(self):
+        """Production's cache: cache.incr() there would give the key a new five-minute life each time."""
+        from django.core.cache import caches
+        from django.core.management import call_command
+
+        from . import limits
+
+        with self.settings(CACHES={"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "audit_cache"}}):
+            call_command("createcachetable", "audit_cache", verbosity=0)
+            with mock.patch.object(limits, "cache", caches["default"]), mock.patch.object(limits, "_now") as clock:
+                import time
+
+                clock.return_value = time.time()
+                self.assertEqual([limits.allow("w", 1, 60) for _ in range(3)], [True, False, False])
+                self.assertEqual(limits.count("n", 3600), 1)
+                self.assertEqual(limits.count("n", 3600), 2)  # counted up, not started again
+                clock.return_value += 61  # refused calls in between didn't push the end out
+                self.assertTrue(limits.allow("w", 1, 60))
+
+    def test_the_answer_to_a_new_question_is_emailed_at_once(self):
+        from django.core import mail
+
+        from . import messaging
+        from .models import Message
+
+        c = make_cottage()
+        conv = Conversation.objects.create(cottage=c, channel="direct", guest_name="Erik Lund", guest_email="erik@example.se",
+                                           guest_language="sv", token="v" * 20)
+        messaging.add(conv, Message.Sender.HOST, "Hej!")
+        messaging.add(conv, Message.Sender.GUEST, "En fråga till")
+        messaging.add(conv, Message.Sender.HOST, "Svar")
+        self.assertEqual(len([m for m in mail.outbox if m.to == ["erik@example.se"]]), 2)
+
+    def test_an_alert_that_began_untold_is_told_once_it_can_be(self):
+        from . import limits, monitor
+        from .models import MonitorDevice
+
+        d = MonitorDevice.objects.create(serial="MM-2", cottage=make_cottage(email="m2@example.fi"))
+        with mock.patch.object(monitor, "_tell") as tell:
+            with mock.patch.object(monitor, "_may_tell", return_value=False):
+                monitor._start(d, "leak", "wet")
+            self.assertEqual(tell.call_count, 0)
+            monitor._start(d, "leak", "wet")  # the next reading: still wet
+            self.assertEqual(tell.call_count, 1)
 
     def test_answers_in_a_row_are_one_email_to_the_guest(self):
         from django.core import mail

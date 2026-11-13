@@ -173,6 +173,8 @@ def add(c: Conversation, sender: str, text: str, *, notify: bool = True) -> Mess
         c.guest_read_at = now
         fields.append("guest_read_at")
     c.save(update_fields=fields)
+    if sender == Message.Sender.GUEST:
+        limits.forget(f"guest-reply-mail:{c.pk}")  # the answer to a new question is always emailed
     if notify and sender == Message.Sender.GUEST:
         _notify_owner(c, c.guest_name, text)
     if notify and sender == Message.Sender.HOST:
