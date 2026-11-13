@@ -61,6 +61,8 @@ def _post(path: str, data: dict | None = None, idempotency_key: str | None = Non
         except ValueError:
             message = ""
         raise StripeError(f"Stripe {path}: {e.code} {message}") from e
+    except (OSError, ValueError) as e:  # no answer, or not JSON: the callers handle StripeError
+        raise StripeError(f"Stripe {path}: no answer ({type(e).__name__})") from e
 
 
 post = _post
@@ -75,6 +77,8 @@ def get(path: str, params: dict | None = None) -> dict:
             return json.loads(resp.read())
     except urllib.error.HTTPError as e:
         raise StripeError(f"Stripe {path}: {e.code}") from e
+    except (OSError, ValueError) as e:
+        raise StripeError(f"Stripe {path}: no answer ({type(e).__name__})") from e
 
 
 def cents(amount: Decimal, currency: str = "EUR") -> int:
@@ -113,6 +117,10 @@ def send(invoice: Invoice) -> Invoice:
         raise StripeError("STRIPE_SECRET_KEY is not set.")
     if invoice.status != Invoice.Status.DRAFT:
         return invoice
+    if invoice.stripe_invoice_id:
+        # An earlier try got as far as making the invoice in Stripe and then lost its answer.
+        # It's finished there, never made (and charged) a second time.
+        return _resume(invoice)
     customer = ensure_customer(invoice.owner)
     card = payment_method(invoice.owner)
     key = f"invoice-{invoice.number}-{invoice.subtotal}"
@@ -126,6 +134,9 @@ def send(invoice: Invoice) -> Invoice:
         "auto_advance": False, "description": f"Rantio {invoice.month:%m/%Y} · {invoice.number}",
         "metadata": {"stugora_invoice": invoice.number},
     }, idempotency_key=key)
+    # Remembered at once: whatever happens next, sending again continues with this one.
+    invoice.stripe_invoice_id = inv["id"]
+    invoice.save(update_fields=["stripe_invoice_id"])
     tax = [settings.STRIPE_TAX_RATE_ID] if settings.STRIPE_TAX_RATE_ID else None
     for i, line in enumerate(invoice.lines):
         _post("/invoiceitems", {
@@ -146,7 +157,10 @@ def send(invoice: Invoice) -> Invoice:
             failed = str(e)
     else:
         final = _post(f"/invoices/{inv['id']}/send", {}, idempotency_key=f"{key}-send")
-    invoice.stripe_invoice_id = inv["id"]
+    return _record(invoice, final, failed)
+
+
+def _record(invoice: Invoice, final: dict, failed: str = "") -> Invoice:
     invoice.stripe_url = final.get("hosted_invoice_url") or ""
     invoice.status = Invoice.Status.PAID if final.get("status") == "paid" else Invoice.Status.SENT
     invoice.sent_at = timezone.now()
@@ -154,3 +168,21 @@ def send(invoice: Invoice) -> Invoice:
     if failed:
         raise StripeError(f"The card was not charged ({failed}); pay page: {invoice.stripe_url}")
     return invoice
+
+
+def _resume(invoice: Invoice) -> Invoice:
+    """Carries on with the Stripe invoice an interrupted send() left behind, from wherever it stopped."""
+    sid = invoice.stripe_invoice_id
+    current = get(f"/invoices/{sid}")
+    state = current.get("status")
+    if state == "draft":
+        # Its lines may be incomplete and can't be told apart from here: someone looks at it in
+        # Stripe (delete it there, clear the id in the admin, send again).
+        raise StripeError(f"Stripe has an unfinished draft {sid} for {invoice.number}: check it in Stripe before sending again.")
+    failed = ""
+    if state == "open" and current.get("collection_method") == "charge_automatically":
+        try:
+            current = _post(f"/invoices/{sid}/pay", {}, idempotency_key=f"resume-{sid}-pay")
+        except StripeError as e:
+            failed = str(e)
+    return _record(invoice, current, failed)

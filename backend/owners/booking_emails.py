@@ -51,6 +51,7 @@ GUESTS_LABEL = re.compile(r"(?:henkilömäärä|henkilöitä|vieraita|guests|per
 REFERENCE = re.compile(r"(?:varausnumero|varaustunnus|varaus\s*nro|tilausnumero|booking (?:number|id|reference)|bokningsnummer)\s*:?\s*#?\s*([A-Z0-9-]{3,30})", re.I)
 AMOUNT = re.compile(r"(?:yhteensä|hinta|kokonaishinta|total|summa|pris)\s*:?\s*(\d[\d  ]*(?:[.,]\d{1,2})?)\s*(?:€|eur)", re.I)
 PLUS_CODE = re.compile(r"\+([0-9a-f]{8})@", re.I)
+MAX_RECIPIENTS = 20
 NETTIMOKKI_ID = re.compile(r"nettimokki\.com/\S*?(\d{3,})")
 
 
@@ -77,7 +78,10 @@ def plain_text(msg: EmailMessage) -> str:
     part = msg.get_body(preferencelist=("plain", "html"))
     if part is None:
         return ""
-    text = part.get_content()
+    try:
+        text = part.get_content()
+    except (LookupError, ValueError):  # a charset Python doesn't know: read the bytes as best we can
+        text = (part.get_payload(decode=True) or b"").decode("utf-8", "replace")
     if part.get_content_type() == "text/html":
         text = re.sub(r"(?is)<(script|style).*?</\1>", " ", text)
         text = re.sub(r"(?i)<br\s*/?>|</(p|div|tr|li|h\d)>", "\n", text)
@@ -190,7 +194,9 @@ def find_cottage(msg: EmailMessage, body: str) -> tuple[Cottage | None, str, boo
     mail server confirms the owner really sent it; otherwise it waits in "Needs a look".
     """
     to = addresses(msg, "To", "Cc", "Delivered-To", "X-Original-To", "X-Forwarded-To", "Envelope-To", "Resent-To")
-    for a in to:
+    # A real forward has a handful of recipients; an email listing thousands of bookings+… addresses
+    # is someone guessing codes.
+    for a in to[:MAX_RECIPIENTS]:
         if m := PLUS_CODE.search(a + "@"):
             cottage = Cottage.objects.filter(inbound_code=m.group(1).lower()).select_related("owner").first()
             if cottage:
@@ -222,18 +228,20 @@ def find_cottage(msg: EmailMessage, body: str) -> tuple[Cottage | None, str, boo
 def ingest(raw: bytes | str) -> InboundEmail:
     msg = to_message(raw)
     message_id = str(msg.get("Message-ID", "")).strip()[:300]
-    raw_text = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
+    # PostgreSQL text can't hold a NUL byte; one in an email must not stop it being stored.
+    raw_text = (raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw).replace("\x00", "")
+    message_id = message_id.replace("\x00", "")
     if message_id and (earlier := InboundEmail.objects.filter(message_id=message_id).exclude(status=InboundEmail.Status.DUPLICATE).first()):
         return InboundEmail.objects.create(
-            message_id=message_id, subject=str(msg.get("Subject", ""))[:300], status=InboundEmail.Status.DUPLICATE,
+            message_id=message_id, subject=str(msg.get("Subject", "")).replace("\x00", "")[:300], status=InboundEmail.Status.DUPLICATE,
             note=f"Same email as #{earlier.pk}.", booking=earlier.booking, cottage=earlier.cottage,
         )
     email = InboundEmail.objects.create(
         message_id=message_id,
-        from_address=str(msg.get("From", ""))[:300],
-        to_address=", ".join(addresses(msg, "To", "Delivered-To", "X-Original-To"))[:500],
-        subject=str(msg.get("Subject", ""))[:300],
-        body=plain_text(msg)[:100_000],
+        from_address=str(msg.get("From", "")).replace("\x00", "")[:300],
+        to_address=", ".join(addresses(msg, "To", "Delivered-To", "X-Original-To"))[:500].replace("\x00", ""),
+        subject=str(msg.get("Subject", "")).replace("\x00", "")[:300],
+        body=plain_text(msg).replace("\x00", "")[:100_000],
         raw=raw_text[:RAW_LIMIT],
     )
     return process(email, msg)

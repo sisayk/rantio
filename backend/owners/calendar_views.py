@@ -143,7 +143,7 @@ class BookingQuoteView(APIView):
             check_out = date.fromisoformat(request.query_params.get("check_out", ""))
         except ValueError:
             return Response({"detail": "dates"}, status=status.HTTP_400_BAD_REQUEST)
-        if not 0 < (check_out - check_in).days <= booking_requests.MAX_NIGHTS:
+        if not 0 < (check_out - check_in).days <= booking_requests.MAX_NIGHTS or not sane(check_in):
             return Response({"detail": "dates"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(pricing.quote(cottage, check_in, check_out))
 
@@ -205,12 +205,17 @@ def request_row(c: Conversation) -> dict:
     }
 
 
+def sane(d: date) -> bool:
+    """A date a calendar can show: year 1 or 9999 would overflow the sums around it."""
+    return 2000 <= d.year <= 2100
+
+
 def parse_month(value: str | None, today: date) -> date:
     try:
         d = date.fromisoformat(value) if value else today
     except ValueError:
         d = today
-    return d.replace(day=1)
+    return (d if sane(d) else today).replace(day=1)
 
 
 def add_months(d: date, n: int) -> date:

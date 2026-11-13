@@ -18,6 +18,7 @@ import ipaddress
 import logging
 import re
 import socket
+import time
 import urllib.error
 import urllib.request
 from urllib.parse import urlparse
@@ -25,7 +26,9 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone as dt_timezone
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from .models import Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, RequestStatus
@@ -35,7 +38,8 @@ logger = logging.getLogger(__name__)
 # Sites that let a host paste a calendar link to import, and give one to export.
 FEED_CHANNELS = [Booking.Channel.AIRBNB, Booking.Channel.BOOKING, Booking.Channel.VRBO, Booking.Channel.AGODA]
 MAX_FEED_BYTES = 2_000_000
-FETCH_TIMEOUT = 20
+FETCH_TIMEOUT = 20  # per read
+FETCH_DEADLINE = 30  # for the whole calendar: a site sending a byte at a time can't hold a worker (or the sync) up
 HORIZON_DAYS = 2 * 365  # nothing further ahead is exported or imported
 
 
@@ -201,10 +205,13 @@ def _date(value: str) -> date | None:
     if not m:
         return None
     y, mo, d = int(m[1]), int(m[2]), int(m[3])
-    if m[4] and m[7]:  # a UTC time: the guest's day where the cottage is
-        moment = datetime(y, mo, d, int(m[4]), int(m[5]), int(m[6]), tzinfo=dt_timezone.utc)
-        return timezone.localtime(moment).date()
-    return date(y, mo, d)
+    try:
+        if m[4] and m[7]:  # a UTC time: the guest's day where the cottage is
+            moment = datetime(y, mo, d, int(m[4]), int(m[5]), int(m[6]), tzinfo=dt_timezone.utc)
+            return timezone.localtime(moment).date()
+        return date(y, mo, d)
+    except (ValueError, OverflowError):  # 20261340: not a date; the event is skipped
+        return None
 
 
 def parse_ics(text: str) -> list[Event]:
@@ -269,8 +276,15 @@ def fetch(url: str) -> str:
     check_address(url)
     req = urllib.request.Request(url, headers={"User-Agent": "Rantio calendar sync (+https://rantio.fi)"})
     try:
+        deadline = time.monotonic() + FETCH_DEADLINE
         with _opener.open(req, timeout=FETCH_TIMEOUT) as res:  # noqa: S310 (address checked above)
-            body = res.read(MAX_FEED_BYTES + 1)
+            chunks, size = [], 0
+            while size <= MAX_FEED_BYTES and (chunk := res.read1(65536)):
+                if time.monotonic() > deadline:
+                    raise FeedError("The site took too long to send the calendar.")
+                chunks.append(chunk)
+                size += len(chunk)
+            body = b"".join(chunks)
     except FeedError:
         raise
     except urllib.error.HTTPError as exc:  # the site's own answer (404, 403…)
@@ -297,6 +311,16 @@ def sync_feed(feed: CalendarFeed, *, get=fetch) -> int:
     events = [e for e in events if e.end >= today and e.start <= today + timedelta(days=HORIZON_DAYS)]
     # Our own calendar read back by the site (some sites echo it) isn't the site's booking.
     events = [e for e in events if not e.uid.startswith("stugora-")]
+    # A site that suddenly sends an empty calendar is more often broken than empty: the dates stay
+    # closed until the next read says the same (otherwise Beds24 would open them within minutes).
+    quiet = f"feed-empty:{feed.pk}"
+    if not events and CalendarBlock.objects.filter(feed=feed).exists() and not cache.get(quiet):
+        cache.set(quiet, 1, 6 * 3600)
+        feed.last_synced_at = timezone.now()
+        feed.save(update_fields=["last_synced_at"])
+        return 0
+    if events:
+        cache.delete(quiet)
     with transaction.atomic():
         kept = set()
         for e in events:
@@ -314,11 +338,16 @@ def sync_feed(feed: CalendarFeed, *, get=fetch) -> int:
 
 def sync_all(*, get=fetch) -> tuple[int, int]:
     ok = failed = 0
-    for feed in CalendarFeed.objects.select_related("cottage"):
+    # The one read longest ago first, so a slow or broken calendar can't keep the others waiting.
+    feeds = CalendarFeed.objects.select_related("cottage").order_by(F("last_synced_at").asc(nulls_first=True), "pk")
+    for feed in feeds:
         try:
             sync_feed(feed, get=get)
             ok += 1
         except FeedError:
             failed += 1
             logger.warning("Calendar %s couldn't be read: %s", feed.pk, feed.last_error)
+        except Exception:  # one calendar's surprise must not stop the rest
+            failed += 1
+            logger.exception("Calendar %s failed", feed.pk)
     return ok, failed

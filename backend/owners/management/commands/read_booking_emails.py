@@ -4,11 +4,15 @@ In a normal terminal (local):  backend/.venv/bin/python backend/manage.py read_b
 """
 
 import imaplib
+import logging
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from owners.booking_emails import ingest
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -29,7 +33,14 @@ class Command(BaseCommand):
                 raw = next((part[1] for part in data if isinstance(part, tuple)), None)
                 if raw is None:
                     continue
-                email = ingest(raw)  # stored even when unclear, so it's safe to mark it read
+                try:
+                    email = ingest(raw)  # stored even when unclear, so it's safe to mark it read
+                    status = email.status
+                except Exception:
+                    # One unreadable email must not be met again every five minutes with every
+                    # email after it left unread: it's marked read and reported, to be looked at.
+                    logger.exception("Booking email %s couldn't be read; marked as read", num.decode(errors="replace"))
+                    status = "failed"
                 box.store(num, "+FLAGS", "\\Seen")
-                counts[email.status] = counts.get(email.status, 0) + 1
+                counts[status] = counts.get(status, 0) + 1
         self.stdout.write(", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "No new emails.")

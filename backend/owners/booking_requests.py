@@ -155,9 +155,11 @@ def create(cottage: Cottage, *, name: str, email: str, phone: str, lang: str, ch
 
 @transaction.atomic
 def accept(c: Conversation, payout: Decimal) -> Booking:
+    cottage = Cottage.objects.select_for_update().get(pk=c.cottage_id)
+    # Read again under the lock: an accept and a decline sent at the same moment can't both win.
+    c.request_status = Conversation.objects.select_for_update().values_list("request_status", flat=True).get(pk=c.pk)
     if c.request_status != RequestStatus.PENDING:
         raise RequestError("not_pending")
-    cottage = Cottage.objects.select_for_update().get(pk=c.cottage_id)
     if not calendar.is_free(cottage, c.check_in, c.check_out):
         raise RequestError("taken")
     with alerts.muted():  # the owner is accepting it right now; no "new booking" email to them
@@ -176,6 +178,8 @@ def accept(c: Conversation, payout: Decimal) -> Booking:
 
 @transaction.atomic
 def decline(c: Conversation) -> None:
+    Cottage.objects.select_for_update().get(pk=c.cottage_id)
+    c.request_status = Conversation.objects.select_for_update().values_list("request_status", flat=True).get(pk=c.pk)
     if c.request_status != RequestStatus.PENDING:
         raise RequestError("not_pending")
     c.request_status = RequestStatus.DECLINED

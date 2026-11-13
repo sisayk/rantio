@@ -258,7 +258,10 @@ def _device_for(request) -> MonitorDevice | None:
 def _clean(row: dict, now: datetime) -> dict | None:
     if not isinstance(row, dict):
         return None
-    at = parse_datetime(str(row.get("at") or "")) if row.get("at") else now
+    try:
+        at = parse_datetime(str(row.get("at") or "")) if row.get("at") else now
+    except ValueError:  # shaped like a time but isn't one (month 13)
+        return None
     if at is None:
         return None
     if timezone.is_naive(at):

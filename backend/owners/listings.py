@@ -877,6 +877,8 @@ class OwnerPricesView(APIView):
             start = date.fromisoformat(request.query_params.get("from", ""))
         except ValueError:
             start = timezone.localdate()
+        if not 2000 <= start.year <= 2100:
+            start = timezone.localdate()
         try:
             days = min(MAX_PRICE_DAYS, max(1, int(request.query_params.get("days", 60))))
         except ValueError:

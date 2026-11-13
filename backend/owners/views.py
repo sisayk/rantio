@@ -67,14 +67,18 @@ class EmailCodeView(views.APIView):
         # sign-in limits (tries per day, the lock): the form signs them in, so it must not be an
         # easier way into an account than signing in is.
         owner = owner_login.find_owner(email)
-        if owner:
-            if not owner_login.can_send(owner):
+        try:
+            if owner:
+                if not owner_login.can_send(owner):
+                    return Response({"detail": "too_many"}, status=429)
+                owner_login.issue_code(owner, lang)
+                return Response({"sent": True})
+            if not email_check.can_send(email):
                 return Response({"detail": "too_many"}, status=429)
-            owner_login.issue_code(owner, lang)
-            return Response({"sent": True})
-        if not email_check.can_send(email):
-            return Response({"detail": "too_many"}, status=429)
-        email_check.send(email, str(request.data.get("name", ""))[:120], lang)
+            email_check.send(email, str(request.data.get("name", ""))[:120], lang)
+        except Exception:  # the mail server is down: say so instead of an error page
+            logger.exception("Could not send a sign-up code")
+            return Response({"detail": "email_failed"}, status=503)
         return Response({"sent": True})
 
 

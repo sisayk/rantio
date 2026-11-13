@@ -144,7 +144,10 @@ CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:3100,h
 # Rate limits (and anything else cached) are shared by all gunicorn workers and survive
 # worker restarts in production; manage.py createcachetable makes the table (deploy.sh).
 if not DEBUG:
-    CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache"}}
+    # MAX_ENTRIES: the default 300 is passed by a busy hour's rate-limit counters alone, and culling
+    # then throws out the oldest keys by name: the Beds24 cursor and sign-in counters among them.
+    CACHES = {"default": {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "django_cache",
+                          "OPTIONS": {"MAX_ENTRIES": 50000}}}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

@@ -14,6 +14,7 @@ countries) is converted at the ECB rate of the day the invoice is made. Invoices
 
 from __future__ import annotations
 
+import logging
 from datetime import date
 from decimal import Decimal
 
@@ -21,8 +22,10 @@ from django.db.models import Q
 from django.db import transaction
 
 from . import rates as fx
-from .models import Booking, Invoice, Owner, add_months, vat_on
+from .models import Booking, Cottage, Invoice, Owner, add_months, vat_on
 from .statements import owner_currency
+
+logger = logging.getLogger(__name__)
 
 ZERO = Decimal("0.00")
 
@@ -62,7 +65,9 @@ def lines_for(owner: Owner, month: date, rates: dict, currency: str = "EUR") -> 
             "amount": str(amount),
             "original": f"{b.commission} {b.currency}" if b.currency != currency else "",
         })
-    for cottage in owner.cottages.exclude(listing_started_on=None):
+    # An archived cottage has stopped: no yearly fee (as the card page says: stop before the free
+    # months end and there's no yearly fee). Paused ones are still listed and are charged.
+    for cottage in owner.cottages.exclude(listing_started_on=None).exclude(status=Cottage.Status.ARCHIVED):
         n = 1
         while (starts := cottage.listing_year_starts_on(n)) < end:
             fee = cottage.yearly_fee(n)
@@ -80,8 +85,9 @@ def lines_for(owner: Owner, month: date, rates: dict, currency: str = "EUR") -> 
 
 def _next_number(year: int) -> str:
     prefix = f"STG-{year}-"
-    last = Invoice.objects.filter(number__startswith=prefix).order_by("-number").values_list("number", flat=True).first()
-    return f"{prefix}{int(last.rsplit('-', 1)[1]) + 1 if last else 1:04d}"
+    # The highest number, as a number: sorted as text, STG-2026-9999 would come after STG-2026-10000.
+    used = [int(n.rsplit("-", 1)[1]) for n in Invoice.objects.filter(number__startswith=prefix).values_list("number", flat=True)]
+    return f"{prefix}{max(used, default=0) + 1:04d}"
 
 
 @transaction.atomic
@@ -115,4 +121,11 @@ def build_all(month: date) -> list[Invoice]:
     rates = fx.current()
     # Closed accounts too (is_host False, cottages kept): stays before the account was deleted are still owed.
     owners = Owner.objects.filter(Q(is_host=True) | Q(cottages__isnull=False)).distinct()
-    return [inv for owner in owners if (inv := build(owner, month, rates))]
+    built = []
+    for owner in owners:
+        try:
+            if inv := build(owner, month, rates):
+                built.append(inv)
+        except Exception:  # one owner's trouble must not leave everyone after them without an invoice
+            logger.exception("No invoice built for owner %s, %s", owner.pk, month)
+    return built

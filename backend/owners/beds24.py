@@ -13,6 +13,7 @@ tested on the real account. Without BEDS24_REFRESH_TOKEN nothing is sent.
 from __future__ import annotations
 
 import json
+import logging
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -24,6 +25,8 @@ from django.core.cache import cache
 from django.utils import timezone
 
 from .models import Cottage
+
+logger = logging.getLogger(__name__)
 
 TOKEN_CACHE = "beds24:token"
 PRICE_DAYS = 365
@@ -297,16 +300,21 @@ def pull_bookings() -> dict:
         if not c or check_out <= check_in:
             counts["skipped"] += 1
             continue
-        ext = f"b24:{b['id']}"
-        values = {
-            "cottage": c,
-            "channel": CHANNELS.get(str(b.get("channel") or "").lower(), Booking.Channel.OTHER),
-            "check_in": check_in,
-            "check_out": check_out,
-            "guests": max(1, int(b.get("numAdult") or 0) + int(b.get("numChild") or 0)),
-            "owner_payout": _payout(b, c),
-            "cancelled": b.get("status") == "cancelled",
-        }
+        try:
+            ext = f"b24:{b['id']}"
+            values = {
+                "cottage": c,
+                "channel": CHANNELS.get(str(b.get("channel") or "").lower(), Booking.Channel.OTHER),
+                "check_in": check_in,
+                "check_out": check_out,
+                "guests": max(1, int(b.get("numAdult") or 0) + int(b.get("numChild") or 0)),
+                "owner_payout": _payout(b, c),
+                "cancelled": b.get("status") == "cancelled",
+            }
+        except Exception:  # one odd row (no id, a price that isn't a number) must not stop the rest
+            logger.exception("Beds24 booking skipped: %r", {k: b.get(k) for k in ("id", "roomId", "arrival", "departure")})
+            counts["skipped"] += 1
+            continue
         existing = Booking.objects.filter(external_id=ext).first()
         if existing:
             for k, v in values.items():
@@ -393,7 +401,11 @@ def push_closed_dates(c: Cottage) -> tuple[int, int]:
 
 def sync_calendars() -> list[str]:
     """Every 15 minutes: bookings in, closed dates out. Returns a line per cottage."""
-    lines = [f"Bookings: {pull_bookings()}"]
+    try:
+        lines = [f"Bookings: {pull_bookings()}"]
+    except Exception as e:  # closed dates still go out when reading bookings fails
+        logger.exception("Beds24 bookings couldn't be read")
+        lines = [f"Bookings: failed ({e})"]
     for c in Cottage.objects.filter(beds24_room_id__isnull=False):
         try:
             closed, opened = push_closed_dates(c)

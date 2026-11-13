@@ -146,3 +146,221 @@ class DeletedAccountTests(TestCase):
         invoices = invoicing.build_all(date(2026, 11, 1))
         self.assertEqual([i.owner_id for i in invoices], [c.owner_id])
         self.assertIn("commission", [x["kind"] for x in invoices[0].lines])
+
+
+# ---------------------------------------------------------------------------------------------
+# Part 2: one bad input must not stop a job, and money isn't taken twice.
+
+from unittest import mock  # noqa: E402
+
+from django.utils import timezone  # noqa: E402
+
+from . import beds24, booking_emails, booking_requests, calendar, stripe_api  # noqa: E402
+from .models import CalendarBlock, Conversation, RequestStatus  # noqa: E402
+from .tests_calendar import D  # noqa: E402
+
+ICS = "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:a@x\r\nDTSTART;VALUE=DATE:{a}\r\nDTEND;VALUE=DATE:{b}\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+
+
+class FeedTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.c = make_cottage()
+        self.feed = CalendarFeed.objects.create(cottage=self.c, channel="airbnb", url="https://www.airbnb.fi/calendar/ical/1.ics")
+
+    def good(self):
+        return ICS.format(a=D(10).strftime("%Y%m%d"), b=D(12).strftime("%Y%m%d"))
+
+    def test_a_date_that_isnt_one_is_skipped(self):
+        self.assertIsNone(calendar._date("20261340"))
+        self.assertEqual(calendar.sync_feed(self.feed, get=lambda url: ICS.format(a="20261340", b="20261342")), 0)
+
+    def test_one_broken_calendar_doesnt_stop_the_others(self):
+        other = CalendarFeed.objects.create(cottage=self.c, channel="booking", url="https://admin.booking.com/ical/2.ics")
+
+        def get(url):
+            if "airbnb" in url:
+                raise RuntimeError("surprise")
+            return self.good()
+
+        self.assertEqual(calendar.sync_all(get=get), (1, 1))
+        self.assertTrue(CalendarBlock.objects.filter(feed=other).exists())
+
+    def test_the_calendar_read_longest_ago_goes_first(self):
+        other = CalendarFeed.objects.create(cottage=self.c, channel="booking", url="https://admin.booking.com/ical/2.ics")
+        CalendarFeed.objects.filter(pk=self.feed.pk).update(last_synced_at=timezone.now())
+        seen = []
+        calendar.sync_all(get=lambda url: seen.append(url) or self.good())
+        self.assertEqual(seen[0], other.url)
+
+    def test_a_suddenly_empty_calendar_keeps_its_dates_until_it_says_so_twice(self):
+        calendar.sync_feed(self.feed, get=lambda url: self.good())
+        empty = "BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n"
+        calendar.sync_feed(self.feed, get=lambda url: empty)
+        self.assertEqual(CalendarBlock.objects.filter(feed=self.feed).count(), 1)
+        calendar.sync_feed(self.feed, get=lambda url: empty)
+        self.assertEqual(CalendarBlock.objects.filter(feed=self.feed).count(), 0)
+
+    def test_a_site_sending_a_byte_at_a_time_is_given_up_on(self):
+        class Slow:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read1(self, n):
+                return b"x"
+
+        clock = iter(range(0, 10_000, 10))
+        with mock.patch.object(calendar, "check_address"), mock.patch.object(calendar._opener, "open", return_value=Slow()), \
+                mock.patch.object(calendar.time, "monotonic", side_effect=lambda: next(clock)):
+            with self.assertRaises(calendar.FeedError):
+                calendar.fetch("https://slow.example/cal.ics")
+
+
+class BookingEmailTests(TestCase):
+    def test_an_unknown_charset_or_a_nul_byte_is_still_stored(self):
+        raw = (b"From: a@example.com\r\nTo: bookings@rantio.fi\r\nSubject: Varaus\x00\r\nMessage-ID: <1@x>\r\n"
+               b'Content-Type: text/plain; charset="nope-8"\r\n\r\nHei \x00 maailma\r\n')
+        email = booking_emails.ingest(raw)
+        self.assertNotIn("\x00", email.body + email.subject + email.raw)
+        self.assertIn("maailma", email.body)
+
+    def test_only_a_handful_of_recipients_are_looked_at_for_the_cottage_code(self):
+        c = make_cottage()
+        guesses = ", ".join(f"bookings+{i:08x}@rantio.fi" for i in range(50))
+        raw = f"From: x@example.com\r\nTo: {guesses}, {c.forwarding_address}\r\nSubject: s\r\n\r\nbody\r\n"
+        self.assertIsNone(booking_emails.find_cottage(booking_emails.to_message(raw), "body")[0])
+        raw = f"From: x@example.com\r\nTo: {c.forwarding_address}\r\nSubject: s\r\n\r\nbody\r\n"
+        self.assertEqual(booking_emails.find_cottage(booking_emails.to_message(raw), "body")[0], c)
+
+
+class Beds24Tests(TestCase):
+    def test_one_odd_booking_row_is_skipped_and_the_rest_come_in(self):
+        cache.clear()
+        c = make_cottage()
+        Cottage.objects.filter(pk=c.pk).update(beds24_property_id=1, beds24_room_id=7)
+        rows = [
+            {"roomId": 7, "arrival": D(5).isoformat(), "departure": D(8).isoformat(), "numAdult": "two"},  # no id, bad number
+            {"id": 2, "roomId": 7, "arrival": D(10).isoformat(), "departure": D(12).isoformat(), "numAdult": 2, "price": 300},
+        ]
+        with mock.patch.object(beds24, "_pages", return_value=rows):
+            counts = beds24.pull_bookings()
+        self.assertEqual((counts["new"], counts["skipped"]), (1, 1))
+
+    def test_closed_dates_still_go_out_when_bookings_cant_be_read(self):
+        c = make_cottage()
+        Cottage.objects.filter(pk=c.pk).update(beds24_property_id=1, beds24_room_id=7)
+        with mock.patch.object(beds24, "pull_bookings", side_effect=RuntimeError("down")), \
+                mock.patch.object(beds24, "push_closed_dates", return_value=(1, 0)) as push:
+            lines = beds24.sync_calendars()
+        self.assertTrue(push.called)
+        self.assertIn("failed", lines[0])
+
+
+class StripeTests(TestCase):
+    def setUp(self):
+        self.c = make_cottage()
+        self.inv = Invoice.objects.create(owner=self.c.owner, month=date(2026, 11, 1), number="STG-2026-0007",
+                                          lines=[{"kind": "commission", "description": "x", "amount": "10.00"}],
+                                          subtotal=Decimal("10.00"), vat=Decimal("2.55"), total=Decimal("12.55"))
+
+    @override_settings(STRIPE_SECRET_KEY="sk_test_x")
+    def test_no_answer_from_stripe_is_a_stripe_error(self):
+        with mock.patch("urllib.request.urlopen", side_effect=TimeoutError("timed out")):
+            with self.assertRaises(stripe_api.StripeError):
+                stripe_api._post("/invoices", {})
+            with self.assertRaises(stripe_api.StripeError):
+                stripe_api.get("/invoices/in_1")
+
+    @override_settings(STRIPE_SECRET_KEY="sk_test_x")
+    def test_an_interrupted_send_is_finished_not_charged_again(self):
+        posts = []
+
+        def post(path, data=None, idempotency_key=None):
+            posts.append(path)
+            if path == "/customers":
+                return {"id": "cus_1"}
+            if path == "/invoices":
+                return {"id": "in_1"}
+            if path.endswith("/finalize"):
+                raise stripe_api.StripeError("no answer")  # Stripe did it, the answer was lost
+            return {"id": "x"}
+
+        with mock.patch.object(stripe_api, "_post", side_effect=post), self.assertRaises(stripe_api.StripeError):
+            stripe_api.send(self.inv)
+        self.inv.refresh_from_db()
+        self.assertEqual((self.inv.stripe_invoice_id, self.inv.status), ("in_1", "draft"))
+        posts.clear()
+        open_invoice = {"id": "in_1", "status": "open", "collection_method": "send_invoice", "hosted_invoice_url": "https://pay/1"}
+        with mock.patch.object(stripe_api, "_post", side_effect=post), mock.patch.object(stripe_api, "get", return_value=open_invoice):
+            stripe_api.send(self.inv)
+        self.assertEqual(posts, [])  # nothing new was made in Stripe
+        self.inv.refresh_from_db()
+        self.assertEqual((self.inv.status, self.inv.stripe_url), ("sent", "https://pay/1"))
+
+
+class RequestRaceTests(TestCase):
+    def test_a_request_declined_a_moment_ago_cant_also_be_accepted(self):
+        c = make_cottage()
+        conv = Conversation.objects.create(
+            cottage=c, channel="owner", guest_name="Erik Lund", guest_email="erik@example.se", guest_language="sv",
+            check_in=D(30), check_out=D(33), guests=2, token="t" * 20, request_status=RequestStatus.PENDING,
+        )
+        stale = Conversation.objects.get(pk=conv.pk)  # what the other request read before the decline
+        booking_requests.decline(conv)
+        with self.assertRaises(booking_requests.RequestError):
+            booking_requests.accept(stale, Decimal("300.00"))
+        self.assertFalse(Booking.objects.filter(cottage=c).exists())
+
+
+class InvoiceRuleTests(TestCase):
+    def test_an_archived_cottage_has_no_yearly_fee(self):
+        c = make_cottage(listing_started_on=date(2026, 8, 15), trial_months=3)
+        self.assertEqual([x["kind"] for x in invoicing.build(c.owner, date(2026, 11, 1)).lines], ["yearly_fee"])
+        Invoice.objects.all().delete()
+        Cottage.objects.filter(pk=c.pk).update(status=Cottage.Status.ARCHIVED)
+        self.assertIsNone(invoicing.build(Owner.objects.get(pk=c.owner_id), date(2026, 11, 1)))
+
+    def test_invoice_numbers_count_past_9999(self):
+        c = make_cottage()
+        for n in ("STG-2026-9999", "STG-2026-10000"):
+            Invoice.objects.create(owner=c.owner, month=date(2026, int(n[-1]) + 1, 1), number=n, lines=[], subtotal=0, vat=0, total=0)
+        self.assertEqual(invoicing._next_number(2026), "STG-2026-10001")
+
+    def test_one_owners_trouble_doesnt_stop_the_others_invoices(self):
+        a = make_cottage(listing_started_on=date(2026, 8, 15), trial_months=3)
+        b = make_cottage(email="b@example.fi", listing_started_on=date(2026, 8, 15), trial_months=3)
+        real = invoicing.build
+
+        def build(owner, month, rates=None):
+            if owner.pk == a.owner_id:
+                raise RuntimeError("bad data")
+            return real(owner, month, rates)
+
+        with mock.patch.object(invoicing, "build", side_effect=build):
+            self.assertEqual([i.owner_id for i in invoicing.build_all(date(2026, 11, 1))], [b.owner_id])
+
+
+class BadInputTests(TestCase):
+    def test_dates_far_outside_any_calendar_are_refused_not_an_error_page(self):
+        c = make_cottage()
+        for a, b in (("0001-01-01", "0001-01-03"), ("9999-12-25", "9999-12-28")):
+            res = self.client.get(f"/api/book/{c.booking_link_token}/quote/?check_in={a}&check_out={b}")
+            self.assertEqual(res.status_code, 400)
+        self.client.force_login(owner_login.user_for(c.owner))
+        for when in ("9999-12-01", "0001-01-01"):
+            self.assertEqual(self.client.get(f"/api/owner/calendar/?from={when}").status_code, 200)
+            self.assertEqual(self.client.get(f"/api/owner/cottages/{c.pk}/prices/?from={when}").status_code, 200)
+
+    def test_a_monitor_reading_with_an_impossible_time_is_dropped(self):
+        from . import monitor
+
+        self.assertIsNone(monitor._clean({"at": "2026-13-45T00:00:00"}, timezone.now()))
+
+    def test_the_code_endpoint_says_so_when_mail_is_down(self):
+        cache.clear()
+        with mock.patch("owners.email_check.send_mail", side_effect=OSError("down")):
+            res = self.client.post("/api/signups/email-code/", {"email": "new@example.fi"}, content_type="application/json")
+        self.assertEqual((res.status_code, res.json()), (503, {"detail": "email_failed"}))

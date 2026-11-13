@@ -14,6 +14,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db import IntegrityError, transaction
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -279,11 +280,15 @@ class GuestReviewView(APIView):
         v = data.validated_data
         if Review.objects.filter(conversation=c).exists():
             return Response({"detail": "already_reviewed"}, status=status.HTTP_400_BAD_REQUEST)
-        r = Review.objects.create(
-            conversation=c, cottage=c.cottage, rating=v["rating"], cleanliness=v.get("cleanliness"),
-            location=v.get("location"), value=v.get("value"), comment=v.get("comment", "").strip(),
-            language=c.guest_language,
-        )
+        try:
+            with transaction.atomic():
+                r = Review.objects.create(
+                    conversation=c, cottage=c.cottage, rating=v["rating"], cleanliness=v.get("cleanliness"),
+                    location=v.get("location"), value=v.get("value"), comment=v.get("comment", "").strip(),
+                    language=c.guest_language,
+                )
+        except IntegrityError:  # the same review sent twice at once
+            return Response({"detail": "already_reviewed"}, status=status.HTTP_400_BAD_REQUEST)
         c.review = r
         owner = c.cottage.owner
         name = c.guest_name.split()[0] if c.guest_name else ""
