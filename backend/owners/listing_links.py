@@ -14,7 +14,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import calendar
+from . import calendar, limits
 from .calendar import FEED_CHANNELS, FeedError
 from .models import Booking, CalendarFeed, Cottage, ListingLink
 from .portal import IsOwner
@@ -190,6 +190,8 @@ class OwnerLinksView(APIView):
             return Response({"url": ["already_added"]}, status=status.HTTP_400_BAD_REQUEST)
         if cottage.links.count() >= MAX_LINKS:
             return Response({"url": ["too_many"]}, status=status.HTTP_400_BAD_REQUEST)
+        if data.validated_data.get("calendar_url") and not limits.allow(f"feed-reads:{request.user.owner.pk}", 30, 3600):
+            return Response({"detail": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         with transaction.atomic():
             link = ListingLink.objects.create(cottage=cottage, site=detect_site(url), url=url)
             if link.site == "nettimokki":
@@ -213,6 +215,8 @@ class OwnerLinkView(APIView):
         link = self.link(request, pk)
         data = CalendarSerializer(data=request.data)
         data.is_valid(raise_exception=True)
+        if data.validated_data["calendar_url"] and not limits.allow(f"feed-reads:{request.user.owner.pk}", 30, 3600):
+            return Response({"detail": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         set_calendar(link, data.validated_data["calendar_url"])
         return Response(link_row(link))
 

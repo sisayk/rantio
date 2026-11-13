@@ -364,3 +364,76 @@ class BadInputTests(TestCase):
         with mock.patch("owners.email_check.send_mail", side_effect=OSError("down")):
             res = self.client.post("/api/signups/email-code/", {"email": "new@example.fi"}, content_type="application/json")
         self.assertEqual((res.status_code, res.json()), (503, {"detail": "email_failed"}))
+
+
+# ---------------------------------------------------------------------------------------------
+# Part 3: ceilings on what one account, or everyone together, can make Rantio send or pay for.
+
+class LimitTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_the_counter_allows_a_number_of_calls_per_window(self):
+        from . import limits
+
+        self.assertEqual([limits.allow("t", 2, 60) for _ in range(3)], [True, True, False])
+
+    def test_answers_in_a_row_are_one_email_to_the_guest(self):
+        from django.core import mail
+
+        from . import messaging
+        from .models import Message
+
+        c = make_cottage()
+        conv = Conversation.objects.create(cottage=c, channel="direct", guest_name="Erik Lund", guest_email="erik@example.se",
+                                           guest_language="sv", token="t" * 20)
+        for text in ("Hej!", "Och en sak till"):
+            messaging.add(conv, Message.Sender.HOST, text)
+        self.assertEqual(len([m for m in mail.outbox if m.to == ["erik@example.se"]]), 1)
+
+    def test_host_replies_have_a_ceiling_per_account(self):
+        from . import limits
+
+        c = make_cottage()
+        conv = Conversation.objects.create(cottage=c, channel="direct", guest_name="Erik", guest_email="e@example.se",
+                                           guest_language="sv", token="u" * 20)
+        self.client.force_login(owner_login.user_for(c.owner))
+        with mock.patch.object(limits, "allow", return_value=False):
+            res = self.client.post(f"/api/owner/conversations/{conv.pk}/", {"body": "Hi"}, content_type="application/json")
+        self.assertEqual(res.status_code, 429)
+
+    def test_a_flickering_sensor_is_told_about_a_few_times_not_every_minute(self):
+        from . import monitor
+        from .models import MonitorDevice
+
+        d = MonitorDevice.objects.create(serial="MM-1", cottage=make_cottage())
+        with mock.patch.object(monitor, "_tell") as tell:
+            for _ in range(10):
+                monitor._start(d, "leak", "wet")
+                monitor._end(d, "leak", "leak_end")
+        self.assertEqual(tell.call_count, 4)
+
+    def test_new_cottages_get_a_longer_forwarding_code_and_old_ones_still_work(self):
+        c = make_cottage()
+        self.assertEqual(len(c.inbound_code), 16)
+        old = make_cottage(email="old@example.fi", inbound_code="3f9a1c2e")
+        for cottage in (c, old):
+            raw = f"From: x@example.com\r\nTo: {cottage.forwarding_address}\r\nSubject: s\r\n\r\nbody\r\n"
+            self.assertEqual(booking_emails.find_cottage(booking_emails.to_message(raw), "body")[0], cottage)
+
+    def test_health_says_so_when_the_database_doesnt_answer(self):
+        self.assertEqual(self.client.get("/api/health/").json()["ok"], True)
+        with mock.patch("django.db.backends.utils.CursorWrapper.execute", side_effect=RuntimeError("down")):
+            self.assertEqual(self.client.get("/api/health/").status_code, 503)
+
+    def test_a_profile_photo_gets_a_name_nobody_can_guess(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        o = owner_login.new_account("p@example.com")
+        self.client.force_login(owner_login.user_for(o))
+        png = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
+        with self.settings(MEDIA_ROOT="/tmp/claude-0/audit/test-media"):
+            res = self.client.post("/api/owner/me/photo/", {"file": SimpleUploadedFile("me.png", png, "image/png")})
+            self.assertEqual(res.status_code, 201, res.content)
+            o.refresh_from_db()
+            self.assertRegex(o.photo.name, r"owners/\d{4}/[0-9a-f]{16}\.png$")

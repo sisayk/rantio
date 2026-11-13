@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import assistant, messaging, reviews
+from . import assistant, limits, messaging, reviews
 from .calendar_views import request_row
 from .models import Conversation, Language, Message, RequestStatus
 from .portal import IsOwner
@@ -132,6 +132,10 @@ class EnquiryDraftView(APIView):
     def post(self, request):
         data = EnquiryDraftSerializer(data=request.data)
         data.is_valid(raise_exception=True)
+        # Open to anyone, and each call costs money: a ceiling for everyone together per day, on
+        # top of the per-visitor limit (which many addresses get around).
+        if not limits.allow("guest-ai-drafts", 1000, 24 * 3600):
+            return Response({"detail": "ai_failed"}, status=status.HTTP_502_BAD_GATEWAY)
         try:
             text = assistant.suggest_enquiry(**data.validated_data)
         except assistant.NotConfigured:
@@ -215,6 +219,10 @@ class OwnerThreadView(APIView):
         c = self.get_conversation(request, pk)
         data = BodySerializer(data=request.data)
         data.is_valid(raise_exception=True)
+        # Each reply emails the guest, at an address nobody has checked: a ceiling per account, so
+        # an account can't be used to send mail from Rantio's name to whoever it likes.
+        if not limits.allow(f"host-replies:{request.user.owner.pk}", 120, 3600):
+            return Response({"detail": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         messaging.add(c, Message.Sender.HOST, data.validated_data["body"])
         return Response(thread(self.get_conversation(request, pk), "host"), status=status.HTTP_201_CREATED)
 

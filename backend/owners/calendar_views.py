@@ -25,7 +25,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from . import booking_requests, calendar, messaging, pricing, reviews
+from . import booking_requests, calendar, limits, messaging, pricing, reviews
 from .booking_requests import RequestError
 from .calendar import FEED_CHANNELS, FeedError
 from .models import Booking, CalendarBlock, CalendarFeed, Conversation, Cottage, Language, RequestStatus, new_link_token
@@ -321,6 +321,9 @@ class OwnerFeedsView(APIView):
         data.is_valid(raise_exception=True)
         v = data.validated_data
         cottage = own_cottage(request, v["cottage"])
+        # Each one makes the server read a web address the owner typed, while they wait.
+        if not limits.allow(f"feed-reads:{request.user.owner.pk}", 30, 3600):
+            return Response({"detail": "limit"}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         feed, _ = CalendarFeed.objects.update_or_create(cottage=cottage, channel=v["channel"], defaults={"url": v["url"]})
         try:
             calendar.sync_feed(feed)

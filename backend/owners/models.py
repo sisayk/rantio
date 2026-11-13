@@ -121,7 +121,8 @@ def add_months(day: date, months: int) -> date:
 
 
 def new_inbound_code() -> str:
-    return secrets.token_hex(4)
+    """The key in a cottage's bookings+<code>@ address. 64 bits (older cottages have 32)."""
+    return secrets.token_hex(8)
 
 
 def new_link_token() -> str:

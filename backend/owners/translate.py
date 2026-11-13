@@ -18,7 +18,7 @@ from django.conf import settings
 from django.db import close_old_connections, transaction
 from django.utils import timezone
 
-from . import assistant
+from . import assistant, limits
 from .models import Cottage, Language
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,11 @@ def plan(c: Cottage, source: str) -> str | None:
     langs = [lang for lang in LANGS if lang not in own]
     if not langs:
         c.translating = {}
+        return None
+    # Each job is up to ten calls to a paid API: a ceiling per cottage per day (a normal day of
+    # editing is a handful), so a script saving two texts in turn can't run up a bill.
+    if c.pk and not limits.allow(f"translate:{c.pk}", 30, 24 * 3600):
+        logger.warning("Translation limit reached for cottage %s", c.pk)
         return None
     job = uuid.uuid4().hex
     c.translating = {"job": job, "from": source, "langs": langs, "started": timezone.now().isoformat()}

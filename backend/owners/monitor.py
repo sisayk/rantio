@@ -42,7 +42,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import app
+from . import app, limits
 from .models import Cottage, MonitorAlert, MonitorDevice, MonitorReading
 from .monitor_texts import ALERTS
 from .portal import IsOwner
@@ -136,11 +136,18 @@ def _open(d: MonitorDevice, kind: str) -> MonitorAlert | None:
     return d.alerts.filter(kind=kind, ended_at__isnull=True).first()
 
 
+def _may_tell(d: MonitorDevice, kind: str) -> bool:
+    """A sensor flickering on and off is told about a few times an hour, not every minute
+    (the alerts themselves are all kept and shown in the app)."""
+    return limits.allow(f"monitor-tell:{d.pk}:{kind}", 4, 3600)
+
+
 def _start(d: MonitorDevice, kind: str, value: str, key: str | None = None, **vars) -> None:
     if _open(d, kind):
         return
     MonitorAlert.objects.create(device=d, kind=kind, value=value[:60])
-    _tell(d, key or kind, email=kind in EMAILED, value=value, **vars)
+    if _may_tell(d, kind):
+        _tell(d, key or kind, email=kind in EMAILED, value=value, **vars)
 
 
 def _end(d: MonitorDevice, kind: str, key: str | None = None, **vars) -> None:
@@ -149,7 +156,7 @@ def _end(d: MonitorDevice, kind: str, key: str | None = None, **vars) -> None:
         return
     a.ended_at = timezone.now()
     a.save(update_fields=["ended_at"])
-    if key:
+    if key and _may_tell(d, kind):
         _tell(d, key, **vars)
 
 

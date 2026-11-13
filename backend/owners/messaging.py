@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 
-from . import app
+from . import app, limits
 from .models import Booking, Conversation, Cottage, Message
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,8 @@ def notify_guest(c: Conversation, text: str) -> None:
     Signed by whoever answers: the owner, or the Rantio team for an example stay."""
     if not c.replies_here:
         return  # they read it on the booking site
-    if c.guest_email:
+    # Several answers in a row are one email: the page shows them all.
+    if c.guest_email and limits.allow(f"guest-reply-mail:{c.pk}", 1, 60):
         templates = GUEST_REPLY if answered_by(c) == "owner" else GUEST_REPLY_TEAM
         _send(templates, c.guest_language, [c.guest_email], name=c.guest_name.split()[0], cottage=cottage_label(c),
               text=_excerpt(text), link=guest_link(c))

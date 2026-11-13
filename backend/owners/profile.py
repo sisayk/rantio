@@ -8,6 +8,7 @@ the customer's default, so the next invoice is charged to it.
 import logging
 import re
 
+import secrets
 from django.conf import settings
 from django.utils import timezone
 from django.views.decorators.debug import sensitive_variables
@@ -40,7 +41,7 @@ class ProfilePhotoView(APIView):
         upload.seek(0)
         if not kind:
             return Response({"file": ["not_image"]}, status=status.HTTP_400_BAD_REQUEST)
-        upload.name = f"photo.{'jpg' if kind == 'jpeg' else kind}"
+        upload.name = f"{secrets.token_hex(8)}.{'jpg' if kind == 'jpeg' else kind}"  # not guessable
         o = request.user.owner
         old = o.photo.name if o.photo else ""
         o.photo = upload

@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 
+import secrets
 from decimal import Decimal
 
 from django import forms
@@ -422,11 +423,18 @@ class HeroSlideForm(forms.ModelForm):
         if new_image:
             try:
                 media_checks.check_image(image)
+                # Stored under a name of ours with the ending its content has: a file called
+                # x.html with a photo's first bytes would otherwise be served as a web page.
+                ext = media_checks.image_type(image.read(16))
+                image.seek(0)
+                image.name = f"slide-{secrets.token_hex(6)}.{'jpg' if ext == 'jpeg' else ext}"
             except forms.ValidationError as err:
                 self.add_error("image", err)
         if new_video:
             try:
                 self.instance.video_seconds = Decimal(f"{media_checks.check_video(video):.2f}")
+                ending = video.name.rsplit(".", 1)[-1].lower() if "." in video.name else ""
+                video.name = f"slide-{secrets.token_hex(6)}.{ending if ending in ('mp4', 'mov', 'm4v') else 'mp4'}"
             except forms.ValidationError as err:
                 self.add_error("video", err)
         # The file decides the kind, so a video added while "Photo" is still selected becomes

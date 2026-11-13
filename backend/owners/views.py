@@ -328,6 +328,13 @@ def health(request):
     from django.http import JsonResponse
 
     body = {"ok": True}
+    try:  # "ok" means the database answers too, so the uptime monitor notices when it doesn't
+        from django.db import connection
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+    except Exception:
+        return JsonResponse({"ok": False}, status=503)
     try:
         with open(settings.DEPLOY_STATUS_FILE) as f:
             data = json.load(f)

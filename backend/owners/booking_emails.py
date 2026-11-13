@@ -50,7 +50,7 @@ GUESTS = re.compile(r"(\d{1,2})\s*(?:henkilö|hlö|aikuis|vieras|vierasta|guests
 GUESTS_LABEL = re.compile(r"(?:henkilömäärä|henkilöitä|vieraita|guests|personer|antal gäster)\s*:?\s*(\d{1,2})", re.I)
 REFERENCE = re.compile(r"(?:varausnumero|varaustunnus|varaus\s*nro|tilausnumero|booking (?:number|id|reference)|bokningsnummer)\s*:?\s*#?\s*([A-Z0-9-]{3,30})", re.I)
 AMOUNT = re.compile(r"(?:yhteensä|hinta|kokonaishinta|total|summa|pris)\s*:?\s*(\d[\d  ]*(?:[.,]\d{1,2})?)\s*(?:€|eur)", re.I)
-PLUS_CODE = re.compile(r"\+([0-9a-f]{8})@", re.I)
+PLUS_CODE = re.compile(r"\+([0-9a-f]{8}(?:[0-9a-f]{8})?)@", re.I)
 MAX_RECIPIENTS = 20
 NETTIMOKKI_ID = re.compile(r"nettimokki\.com/\S*?(\d{3,})")
 
